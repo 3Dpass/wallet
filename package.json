@@ -1,0 +1,38 @@
+{
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "start": "remix-serve build",
+    "build": "npm run build:css && remix build",
+    "build:css": "tailwindcss -m -i ./styles/app.css -o app/styles/app.css",
+    "dev": "concurrently \"npm run dev:css\" \"remix dev\"",
+    "dev:css": "tailwindcss -w -i ./styles/app.css -o app/styles/app.css"
+  },
+  "dependencies": {
+    "@blueprintjs/core": "4.5.1",
+    "@polkadot/api": "8.8.2",
+    "@react-three/drei": "9.13.2",
+    "@react-three/fiber": "8.0.27",
+    "@remix-run/node": "1.6.0",
+    "@remix-run/react": "1.6.0",
+    "@remix-run/serve": "1.6.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "three": "0.141.0"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "1.6.0",
+    "@remix-run/eslint-config": "1.6.0",
+    "@types/react": "17.0.45",
+    "@types/react-dom": "17.0.17",
+    "autoprefixer": "10.4.7",
+    "concurrently": "7.2.2",
+    "eslint": "8.15.0",
+    "postcss": "8.4.14",
+    "tailwindcss": "3.1.4",
+    "typescript": "4.6.4"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
