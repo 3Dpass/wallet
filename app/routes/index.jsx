@@ -13,6 +13,11 @@ import {
 import stylesBlueprint from "@blueprintjs/core/lib/css/blueprint.css";
 import {useEffect, useState} from "react";
 import {Canvas} from "@react-three/fiber";
+import {ApiPromise, WsProvider} from "@polkadot/api";
+import {Rock} from "../components/Rock";
+import {OBJLoader} from "three-stdlib/loaders/OBJLoader.cjs";
+
+const BLOCK_TO_LOAD = 8;
 
 export function links() {
     return [
@@ -44,22 +49,35 @@ const rpc = {
     },
 }
 
-const loadBlocks = async () => {
-    const {ApiPromise, WsProvider} = require("@polkadot/api");
-    // const wsProvider = new WsProvider("wss://rpc.3dpass.org");
-    const wsProvider = new WsProvider("ws://127.0.0.1:9944");
-    const api = await ApiPromise.create({provider: wsProvider, rpc});
+const loadBlock = async (provider, hash) => {
+    const api = await ApiPromise.create({provider: provider, rpc});
+    let signedBlock;
 
-    console.log(api.rpc.chain);
-    const signedBlock = await api.rpc.chain.getBlock();
-    const blockHash = signedBlock.block.header.hash.toHex();
+    if (hash === undefined) {
+        signedBlock = await api.rpc.chain.getBlock();
+    } else {
+        signedBlock = await api.rpc.chain.getBlock(hash);
+    }
+    const block = signedBlock.block;
+    const blockHash = block.header.hash.toHex();
     const data = await api.rpc.poscan.getMiningObject(blockHash);
+    return {
+        "block": block,
+        "hash": blockHash,
+        "data": data,
+    }
+}
 
-    return [{
-        number: signedBlock.block.header.number.toNumber(),
-        hash: blockHash,
-        data: data,
-    }];
+const loadBlocks = async (provider) => {
+    const blocks = [];
+    const block = await loadBlock(provider);
+    blocks.push(block)
+    for (let i = 0; i < BLOCK_TO_LOAD - 1; i++) {
+        let parent_hash = blocks[blocks.length - 1].block.header.parentHash.toHex();
+        let next_block = await loadBlock(provider, parent_hash);
+        blocks.push(next_block);
+    }
+    return blocks;
 };
 
 export default function Index() {
@@ -67,17 +85,16 @@ export default function Index() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const OBJLoader = import("three/examples/jsm/loaders/OBJLoader.js");
-        OBJLoader.then((module) => {
-            loadBlocks().then((loaded_blocks) => {
-                loaded_blocks = loaded_blocks.map((block) => {
-                    const loader = new module.OBJLoader();
-                    block.object = loader.parse(block.data);
-                    return block;
-                });
-                setBlocks(loaded_blocks);
-                setLoading(false);
+        // const wsProvider = new WsProvider("wss://rpc.3dpass.org");
+        const wsProvider = new WsProvider("ws://127.0.0.1:9944");
+        loadBlocks(wsProvider).then((loaded_blocks) => {
+            loaded_blocks = loaded_blocks.map((block) => {
+                const loader = new OBJLoader();
+                block.object = loader.parse(block.data).children[0];
+                return block;
             });
+            setBlocks(loaded_blocks);
+            setLoading(false);
         });
     }, []);
 
@@ -92,20 +109,15 @@ export default function Index() {
                     </NavbarGroup>
                 </NavbarGroup>
             </Navbar>
-            <div className={"grid gap-2 grid-cols-4 p-4"}>
-                {loading && <Spinner style={{margin: 50}}/>}
+            <div className={"grid gap-4 grid-cols-2 lg:grid-cols-4 p-4"}>
+                {loading && <Spinner className={"p-10"}/>}
                 {!loading && blocks.map((block) => (
                     <div key={block.hash}>
                         <Card elevation={Elevation.TWO}>
-                            <h3>Block: {block.number}</h3>
+                            <div className={"mb-3"}>Block: {block.block.header.number.toNumber()}</div>
                             <div style={{height: 300}}>
-                                <Canvas>
-                                    <ambientLight intensity={0.5}/>
-                                    <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1}/>
-                                    <pointLight position={[-10, -10, -10]}/>
-                                    <mesh>
-                                        <primitive object={block.object} position={[0, 0, -1]}/>
-                                    </mesh>
+                                <Canvas camera={{fov: 30, near: 0.1, far: 1000, position: [0, 0, 10]}}>
+                                    <Rock geometry={block.object.geometry}/>
                                 </Canvas>
                             </div>
                         </Card>
