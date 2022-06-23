@@ -1,13 +1,4 @@
-import {
-  Alignment,
-  Button,
-  Classes,
-  Navbar,
-  NavbarDivider,
-  NavbarGroup,
-  NavbarHeading,
-  Spinner,
-} from "@blueprintjs/core";
+import { Alignment, Button, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Spinner } from "@blueprintjs/core";
 import stylesBlueprint from "@blueprintjs/core/lib/css/blueprint.css";
 import { useEffect, useState } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -105,11 +96,7 @@ export default function Index() {
           <NavbarHeading>3DP Explorer</NavbarHeading>
           <NavbarDivider />
           <NavbarGroup>
-            <Button
-              className={Classes.MINIMAL}
-              icon="code-block"
-              text="Blocks"
-            />
+            <Button className={Classes.MINIMAL} icon="code-block" text="Blocks" />
           </NavbarGroup>
         </NavbarGroup>
       </Navbar>

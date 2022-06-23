@@ -15,12 +15,7 @@ export function Rock({ geometry }) {
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
       <pointLight position={[-10, -10, -10]} />
       <mesh ref={rock} geometry={geometry}>
-        <meshStandardMaterial
-          color="#89CFF0"
-          roughness={0.1}
-          wireframe={false}
-          side={THREE.DoubleSide}
-        />
+        <meshStandardMaterial color="#89CFF0" roughness={0.1} wireframe={false} side={THREE.DoubleSide} />
       </mesh>
     </>
   );
