@@ -16,6 +16,7 @@ import {Canvas} from "@react-three/fiber";
 import {ApiPromise, WsProvider} from "@polkadot/api";
 import {Rock} from "../components/Rock";
 import {OBJLoader} from "three-stdlib/loaders/OBJLoader.cjs";
+import Block from "../components/Block";
 
 const BLOCK_TO_LOAD = 8;
 
@@ -113,14 +114,7 @@ export default function Index() {
             <div className={"grid gap-4 grid-cols-2 lg:grid-cols-4 p-4"}>
                 {!loading && blocks.map((block) => (
                     <div key={block.hash}>
-                        <Card elevation={Elevation.TWO}>
-                            <div className={"mb-3"}>Block: {block.block.header.number.toNumber()}</div>
-                            <div style={{height: 300}}>
-                                <Canvas camera={{fov: 30, near: 0.1, far: 1000, position: [0, 0, 10]}}>
-                                    <Rock geometry={block.object.geometry}/>
-                                </Canvas>
-                            </div>
-                        </Card>
+                        <Block block={block}/>
                     </div>
                 ))}
             </div>
