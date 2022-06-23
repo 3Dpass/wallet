@@ -1,9 +1,7 @@
 import {
     Alignment,
     Button,
-    Card,
     Classes,
-    Elevation,
     Navbar,
     NavbarDivider,
     NavbarGroup,
@@ -12,9 +10,7 @@ import {
 } from "@blueprintjs/core";
 import stylesBlueprint from "@blueprintjs/core/lib/css/blueprint.css";
 import {useEffect, useState} from "react";
-import {Canvas} from "@react-three/fiber";
 import {ApiPromise, WsProvider} from "@polkadot/api";
-import {Rock} from "../components/Rock";
 import {OBJLoader} from "three-stdlib/loaders/OBJLoader.cjs";
 import Block from "../components/Block";
 
