@@ -578,16 +578,12 @@ video {
   gap: 1rem;
 }
 
-.p-4 {
-  padding: 1rem;
-}
-
-.p-10 {
-  padding: 2.5rem;
-}
-
 .p-20 {
   padding: 5rem;
+}
+
+.p-4 {
+  padding: 1rem;
 }
 
 @media (min-width: 1024px) {
