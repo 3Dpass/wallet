@@ -81,12 +81,11 @@ export default function Index() {
       </Navbar>
       {progress < 1.0 && <ProgressBar value={progress} />}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 p-4">
-        {progress == 1.0 &&
-          blocks.map((block) => (
-            <div key={block.blockHash}>
-              <Block block={block} />
-            </div>
-          ))}
+        {blocks.map((block) => (
+          <div key={block.blockHash}>
+            <Block block={block} />
+          </div>
+        ))}
       </div>
     </div>
   );
