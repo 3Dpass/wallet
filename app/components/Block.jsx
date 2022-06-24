@@ -20,13 +20,9 @@ export default function Block({ block }) {
           <Rock geometry={block.object.geometry} />
         </Canvas>
       </div>
-      <code className="mb-3 overflow-x-auto block text-center text-gray-500">
+      <code className="mb-3 overflow-x-auto block text-center text-xs text-gray-500">
         {block.objectHashes.map((hash, index) => {
-          return (
-            <div key={index} className="text-xs">
-              {hash}
-            </div>
-          );
+          return <div key={index}>{hash}</div>;
         })}
       </code>
     </Card>
