@@ -5,7 +5,7 @@ import { Rock } from "./Rock";
 export default function Block({ block }) {
   return (
     <Card elevation={Elevation.TWO}>
-      <div className={"text-center"}>
+      <div className="text-center">
         Block: <strong>{block.block.header.number.toNumber()}</strong>
       </div>
       <div style={{ height: 300 }}>
@@ -20,10 +20,10 @@ export default function Block({ block }) {
           <Rock geometry={block.object.geometry} />
         </Canvas>
       </div>
-      <code className={"mb-3 overflow-x-auto block text-center"}>
+      <code className="mb-3 overflow-x-auto block text-center">
         {block.objectHashes.map((hash, index) => {
           return (
-            <div key={index} className={"text-xs"}>
+            <div key={index} className="text-xs">
               {hash}
             </div>
           );
