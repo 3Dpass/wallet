@@ -5,7 +5,8 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
 import Block from "../components/Block";
 
-const BLOCK_TO_LOAD = 8;
+const LOCAL_NODE = false;
+const BLOCK_TO_LOAD = 4;
 
 export function links() {
   return [{ rel: "stylesheet", href: stylesBlueprint }];
@@ -39,9 +40,15 @@ const rpc = {
     },
   },
 };
+const types = {
+  AccountInfo: "AccountInfoWithTripleRefCount",
+  Address: "AccountId",
+  LookupSource: "AccountId",
+  Weight: "u32",
+};
 
 const loadBlock = async (provider, hash) => {
-  const api = await ApiPromise.create({ provider: provider, rpc });
+  const api = await ApiPromise.create({ provider: provider, rpc, types });
   let signedBlock;
 
   if (hash === undefined) {
@@ -76,8 +83,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // const wsProvider = new WsProvider("wss://rpc.3dpass.org");
-    const wsProvider = new WsProvider("ws://127.0.0.1:9944");
+    const wsProvider = new WsProvider(LOCAL_NODE ? "ws://127.0.0.1:9944" : "wss://rpc.3dpass.org");
     loadBlocks(wsProvider).then((loaded_blocks) => {
       loaded_blocks = loaded_blocks.map((block) => {
         const loader = new OBJLoader();
