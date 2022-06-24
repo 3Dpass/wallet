@@ -1,4 +1,4 @@
-import { Alignment, Button, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar } from "@blueprintjs/core";
+import { Alignment, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar, Switch } from "@blueprintjs/core";
 import stylesBlueprint from "@blueprintjs/core/lib/css/blueprint.css";
 import { useEffect, useState } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -6,7 +6,7 @@ import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
 import Block from "../components/Block";
 import { rpc, types } from "../api.config";
 
-const LOCAL_NODE = false;
+const DEFAULT_API_ENDPOINT = "wss://rpc2.3dpass.org";
 const BLOCK_TO_LOAD = 6;
 
 export function links() {
@@ -44,9 +44,14 @@ const loadBlock = async (api, hash) => {
 export default function Index() {
   const [blocks, setBlocks] = useState([]);
   const [progress, setProgress] = useState(0.0);
+  const [apiEndpoint, setApiEndpoint] = useState(DEFAULT_API_ENDPOINT);
+  const [useLocalApiEndpoint, setUseLocalApiEndpoint] = useState(false);
 
   useEffect(() => {
-    const provider = new WsProvider(LOCAL_NODE ? "ws://127.0.0.1:9944" : "wss://rpc.3dpass.org");
+    setBlocks([]);
+    setProgress(0.0);
+
+    const provider = new WsProvider(useLocalApiEndpoint ? "ws://127.0.0.1:9944" : apiEndpoint);
     ApiPromise.create({ provider, rpc, types }).then(async (api) => {
       let block = await loadBlock(api);
       setBlocks((prevBlocks) => [...prevBlocks, block]);
@@ -58,7 +63,7 @@ export default function Index() {
       }
       setProgress(1.0);
     });
-  }, []);
+  }, [apiEndpoint, useLocalApiEndpoint]);
 
   return (
     <div>
@@ -67,7 +72,10 @@ export default function Index() {
           <NavbarHeading>3DP Explorer</NavbarHeading>
           <NavbarDivider />
           <NavbarGroup>
-            <Button className={Classes.MINIMAL} icon="code-block" text="Blocks" />
+            <input type="text" className={Classes.INPUT} value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} />
+            <div className="ml-4">
+              <Switch style={{ marginBottom: 0 }} checked={useLocalApiEndpoint} label="Use local node" onChange={(e) => setUseLocalApiEndpoint(e.target.checked)} />
+            </div>
           </NavbarGroup>
         </NavbarGroup>
       </Navbar>
