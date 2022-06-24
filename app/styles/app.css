@@ -578,6 +578,10 @@ video {
   gap: 1rem;
 }
 
+.overflow-auto {
+  overflow: auto;
+}
+
 .p-20 {
   padding: 5rem;
 }

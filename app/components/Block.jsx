@@ -5,7 +5,12 @@ import { Rock } from "./Rock";
 export default function Block({ block }) {
   return (
     <Card elevation={Elevation.TWO}>
-      <div className={"mb-3"}>Block: {block.block.header.number.toNumber()}</div>
+      <div>
+        Block: <strong>{block.block.header.number.toNumber()}</strong>
+      </div>
+      <div className={"mb-3"}>
+        <code className={"block overflow-auto"}>{block.objectHash}</code>
+      </div>
       <div style={{ height: 300 }}>
         <Canvas
           camera={{

@@ -24,10 +24,12 @@ const loadBlock = async (provider, hash) => {
   }
   const block = signedBlock.block;
   const blockHash = block.header.hash.toHex();
+  const objectHash = block.header.digest.logs[2].asOther.toString();
   const data = await api.rpc.poscan.getMiningObject(blockHash);
   return {
     block: block,
-    hash: blockHash,
+    blockHash: blockHash,
+    objectHash: objectHash,
     data: data,
   };
 };
@@ -76,7 +78,7 @@ export default function Index() {
       <div className={"grid gap-4 grid-cols-2 lg:grid-cols-4 p-4"}>
         {!loading &&
           blocks.map((block) => (
-            <div key={block.hash}>
+            <div key={block.blockHash}>
               <Block block={block} />
             </div>
           ))}
