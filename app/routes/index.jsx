@@ -43,20 +43,18 @@ const loadBlock = async (api, hash) => {
 
 export default function Index() {
   const [blocks, setBlocks] = useState([]);
-  const [progress, setProgress] = useState(0.0);
+  const [progress, setProgress] = useState(1 / (BLOCK_TO_LOAD + 1));
   const [apiEndpoint, setApiEndpoint] = useState(DEFAULT_API_ENDPOINT);
   const [useLocalApiEndpoint, setUseLocalApiEndpoint] = useState(false);
 
   useEffect(() => {
     setBlocks([]);
-    setProgress(0.0);
-
     const provider = new WsProvider(useLocalApiEndpoint ? "ws://127.0.0.1:9944" : apiEndpoint);
     ApiPromise.create({ provider, rpc, types }).then(async (api) => {
       let block = await loadBlock(api);
       setBlocks((prevBlocks) => [...prevBlocks, block]);
-      for (let i = 0; i < BLOCK_TO_LOAD - 1; i++) {
-        setProgress((i + 1) / BLOCK_TO_LOAD);
+      for (let i = 1; i < BLOCK_TO_LOAD; i++) {
+        setProgress((i + 1) / (BLOCK_TO_LOAD + 1));
         let parent_hash = block.block.header.parentHash.toHex();
         block = await loadBlock(api, parent_hash);
         setBlocks((prevBlocks) => [...prevBlocks, block]);
