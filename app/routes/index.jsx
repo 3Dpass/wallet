@@ -1,4 +1,4 @@
-import { Alignment, Button, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, Spinner } from "@blueprintjs/core";
+import { Alignment, Button, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar } from "@blueprintjs/core";
 import stylesBlueprint from "@blueprintjs/core/lib/css/blueprint.css";
 import { useEffect, useState } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -13,8 +13,7 @@ export function links() {
   return [{ rel: "stylesheet", href: stylesBlueprint }];
 }
 
-const loadBlock = async (provider, hash) => {
-  const api = await ApiPromise.create({ provider: provider, rpc, types });
+const loadBlock = async (api, hash) => {
   let signedBlock;
 
   if (hash === undefined) {
@@ -30,40 +29,34 @@ const loadBlock = async (provider, hash) => {
     objectHashes.push(objectHashesString.substring(i * 64, (i + 1) * 64));
   }
   const data = await api.rpc.poscan.getMiningObject(blockHash);
+
+  const loader = new OBJLoader();
+  const object = loader.parse(data).children[0];
+
   return {
     block: block,
     blockHash: blockHash,
     objectHashes: objectHashes,
-    data: data,
+    object: object,
   };
-};
-
-const loadBlocks = async (provider) => {
-  const blocks = [];
-  const block = await loadBlock(provider);
-  blocks.push(block);
-  for (let i = 0; i < BLOCK_TO_LOAD - 1; i++) {
-    let parent_hash = blocks[blocks.length - 1].block.header.parentHash.toHex();
-    let next_block = await loadBlock(provider, parent_hash);
-    blocks.push(next_block);
-  }
-  return blocks;
 };
 
 export default function Index() {
   const [blocks, setBlocks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0.0);
 
   useEffect(() => {
-    const wsProvider = new WsProvider(LOCAL_NODE ? "ws://127.0.0.1:9944" : "wss://rpc.3dpass.org");
-    loadBlocks(wsProvider).then((loaded_blocks) => {
-      loaded_blocks = loaded_blocks.map((block) => {
-        const loader = new OBJLoader();
-        block.object = loader.parse(block.data).children[0];
-        return block;
-      });
-      setBlocks(loaded_blocks);
-      setLoading(false);
+    const provider = new WsProvider(LOCAL_NODE ? "ws://127.0.0.1:9944" : "wss://rpc.3dpass.org");
+    ApiPromise.create({ provider, rpc, types }).then(async (api) => {
+      let block = await loadBlock(api);
+      setBlocks((prevBlocks) => [...prevBlocks, block]);
+      for (let i = 0; i < BLOCK_TO_LOAD - 1; i++) {
+        setProgress((i + 1) / BLOCK_TO_LOAD);
+        let parent_hash = block.block.header.parentHash.toHex();
+        block = await loadBlock(api, parent_hash);
+        setBlocks((prevBlocks) => [...prevBlocks, block]);
+      }
+      setProgress(1.0);
     });
   }, []);
 
@@ -78,9 +71,9 @@ export default function Index() {
           </NavbarGroup>
         </NavbarGroup>
       </Navbar>
-      {loading && <Spinner className="p-20" />}
+      {progress < 1.0 && <ProgressBar value={progress} />}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 p-4">
-        {!loading &&
+        {progress == 1.0 &&
           blocks.map((block) => (
             <div key={block.blockHash}>
               <Block block={block} />
