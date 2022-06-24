@@ -3,4 +3,5 @@
 /build
 /node_modules
 /public/build
+/app/styles
 .env
