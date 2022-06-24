@@ -1,6 +1,5 @@
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 import styles from "./styles/app.css";
-import { LinksFunction } from "@remix-run/node";
 
 export const meta = () => ({
   charset: "utf-8",
