@@ -31,4 +31,6 @@ export const types = {
   Address: "AccountId",
   LookupSource: "AccountId",
   Weight: "u32",
+  Difficulty: "u256",
+  Timestamp: "u64",
 };
