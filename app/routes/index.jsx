@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
 import Block from "../components/Block";
+import { rpc, types } from "../api.config";
 
 const LOCAL_NODE = false;
 const BLOCK_TO_LOAD = 4;
@@ -11,41 +12,6 @@ const BLOCK_TO_LOAD = 4;
 export function links() {
   return [{ rel: "stylesheet", href: stylesBlueprint }];
 }
-
-const rpc = {
-  poscan: {
-    pushMiningObject: {
-      description: "Submit 3D object for mining.",
-      params: [
-        {
-          name: "obj_id",
-          type: "u64",
-        },
-        {
-          name: "obj",
-          type: "String",
-        },
-      ],
-      type: "u64",
-    },
-    getMiningObject: {
-      description: "Get and unpack 3D object from block.",
-      params: [
-        {
-          name: "at",
-          type: "BlockHash",
-        },
-      ],
-      type: "String",
-    },
-  },
-};
-const types = {
-  AccountInfo: "AccountInfoWithTripleRefCount",
-  Address: "AccountId",
-  LookupSource: "AccountId",
-  Weight: "u32",
-};
 
 const loadBlock = async (provider, hash) => {
   const api = await ApiPromise.create({ provider: provider, rpc, types });
