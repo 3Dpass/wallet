@@ -7,7 +7,7 @@ import Block from "../components/Block";
 import { rpc, types } from "../api.config";
 
 const LOCAL_NODE = false;
-const BLOCK_TO_LOAD = 4;
+const BLOCK_TO_LOAD = 6;
 
 export function links() {
   return [{ rel: "stylesheet", href: stylesBlueprint }];
@@ -24,12 +24,16 @@ const loadBlock = async (provider, hash) => {
   }
   const block = signedBlock.block;
   const blockHash = block.header.hash.toHex();
-  const objectHash = block.header.digest.logs[2].asOther.toString();
+  const objectHashesString = block.header.digest.logs[2].asOther.toString().substring(2);
+  const objectHashes = [];
+  for (let i = 0; i < 10; i++) {
+    objectHashes.push(objectHashesString.substring(i * 64, (i + 1) * 64));
+  }
   const data = await api.rpc.poscan.getMiningObject(blockHash);
   return {
     block: block,
     blockHash: blockHash,
-    objectHash: objectHash,
+    objectHashes: objectHashes,
     data: data,
   };
 };
@@ -75,7 +79,7 @@ export default function Index() {
         </NavbarGroup>
       </Navbar>
       {loading && <Spinner className={"p-20"} />}
-      <div className={"grid gap-4 grid-cols-2 lg:grid-cols-4 p-4"}>
+      <div className={"grid gap-4 grid-cols-1 lg:grid-cols-3 p-4"}>
         {!loading &&
           blocks.map((block) => (
             <div key={block.blockHash}>
