@@ -11,11 +11,11 @@ export function Rock({ geometry }) {
   });
   return (
     <>
-      <ambientLight intensity={0.5} color={[1, 1, 1]} />
+      <ambientLight intensity={0.8} color={[1, 1, 1]} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
       <pointLight position={[-10, -10, -10]} />
       <mesh ref={rock} geometry={geometry}>
-        <meshStandardMaterial color="#89CFF0" roughness={0.1} wireframe={false} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#2f343c" roughness={0.1} wireframe={false} side={THREE.DoubleSide} />
       </mesh>
     </>
   );
