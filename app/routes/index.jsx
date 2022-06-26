@@ -71,7 +71,7 @@ export default function Index() {
           <NavbarDivider />
           <NavbarGroup>
             <input type="text" className={Classes.INPUT} value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} />
-            <div className="ml-4 invisible sm:visible">
+            <div className="ml-4 hidden sm:block">
               <Switch style={{ marginBottom: 0 }} checked={useLocalApiEndpoint} label="Use local node" onChange={(e) => setUseLocalApiEndpoint(e.target.checked)} />
             </div>
           </NavbarGroup>
