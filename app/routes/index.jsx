@@ -5,6 +5,8 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
 import Block from "../components/Block";
 import { rpc, types } from "../api.config";
+import Wallet from "../components/Wallet";
+import { RecoilRoot } from "recoil";
 
 const DEFAULT_API_ENDPOINT = "wss://rpc2.3dpass.org";
 const BLOCK_TO_LOAD = 6;
@@ -64,7 +66,7 @@ export default function Index() {
   }, [apiEndpoint, useLocalApiEndpoint]);
 
   return (
-    <div>
+    <RecoilRoot>
       <Navbar>
         <NavbarGroup align={Alignment.LEFT}>
           <NavbarHeading className="whitespace-nowrap">3DP Explorer</NavbarHeading>
@@ -76,6 +78,9 @@ export default function Index() {
             </div>
           </NavbarGroup>
         </NavbarGroup>
+        <NavbarGroup align={Alignment.RIGHT}>
+          <Wallet />
+        </NavbarGroup>
       </Navbar>
       {progress < 1.0 && <ProgressBar value={progress} />}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 p-4">
@@ -85,6 +90,6 @@ export default function Index() {
           </div>
         ))}
       </div>
-    </div>
+    </RecoilRoot>
   );
 }
