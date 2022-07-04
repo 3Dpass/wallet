@@ -6,7 +6,6 @@ import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
 import Block from "../components/Block";
 import { rpc, types } from "../api.config";
 import Wallet from "../components/Wallet";
-import { RecoilRoot } from "recoil";
 
 const DEFAULT_API_ENDPOINT = "wss://rpc2.3dpass.org";
 const BLOCK_TO_LOAD = 6;
@@ -66,7 +65,7 @@ export default function Index() {
   }, [apiEndpoint, useLocalApiEndpoint]);
 
   return (
-    <RecoilRoot>
+    <>
       <Navbar>
         <NavbarGroup align={Alignment.LEFT}>
           <NavbarHeading className="whitespace-nowrap">3DP Explorer</NavbarHeading>
@@ -90,6 +89,6 @@ export default function Index() {
           </div>
         ))}
       </div>
-    </RecoilRoot>
+    </>
   );
 }

@@ -17,9 +17,9 @@
     "@remix-run/node": "1.6.0",
     "@remix-run/react": "1.6.0",
     "@remix-run/serve": "1.6.0",
+    "jotai": "1.7.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "recoil": "0.7.4",
     "three": "0.141.0",
     "three-stdlib": "2.12.1"
   },

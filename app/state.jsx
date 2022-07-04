@@ -1,6 +1,3 @@
-import { atom } from "recoil";
+import { atomWithStorage } from "jotai/utils";
 
-export const walletMnemonic = atom({
-  key: "walletMnemonic",
-  default: null,
-});
+export const walletMnemonic = atomWithStorage("walletMnemonic", null);

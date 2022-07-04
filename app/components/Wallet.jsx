@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Keyring } from "@polkadot/keyring";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 import { walletMnemonic } from "../state";
-import { useRecoilState } from "recoil";
+import { useAtom } from "jotai";
 
 const ss58format = {
   test: 72,
@@ -11,17 +11,25 @@ const ss58format = {
 const keyring = new Keyring({ type: "sr25519", ss58Format: ss58format.test });
 
 export default function Wallet() {
-  const [mnemonic, setMnemonic] = useRecoilState(walletMnemonic);
+  const [mnemonic, setMnemonic] = useAtom(walletMnemonic);
   const [pair, setPair] = useState(null);
 
-  function randomPair() {
+  function generateRandomAddress() {
     const newMnemonic = mnemonicGenerate();
     setMnemonic(newMnemonic);
-    setPair(keyring.addFromMnemonic(newMnemonic, {}, "ed25519"));
+    loadKeyringPairFromMnemonic(newMnemonic);
+  }
+
+  function loadKeyringPairFromMnemonic(mnemonic) {
+    setPair(keyring.addFromMnemonic(mnemonic, {}, "ed25519"));
   }
 
   useEffect(() => {
-    randomPair();
+    if (!mnemonic) {
+      generateRandomAddress();
+    } else {
+      loadKeyringPairFromMnemonic(mnemonic);
+    }
   }, []);
 
   if (!pair) {
@@ -34,7 +42,7 @@ export default function Wallet() {
         Address: <strong>{pair.address}</strong>
         <div className="text-xs">{mnemonic}</div>
       </div>
-      <a onClick={randomPair} className="ml-4">
+      <a onClick={generateRandomAddress} className="ml-4">
         Generate address
       </a>
     </div>
