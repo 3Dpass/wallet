@@ -15,26 +15,29 @@ export default function Wallet() {
   function generateAddress() {
     const mnemonic = mnemonicGenerate();
     keyring.addUri(mnemonic);
-    setAccounts(keyring.getAccounts());
   }
 
   function forgetAddress(address) {
     keyring.forgetAccount(address);
-    setAccounts(keyring.getAccounts());
-    return false;
   }
 
   useEffect(() => {
+    let sub;
     cryptoWaitReady().then(() => {
       keyring.loadAll({ ss58Format: ss58format.test, type: "sr25519" });
+      sub = keyring.accounts.subject.subscribe(() => {
+        setAccounts(keyring.getAccounts());
+      });
       const accounts = keyring.getAccounts();
       if (accounts.length === 0) {
         generateAddress();
-      } else {
-        setAccounts(accounts);
       }
       setIsLoading(false);
     });
+
+    return () => {
+      sub.unsubscribe();
+    };
   }, []);
 
   if (isLoading) {
@@ -46,7 +49,7 @@ export default function Wallet() {
       <div>
         {accounts.map((account) => {
           return (
-            <div>
+            <div key={account.address}>
               Address: <Identicon value={account.address} size={18} theme="substrate" className="mr-1 mb-[-4px]" />
               <strong>{account.address}</strong>
               <a
