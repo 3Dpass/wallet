@@ -1,4 +1,4 @@
-import { Alignment, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar, Switch } from "@blueprintjs/core";
+import { Alignment, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar } from "@blueprintjs/core";
 import stylesBlueprint from "@blueprintjs/core/lib/css/blueprint.css";
 import { useEffect, useState } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
@@ -6,6 +6,8 @@ import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
 import Block from "../components/Block";
 import { rpc, types } from "../api.config";
 import Wallet from "../components/Wallet";
+import { polkadotApi } from "../state";
+import { useAtom } from "jotai";
 
 const DEFAULT_API_ENDPOINT = "wss://rpc2.3dpass.org";
 const BLOCK_TO_LOAD = 6;
@@ -46,11 +48,13 @@ export default function Index() {
   const [blocks, setBlocks] = useState([]);
   const [progress, setProgress] = useState(1 / (BLOCK_TO_LOAD + 1));
   const [apiEndpoint, setApiEndpoint] = useState(DEFAULT_API_ENDPOINT);
+  const [api, setApi] = useAtom(polkadotApi);
 
   useEffect(() => {
     setBlocks([]);
     const provider = new WsProvider(apiEndpoint);
     ApiPromise.create({ provider, rpc, types }).then(async (api) => {
+      setApi(api);
       let block = await loadBlock(api);
       setBlocks((prevBlocks) => [...prevBlocks, block]);
       for (let i = 1; i < BLOCK_TO_LOAD; i++) {

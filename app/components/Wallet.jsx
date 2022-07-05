@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { cryptoWaitReady, mnemonicGenerate } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import Identicon from "@polkadot/react-identicon";
+import { useAtomValue } from "jotai";
+import { polkadotApi } from "../state";
 
 const ss58format = {
   test: 72,
@@ -10,7 +12,9 @@ const ss58format = {
 
 export default function Wallet() {
   const [isLoading, setIsLoading] = useState(true);
+  const api = useAtomValue(polkadotApi);
   const [accounts, setAccounts] = useState([]);
+  const [balances, setBalances] = useState({});
 
   function generateAddress() {
     const mnemonic = mnemonicGenerate();
@@ -40,6 +44,16 @@ export default function Wallet() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+    accounts.forEach((account) => {
+      const { nonce, data: balance } = api.query.system.account(account.address);
+      setBalances((prevBalances) => ({ ...prevBalances, [account.address]: { nonce, balance } }));
+    });
+  }, [api, accounts]);
+
   if (isLoading) {
     return <div>Loading wallet...</div>;
   }
@@ -50,8 +64,9 @@ export default function Wallet() {
         {accounts.map((account) => {
           return (
             <div key={account.address}>
-              Address: <Identicon value={account.address} size={18} theme="substrate" className="mr-1 mb-[-4px]" />
+              <Identicon value={account.address} size={18} theme="substrate" className="mr-1 mb-[-4px]" />
               <strong>{account.address}</strong>
+              {balances[account.address] && <span className="ml-1">{balances[account.address].balance ?? "N/A"} 3dp</span>}
               <a
                 onClick={() => {
                   forgetAddress(account.address);
