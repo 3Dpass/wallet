@@ -46,11 +46,10 @@ export default function Index() {
   const [blocks, setBlocks] = useState([]);
   const [progress, setProgress] = useState(1 / (BLOCK_TO_LOAD + 1));
   const [apiEndpoint, setApiEndpoint] = useState(DEFAULT_API_ENDPOINT);
-  const [useLocalApiEndpoint, setUseLocalApiEndpoint] = useState(false);
 
   useEffect(() => {
     setBlocks([]);
-    const provider = new WsProvider(useLocalApiEndpoint ? "ws://127.0.0.1:9944" : apiEndpoint);
+    const provider = new WsProvider(apiEndpoint);
     ApiPromise.create({ provider, rpc, types }).then(async (api) => {
       let block = await loadBlock(api);
       setBlocks((prevBlocks) => [...prevBlocks, block]);
@@ -62,7 +61,7 @@ export default function Index() {
       }
       setProgress(1.0);
     });
-  }, [apiEndpoint, useLocalApiEndpoint]);
+  }, [apiEndpoint]);
 
   return (
     <>
@@ -72,14 +71,13 @@ export default function Index() {
           <NavbarDivider />
           <NavbarGroup>
             <input type="text" className={Classes.INPUT} value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} />
-            <div className="ml-4 hidden sm:block">
-              <Switch style={{ marginBottom: 0 }} checked={useLocalApiEndpoint} label="Use local node" onChange={(e) => setUseLocalApiEndpoint(e.target.checked)} />
-            </div>
           </NavbarGroup>
         </NavbarGroup>
-        <NavbarGroup align={Alignment.RIGHT}>
-          <Wallet />
-        </NavbarGroup>
+        <div className="hidden lg:block">
+          <NavbarGroup align={Alignment.RIGHT}>
+            <Wallet />
+          </NavbarGroup>
+        </div>
       </Navbar>
       {progress < 1.0 && <ProgressBar value={progress} />}
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 p-4">
