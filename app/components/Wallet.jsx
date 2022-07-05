@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Keyring } from "@polkadot/keyring";
-import { mnemonicGenerate, cryptoWaitReady } from "@polkadot/util-crypto";
+import { cryptoWaitReady, mnemonicGenerate } from "@polkadot/util-crypto";
 import { walletMnemonic } from "../state";
+import Identicon from "@polkadot/react-identicon";
+
 import { useAtom } from "jotai";
 
 const ss58format = {
@@ -47,11 +49,12 @@ export default function Wallet() {
     <div className="flex items-center">
       <div>
         <div>
-          Address: <strong>{pair.address}</strong>
+          Address: <Identicon value={pair.address} size={18} theme="substrate" className="mr-1 mb-[-4px]" />
+          <strong>{pair.address}</strong>
         </div>
         <input
           type="text"
-          className="text-xs w-full border border-gray-500"
+          className="text-xs w-full border border-gray-500 mt-1"
           value={mnemonic}
           onChange={(e) => {
             setMnemonic(e.target.value);
