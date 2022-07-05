@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Keyring } from "@polkadot/keyring";
-import { mnemonicGenerate } from "@polkadot/util-crypto";
+import { mnemonicGenerate, cryptoWaitReady } from "@polkadot/util-crypto";
 import { walletMnemonic } from "../state";
 import { useAtom } from "jotai";
 
@@ -14,14 +14,21 @@ export default function Wallet() {
   const [mnemonic, setMnemonic] = useAtom(walletMnemonic);
   const [pair, setPair] = useState(null);
 
-  function generateRandomAddress() {
+  async function loadKeyringPairFromMnemonic(mnemonic) {
+    await cryptoWaitReady();
+    try {
+      const pair = keyring.addFromMnemonic(mnemonic);
+      setPair(pair);
+    } catch (e) {
+      console.log(e);
+      generateRandomAddress();
+    }
+  }
+
+  async function generateRandomAddress() {
     const newMnemonic = mnemonicGenerate();
     setMnemonic(newMnemonic);
     loadKeyringPairFromMnemonic(newMnemonic);
-  }
-
-  function loadKeyringPairFromMnemonic(mnemonic) {
-    setPair(keyring.addFromMnemonic(mnemonic, {}, "ed25519"));
   }
 
   useEffect(() => {
@@ -30,7 +37,7 @@ export default function Wallet() {
     } else {
       loadKeyringPairFromMnemonic(mnemonic);
     }
-  }, []);
+  }, [mnemonic]);
 
   if (!pair) {
     return <div>Loading wallet...</div>;
@@ -39,8 +46,17 @@ export default function Wallet() {
   return (
     <div className="flex items-center">
       <div>
-        Address: <strong>{pair.address}</strong>
-        <div className="text-xs">{mnemonic}</div>
+        <div>
+          Address: <strong>{pair.address}</strong>
+        </div>
+        <input
+          type="text"
+          className="text-xs w-full border border-gray-500"
+          value={mnemonic}
+          onChange={(e) => {
+            setMnemonic(e.target.value);
+          }}
+        />
       </div>
       <a onClick={generateRandomAddress} className="ml-4">
         Generate address
