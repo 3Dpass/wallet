@@ -1,4 +1,5 @@
 {
+  "name": "3dp-frontend",
   "private": true,
   "sideEffects": false,
   "scripts": {
