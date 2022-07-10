@@ -1,5 +1,4 @@
 import { Alignment, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar } from "@blueprintjs/core";
-import stylesBlueprint from "@blueprintjs/core/lib/css/blueprint.css";
 import { useEffect, useState } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
@@ -10,11 +9,8 @@ import { polkadotApi } from "../state";
 import { useAtom } from "jotai";
 
 const DEFAULT_API_ENDPOINT = "wss://rpc2.3dpass.org";
+const USE_LOCAL_API = false;
 const BLOCK_TO_LOAD = 6;
-
-export function links() {
-  return [{ rel: "stylesheet", href: stylesBlueprint }];
-}
 
 const loadBlock = async (api, hash) => {
   let signedBlock;
@@ -47,7 +43,7 @@ const loadBlock = async (api, hash) => {
 export default function Index() {
   const [blocks, setBlocks] = useState([]);
   const [progress, setProgress] = useState(1 / (BLOCK_TO_LOAD + 1));
-  const [apiEndpoint, setApiEndpoint] = useState(DEFAULT_API_ENDPOINT);
+  const [apiEndpoint, setApiEndpoint] = useState(USE_LOCAL_API ? "ws://127.0.0.1:9944" : DEFAULT_API_ENDPOINT);
   const [api, setApi] = useAtom(polkadotApi);
 
   useEffect(() => {

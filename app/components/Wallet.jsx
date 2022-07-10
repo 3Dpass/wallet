@@ -4,6 +4,8 @@ import keyring from "@polkadot/ui-keyring";
 import Identicon from "@polkadot/react-identicon";
 import { useAtomValue } from "jotai";
 import { polkadotApi } from "../state";
+import { Icon, Menu, MenuItem } from "@blueprintjs/core";
+import { Popover2 } from "@blueprintjs/popover2";
 
 const ss58format = {
   test: 72,
@@ -59,29 +61,42 @@ export default function Wallet() {
   }
 
   return (
-    <div className="flex items-center">
-      <div>
-        {accounts.map((account) => {
-          return (
-            <div key={account.address}>
-              <Identicon value={account.address} size={18} theme="substrate" className="mr-1 mb-[-4px]" />
-              <strong>{account.address}</strong>
-              {balances[account.address] && <span className="ml-1">{balances[account.address].balance ?? "N/A"} 3dp</span>}
-              <a
-                onClick={() => {
-                  forgetAddress(account.address);
-                }}
-                className="ml-1"
-              >
-                &times;
-              </a>
-            </div>
-          );
-        })}
-      </div>
-      <a onClick={generateAddress} className="ml-4">
-        Generate address
-      </a>
+    <div className="bp4-navbar-group bp4-align-right">
+      {accounts.map((account) => {
+        const menu = (
+          <Menu>
+            {balances[account.address] && balances[account.address].balance && <MenuItem>{balances[account.address].balance.free ?? "N/A"} 3dp</MenuItem>}
+            <MenuItem
+              icon="delete"
+              text="Remove"
+              onClick={() => {
+                forgetAddress(account.address);
+              }}
+            />
+          </Menu>
+        );
+        return (
+          <div key={account.address}>
+            <Popover2 content={menu}>
+              <button className="bp4-button bp4-minimal">
+                <Identicon value={account.address} size={16} theme="substrate" />
+                <div className="max-w-[200px] text-ellipsis overflow-hidden">{account.address}</div>
+              </button>
+            </Popover2>
+          </div>
+        );
+      })}
+      <Popover2
+        content={
+          <Menu>
+            <MenuItem icon="add" text="Generate random wallet" onClick={generateAddress} />
+          </Menu>
+        }
+      >
+        <button className="bp4-button bp4-minimal">
+          <Icon icon="plus" />
+        </button>
+      </Popover2>
     </div>
   );
 }
