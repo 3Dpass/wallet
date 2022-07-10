@@ -4,7 +4,7 @@ import keyring from "@polkadot/ui-keyring";
 import Identicon from "@polkadot/react-identicon";
 import { useAtomValue } from "jotai";
 import { polkadotApi } from "../state";
-import { Icon, Menu, MenuItem } from "@blueprintjs/core";
+import { Button, Classes, Dialog, Icon, Intent, Menu, MenuItem, Spinner, SpinnerSize, TextArea } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 
 const ss58format = {
@@ -18,7 +18,28 @@ export default function Wallet() {
   const [accounts, setAccounts] = useState([]);
   const [balances, setBalances] = useState({});
 
-  function generateAddress() {
+  const [isSeedPhraseDialogOpen, setIsSeedPhraseDialogOpen] = useState(false);
+  const [seedPhraseValue, setSeedPhraseValue] = useState("");
+
+  function handleSeedPhraseDialogOpen() {
+    setIsSeedPhraseDialogOpen(true);
+    setSeedPhraseValue("");
+  }
+
+  function handleSeedPhraseDialogCancel() {
+    setIsSeedPhraseDialogOpen(false);
+  }
+
+  function handleSeedPhraseChange(e) {
+    setSeedPhraseValue(e.target.value);
+  }
+
+  function handleSeedPhraseImportClick() {
+    keyring.addUri(seedPhraseValue);
+    setIsSeedPhraseDialogOpen(false);
+  }
+
+  function handleGenerateAddressClick() {
     const mnemonic = mnemonicGenerate();
     keyring.addUri(mnemonic);
   }
@@ -34,10 +55,6 @@ export default function Wallet() {
       sub = keyring.accounts.subject.subscribe(() => {
         setAccounts(keyring.getAccounts());
       });
-      const accounts = keyring.getAccounts();
-      if (accounts.length === 0) {
-        generateAddress();
-      }
       setIsLoading(false);
     });
 
@@ -57,11 +74,24 @@ export default function Wallet() {
   }, [api, accounts]);
 
   if (isLoading) {
-    return <div>Loading wallet...</div>;
+    return <Spinner size={SpinnerSize.SMALL} />;
   }
 
   return (
     <div className="bp4-navbar-group bp4-align-right">
+      <Dialog isOpen={isSeedPhraseDialogOpen} usePortal={true}>
+        <div className={Classes.DIALOG_BODY}>
+          <TextArea className="w-full" rows={5} onChange={handleSeedPhraseChange} value={seedPhraseValue} />
+        </div>
+        <div className={Classes.DIALOG_FOOTER}>
+          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+            <Button onClick={handleSeedPhraseDialogCancel}>Cancel</Button>
+            <Button intent={Intent.PRIMARY} onClick={handleSeedPhraseImportClick} icon="add">
+              Import seed phrase
+            </Button>
+          </div>
+        </div>
+      </Dialog>
       {accounts.map((account) => {
         const menu = (
           <Menu>
@@ -77,7 +107,7 @@ export default function Wallet() {
         );
         return (
           <div key={account.address}>
-            <Popover2 content={menu}>
+            <Popover2 content={menu} position="bottom">
               <button className="bp4-button bp4-minimal">
                 <Identicon value={account.address} size={16} theme="substrate" />
                 <div className="max-w-[200px] text-ellipsis overflow-hidden">{account.address}</div>
@@ -89,9 +119,11 @@ export default function Wallet() {
       <Popover2
         content={
           <Menu>
-            <MenuItem icon="add" text="Generate random wallet" onClick={generateAddress} />
+            <MenuItem icon="add" text="Import seed phrase..." onClick={handleSeedPhraseDialogOpen} />
+            <MenuItem icon="random" text="Generate random wallet" onClick={handleGenerateAddressClick} />
           </Menu>
         }
+        position="bottom-left"
       >
         <button className="bp4-button bp4-minimal">
           <Icon icon="plus" />
