@@ -1,4 +1,4 @@
-import { Menu, MenuDivider, MenuItem, Spinner, SpinnerSize, Toaster } from "@blueprintjs/core";
+import { Intent, Menu, MenuDivider, MenuItem, Spinner, SpinnerSize, Toaster } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import Identicon from "@polkadot/react-identicon";
 import keyring from "@polkadot/ui-keyring";
@@ -7,9 +7,6 @@ import { polkadotApiAtom } from "../state";
 import { useRef, useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
-
-// TODO: retrieve seed phrase from local storage
-const SHOW_COPY_SEED_PHRASE = false;
 
 export default function Account({ address }) {
   const api = useAtomValue(polkadotApiAtom);
@@ -21,13 +18,13 @@ export default function Account({ address }) {
     loadAccount();
   }
 
-  async function handleCopySeedPhrase() {
-    const seed_phrase = "TODO: retrieve seed phrase";
-    await navigator.clipboard.writeText(seed_phrase);
+  async function handleCopyJson() {
+    const pair = keyring.getPair(address);
+    await navigator.clipboard.writeText(JSON.stringify(pair.toJson()));
     toaster.current.show({
-      message: "Seed phrase copied to clipboard",
-      intent: "success",
       icon: "tick",
+      intent: Intent.SUCCESS,
+      message: "Wallet JSON copied to clipboard",
     });
   }
 
@@ -57,12 +54,8 @@ export default function Account({ address }) {
           <MenuItem disabled={true} icon="lock" text={`Locked: ${balances.lockedBalance.toHuman()}`} />
         </>
       )}
-      {SHOW_COPY_SEED_PHRASE && (
-        <>
-          <MenuDivider />
-          <MenuItem icon="star" text="Copy seed phrase" onClick={handleCopySeedPhrase} />
-        </>
-      )}
+      <MenuDivider />
+      <MenuItem icon="export" text="Copy JSON wallet" onClick={handleCopyJson} />
       <MenuDivider />
       <MenuItem
         icon="delete"
