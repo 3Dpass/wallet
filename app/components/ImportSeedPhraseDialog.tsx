@@ -1,10 +1,14 @@
 import keyring from "@polkadot/ui-keyring";
+import type { IToastProps } from "@blueprintjs/core";
 import { Button, Classes, Dialog, Intent, TextArea, Toaster } from "@blueprintjs/core";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 export default function ImportSeedPhraseDialog({ isOpen, onClose }) {
   const [seedPhraseValue, setSeedPhraseValue] = useState("");
-  const toaster = useRef();
+  let toaster: Toaster;
+  const refHandlers = {
+    toaster: (ref: Toaster) => (toaster = ref),
+  };
 
   function handleOnOpening() {
     setSeedPhraseValue("");
@@ -19,18 +23,18 @@ export default function ImportSeedPhraseDialog({ isOpen, onClose }) {
       keyring.addUri(seedPhraseValue);
       onClose();
     } catch (e) {
-      const toast = {
+      const toast: IToastProps = {
         icon: "ban-circle",
         intent: Intent.DANGER,
         message: e.message,
       };
-      toaster.current.show(toast);
+      toaster.show(toast);
     }
   }
 
   return (
     <>
-      <Toaster ref={toaster} />
+      <Toaster ref={refHandlers.toaster} />
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening}>
         <div className={Classes.DIALOG_BODY}>
           <TextArea className="w-full" rows={5} onChange={handleSeedPhraseChange} value={seedPhraseValue} />

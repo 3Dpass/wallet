@@ -5,14 +5,14 @@ import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
 import Block from "../components/Block";
 import { rpc, types } from "../api.config";
 import Wallet from "../components/Wallet";
-import { polkadotApi } from "../state";
+import { polkadotApiAtom } from "../state";
 import { useAtom } from "jotai";
 
 const DEFAULT_API_ENDPOINT = "wss://rpc2.3dpass.org";
 const USE_LOCAL_API = false;
 const BLOCK_TO_LOAD = 6;
 
-const loadBlock = async (api, hash) => {
+const loadBlock = async (api, hash?: string) => {
   let signedBlock;
 
   if (hash === undefined) {
@@ -44,24 +44,26 @@ export default function Index() {
   const [blocks, setBlocks] = useState([]);
   const [progress, setProgress] = useState(1 / (BLOCK_TO_LOAD + 1));
   const [apiEndpoint, setApiEndpoint] = useState(USE_LOCAL_API ? "ws://127.0.0.1:9944" : DEFAULT_API_ENDPOINT);
-  const [api, setApi] = useAtom(polkadotApi);
+  const [, setApi] = useAtom(polkadotApiAtom);
 
   useEffect(() => {
     setBlocks([]);
     const provider = new WsProvider(apiEndpoint);
     ApiPromise.create({ provider, rpc, types }).then(async (api) => {
       setApi(api);
-      let block = await loadBlock(api);
+      const block = await loadBlock(api);
+      let last_block = block;
       setBlocks((prevBlocks) => [...prevBlocks, block]);
       for (let i = 1; i < BLOCK_TO_LOAD; i++) {
         setProgress((i + 1) / (BLOCK_TO_LOAD + 1));
-        let parent_hash = block.block.header.parentHash.toHex();
-        block = await loadBlock(api, parent_hash);
+        let parent_hash = last_block.block.header.parentHash.toHex();
+        const block = await loadBlock(api, parent_hash);
+        last_block = block;
         setBlocks((prevBlocks) => [...prevBlocks, block]);
       }
       setProgress(1.0);
     });
-  }, [apiEndpoint]);
+  }, [setApi, apiEndpoint]);
 
   return (
     <>
