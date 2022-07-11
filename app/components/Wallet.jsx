@@ -4,8 +4,9 @@ import keyring from "@polkadot/ui-keyring";
 import Identicon from "@polkadot/react-identicon";
 import { useAtomValue } from "jotai";
 import { polkadotApi } from "../state";
-import { Button, Classes, Dialog, Icon, Intent, Menu, MenuItem, Spinner, SpinnerSize, TextArea } from "@blueprintjs/core";
+import { Icon, Menu, MenuItem, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
+import ImportSeedPhraseDialog from "./ImportSeedPhraseDialog";
 
 const ss58format = {
   test: 72,
@@ -17,31 +18,15 @@ export default function Wallet() {
   const api = useAtomValue(polkadotApi);
   const [accounts, setAccounts] = useState([]);
   const [balances, setBalances] = useState({});
-
   const [isSeedPhraseDialogOpen, setIsSeedPhraseDialogOpen] = useState(false);
-  const [seedPhraseValue, setSeedPhraseValue] = useState("");
-
-  function handleSeedPhraseDialogOpen() {
-    setIsSeedPhraseDialogOpen(true);
-    setSeedPhraseValue("");
-  }
-
-  function handleSeedPhraseDialogCancel() {
-    setIsSeedPhraseDialogOpen(false);
-  }
-
-  function handleSeedPhraseChange(e) {
-    setSeedPhraseValue(e.target.value);
-  }
-
-  function handleSeedPhraseImportClick() {
-    keyring.addUri(seedPhraseValue);
-    setIsSeedPhraseDialogOpen(false);
-  }
 
   function handleGenerateAddressClick() {
     const mnemonic = mnemonicGenerate();
     keyring.addUri(mnemonic);
+  }
+
+  function handleSeedPhraseDialogOpen() {
+    setIsSeedPhraseDialogOpen(true);
   }
 
   function forgetAddress(address) {
@@ -79,19 +64,7 @@ export default function Wallet() {
 
   return (
     <div className="bp4-navbar-group bp4-align-right">
-      <Dialog isOpen={isSeedPhraseDialogOpen} usePortal={true}>
-        <div className={Classes.DIALOG_BODY}>
-          <TextArea className="w-full" rows={5} onChange={handleSeedPhraseChange} value={seedPhraseValue} />
-        </div>
-        <div className={Classes.DIALOG_FOOTER}>
-          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={handleSeedPhraseDialogCancel}>Cancel</Button>
-            <Button intent={Intent.PRIMARY} onClick={handleSeedPhraseImportClick} icon="add">
-              Import seed phrase
-            </Button>
-          </div>
-        </div>
-      </Dialog>
+      <ImportSeedPhraseDialog isOpen={isSeedPhraseDialogOpen} onClose={() => setIsSeedPhraseDialogOpen(false)} />
       {accounts.map((account) => {
         const menu = (
           <Menu>
