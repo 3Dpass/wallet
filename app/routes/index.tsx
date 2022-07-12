@@ -69,7 +69,7 @@ export default function Index() {
     <>
       <Navbar>
         <NavbarGroup align={Alignment.LEFT}>
-          <NavbarHeading className="whitespace-nowrap">3DP Explorer</NavbarHeading>
+          <NavbarHeading className="whitespace-nowrap">3DP Wallet</NavbarHeading>
           <NavbarDivider />
           <NavbarGroup>
             <input type="text" className={Classes.INPUT} value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} />
