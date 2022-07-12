@@ -7,15 +7,25 @@ import { polkadotApiAtom } from "../state";
 import { useRef, useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
+import SendDialog from "./SendDialog";
 
 export default function Account({ address }) {
   const api = useAtomValue(polkadotApiAtom);
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const [formatOptions, setFormatOptions] = useState({});
+  const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
   const toaster = useRef<Toaster>();
 
   function handleOnMenuOpening() {
     loadAccount();
+  }
+
+  function handleSendMenuClick() {
+    setIsSendDialogOpen(true);
+  }
+
+  function handleSendDialogSubmit(address) {
+    setIsSendDialogOpen(false);
   }
 
   async function handleCopyJson() {
@@ -52,6 +62,7 @@ export default function Account({ address }) {
           <MenuDivider title={`Total balance: ${formatBalance(balances.freeBalance, formatOptions)}`} />
           <MenuItem disabled={true} icon="cube" text={`Transferable: ${balances.availableBalance.toHuman()}`} />
           <MenuItem disabled={true} icon="lock" text={`Locked: ${balances.lockedBalance.toHuman()}`} />
+          <MenuItem icon="send-to" text="Send funds..." onClick={handleSendMenuClick} />
         </>
       )}
       <MenuDivider />
@@ -70,6 +81,7 @@ export default function Account({ address }) {
   return (
     <>
       <Toaster ref={toaster} />
+      <SendDialog isOpen={isSendDialogOpen} onSubmit={handleSendDialogSubmit} onClose={() => setIsSendDialogOpen(false)} />
       <Popover2 content={menu} onOpening={handleOnMenuOpening} position="bottom">
         <button className="bp4-button bp4-minimal">
           <Identicon value={address} size={16} theme="substrate" />
