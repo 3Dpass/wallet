@@ -1,12 +1,14 @@
-import { Alignment, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar } from "@blueprintjs/core";
+import { Alignment, Card, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
-import Block from "../components/Block";
 import { rpc, types } from "../api.config";
-import Wallet from "../components/Wallet";
 import { polkadotApiAtom } from "../state";
 import { useAtom } from "jotai";
+
+import NetworkState from "../components/NetworkState";
+import Wallet from "../components/Wallet";
+import Block from "../components/Block";
 
 const DEFAULT_API_ENDPOINT = "wss://rpc2.3dpass.org";
 const USE_LOCAL_API = false;
@@ -81,7 +83,10 @@ export default function Index() {
           </NavbarGroup>
         </div>
       </Navbar>
-      {progress < 1.0 && <ProgressBar value={progress} />}
+      {progress < 1.0 && <ProgressBar className="absolute" value={progress} />}
+      <Card>
+        <NetworkState />
+      </Card>
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 p-4">
         {blocks.map((block) => (
           <div key={block.blockHash}>
