@@ -1,4 +1,4 @@
-import Block from "./Block.client";
+import Block from "./Block";
 import { OBJLoader } from "three-stdlib";
 import { lazy, useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
