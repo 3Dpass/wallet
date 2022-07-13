@@ -2,7 +2,7 @@ import { Button, Classes, Dialog, InputGroup, Intent, NumericInput } from "@blue
 import { useState } from "react";
 import Identicon from "@polkadot/react-identicon";
 
-export default function SendDialog({ isOpen, onSubmit, onClose }) {
+export default function DialogSendFunds({ isOpen, onSubmit, onClose }) {
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState(null);
 

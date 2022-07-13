@@ -3,7 +3,7 @@ import { cryptoWaitReady, mnemonicGenerate } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { Icon, Intent, Menu, MenuDivider, MenuItem, Spinner, SpinnerSize, Toaster } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
-import ImportDialog from "./ImportDialog";
+import DialogImportAccount from "./DialogImportAccount";
 import Account from "./Account";
 import { useAtomValue } from "jotai";
 import { polkadotApiAtom } from "../state";
@@ -75,8 +75,8 @@ export default function Wallet() {
   return (
     <div className="bp4-navbar-group bp4-align-right">
       <Toaster ref={toaster} />
-      <ImportDialog isOpen={isSeedPhraseDialogOpen} onClose={() => setIsSeedPhraseDialogOpen(false)} onImport={handleSeedPhraseImportClick} />
-      <ImportDialog isOpen={isJSONWalletDialogOpen} onClose={() => setIsJSONWalletDialogOpen(false)} onImport={handleJSONWalletImportClick} />
+      <DialogImportAccount isOpen={isSeedPhraseDialogOpen} onClose={() => setIsSeedPhraseDialogOpen(false)} onImport={handleSeedPhraseImportClick} />
+      <DialogImportAccount isOpen={isJSONWalletDialogOpen} onClose={() => setIsJSONWalletDialogOpen(false)} onImport={handleJSONWalletImportClick} />
       {accounts.map((account) => {
         return <Account key={account.address} address={account.address} />;
       })}

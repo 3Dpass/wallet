@@ -7,7 +7,7 @@ import { polkadotApiAtom } from "../state";
 import { useRef, useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
-import SendDialog from "./SendDialog";
+import DialogSendFunds from "./DialogSendFunds";
 
 export default function Account({ address }) {
   const api = useAtomValue(polkadotApiAtom);
@@ -81,7 +81,7 @@ export default function Account({ address }) {
   return (
     <>
       <Toaster ref={toaster} />
-      <SendDialog isOpen={isSendDialogOpen} onSubmit={handleSendDialogSubmit} onClose={() => setIsSendDialogOpen(false)} />
+      <DialogSendFunds isOpen={isSendDialogOpen} onSubmit={handleSendDialogSubmit} onClose={() => setIsSendDialogOpen(false)} />
       <Popover2 content={menu} onOpening={handleOnMenuOpening} position="bottom">
         <button className="bp4-button bp4-minimal">
           <Identicon value={address} size={16} theme="substrate" />
