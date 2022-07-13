@@ -16,12 +16,18 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
   const api = useAtomValue(polkadotApiAtom);
   const toaster = useAtomValue(toasterAtom);
   const [canSend, setCanSend] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [address, setAddress] = useState("");
-  const [amount, setAmount] = useState(null);
+  const [amount, setAmount] = useState(0);
+
+  function resetForm() {
+    setIsLoading(false);
+    setAddress("");
+    setAmount(0);
+  }
 
   function handleOnOpening() {
-    setAddress("");
-    setAmount(null);
+    resetForm();
   }
 
   function handleAddressChange(e) {
@@ -29,20 +35,26 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
   }
 
   useEffect(() => {
-    setCanSend(api && address.length === 49 && amount !== null);
+    setCanSend(api && address.length === 49 && amount > 0);
   }, [api, address, amount]);
 
   async function handleSendClick() {
     if (!api) {
       return;
     }
+    setIsLoading(true);
     if (pair.isLocked) {
       // TODO: show unlock dialog
       pair.unlock();
     }
     try {
-      const sent = await api.tx.balances.transfer(address, amount).signAndSend(pair);
-      console.log(sent);
+      await api.tx.balances.transfer(address, amount).signAndSend(pair);
+      toaster &&
+        toaster.show({
+          icon: "endorsed",
+          intent: Intent.SUCCESS,
+          message: "Funds are sent",
+        });
       onAfterSubmit();
     } catch (e) {
       toaster &&
@@ -51,6 +63,8 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
           intent: Intent.DANGER,
           message: e.message,
         });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -60,13 +74,13 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} className="w-[560px]">
         <div className={Classes.DIALOG_BODY}>
-          <InputGroup large={true} className="font-mono mb-2" spellCheck={false} placeholder="Enter address to send to" onChange={handleAddressChange} value={address} leftElement={icon} />
-          <NumericInput large={true} leftIcon="dollar" placeholder="Amount" onValueChange={setAmount} value={amount} fill={true} min={0} />
+          <InputGroup disabled={isLoading} large={true} className="font-mono mb-2" spellCheck={false} placeholder="Enter address to send to" onChange={handleAddressChange} value={address} leftElement={icon} />
+          <NumericInput disabled={isLoading} large={true} leftIcon="dollar" placeholder="Amount" onValueChange={setAmount} value={amount} fill={true} min={0} />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={onClose} text="Cancel" />
-            <Button intent={Intent.PRIMARY} disabled={!canSend} onClick={handleSendClick} icon="send-message" text="Send [TODO]" />
+            <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+            <Button intent={Intent.PRIMARY} disabled={isLoading || !canSend} onClick={handleSendClick} icon="send-message" loading={isLoading} text="Send" />
           </div>
         </div>
       </Dialog>
