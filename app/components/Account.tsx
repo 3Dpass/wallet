@@ -60,11 +60,10 @@ export default function Account({ pair }: AccountProps) {
     setBalances(undefined);
     api.derive.balances.all(pair.address).then((balances) => {
       setBalances(balances);
-      const registry = balances.freeBalance.registry;
       setFormatOptions({
-        decimals: registry.chainDecimals[0],
+        decimals: api.registry.chainDecimals[0],
         withSi: true,
-        withUnit: registry.chainTokens[0],
+        withUnit: api.registry.chainTokens[0],
       });
     });
   }

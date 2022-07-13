@@ -20,6 +20,7 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
   const [isLoading, setIsLoading] = useState(false);
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState(0);
+  const [tokenSymbol, setTokenSymbol] = useState("");
 
   function resetForm() {
     setIsLoading(false);
@@ -37,6 +38,10 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
 
   useEffect(() => {
     setCanSend(api && isValidAddressPolkadotAddress(address) && amount > 0);
+    if (!api) {
+      return;
+    }
+    setTokenSymbol(api.registry.getChainProperties().tokenSymbol.toHuman().toString());
   }, [api, address, amount]);
 
   async function handleSendClick() {
@@ -88,7 +93,7 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
             value={amount}
             fill={true}
             min={0}
-            rightElement={<Tag minimal={true}>3DPt</Tag>}
+            rightElement={<Tag minimal={true}>{tokenSymbol}</Tag>}
           />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
