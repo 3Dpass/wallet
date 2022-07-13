@@ -1,20 +1,25 @@
-import { Intent, Menu, MenuDivider, MenuItem, Spinner, SpinnerSize, Toaster } from "@blueprintjs/core";
+import { Intent, Menu, MenuDivider, MenuItem, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import Identicon from "@polkadot/react-identicon";
 import keyring from "@polkadot/ui-keyring";
 import { useAtomValue } from "jotai";
-import { polkadotApiAtom } from "../state";
-import { useRef, useState } from "react";
+import { polkadotApiAtom, toasterAtom } from "../atoms";
+import { useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
 import DialogSendFunds from "./DialogSendFunds";
+import type { KeyringPair } from "@polkadot/keyring/types";
 
-export default function Account({ address }) {
+type AccountProps = {
+  pair: KeyringPair;
+};
+
+export default function Account({ pair }: AccountProps) {
   const api = useAtomValue(polkadotApiAtom);
+  const toaster = useAtomValue(toasterAtom);
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const [formatOptions, setFormatOptions] = useState({});
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
-  const toaster = useRef<Toaster>();
 
   function handleOnMenuOpening() {
     loadAccount();
@@ -24,27 +29,28 @@ export default function Account({ address }) {
     setIsSendDialogOpen(true);
   }
 
-  function handleSendDialogSubmit(address) {
+  function handleSendDialogAfterSubmit() {
     setIsSendDialogOpen(false);
   }
 
   async function handleCopyAddress() {
-    await navigator.clipboard.writeText(address);
-    toaster.current.show({
-      icon: "tick",
-      intent: Intent.SUCCESS,
-      message: "Address copied to clipboard",
-    });
+    await navigator.clipboard.writeText(pair.address);
+    toaster &&
+      toaster.show({
+        icon: "tick",
+        intent: Intent.SUCCESS,
+        message: "Address copied to clipboard",
+      });
   }
 
   async function handleCopyJson() {
-    const pair = keyring.getPair(address);
     await navigator.clipboard.writeText(JSON.stringify(pair.toJson()));
-    toaster.current.show({
-      icon: "tick",
-      intent: Intent.SUCCESS,
-      message: "Wallet JSON copied to clipboard",
-    });
+    toaster &&
+      toaster.show({
+        icon: "tick",
+        intent: Intent.SUCCESS,
+        message: "Wallet JSON copied to clipboard",
+      });
   }
 
   function loadAccount() {
@@ -52,7 +58,7 @@ export default function Account({ address }) {
       return;
     }
     setBalances(undefined);
-    api.derive.balances.all(address).then((balances) => {
+    api.derive.balances.all(pair.address).then((balances) => {
       setBalances(balances);
       const registry = balances.freeBalance.registry;
       setFormatOptions({
@@ -82,7 +88,7 @@ export default function Account({ address }) {
         icon="delete"
         text="Remove"
         onClick={() => {
-          keyring.forgetAccount(address);
+          keyring.forgetAccount(pair.address);
         }}
       />
     </Menu>
@@ -90,12 +96,11 @@ export default function Account({ address }) {
 
   return (
     <>
-      <Toaster ref={toaster} />
-      <DialogSendFunds isOpen={isSendDialogOpen} onSubmit={handleSendDialogSubmit} onClose={() => setIsSendDialogOpen(false)} />
+      <DialogSendFunds pair={pair} isOpen={isSendDialogOpen} onAfterSubmit={handleSendDialogAfterSubmit} onClose={() => setIsSendDialogOpen(false)} />
       <Popover2 content={menu} onOpening={handleOnMenuOpening} position="bottom">
         <button className="bp4-button bp4-minimal">
-          <Identicon value={address} size={16} theme="substrate" />
-          <div className="max-w-[200px] text-ellipsis overflow-hidden">{address}</div>
+          <Identicon value={pair.address} size={16} theme="substrate" />
+          <div className="max-w-[100px] text-ellipsis overflow-hidden">{pair.address}</div>
         </button>
       </Popover2>
     </>

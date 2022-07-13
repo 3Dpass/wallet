@@ -1,17 +1,15 @@
-import { Alignment, Card, Classes, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar } from "@blueprintjs/core";
-import { useEffect, useState } from "react";
+import { Alignment, Card, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar, Toaster } from "@blueprintjs/core";
+import { useEffect, useRef, useState } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
 import { rpc, types } from "../api.config";
-import { polkadotApiAtom } from "../state";
+import { polkadotApiAtom, toasterAtom } from "../atoms";
 import { useAtom } from "jotai";
-
 import NetworkState from "../components/NetworkState";
 import Wallet from "../components/Wallet";
 import Block from "../components/Block";
 
-const DEFAULT_API_ENDPOINT = "wss://rpc2.3dpass.org";
-const USE_LOCAL_API = false;
+const API_ENDPOINT = "wss://rpc2.3dpass.org";
 const BLOCK_TO_LOAD = 6;
 
 const loadBlock = async (api, hash?: string) => {
@@ -45,12 +43,17 @@ const loadBlock = async (api, hash?: string) => {
 export default function Index() {
   const [blocks, setBlocks] = useState([]);
   const [progress, setProgress] = useState(1 / (BLOCK_TO_LOAD + 1));
-  const [apiEndpoint, setApiEndpoint] = useState(USE_LOCAL_API ? "ws://127.0.0.1:9944" : DEFAULT_API_ENDPOINT);
   const [, setApi] = useAtom(polkadotApiAtom);
+  const [, setToaster] = useAtom(toasterAtom);
+  const toasterRef = useRef<Toaster>();
+
+  useEffect(() => {
+    setToaster(toasterRef.current);
+  }, [toasterRef]);
 
   useEffect(() => {
     setBlocks([]);
-    const provider = new WsProvider(apiEndpoint);
+    const provider = new WsProvider(API_ENDPOINT);
     ApiPromise.create({ provider, rpc, types }).then(async (api) => {
       setApi(api);
       const block = await loadBlock(api);
@@ -65,23 +68,19 @@ export default function Index() {
       }
       setProgress(1.0);
     });
-  }, [setApi, apiEndpoint]);
+  }, [setApi]);
 
   return (
     <>
+      <Toaster ref={toasterRef} />
       <Navbar>
         <NavbarGroup align={Alignment.LEFT}>
           <NavbarHeading className="whitespace-nowrap">3DP Wallet</NavbarHeading>
           <NavbarDivider />
-          <NavbarGroup>
-            <input type="text" className={Classes.INPUT} value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} />
-          </NavbarGroup>
         </NavbarGroup>
-        <div className="hidden lg:block">
-          <NavbarGroup align={Alignment.RIGHT}>
-            <Wallet />
-          </NavbarGroup>
-        </div>
+        <NavbarGroup align={Alignment.RIGHT}>
+          <Wallet />
+        </NavbarGroup>
       </Navbar>
       {progress < 1.0 && <ProgressBar className="absolute" value={progress} />}
       <Card>

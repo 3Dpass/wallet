@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { cryptoWaitReady, mnemonicGenerate } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
-import { Icon, Intent, Menu, MenuDivider, MenuItem, Spinner, SpinnerSize, Toaster } from "@blueprintjs/core";
-import { Popover2 } from "@blueprintjs/popover2";
+import { Button, Intent, Menu, MenuDivider, MenuItem, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Popover2, PopupKind } from "@blueprintjs/popover2";
 import DialogImportAccount from "./DialogImportAccount";
 import Account from "./Account";
 import { useAtomValue } from "jotai";
-import { polkadotApiAtom } from "../state";
+import { polkadotApiAtom, toasterAtom } from "../atoms";
 
 const ss58format = {
   test: 72,
@@ -14,12 +14,12 @@ const ss58format = {
 };
 
 export default function Wallet() {
+  const api = useAtomValue(polkadotApiAtom);
+  const toaster = useAtomValue(toasterAtom);
   const [isLoading, setIsLoading] = useState(true);
-  const [accounts, setAccounts] = useState([]);
+  const [pairs, setPairs] = useState([]);
   const [isSeedPhraseDialogOpen, setIsSeedPhraseDialogOpen] = useState(false);
   const [isJSONWalletDialogOpen, setIsJSONWalletDialogOpen] = useState(false);
-  const toaster = useRef<Toaster>();
-  const api = useAtomValue(polkadotApiAtom);
 
   function handleGenerateAddressClick() {
     const mnemonic = mnemonicGenerate();
@@ -31,11 +31,12 @@ export default function Wallet() {
       keyring.addUri(value);
       setIsSeedPhraseDialogOpen(false);
     } catch (e) {
-      toaster.current.show({
-        icon: "ban-circle",
-        intent: Intent.DANGER,
-        message: e.message,
-      });
+      toaster &&
+        toaster.show({
+          icon: "ban-circle",
+          intent: Intent.DANGER,
+          message: e.message,
+        });
     }
   }
 
@@ -45,11 +46,12 @@ export default function Wallet() {
       keyring.addPair(pair, "");
       setIsJSONWalletDialogOpen(false);
     } catch (e) {
-      toaster.current.show({
-        icon: "ban-circle",
-        intent: Intent.DANGER,
-        message: e.message,
-      });
+      toaster &&
+        toaster.show({
+          icon: "ban-circle",
+          intent: Intent.DANGER,
+          message: e.message,
+        });
     }
   }
 
@@ -58,7 +60,7 @@ export default function Wallet() {
     cryptoWaitReady().then(() => {
       keyring.loadAll({ ss58Format: ss58format.test, type: "sr25519" });
       sub = keyring.accounts.subject.subscribe(() => {
-        setAccounts(keyring.getAccounts());
+        setPairs(keyring.getPairs());
       });
       setIsLoading(false);
     });
@@ -74,11 +76,10 @@ export default function Wallet() {
 
   return (
     <div className="bp4-navbar-group bp4-align-right">
-      <Toaster ref={toaster} />
       <DialogImportAccount isOpen={isSeedPhraseDialogOpen} onClose={() => setIsSeedPhraseDialogOpen(false)} onImport={handleSeedPhraseImportClick} />
       <DialogImportAccount isOpen={isJSONWalletDialogOpen} onClose={() => setIsJSONWalletDialogOpen(false)} onImport={handleJSONWalletImportClick} />
-      {accounts.map((account) => {
-        return <Account key={account.address} address={account.address} />;
+      {pairs.map((pair) => {
+        return <Account key={pair.address} pair={pair} />;
       })}
       <Popover2
         content={
@@ -89,11 +90,10 @@ export default function Wallet() {
             <MenuItem icon="import" text="Import JSON wallet..." onClick={() => setIsJSONWalletDialogOpen(true)} />
           </Menu>
         }
-        position="bottom-left"
+        popupKind={PopupKind.MENU}
+        position={Position.LEFT}
       >
-        <button className="bp4-button bp4-minimal">
-          <Icon icon="plus" />
-        </button>
+        <Button icon="plus" minimal={true} />
       </Popover2>
     </div>
   );

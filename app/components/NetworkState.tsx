@@ -1,5 +1,5 @@
 import { useAtomValue } from "jotai";
-import { polkadotApiAtom } from "../state";
+import { polkadotApiAtom } from "../atoms";
 import { useEffect, useState } from "react";
 import { Spinner } from "@blueprintjs/core";
 import TimeAgo from "react-timeago";
