@@ -98,7 +98,7 @@ export default function Account({ pair }: AccountProps) {
       <DialogSendFunds pair={pair} isOpen={isSendDialogOpen} onAfterSubmit={handleSendDialogAfterSubmit} onClose={() => setIsSendDialogOpen(false)} />
       <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
         <Button minimal={true} icon={<Identicon value={pair.address} size={24} theme="substrate" />}>
-          <div className="hidden sm:block max-w-[100px] md:max-w-[200px] text-ellipsis overflow-hidden">{pair.address}</div>
+          <div className="max-w-[100px] md:max-w-[200px] text-ellipsis overflow-hidden">{pair.address}</div>
         </Button>
       </Popover2>
     </>

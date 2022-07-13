@@ -78,9 +78,9 @@ export default function Wallet() {
     <NavbarGroup align={Alignment.RIGHT}>
       <DialogImportAccount isOpen={isSeedPhraseDialogOpen} onClose={() => setIsSeedPhraseDialogOpen(false)} onImport={handleSeedPhraseImportClick} />
       <DialogImportAccount isOpen={isJSONWalletDialogOpen} onClose={() => setIsJSONWalletDialogOpen(false)} onImport={handleJSONWalletImportClick} />
-      {pairs.map((pair) => {
-        return <Account key={pair.address} pair={pair} />;
-      })}
+        {pairs.map((pair) => {
+          return <Account key={pair.address} pair={pair} />;
+        })}
       <Popover2
         minimal={true}
         position={Position.BOTTOM_LEFT}
