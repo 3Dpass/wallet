@@ -1,9 +1,10 @@
-import { Button, Classes, Dialog, InputGroup, Intent, NumericInput } from "@blueprintjs/core";
+import { Button, Classes, Dialog, Icon, InputGroup, Intent, NumericInput, Tag } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import Identicon from "@polkadot/react-identicon";
 import { useAtomValue } from "jotai";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { polkadotApiAtom, toasterAtom } from "../atoms";
+import { isValidAddressPolkadotAddress } from "../utils/address";
 
 type DialogSendFundsProps = {
   pair: KeyringPair;
@@ -35,7 +36,7 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
   }
 
   useEffect(() => {
-    setCanSend(api && address.length === 49 && amount > 0);
+    setCanSend(api && isValidAddressPolkadotAddress(address) && amount > 0);
   }, [api, address, amount]);
 
   async function handleSendClick() {
@@ -48,7 +49,8 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
       pair.unlock();
     }
     try {
-      await api.tx.balances.transfer(address, amount).signAndSend(pair);
+      const toSend = amount * 1_000_000_000_000;
+      await api.tx.balances.transfer(address, toSend).signAndSend(pair);
       toaster &&
         toaster.show({
           icon: "endorsed",
@@ -68,14 +70,26 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
     }
   }
 
-  const icon = <Identicon value={address} size={40} theme="substrate" />;
+  const addressIcon = isValidAddressPolkadotAddress(address) ? <Identicon value={address} size={40} theme="substrate" /> : <Icon icon="asterisk" />;
 
   return (
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} className="w-[560px]">
         <div className={Classes.DIALOG_BODY}>
-          <InputGroup disabled={isLoading} large={true} className="font-mono mb-2" spellCheck={false} placeholder="Enter address to send to" onChange={handleAddressChange} value={address} leftElement={icon} />
-          <NumericInput disabled={isLoading} large={true} leftIcon="dollar" placeholder="Amount" onValueChange={setAmount} value={amount} fill={true} min={0} />
+          <InputGroup disabled={isLoading} large={true} className="font-mono mb-2" spellCheck={false} placeholder="Enter address to send to" onChange={handleAddressChange} value={address} leftElement={addressIcon} />
+          <NumericInput
+            disabled={isLoading}
+            selectAllOnFocus={true}
+            buttonPosition={null}
+            large={true}
+            leftIcon="send-to"
+            placeholder="Amount"
+            onValueChange={setAmount}
+            value={amount}
+            fill={true}
+            min={0}
+            rightElement={<Tag minimal={true}>3DPt</Tag>}
+          />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
