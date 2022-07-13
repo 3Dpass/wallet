@@ -28,6 +28,15 @@ export default function Account({ address }) {
     setIsSendDialogOpen(false);
   }
 
+  async function handleCopyAddress() {
+    await navigator.clipboard.writeText(address);
+    toaster.current.show({
+      icon: "tick",
+      intent: Intent.SUCCESS,
+      message: "Address copied to clipboard",
+    });
+  }
+
   async function handleCopyJson() {
     const pair = keyring.getPair(address);
     await navigator.clipboard.writeText(JSON.stringify(pair.toJson()));
@@ -66,6 +75,7 @@ export default function Account({ address }) {
         </>
       )}
       <MenuDivider />
+      <MenuItem icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
       <MenuItem icon="export" text="Copy JSON wallet" onClick={handleCopyJson} />
       <MenuDivider />
       <MenuItem
