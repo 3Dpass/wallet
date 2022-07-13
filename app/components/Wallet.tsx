@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { cryptoWaitReady, mnemonicGenerate } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
-import { Button, Intent, Menu, MenuDivider, MenuItem, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
-import { Popover2, PopupKind } from "@blueprintjs/popover2";
+import { Alignment, Button, Intent, Menu, MenuDivider, MenuItem, NavbarGroup, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Popover2 } from "@blueprintjs/popover2";
 import DialogImportAccount from "./DialogImportAccount";
 import Account from "./Account";
 import { useAtomValue } from "jotai";
@@ -75,13 +75,15 @@ export default function Wallet() {
   }
 
   return (
-    <div className="bp4-navbar-group bp4-align-right">
+    <NavbarGroup align={Alignment.RIGHT}>
       <DialogImportAccount isOpen={isSeedPhraseDialogOpen} onClose={() => setIsSeedPhraseDialogOpen(false)} onImport={handleSeedPhraseImportClick} />
       <DialogImportAccount isOpen={isJSONWalletDialogOpen} onClose={() => setIsJSONWalletDialogOpen(false)} onImport={handleJSONWalletImportClick} />
       {pairs.map((pair) => {
         return <Account key={pair.address} pair={pair} />;
       })}
       <Popover2
+        minimal={true}
+        position={Position.BOTTOM_LEFT}
         content={
           <Menu>
             <MenuItem icon="random" text="Generate random wallet" onClick={handleGenerateAddressClick} />
@@ -90,11 +92,9 @@ export default function Wallet() {
             <MenuItem icon="import" text="Import JSON wallet..." onClick={() => setIsJSONWalletDialogOpen(true)} />
           </Menu>
         }
-        popupKind={PopupKind.MENU}
-        position={Position.LEFT}
       >
         <Button icon="plus" minimal={true} />
       </Popover2>
-    </div>
+    </NavbarGroup>
   );
 }

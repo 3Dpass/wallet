@@ -1,4 +1,4 @@
-import { Intent, Menu, MenuDivider, MenuItem, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Button, Intent, Menu, MenuDivider, MenuItem, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import Identicon from "@polkadot/react-identicon";
 import keyring from "@polkadot/ui-keyring";
@@ -97,11 +97,10 @@ export default function Account({ pair }: AccountProps) {
   return (
     <>
       <DialogSendFunds pair={pair} isOpen={isSendDialogOpen} onAfterSubmit={handleSendDialogAfterSubmit} onClose={() => setIsSendDialogOpen(false)} />
-      <Popover2 content={menu} onOpening={handleOnMenuOpening} position="bottom">
-        <button className="bp4-button bp4-minimal">
-          <Identicon value={pair.address} size={16} theme="substrate" />
-          <div className="max-w-[100px] text-ellipsis overflow-hidden">{pair.address}</div>
-        </button>
+      <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
+        <Button minimal={true} icon={<Identicon value={pair.address} size={24} theme="substrate" />}>
+          <div className="max-w-[100px] md:max-w-[200px] text-ellipsis overflow-hidden">{pair.address}</div>
+        </Button>
       </Popover2>
     </>
   );

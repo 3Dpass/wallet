@@ -1,5 +1,6 @@
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 import styles from "./styles/app.css";
+import { Classes } from "@blueprintjs/core";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -25,7 +26,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bp4-dark">
+      <body className={Classes.DARK}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

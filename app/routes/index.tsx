@@ -75,8 +75,9 @@ export default function Index() {
       <Toaster ref={toasterRef} />
       <Navbar>
         <NavbarGroup align={Alignment.LEFT}>
-          <NavbarHeading className="whitespace-nowrap">3DP Wallet</NavbarHeading>
-          <NavbarDivider />
+          <NavbarHeading className="whitespace-nowrap">
+            <strong>3DP</strong> Wallet
+          </NavbarHeading>
         </NavbarGroup>
         <NavbarGroup align={Alignment.RIGHT}>
           <Wallet />
