@@ -9,6 +9,7 @@ import Wallet from "./components/Wallet.client";
 import { rpc, types } from "./api.config";
 import { ClientOnly } from "remix-utils";
 import { ApiPromise, WsProvider } from "@polkadot/api";
+import { withSentry } from "@sentry/remix";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -29,7 +30,7 @@ export function links() {
 
 const API_ENDPOINT = "wss://rpc2.3dpass.org";
 
-export default function App() {
+function App() {
   const toasterRef = useRef<Toaster>();
   const setToaster = useSetAtom(toasterAtom);
   const setApi = useSetAtom(polkadotApiAtom);
@@ -73,3 +74,5 @@ export default function App() {
     </html>
   );
 }
+
+export default withSentry(App);
