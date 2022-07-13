@@ -1,6 +1,8 @@
 import { Card, Elevation } from "@blueprintjs/core";
-import { Canvas } from "@react-three/fiber";
-import { Rock } from "./Rock";
+import { Rock } from "./Rock.client";
+import { lazy } from "react";
+
+const Canvas = lazy(() => import("@react-three/fiber").then((module) => ({ default: module.Canvas })));
 
 export default function Block({ block }) {
   return (

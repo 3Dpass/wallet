@@ -1,10 +1,11 @@
 import { useAtomValue } from "jotai";
 import { polkadotApiAtom } from "../atoms";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { Spinner } from "@blueprintjs/core";
-import TimeAgo from "react-timeago";
-import type { AnyJson } from "@polkadot/types-codec/types/helpers";
 import { formatDuration } from "../utils/time";
+import type { AnyJson } from "@polkadot/types-codec/types/helpers";
+
+const TimeAgo = lazy(() => import("react-timeago"));
 
 type INetworkState = {
   totalIssuance: string;

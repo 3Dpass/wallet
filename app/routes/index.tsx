@@ -1,99 +1,19 @@
-import { Alignment, Card, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, ProgressBar, Toaster } from "@blueprintjs/core";
-import { useEffect, useRef, useState } from "react";
-import { ApiPromise, WsProvider } from "@polkadot/api";
-import { OBJLoader } from "three-stdlib/loaders/OBJLoader.cjs";
-import { rpc, types } from "../api.config";
-import { polkadotApiAtom, toasterAtom } from "../atoms";
-import { useAtom } from "jotai";
-import NetworkState from "../components/NetworkState";
-import Wallet from "../components/Wallet";
-import Block from "../components/Block";
-
-const API_ENDPOINT = "wss://rpc2.3dpass.org";
-const BLOCK_TO_LOAD = 6;
-
-const loadBlock = async (api, hash?: string) => {
-  let signedBlock;
-
-  if (hash === undefined) {
-    signedBlock = await api.rpc.chain.getBlock();
-  } else {
-    signedBlock = await api.rpc.chain.getBlock(hash);
-  }
-  const block = signedBlock.block;
-  const blockHash = block.header.hash.toHex();
-  const objectHashesString = block.header.digest.logs[2].asOther.toString().substring(2);
-  const objectHashes = [];
-  for (let i = 0; i < 10; i++) {
-    objectHashes.push(objectHashesString.substring(i * 64, (i + 1) * 64));
-  }
-  const data = await api.rpc.poscan.getMiningObject(blockHash);
-
-  const loader = new OBJLoader();
-  const object = loader.parse(data).children[0];
-
-  return {
-    block: block,
-    blockHash: blockHash,
-    objectHashes: objectHashes,
-    object: object,
-  };
-};
+import { Card } from "@blueprintjs/core";
+import NetworkState from "../components/NetworkState.client";
+import Blocks from "../components/Blocks.client";
+import { ClientOnly } from "remix-utils";
 
 export default function Index() {
-  const [blocks, setBlocks] = useState([]);
-  const [progress, setProgress] = useState(1 / (BLOCK_TO_LOAD + 1));
-  const [, setApi] = useAtom(polkadotApiAtom);
-  const [, setToaster] = useAtom(toasterAtom);
-  const toasterRef = useRef<Toaster>();
-
-  useEffect(() => {
-    setToaster(toasterRef.current);
-  }, [toasterRef]);
-
-  useEffect(() => {
-    setBlocks([]);
-    const provider = new WsProvider(API_ENDPOINT);
-    ApiPromise.create({ provider, rpc, types }).then(async (api) => {
-      setApi(api);
-      const block = await loadBlock(api);
-      let last_block = block;
-      setBlocks((prevBlocks) => [...prevBlocks, block]);
-      for (let i = 1; i < BLOCK_TO_LOAD; i++) {
-        setProgress((i + 1) / (BLOCK_TO_LOAD + 1));
-        let parent_hash = last_block.block.header.parentHash.toHex();
-        const block = await loadBlock(api, parent_hash);
-        last_block = block;
-        setBlocks((prevBlocks) => [...prevBlocks, block]);
-      }
-      setProgress(1.0);
-    });
-  }, [setApi]);
-
   return (
-    <>
-      <Toaster ref={toasterRef} />
-      <Navbar>
-        <NavbarGroup align={Alignment.LEFT}>
-          <NavbarHeading className="whitespace-nowrap">
-            <strong>3DP</strong> Wallet
-          </NavbarHeading>
-        </NavbarGroup>
-        <NavbarGroup align={Alignment.RIGHT}>
-          <Wallet />
-        </NavbarGroup>
-      </Navbar>
-      {progress < 1.0 && <ProgressBar className="absolute" value={progress} />}
-      <Card>
-        <NetworkState />
-      </Card>
-      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 p-4">
-        {blocks.map((block) => (
-          <div key={block.blockHash}>
-            <Block block={block} />
-          </div>
-        ))}
-      </div>
-    </>
+    <ClientOnly>
+      {() => (
+        <>
+          <Card>
+            <NetworkState />
+          </Card>
+          <Blocks count={6} />
+        </>
+      )}
+    </ClientOnly>
   );
 }

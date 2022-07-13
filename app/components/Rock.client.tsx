@@ -12,6 +12,7 @@ export function Rock({ geometry }) {
     rock.current.rotation.z = clock.getElapsedTime() / 5.0;
     rock.current.rotation.x = clock.getElapsedTime() / 10.0;
   });
+
   return (
     <>
       <ambientLight intensity={0.8} color={[1, 1, 1]} />
