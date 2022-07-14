@@ -1,3 +1,4 @@
+export const endpoint = "wss://rpc2.3dpass.org";
 export const rpc = {
   poscan: {
     pushMiningObject: {

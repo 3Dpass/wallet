@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { polkadotApiAtom, toasterAtom } from "./atoms";
 import { useSetAtom } from "jotai";
 import Wallet from "./components/Wallet.client";
-import { rpc, types } from "./api.config";
+import { endpoint, rpc, types } from "./api.config";
 import { ClientOnly } from "remix-utils";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { withSentry } from "@sentry/remix";
@@ -28,8 +28,6 @@ export function links() {
   ];
 }
 
-const API_ENDPOINT = "wss://rpc2.3dpass.org";
-
 function App() {
   const toasterRef = useRef<Toaster>();
   const setToaster = useSetAtom(toasterAtom);
@@ -40,7 +38,7 @@ function App() {
   }, [setToaster, toasterRef]);
 
   useEffect(() => {
-    const provider = new WsProvider(API_ENDPOINT);
+    const provider = new WsProvider(endpoint);
     ApiPromise.create({ provider, rpc, types }).then(async (api) => {
       setApi(api);
     });
