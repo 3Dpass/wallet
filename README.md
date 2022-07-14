@@ -1,4 +1,4 @@
-# 3DP block explorer
+# 3DP Wallet
 
 ## Development
 

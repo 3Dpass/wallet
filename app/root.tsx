@@ -13,7 +13,7 @@ import { withSentry } from "@sentry/remix";
 
 export const meta = () => ({
   charset: "utf-8",
-  title: "3DP Explorer",
+  title: "3DP Wallet",
   viewport: "width=device-width,initial-scale=1",
 });
 

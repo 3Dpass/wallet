@@ -1,6 +1,4 @@
-# fly.toml file generated for 3dp-explorer on 2022-06-24T18:35:59+03:00
-
-app = "3dp-explorer"
+app = "3dp-wallet"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
