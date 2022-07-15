@@ -1,11 +1,10 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+const COLOR = "#fff";
+
 export function Rock({ geometry }) {
-  const DEFAULT_COLOR = "#2f343c";
-  const [wireframe, setWireframe] = useState(false);
-  const [color, setColor] = useState(DEFAULT_COLOR);
   const rock = useRef();
   useFrame(({ clock }) => {
     rock.current.rotation.y = clock.getElapsedTime() / 3.0;
@@ -13,24 +12,19 @@ export function Rock({ geometry }) {
     rock.current.rotation.x = clock.getElapsedTime() / 10.0;
   });
 
+  const textureUrl = "/textures/space.jpg";
+  const textureUrls = [textureUrl, textureUrl, textureUrl, textureUrl, textureUrl, textureUrl];
+  const textureCube = new THREE.CubeTextureLoader().load(textureUrls);
+  textureCube.wrapping = THREE.MirroredRepeatWrapping;
+  textureCube.mapping = THREE.CubeRefractionMapping;
+
   return (
     <>
-      <ambientLight intensity={0.8} color={[1, 1, 1]} />
+      <ambientLight color={[1, 1, 1]} />
+      <pointLight intensity={2} position={[-10, -10, -10]} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-      <pointLight position={[-10, -10, -10]} />
-      <mesh
-        ref={rock}
-        geometry={geometry}
-        onPointerEnter={() => {
-          setWireframe(true);
-          setColor("#fff");
-        }}
-        onPointerLeave={() => {
-          setWireframe(false);
-          setColor(DEFAULT_COLOR);
-        }}
-      >
-        <meshStandardMaterial color={color} roughness={0.1} wireframe={wireframe} side={THREE.DoubleSide} />
+      <mesh ref={rock} geometry={geometry}>
+        <meshPhongMaterial color={COLOR} roughness={0.8} envMap={textureCube} refractionRatio={0.7} reflectivity={1} flatShading={true} />
       </mesh>
     </>
   );
