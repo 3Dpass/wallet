@@ -1,4 +1,4 @@
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { blocksAtom, polkadotApiAtom } from "../atoms";
 import { lazy, useEffect, useState } from "react";
 import { Card, Spinner } from "@blueprintjs/core";
@@ -18,7 +18,7 @@ type INetworkState = {
 
 export default function NetworkState() {
   const api = useAtomValue(polkadotApiAtom);
-  const setBlocks = useSetAtom(blocksAtom);
+  const [blocks, setBlocks] = useAtom(blocksAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [networkState, setNetworkState] = useState<INetworkState>();
 
@@ -42,6 +42,10 @@ export default function NetworkState() {
     setIsLoading(false);
   }
 
+  function isBlockAlreadyLoaded(hash) {
+    return blocks.some((block) => block.blockHash === hash);
+  }
+
   useEffect(() => {
     if (!api) {
       return;
@@ -53,6 +57,9 @@ export default function NetworkState() {
       timestampUnsubscribe = await api.query.timestamp.now(loadNetworkState);
       newHeadsUnsubscribe = await api.rpc.chain.subscribeNewHeads((head) => {
         const hash = head.hash.toHex();
+        if (isBlockAlreadyLoaded(hash)) {
+          return;
+        }
         loadBlock(api, hash).then((block) => {
           setBlocks((prevBlocks) => [block, ...prevBlocks]);
         });
