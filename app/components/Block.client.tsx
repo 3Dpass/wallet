@@ -1,5 +1,5 @@
 import { Rock } from "./Rock";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { Button, Card, Elevation } from "@blueprintjs/core";
 import TitledValue from "./TitledValue";
 import { Popover2 } from "@blueprintjs/popover2";
@@ -32,7 +32,9 @@ export default function Block({ block }) {
             position: [0, 0, 8],
           }}
         >
-          <Rock geometry={block.object.geometry} />
+          <Suspense fallback={null}>
+            <Rock geometry={block.object.geometry} />
+          </Suspense>
         </Canvas>
       </div>
     </Card>
