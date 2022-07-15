@@ -67,13 +67,18 @@ export default function NetworkState() {
     };
   }, [api]);
 
-  if (isLoading) {
+  if (isLoading && !networkState) {
     return <Spinner />;
   }
 
+  let cardClassName = "grid gap-y-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-6";
+  if (isLoading) {
+    cardClassName += " opacity-50";
+  }
+
   return (
-    <Card className="mb-4 min-h-[90px]">
-      <div className="grid gap-y-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-6">
+    <Card className="mb-4">
+      <div className={cardClassName}>
         <div>
           <div className="text-sm text-gray-500">Best Block</div>
           <div className="text-xl">{networkState.bestNumber}</div>
