@@ -64,7 +64,9 @@ function App() {
             <ClientOnly>{() => <Wallet />}</ClientOnly>
           </NavbarGroup>
         </Navbar>
-        <Outlet />
+        <div className="container mx-auto p-4">
+          <Outlet />
+        </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

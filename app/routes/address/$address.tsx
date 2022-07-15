@@ -1,18 +1,21 @@
-import { Card, Divider, Icon, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useParams } from "@remix-run/react";
-import Transactions from "../../components/Transactions.client";
+import { Card, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { ClientOnly } from "remix-utils";
+import Transactions from "../../components/Transactions.client";
+import { polkadotApiAtom } from "../../atoms";
+import { useAtomValue } from "jotai";
 
 export default function Address() {
+  const api = useAtomValue(polkadotApiAtom);
   const { address } = useParams();
+
+  if (!api) {
+    return <Spinner />;
+  }
 
   return (
     <Card>
-      <div>
-        <Icon icon="id-number" className="mr-1" />
-        {address}
-      </div>
-      <Divider className="my-4" />
+      <div className="mb-4 pb-4 border-b border-b-gray-500 text-sm md:text-xl">{address}</div>
       <ClientOnly fallback={<Spinner size={SpinnerSize.SMALL} />}>{() => <Transactions address={address} />}</ClientOnly>
     </Card>
   );

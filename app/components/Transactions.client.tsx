@@ -3,7 +3,7 @@ import { polkadotApiAtom } from "../atoms";
 import { useEffect, useState } from "react";
 import { Icon } from "@blueprintjs/core";
 
-export default function TransactionsClient({ address }) {
+export default function Transactions({ address }) {
   const api = useAtomValue(polkadotApiAtom);
   const [locks, setLocks] = useState(null);
 
