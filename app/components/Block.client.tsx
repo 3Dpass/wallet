@@ -12,7 +12,7 @@ export default function Block({ block }) {
           <div className="text-sm text-gray-500">Block</div>
           <div className="text-xl">{block.block.header.number.toHuman()}</div>
         </div>
-        <div className="w-[300px] h-[300px]">
+        <div className="w-[200px] h-[200px]">
           <Canvas
             camera={{
               fov: 30,
@@ -25,7 +25,7 @@ export default function Block({ block }) {
           </Canvas>
         </div>
       </div>
-      <code className="overflow-x-auto block text-right text-[10px] text-gray-500">
+      <code className="overflow-x-auto block text-right text-[11px] text-gray-500">
         {block.objectHashes.map((hash, index) => {
           return <div key={index}>{hash}</div>;
         })}
