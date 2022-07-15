@@ -6,6 +6,7 @@ import { formatDuration } from "../utils/time";
 import type { AnyJson } from "@polkadot/types-codec/types/helpers";
 import { loadBlock } from "../utils/block";
 import { MAX_BLOCKS } from "../api.config";
+import TitledValue from "./TitledValue";
 
 const TimeAgo = lazy(() => import("react-timeago"));
 
@@ -90,28 +91,11 @@ export default function NetworkState() {
   return (
     <Card className="mb-4">
       <div className={cardClassName}>
-        <div>
-          <div className="text-sm text-gray-500">Best Block</div>
-          <div className="text-xl">{networkState.bestNumber}</div>
-        </div>
-        <div>
-          <div className="text-sm text-gray-500">Finalized</div>
-          <div className="text-xl">{networkState.bestNumberFinalized}</div>
-        </div>
-        <div>
-          <div className="text-sm text-gray-500">Last Block</div>
-          <div className="text-xl">
-            <TimeAgo date={networkState.timestamp} live={true} />
-          </div>
-        </div>
-        <div>
-          <div className="text-sm text-gray-500">Target</div>
-          <div className="text-xl">{formatDuration(networkState.targetBlockTime)}</div>
-        </div>
-        <div>
-          <div className="text-sm text-gray-500">Total Issuance</div>
-          <div className="text-xl">{networkState.totalIssuance}</div>
-        </div>
+        <TitledValue title="Best block" value={networkState.bestNumber} />
+        <TitledValue title="Finalized" value={networkState.bestNumberFinalized} />
+        <TitledValue title="Latest block" value={<TimeAgo date={networkState.timestamp} live={true} />} />
+        <TitledValue title="Target" value={formatDuration(networkState.targetBlockTime)} />
+        <TitledValue title="Total issuance" value={networkState.totalIssuance} />
       </div>
     </Card>
   );
