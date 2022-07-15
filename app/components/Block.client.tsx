@@ -7,12 +7,12 @@ const Canvas = lazy(() => import("@react-three/fiber").then((module) => ({ defau
 export default function Block({ block }) {
   return (
     <Card elevation={Elevation.ZERO}>
-      <div className="flex flex-row justify-between">
+      <div className="md:flex-row justify-between">
         <div>
           <div className="text-sm text-gray-500">Block</div>
           <div className="text-xl">{block.block.header.number.toHuman()}</div>
         </div>
-        <div className="w-[200px] h-[200px]">
+        <div className="w-full h-[200px] md:h-[400px]">
           <Canvas
             camera={{
               fov: 30,
@@ -25,7 +25,7 @@ export default function Block({ block }) {
           </Canvas>
         </div>
       </div>
-      <code className="overflow-x-auto block text-right text-[11px] text-gray-500">
+      <code className="overflow-x-auto block text-center text-[11px] text-gray-500">
         {block.objectHashes.map((hash, index) => {
           return <div key={index}>{hash}</div>;
         })}
