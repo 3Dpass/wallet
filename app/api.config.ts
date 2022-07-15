@@ -1,5 +1,6 @@
-export const endpoint = "wss://rpc2.3dpass.org";
-export const rpc = {
+export const MAX_BLOCKS = 6;
+export const RPC_ENDPOINT = "wss://rpc2.3dpass.org";
+export const RPC_CONFIG = {
   poscan: {
     pushMiningObject: {
       description: "Submit 3D object for mining.",
@@ -27,7 +28,7 @@ export const rpc = {
     },
   },
 };
-export const types = {
+export const RPC_TYPES = {
   AccountInfo: "AccountInfoWithTripleRefCount",
   Address: "AccountId",
   LookupSource: "AccountId",

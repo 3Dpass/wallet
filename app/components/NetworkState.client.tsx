@@ -5,6 +5,7 @@ import { Card, Spinner } from "@blueprintjs/core";
 import { formatDuration } from "../utils/time";
 import type { AnyJson } from "@polkadot/types-codec/types/helpers";
 import { loadBlock } from "../utils/block";
+import { MAX_BLOCKS } from "../api.config";
 
 const TimeAgo = lazy(() => import("react-timeago"));
 
@@ -61,7 +62,10 @@ export default function NetworkState() {
           return;
         }
         loadBlock(api, hash).then((block) => {
-          setBlocks((prevBlocks) => [block, ...prevBlocks]);
+          setBlocks((prevBlocks) => {
+            const newBlocks = [block, ...prevBlocks];
+            return newBlocks.slice(0, MAX_BLOCKS);
+          });
         });
       });
     }
