@@ -7,8 +7,8 @@ const COLOR = "#fff";
 export function Rock({ geometry }) {
   const rock = useRef();
   useFrame(({ clock }) => {
-    rock.current.rotation.y = clock.getElapsedTime() / 3.0;
-    rock.current.rotation.z = clock.getElapsedTime() / 5.0;
+    rock.current.rotation.y = clock.getElapsedTime() / 10.0;
+    rock.current.rotation.z = clock.getElapsedTime() / 10.0;
     rock.current.rotation.x = clock.getElapsedTime() / 10.0;
   });
 

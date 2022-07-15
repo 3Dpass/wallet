@@ -29,7 +29,7 @@ export default function Block({ block }) {
             fov: 30,
             near: 0.1,
             far: 1000,
-            position: [0, 0, 10],
+            position: [0, 0, 8],
           }}
         >
           <Rock geometry={block.object.geometry} />
