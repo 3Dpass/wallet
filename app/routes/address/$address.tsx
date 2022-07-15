@@ -1,26 +1,19 @@
-import { Button, Card, Intent } from "@blueprintjs/core";
-import { useAtomValue } from "jotai";
-import { toasterAtom } from "../../atoms";
+import { Card, Divider, Icon, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useParams } from "@remix-run/react";
+import Transactions from "../../components/Transactions.client";
+import { ClientOnly } from "remix-utils";
 
 export default function Address() {
-  const toaster = useAtomValue(toasterAtom);
-  const params = useParams();
+  const { address } = useParams();
 
   return (
     <Card>
-      <Card>{params.address}</Card>
-      <Button
-        onClick={() => {
-          toaster &&
-            toaster.show({
-              icon: "tick",
-              intent: Intent.SUCCESS,
-              message: "Clicked!",
-            });
-        }}
-        text="Show toaster"
-      />
+      <div>
+        <Icon icon="id-number" className="mr-1" />
+        {address}
+      </div>
+      <Divider className="my-4" />
+      <ClientOnly fallback={<Spinner size={SpinnerSize.SMALL} />}>{() => <Transactions address={address} />}</ClientOnly>
     </Card>
   );
 }

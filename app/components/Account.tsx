@@ -9,6 +9,7 @@ import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
 import DialogSendFunds from "./DialogSendFunds";
 import type { KeyringPair } from "@polkadot/keyring/types";
+import { useNavigate } from "@remix-run/react";
 
 type AccountProps = {
   pair: KeyringPair;
@@ -17,6 +18,7 @@ type AccountProps = {
 export default function Account({ pair }: AccountProps) {
   const api = useAtomValue(polkadotApiAtom);
   const toaster = useAtomValue(toasterAtom);
+  const navigate = useNavigate();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const [formatOptions, setFormatOptions] = useState({});
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
@@ -70,18 +72,19 @@ export default function Account({ pair }: AccountProps) {
 
   const menu = (
     <Menu>
+      <MenuItem icon="id-number" text="View details..." onClick={() => navigate(`address/${pair.address}`)}></MenuItem>
+      <MenuItem icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
+      <MenuItem icon="export" text="Copy JSON wallet" onClick={handleCopyJson} />
+      <MenuDivider />
       {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
       {balances && (
         <>
-          <MenuDivider title={`Total balance: ${formatBalance(balances.freeBalance, formatOptions)}`} />
+          <MenuItem disabled={true} icon="cube-add" text={`Total balance: ${formatBalance(balances.freeBalance, formatOptions)}`} />
           <MenuItem disabled={true} icon="cube" text={`Transferable: ${balances.availableBalance.toHuman()}`} />
           <MenuItem disabled={true} icon="lock" text={`Locked: ${balances.lockedBalance.toHuman()}`} />
           <MenuItem icon="send-to" text="Send funds..." onClick={handleSendMenuClick} />
         </>
       )}
-      <MenuDivider />
-      <MenuItem icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
-      <MenuItem icon="export" text="Copy JSON wallet" onClick={handleCopyJson} />
       <MenuDivider />
       <MenuItem
         icon="delete"
