@@ -79,7 +79,7 @@ export default function NetworkState() {
   }, [api]);
 
   if (isLoading && !networkState) {
-    return <Spinner />;
+    return <Spinner className="mt-20" />;
   }
 
   let cardClassName = "grid gap-y-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-6";
