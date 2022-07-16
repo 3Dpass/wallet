@@ -96,8 +96,8 @@ export default function Wallet() {
             <Menu>
               {pairs.slice(MAX_ADDRESSES_TO_SHOW).map((pair) => {
                 return (
-                  <div>
-                    <Account key={pair.address} pair={pair} hideAddressOnSmallScreen={false} />
+                  <div key={pair.address}>
+                    <Account pair={pair} hideAddressOnSmallScreen={false} />
                   </div>
                 );
               })}
