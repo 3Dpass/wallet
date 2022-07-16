@@ -1,35 +1,33 @@
 import { useEffect, useState } from "react";
-import { cryptoWaitReady, mnemonicGenerate } from "@polkadot/util-crypto";
+import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { Alignment, Button, Intent, Menu, MenuDivider, MenuItem, NavbarGroup, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
-import DialogImportAccount from "./DialogImportAccount";
-import Account from "./Account";
 import { useAtomValue } from "jotai";
 import { polkadotApiAtom, toasterAtom } from "../atoms";
+import DialogImportAddress from "./dialogs/DialogImportAddress";
+import DialogCreateAddress from "./dialogs/DialogCreateAddress";
+import Account from "./Account";
 
 const ss58format = {
   test: 72,
   live: 71,
 };
+const MAX_ADDRESSES_TO_SHOW = 2;
 
 export default function Wallet() {
   const api = useAtomValue(polkadotApiAtom);
   const toaster = useAtomValue(toasterAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [pairs, setPairs] = useState([]);
-  const [isSeedPhraseDialogOpen, setIsSeedPhraseDialogOpen] = useState(false);
-  const [isJSONWalletDialogOpen, setIsJSONWalletDialogOpen] = useState(false);
-
-  function handleGenerateAddressClick() {
-    const mnemonic = mnemonicGenerate();
-    keyring.addUri(mnemonic);
-  }
+  const [isDialogImportAddressMnemonicSeedOpen, setIsDialogImportAddressMnemonicSeedOpen] = useState(false);
+  const [isDialogImportAddressJSONOpen, setIsDialogImportAddressJSONOpen] = useState(false);
+  const [isDialogCreateAddressOpen, setIsDialogCreateAddressOpen] = useState(false);
 
   function handleSeedPhraseImportClick(value) {
     try {
       keyring.addUri(value);
-      setIsSeedPhraseDialogOpen(false);
+      setIsDialogImportAddressMnemonicSeedOpen(false);
     } catch (e) {
       toaster &&
         toaster.show({
@@ -44,7 +42,7 @@ export default function Wallet() {
     try {
       const pair = keyring.createFromJson(JSON.parse(value));
       keyring.addPair(pair, "");
-      setIsJSONWalletDialogOpen(false);
+      setIsDialogImportAddressJSONOpen(false);
     } catch (e) {
       toaster &&
         toaster.show({
@@ -76,20 +74,48 @@ export default function Wallet() {
 
   return (
     <NavbarGroup align={Alignment.RIGHT}>
-      <DialogImportAccount isOpen={isSeedPhraseDialogOpen} onClose={() => setIsSeedPhraseDialogOpen(false)} onImport={handleSeedPhraseImportClick} />
-      <DialogImportAccount isOpen={isJSONWalletDialogOpen} onClose={() => setIsJSONWalletDialogOpen(false)} onImport={handleJSONWalletImportClick} />
-      {pairs.map((pair) => {
+      <DialogImportAddress
+        isOpen={isDialogImportAddressMnemonicSeedOpen}
+        onClose={() => setIsDialogImportAddressMnemonicSeedOpen(false)}
+        onImport={handleSeedPhraseImportClick}
+      />
+      <DialogImportAddress
+        isOpen={isDialogImportAddressJSONOpen}
+        onClose={() => setIsDialogImportAddressJSONOpen(false)}
+        onImport={handleJSONWalletImportClick}
+      />
+      <DialogCreateAddress isOpen={isDialogCreateAddressOpen} onClose={() => setIsDialogCreateAddressOpen(false)} />
+      {pairs.slice(0, MAX_ADDRESSES_TO_SHOW).map((pair) => {
         return <Account key={pair.address} pair={pair} />;
       })}
+      {pairs.length > MAX_ADDRESSES_TO_SHOW && (
+        <Popover2
+          minimal={true}
+          position={Position.BOTTOM_LEFT}
+          content={
+            <Menu>
+              {pairs.slice(MAX_ADDRESSES_TO_SHOW).map((pair) => {
+                return (
+                  <div>
+                    <Account key={pair.address} pair={pair} hideAddressOnSmallScreen={false} />
+                  </div>
+                );
+              })}
+            </Menu>
+          }
+        >
+          <Button icon="more" minimal={true} />
+        </Popover2>
+      )}
       <Popover2
         minimal={true}
         position={Position.BOTTOM_LEFT}
         content={
           <Menu>
-            <MenuItem icon="random" text="Generate random wallet" onClick={handleGenerateAddressClick} />
+            <MenuItem icon="new-object" text="Create address..." onClick={() => setIsDialogCreateAddressOpen(true)} />
             <MenuDivider />
-            <MenuItem icon="add" text="Import seed phrase..." onClick={() => setIsSeedPhraseDialogOpen(true)} />
-            <MenuItem icon="import" text="Import JSON wallet..." onClick={() => setIsJSONWalletDialogOpen(true)} />
+            <MenuItem icon="add" text="Import address from seed phrase..." onClick={() => setIsDialogImportAddressMnemonicSeedOpen(true)} />
+            <MenuItem icon="import" text="Import address from JSON..." onClick={() => setIsDialogImportAddressJSONOpen(true)} />
           </Menu>
         }
       >

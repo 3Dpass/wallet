@@ -1,7 +1,7 @@
 import { Button, Classes, Dialog, Intent, TextArea } from "@blueprintjs/core";
 import { useState } from "react";
 
-export default function DialogImportAccount({ isOpen, onImport, onClose }) {
+export default function DialogImportAddress({ isOpen, onImport, onClose }) {
   const [value, setValue] = useState("");
 
   function handleOnOpening() {

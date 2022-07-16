@@ -7,15 +7,16 @@ import { polkadotApiAtom, toasterAtom } from "../atoms";
 import { useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
-import DialogSendFunds from "./DialogSendFunds";
+import DialogSendFunds from "./dialogs/DialogSendFunds";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useNavigate } from "@remix-run/react";
 
 type AccountProps = {
   pair: KeyringPair;
+  hideAddressOnSmallScreen?: boolean;
 };
 
-export default function Account({ pair }: AccountProps) {
+export default function Account({ pair, hideAddressOnSmallScreen = true }: AccountProps) {
   const api = useAtomValue(polkadotApiAtom);
   const toaster = useAtomValue(toasterAtom);
   const navigate = useNavigate();
@@ -96,12 +97,17 @@ export default function Account({ pair }: AccountProps) {
     </Menu>
   );
 
+  let addressClassName = "max-w-[120px] lg:max-w-[200px] text-ellipsis overflow-hidden";
+  if (hideAddressOnSmallScreen) {
+    addressClassName += " hidden sm:block";
+  }
+
   return (
     <>
       <DialogSendFunds pair={pair} isOpen={isSendDialogOpen} onAfterSubmit={handleSendDialogAfterSubmit} onClose={() => setIsSendDialogOpen(false)} />
       <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
         <Button minimal={true} icon={<Identicon value={pair.address} size={24} theme="substrate" />}>
-          <div className="hidden sm:block max-w-[100px] lg:max-w-[200px] text-ellipsis overflow-hidden">{pair.address}</div>
+          <div className={addressClassName}>{pair.address}</div>
         </Button>
       </Popover2>
     </>

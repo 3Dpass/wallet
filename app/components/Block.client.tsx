@@ -1,7 +1,7 @@
 import { Rock } from "./Rock";
 import { lazy, Suspense } from "react";
 import { Button, Card, Elevation } from "@blueprintjs/core";
-import TitledValue from "./TitledValue";
+import TitledValue from "./common/TitledValue";
 import { Popover2 } from "@blueprintjs/popover2";
 
 const Canvas = lazy(() => import("@react-three/fiber").then((module) => ({ default: module.Canvas })));

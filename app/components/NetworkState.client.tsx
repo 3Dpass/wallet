@@ -6,7 +6,7 @@ import { formatDuration } from "../utils/time";
 import type { AnyJson } from "@polkadot/types-codec/types/helpers";
 import { loadBlock } from "../utils/block";
 import { MAX_BLOCKS } from "../api.config";
-import TitledValue from "./TitledValue";
+import TitledValue from "./common/TitledValue";
 
 const TimeAgo = lazy(() => import("react-timeago"));
 

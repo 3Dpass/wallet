@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import Identicon from "@polkadot/react-identicon";
 import { useAtomValue } from "jotai";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { polkadotApiAtom, toasterAtom } from "../atoms";
-import { isValidAddressPolkadotAddress } from "../utils/address";
+import { polkadotApiAtom, toasterAtom } from "../../atoms";
+import { isValidAddressPolkadotAddress } from "../../utils/address";
 
 type DialogSendFundsProps = {
   pair: KeyringPair;

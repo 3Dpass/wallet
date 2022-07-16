@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { polkadotApiAtom, toasterAtom } from "./atoms";
 import { useSetAtom } from "jotai";
 import Wallet from "./components/Wallet.client";
-import { RPC_ENDPOINT, RPC_CONFIG, RPC_TYPES } from "./api.config";
+import { RPC_CONFIG, RPC_ENDPOINT, RPC_TYPES } from "./api.config";
 import { ClientOnly } from "remix-utils";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { withSentry } from "@sentry/remix";
