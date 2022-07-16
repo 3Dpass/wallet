@@ -1,10 +1,10 @@
 import { Button, Classes, Dialog, Icon, InputGroup, Intent, NumericInput, Tag } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import Identicon from "@polkadot/react-identicon";
 import { useAtomValue } from "jotai";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { polkadotApiAtom, toasterAtom } from "../../atoms";
 import { isValidAddressPolkadotAddress } from "../../utils/address";
+import { AddressIcon } from "../common/AddressIcon";
 
 type DialogSendFundsProps = {
   pair: KeyringPair;
@@ -75,13 +75,22 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
     }
   }
 
-  const addressIcon = isValidAddressPolkadotAddress(address) ? <Identicon value={address} size={40} theme="substrate" /> : <Icon icon="asterisk" />;
+  const addressIcon = isValidAddressPolkadotAddress(address) ? <AddressIcon address={address} className="m-2" /> : <Icon icon="asterisk" />;
 
   return (
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} className="w-[560px]">
         <div className={Classes.DIALOG_BODY}>
-          <InputGroup disabled={isLoading} large={true} className="font-mono mb-2" spellCheck={false} placeholder="Enter address to send to" onChange={handleAddressChange} value={address} leftElement={addressIcon} />
+          <InputGroup
+            disabled={isLoading}
+            large={true}
+            className="font-mono mb-2"
+            spellCheck={false}
+            placeholder="Enter address to send to"
+            onChange={handleAddressChange}
+            value={address}
+            leftElement={addressIcon}
+          />
           <NumericInput
             disabled={isLoading}
             selectAllOnFocus={true}
@@ -99,7 +108,14 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
             <Button onClick={onClose} text="Cancel" disabled={isLoading} />
-            <Button intent={Intent.PRIMARY} disabled={isLoading || !canSend} onClick={handleSendClick} icon="send-message" loading={isLoading} text="Send" />
+            <Button
+              intent={Intent.PRIMARY}
+              disabled={isLoading || !canSend}
+              onClick={handleSendClick}
+              icon="send-message"
+              loading={isLoading}
+              text="Send"
+            />
           </div>
         </div>
       </Dialog>

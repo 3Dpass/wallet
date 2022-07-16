@@ -1,6 +1,5 @@
 import { Button, Intent, Menu, MenuDivider, MenuItem, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
-import Identicon from "@polkadot/react-identicon";
 import keyring from "@polkadot/ui-keyring";
 import { useAtomValue } from "jotai";
 import { polkadotApiAtom, toasterAtom } from "../atoms";
@@ -10,13 +9,13 @@ import { formatBalance } from "@polkadot/util";
 import DialogSendFunds from "./dialogs/DialogSendFunds";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useNavigate } from "@remix-run/react";
+import { AddressIcon } from "./common/AddressIcon";
 
 type AccountProps = {
   pair: KeyringPair;
-  hideAddressOnSmallScreen?: boolean;
 };
 
-export default function Account({ pair, hideAddressOnSmallScreen = true }: AccountProps) {
+export default function Account({ pair }: AccountProps) {
   const api = useAtomValue(polkadotApiAtom);
   const toaster = useAtomValue(toasterAtom);
   const navigate = useNavigate();
@@ -97,17 +96,12 @@ export default function Account({ pair, hideAddressOnSmallScreen = true }: Accou
     </Menu>
   );
 
-  let addressClassName = "max-w-[120px] lg:max-w-[200px] text-ellipsis overflow-hidden";
-  if (hideAddressOnSmallScreen) {
-    addressClassName += " hidden sm:block";
-  }
-
   return (
     <>
       <DialogSendFunds pair={pair} isOpen={isSendDialogOpen} onAfterSubmit={handleSendDialogAfterSubmit} onClose={() => setIsSendDialogOpen(false)} />
       <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
-        <Button minimal={true} icon={<Identicon value={pair.address} size={24} theme="substrate" />}>
-          <div className={addressClassName}>{pair.address}</div>
+        <Button minimal={true} icon={<AddressIcon address={pair.address} className="mt-1" />}>
+          <div className="max-w-[70px] sm:max-w-[120px] lg:max-w-[300px] text-ellipsis overflow-hidden">{pair.address}</div>
         </Button>
       </Popover2>
     </>
