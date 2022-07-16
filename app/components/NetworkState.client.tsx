@@ -24,7 +24,7 @@ export default function NetworkState() {
   const [isLoading, setIsLoading] = useState(true);
   const [networkState, setNetworkState] = useState<INetworkState>();
 
-  async function loadNetworkState() {
+  async function loadNetworkState(timestamp) {
     if (!api) {
       return;
     }
@@ -32,7 +32,6 @@ export default function NetworkState() {
     const totalIssuance = await api.query.balances.totalIssuance();
     const bestNumber = await api.derive.chain.bestNumber();
     const bestNumberFinalized = await api.derive.chain.bestNumberFinalized();
-    const timestamp = await api.query.timestamp.now();
     const targetBlockTime = await api.consts.difficulty.targetBlockTime;
     setNetworkState({
       totalIssuance: totalIssuance.toHuman().toString(),
