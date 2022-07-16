@@ -30,7 +30,7 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
         <div className={Classes.DIALOG_BODY}>
           <TitledValue title="Address" value={address} />
           <div className="text-gray-500 my-3">
-            The secret seed value for this account. Ensure that you keep this in a safe place, with access to the seed you can re-create the account.
+            Keep your seed phrase in safe. In order to recover the account, all you need to do is to import the seed in the wallet.
           </div>
           <Card>
             <code>{mnemonic}</code>
@@ -39,7 +39,7 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
             <Button intent={Intent.NONE} onClick={onClose} icon="cross" text="Cancel" />
-            <Button intent={Intent.NONE} onClick={onGenerateClick} icon="refresh" text="Generate another" />
+            <Button intent={Intent.NONE} onClick={onGenerateClick} icon="refresh" text="Generate another one" />
             <Button intent={Intent.PRIMARY} onClick={handleCreateClick} icon="plus" text="Create" />
           </div>
         </div>

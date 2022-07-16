@@ -112,10 +112,10 @@ export default function Wallet() {
         position={Position.BOTTOM_LEFT}
         content={
           <Menu>
-            <MenuItem icon="new-object" text="Create address..." onClick={() => setIsDialogCreateAddressOpen(true)} />
+            <MenuItem icon="new-object" text="Create new address..." onClick={() => setIsDialogCreateAddressOpen(true)} />
             <MenuDivider />
-            <MenuItem icon="add" text="Import address from seed phrase..." onClick={() => setIsDialogImportAddressMnemonicSeedOpen(true)} />
-            <MenuItem icon="import" text="Import address from JSON..." onClick={() => setIsDialogImportAddressJSONOpen(true)} />
+            <MenuItem icon="add" text="Import from seed phrase..." onClick={() => setIsDialogImportAddressMnemonicSeedOpen(true)} />
+            <MenuItem icon="import" text="Import from JSON..." onClick={() => setIsDialogImportAddressJSONOpen(true)} />
           </Menu>
         }
       >
