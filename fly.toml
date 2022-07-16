@@ -1,6 +1,6 @@
-# fly.toml file generated for 3dp-wallet on 2022-07-14T16:37:41+03:00
+# fly.toml file generated for wallet-3697 on 2022-07-16T13:27:19+03:00
 
-app = "3dp-wallet"
+app = "wallet-3697"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
