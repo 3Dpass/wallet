@@ -11,8 +11,13 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
   function handleOpening() {
     const mnemonic = mnemonicGenerate();
     setMnemonic(mnemonic);
-    const result = keyring.addUri(mnemonic);
-    setAddress(result.pair.address);
+    const pair = keyring.createFromUri(mnemonic);
+    setAddress(pair.address);
+  }
+
+  function handleCreateClick() {
+    keyring.addUri(mnemonic);
+    onClose();
   }
 
   return (
@@ -29,7 +34,8 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button intent={Intent.PRIMARY} onClick={onClose} icon="tick" text="OK" />
+            <Button intent={Intent.NONE} onClick={onClose} icon="cross" text="Cancel" />
+            <Button intent={Intent.PRIMARY} onClick={handleCreateClick} icon="plus" text="Create" />
           </div>
         </div>
       </Dialog>
