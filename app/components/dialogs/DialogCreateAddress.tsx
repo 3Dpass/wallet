@@ -30,7 +30,7 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
         <div className={Classes.DIALOG_BODY}>
           <TitledValue title="Address" value={address} />
           <div className="text-gray-500 my-3">
-            Keep your seed phrase in safe. In order to recover the account, all you need to do is to import the seed in the wallet.
+            Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.
           </div>
           <Card>
             <code>{mnemonic}</code>
