@@ -1,5 +1,5 @@
 import NetworkState from "../components/NetworkState.client";
-import Blocks from "../components/Blocks.client";
+import Blocks from "../components/block/Blocks.client";
 import { ClientOnly } from "remix-utils";
 
 export default function Index() {

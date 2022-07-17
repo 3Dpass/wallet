@@ -4,11 +4,11 @@ import keyring from "@polkadot/ui-keyring";
 import { Alignment, Button, Intent, Menu, MenuDivider, MenuItem, NavbarGroup, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import { useAtomValue } from "jotai";
-import { polkadotApiAtom, toasterAtom } from "../atoms";
-import DialogImportAddress from "./dialogs/DialogImportAddress";
-import DialogCreateAddress from "./dialogs/DialogCreateAddress";
+import { polkadotApiAtom, toasterAtom } from "../../atoms";
+import DialogImportAddress from "../dialogs/DialogImportAddress";
+import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
-import DialogSendFunds from "./dialogs/DialogSendFunds";
+import DialogSendFunds from "../dialogs/DialogSendFunds";
 import { KeyringPair } from "@polkadot/keyring/types";
 
 const ss58format = {

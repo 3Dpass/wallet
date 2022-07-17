@@ -2,13 +2,13 @@ import { Button, Intent, Menu, MenuDivider, MenuItem, Position, Spinner, Spinner
 import { Popover2 } from "@blueprintjs/popover2";
 import keyring from "@polkadot/ui-keyring";
 import { useAtomValue } from "jotai";
-import { polkadotApiAtom, toasterAtom } from "../atoms";
+import { polkadotApiAtom, toasterAtom } from "../../atoms";
 import { useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useNavigate } from "@remix-run/react";
-import { AddressIcon } from "./common/AddressIcon";
+import { AddressIcon } from "../common/AddressIcon";
 
 type AccountProps = {
   pair: KeyringPair;

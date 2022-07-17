@@ -5,7 +5,7 @@ import { Alignment, Classes, Navbar, NavbarGroup, NavbarHeading, Toaster } from 
 import { useEffect, useRef } from "react";
 import { polkadotApiAtom, toasterAtom } from "./atoms";
 import { useSetAtom } from "jotai";
-import Wallet from "./components/Wallet.client";
+import Wallet from "./components/wallet/Wallet.client";
 import { RPC_CONFIG, RPC_ENDPOINT, RPC_TYPES } from "./api.config";
 import { ClientOnly } from "remix-utils";
 import { ApiPromise, WsProvider } from "@polkadot/api";
