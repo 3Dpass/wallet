@@ -79,7 +79,7 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
 
   return (
     <>
-      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} className="w-[90%] sm:w-[560px]">
+      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} className="w-[90%] sm:w-[640px]">
         <div className={Classes.DIALOG_BODY}>
           <InputGroup
             disabled={isLoading}
