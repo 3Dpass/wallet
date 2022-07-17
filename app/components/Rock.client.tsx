@@ -1,12 +1,15 @@
 import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { MeshProps, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 const COLOR = "#fff";
 
-export function Rock({ geometry }) {
-  const rock = useRef();
+export default function Rock({ geometry }) {
+  const rock = useRef<MeshProps>();
   useFrame(({ clock }) => {
+    if (!rock.current) {
+      return;
+    }
     rock.current.rotation.y = clock.getElapsedTime() / 10.0;
     rock.current.rotation.z = clock.getElapsedTime() / 10.0;
     rock.current.rotation.x = clock.getElapsedTime() / 10.0;

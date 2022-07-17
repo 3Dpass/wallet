@@ -7,7 +7,7 @@ import { useAtomValue } from "jotai";
 import { polkadotApiAtom, toasterAtom } from "../atoms";
 import DialogImportAddress from "./dialogs/DialogImportAddress";
 import DialogCreateAddress from "./dialogs/DialogCreateAddress";
-import Account from "./Account";
+import Account from "./Account.client";
 
 const ss58format = {
   test: 72,

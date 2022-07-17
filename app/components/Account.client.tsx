@@ -97,7 +97,7 @@ export default function Account({ pair, hideAddressOnSmallScreen = true }: Accou
     </Menu>
   );
 
-  let addressClassName = "max-w-[120px] lg:max-w-[200px] text-ellipsis overflow-hidden";
+  let addressClassName = "font-mono max-w-[120px] lg:max-w-[200px] text-ellipsis overflow-hidden";
   if (hideAddressOnSmallScreen) {
     addressClassName += " hidden sm:block";
   }
