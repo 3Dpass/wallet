@@ -15,7 +15,7 @@ const ss58format = {
   test: 72,
   live: 71,
 };
-const MAX_ADDRESSES_TO_SHOW = 2;
+const MAX_ADDRESSES_TO_SHOW = 3;
 
 export default function Wallet() {
   const api = useAtomValue(polkadotApiAtom);

@@ -88,7 +88,7 @@ export default function Account({ pair, handleSendClick, hideAddressOnSmallScree
     </Menu>
   );
 
-  let addressClassName = "font-mono max-w-[120px] lg:max-w-[200px] text-ellipsis overflow-hidden";
+  let addressClassName = "font-mono max-w-[100px] lg:max-w-[200px] text-ellipsis overflow-hidden";
   if (hideAddressOnSmallScreen) {
     addressClassName += " hidden sm:block";
   }
