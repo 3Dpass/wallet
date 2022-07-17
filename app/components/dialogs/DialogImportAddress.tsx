@@ -19,7 +19,7 @@ export default function DialogImportAddress({ isOpen, onImport, onClose }) {
 
   return (
     <>
-      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening}>
+      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} className="w-[90%] sm:w-[560px]">
         <div className={Classes.DIALOG_BODY}>
           <TextArea className="w-full font-mono" rows={5} onChange={handleSeedPhraseChange} value={value} />
           <div className="text-center mt-4">
