@@ -4,6 +4,10 @@ import { ClientOnly } from "remix-utils";
 import Transactions from "../../components/Transactions.client";
 import { polkadotApiAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
+import { lazy } from "react";
+
+const TitledValue = lazy(() => import("../../components/common/TitledValue"));
+const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
 
 export default function Address() {
   const api = useAtomValue(polkadotApiAtom);
@@ -15,8 +19,15 @@ export default function Address() {
 
   return (
     <Card>
-      <div className="mb-4 pb-4 border-b border-b-gray-500 text-sm md:text-xl">{address}</div>
-      <ClientOnly fallback={<Spinner size={SpinnerSize.SMALL} />}>{() => <Transactions address={address} />}</ClientOnly>
+      <ClientOnly fallback={<Spinner size={SpinnerSize.SMALL} />}>
+        {() => (
+          <>
+            <TitledValue title="Address" value={address} fontMono={true} />
+            <Divider className="my-5" />
+            <Transactions address={address} />
+          </>
+        )}
+      </ClientOnly>
     </Card>
   );
 }

@@ -32,7 +32,7 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOpening}>
         <div className={Classes.DIALOG_BODY}>
-          <TitledValue title="Address" value={address} />
+          <TitledValue title="Address" value={address} fontMono={true} />
           <div className="text-gray-500 my-3">Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.</div>
           <Card>
             <div className="text-center font-mono">{mnemonic}</div>
