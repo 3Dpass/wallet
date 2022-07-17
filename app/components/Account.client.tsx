@@ -6,34 +6,25 @@ import { polkadotApiAtom, toasterAtom } from "../atoms";
 import { useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
-import DialogSendFunds from "./dialogs/DialogSendFunds";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useNavigate } from "@remix-run/react";
 import { AddressIcon } from "./common/AddressIcon";
 
 type AccountProps = {
   pair: KeyringPair;
+  handleSendClick: (pair: KeyringPair) => void;
   hideAddressOnSmallScreen?: boolean;
 };
 
-export default function Account({ pair, hideAddressOnSmallScreen = true }: AccountProps) {
+export default function Account({ pair, handleSendClick, hideAddressOnSmallScreen = true }: AccountProps) {
   const api = useAtomValue(polkadotApiAtom);
   const toaster = useAtomValue(toasterAtom);
   const navigate = useNavigate();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const [formatOptions, setFormatOptions] = useState({});
-  const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
 
   function handleOnMenuOpening() {
     loadAccount();
-  }
-
-  function handleSendMenuClick() {
-    setIsSendDialogOpen(true);
-  }
-
-  function handleSendDialogAfterSubmit() {
-    setIsSendDialogOpen(false);
   }
 
   async function handleCopyAddress() {
@@ -83,7 +74,7 @@ export default function Account({ pair, hideAddressOnSmallScreen = true }: Accou
           <MenuItem disabled={true} icon="cube-add" text={`Total balance: ${formatBalance(balances.freeBalance, formatOptions)}`} />
           <MenuItem disabled={true} icon="cube" text={`Transferable: ${balances.availableBalance.toHuman()}`} />
           <MenuItem disabled={true} icon="lock" text={`Locked: ${balances.lockedBalance.toHuman()}`} />
-          <MenuItem icon="send-to" text="Send funds..." onClick={handleSendMenuClick} />
+          <MenuItem icon="send-to" text="Send funds..." onClick={() => handleSendClick(pair)} />
         </>
       )}
       <MenuDivider />
@@ -104,7 +95,6 @@ export default function Account({ pair, hideAddressOnSmallScreen = true }: Accou
 
   return (
     <>
-      <DialogSendFunds pair={pair} isOpen={isSendDialogOpen} onAfterSubmit={handleSendDialogAfterSubmit} onClose={() => setIsSendDialogOpen(false)} />
       <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
         <Button minimal={true} icon={<AddressIcon address={pair.address} className="mt-1" />}>
           <div className={addressClassName}>{pair.address}</div>

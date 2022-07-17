@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { Alignment, Button, Intent, Menu, MenuDivider, MenuItem, NavbarGroup, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
@@ -8,6 +8,8 @@ import { polkadotApiAtom, toasterAtom } from "../atoms";
 import DialogImportAddress from "./dialogs/DialogImportAddress";
 import DialogCreateAddress from "./dialogs/DialogCreateAddress";
 import Account from "./Account.client";
+import DialogSendFunds from "./dialogs/DialogSendFunds";
+import { KeyringPair } from "@polkadot/keyring/types";
 
 const ss58format = {
   test: 72,
@@ -23,6 +25,9 @@ export default function Wallet() {
   const [isDialogImportAddressMnemonicSeedOpen, setIsDialogImportAddressMnemonicSeedOpen] = useState(false);
   const [isDialogImportAddressJSONOpen, setIsDialogImportAddressJSONOpen] = useState(false);
   const [isDialogCreateAddressOpen, setIsDialogCreateAddressOpen] = useState(false);
+  const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
+  const [sendDialogPair, setSendDialogPair] = useState(null);
+  const handleSendDialogClose = useCallback(() => setIsSendDialogOpen(false), []);
 
   function handleSeedPhraseImportClick(value) {
     try {
@@ -36,6 +41,11 @@ export default function Wallet() {
           message: e.message,
         });
     }
+  }
+
+  function handleSendClick(pair: KeyringPair) {
+    setSendDialogPair(pair);
+    setIsSendDialogOpen(true);
   }
 
   function handleJSONWalletImportClick(value) {
@@ -85,8 +95,9 @@ export default function Wallet() {
         onImport={handleJSONWalletImportClick}
       />
       <DialogCreateAddress isOpen={isDialogCreateAddressOpen} onClose={() => setIsDialogCreateAddressOpen(false)} />
+      <DialogSendFunds pair={sendDialogPair} isOpen={isSendDialogOpen} onAfterSubmit={handleSendDialogClose} onClose={handleSendDialogClose} />
       {pairs.slice(0, MAX_ADDRESSES_TO_SHOW).map((pair) => {
-        return <Account key={pair.address} pair={pair} />;
+        return <Account key={pair.address} pair={pair} handleSendClick={handleSendClick} />;
       })}
       {pairs.length > MAX_ADDRESSES_TO_SHOW && (
         <Popover2
@@ -97,7 +108,7 @@ export default function Wallet() {
               {pairs.slice(MAX_ADDRESSES_TO_SHOW).map((pair) => {
                 return (
                   <div key={pair.address}>
-                    <Account pair={pair} hideAddressOnSmallScreen={false} />
+                    <Account pair={pair} hideAddressOnSmallScreen={false} handleSendClick={handleSendClick} />
                   </div>
                 );
               })}
