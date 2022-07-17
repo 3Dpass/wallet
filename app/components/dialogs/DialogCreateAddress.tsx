@@ -39,7 +39,7 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
 
   return (
     <>
-      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOpening}>
+      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOpening} className="w-[90%] sm:w-auto">
         <div className={Classes.DIALOG_BODY}>
           <TitledValue title="Address" value={address} fontMono={true} />
           <div className="text-gray-500 my-3">Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.</div>
@@ -53,7 +53,7 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
             <Button intent={Intent.NONE} onClick={onClose} icon="cross" text="Cancel" />
-            <Button intent={Intent.NONE} onClick={onGenerateClick} icon="refresh" text="Generate another one" />
+            <Button intent={Intent.NONE} onClick={onGenerateClick} icon="refresh" text="More" />
             <Button intent={Intent.PRIMARY} onClick={handleCreateClick} icon="plus" text="Create" />
           </div>
         </div>
