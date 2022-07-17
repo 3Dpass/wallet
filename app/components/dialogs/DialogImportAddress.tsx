@@ -12,11 +12,19 @@ export default function DialogImportAddress({ isOpen, onImport, onClose }) {
     setValue(e.target.value);
   }
 
+  async function handlePaste() {
+    const clipboardValue = await navigator.clipboard.readText();
+    setValue(clipboardValue);
+  }
+
   return (
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening}>
         <div className={Classes.DIALOG_BODY}>
-          <TextArea className="w-full" rows={5} onChange={handleSeedPhraseChange} value={value} />
+          <TextArea className="w-full font-mono" rows={5} onChange={handleSeedPhraseChange} value={value} />
+          <div className="text-center mt-4">
+            <Button icon="clipboard" text="Paste" onClick={handlePaste} />
+          </div>
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
