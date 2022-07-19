@@ -4,7 +4,7 @@ import keyring from "@polkadot/ui-keyring";
 import { Alignment, Button, Intent, Menu, MenuDivider, MenuItem, NavbarGroup, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import { useAtomValue } from "jotai";
-import { polkadotApiAtom, toasterAtom } from "../../atoms";
+import { apiAtom, toasterAtom } from "../../atoms";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
@@ -18,7 +18,7 @@ const ss58format = {
 const MAX_ADDRESSES_TO_SHOW = 3;
 
 export default function Wallet() {
-  const api = useAtomValue(polkadotApiAtom);
+  const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [pairs, setPairs] = useState([]);

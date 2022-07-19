@@ -1,15 +1,16 @@
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 // @ts-ignore
 import styles from "./styles/app.css";
-import { Alignment, Classes, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
-import { useEffect, useRef } from "react";
-import { polkadotApiAtom, toasterAtom } from "./atoms";
-import { useSetAtom } from "jotai";
+import { Alignment, Button, Classes, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
+import { useEffect, useRef, useState } from "react";
+import { apiAtom, apiEndpointAtom, toasterAtom } from "./atoms";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import Wallet from "./components/wallet/Wallet.client";
-import { RPC_CONFIG, RPC_ENDPOINT, RPC_TYPES } from "./api.config";
+import { RPC_CONFIG, RPC_TYPES } from "./api.config";
 import { ClientOnly } from "remix-utils";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { withSentry } from "@sentry/remix";
+import DialogSettings from "./components/dialogs/DialogSettings";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -30,19 +31,52 @@ export function links() {
 
 function App() {
   const toasterRef = useRef<Toaster>();
-  const setToaster = useSetAtom(toasterAtom);
-  const setApi = useSetAtom(polkadotApiAtom);
+  const [toaster, setToaster] = useAtom(toasterAtom);
+  const setApi = useSetAtom(apiAtom);
+  const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+  const apiEndpoint = useAtomValue(apiEndpointAtom);
 
   useEffect(() => {
     setToaster(toasterRef.current);
   }, [setToaster, toasterRef]);
 
   useEffect(() => {
-    const provider = new WsProvider(RPC_ENDPOINT);
-    ApiPromise.create({ provider, rpc: RPC_CONFIG, types: RPC_TYPES }).then(async (api) => {
-      setApi(api);
+    if (!toaster) {
+      return;
+    }
+
+    setApi(false);
+    const provider = new WsProvider(apiEndpoint, false);
+    provider.on("connected", (e) => {
+      toaster &&
+        toaster.show({
+          icon: "tick",
+          intent: "success",
+          message: `API connected`,
+        });
     });
-  }, [setApi]);
+    provider.on("disconnected", () => {
+      toaster &&
+        toaster.show({
+          icon: "error",
+          intent: "warning",
+          message: `API disconnected`,
+        });
+    });
+    provider.on("error", (e) => {
+      toaster &&
+        toaster.show({
+          icon: "error",
+          intent: "danger",
+          message: `API connection error: ${e.message}`,
+        });
+    });
+    provider.connect().then(() => {
+      ApiPromise.create({ provider, rpc: RPC_CONFIG, types: RPC_TYPES }).then(async (api) => {
+        setApi(api);
+      });
+    });
+  }, [apiEndpoint, toaster]);
 
   return (
     <html lang="en">
@@ -58,6 +92,8 @@ function App() {
               <Link to="" style={{ color: "white" }}>
                 <strong>3DP</strong> Wallet
               </Link>
+              <Button className="ml-2" icon="cog" minimal={true} onClick={() => setIsSettingsDialogOpen(true)} />
+              <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
             </NavbarHeading>
           </NavbarGroup>
           <NavbarGroup align={Alignment.RIGHT}>

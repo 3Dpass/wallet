@@ -1,10 +1,10 @@
 import { useAtomValue } from "jotai";
-import { polkadotApiAtom } from "../atoms";
+import { apiAtom } from "../atoms";
 import { useEffect, useState } from "react";
 import { Icon } from "@blueprintjs/core";
 
 export default function Transactions({ address }) {
-  const api = useAtomValue(polkadotApiAtom);
+  const api = useAtomValue(apiAtom);
   const [locks, setLocks] = useState(null);
 
   useEffect(() => {

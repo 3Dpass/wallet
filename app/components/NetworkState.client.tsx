@@ -1,5 +1,5 @@
-import { useAtom, useAtomValue } from "jotai";
-import { blocksAtom, polkadotApiAtom } from "../atoms";
+import { useAtom } from "jotai";
+import { blocksAtom } from "../atoms";
 import { lazy, useEffect, useState } from "react";
 import { Card, Spinner } from "@blueprintjs/core";
 import { formatDuration } from "../utils/time";
@@ -7,6 +7,7 @@ import type { AnyJson } from "@polkadot/types-codec/types/helpers";
 import { loadBlock } from "../utils/block";
 import { MAX_BLOCKS } from "../api.config";
 import TitledValue from "./common/TitledValue";
+import type { ApiPromise } from "@polkadot/api";
 
 const TimeAgo = lazy(() => import("react-timeago"));
 
@@ -18,16 +19,16 @@ type INetworkState = {
   targetBlockTime: number;
 };
 
-export default function NetworkState() {
-  const api = useAtomValue(polkadotApiAtom);
+type IProps = {
+  api: ApiPromise;
+};
+
+export default function NetworkState({ api }: IProps) {
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [networkState, setNetworkState] = useState<INetworkState>();
 
   async function loadNetworkState(timestamp) {
-    if (!api) {
-      return;
-    }
     setIsLoading(true);
     const totalIssuance = await api.query.balances.totalIssuance();
     const bestNumber = await api.derive.chain.bestNumber();
@@ -48,10 +49,6 @@ export default function NetworkState() {
   }
 
   useEffect(() => {
-    if (!api) {
-      return;
-    }
-
     let timestampUnsubscribe, newHeadsUnsubscribe;
 
     async function subscribe(api) {
@@ -70,12 +67,13 @@ export default function NetworkState() {
       });
     }
 
-    subscribe(api);
+    function unsubscribe() {
+      timestampUnsubscribe && timestampUnsubscribe();
+      newHeadsUnsubscribe && newHeadsUnsubscribe();
+    }
 
-    return () => {
-      timestampUnsubscribe();
-      newHeadsUnsubscribe();
-    };
+    subscribe(api).then(() => {});
+    return unsubscribe;
   }, [api]);
 
   if (isLoading && !networkState) {

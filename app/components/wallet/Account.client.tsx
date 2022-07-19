@@ -2,7 +2,7 @@ import { Button, Intent, Menu, MenuDivider, MenuItem, Position, Spinner, Spinner
 import { Popover2 } from "@blueprintjs/popover2";
 import keyring from "@polkadot/ui-keyring";
 import { useAtomValue } from "jotai";
-import { polkadotApiAtom, toasterAtom } from "../../atoms";
+import { apiAtom, toasterAtom } from "../../atoms";
 import { useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
@@ -10,14 +10,14 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { useNavigate } from "@remix-run/react";
 import { AddressIcon } from "../common/AddressIcon";
 
-type AccountProps = {
+type IProps = {
   pair: KeyringPair;
   handleSendClick: (pair: KeyringPair) => void;
   hideAddressOnSmallScreen?: boolean;
 };
 
-export default function Account({ pair, handleSendClick, hideAddressOnSmallScreen = true }: AccountProps) {
-  const api = useAtomValue(polkadotApiAtom);
+export default function Account({ pair, handleSendClick, hideAddressOnSmallScreen = true }: IProps) {
+  const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
   const navigate = useNavigate();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);

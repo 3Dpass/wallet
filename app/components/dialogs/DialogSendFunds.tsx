@@ -2,19 +2,19 @@ import { Button, Classes, Dialog, Icon, InputGroup, Intent, NumericInput, Tag } 
 import { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { polkadotApiAtom, toasterAtom } from "../../atoms";
+import { apiAtom, toasterAtom } from "../../atoms";
 import { isValidAddressPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 
-type DialogSendFundsProps = {
+type IProps = {
   pair: KeyringPair;
   isOpen: boolean;
   onClose: () => void;
   onAfterSubmit: () => void;
 };
 
-export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }: DialogSendFundsProps) {
-  const api = useAtomValue(polkadotApiAtom);
+export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }: IProps) {
+  const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
   const [canSend, setCanSend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
