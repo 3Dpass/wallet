@@ -19,13 +19,15 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
   const [canSend, setCanSend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [address, setAddress] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState("0");
+  const [amountNumber, setAmountNumber] = useState(0);
   const [tokenSymbol, setTokenSymbol] = useState("");
 
   function resetForm() {
     setIsLoading(false);
     setAddress("");
-    setAmount(0);
+    setAmount("0");
+    setAmountNumber(0);
   }
 
   function handleOnOpening() {
@@ -36,13 +38,18 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
     setAddress(e.target.value);
   }
 
+  function handleAmountChange(valueAsNumber, valueAsString) {
+    setAmount(valueAsString);
+    setAmountNumber(valueAsNumber);
+  }
+
   useEffect(() => {
-    setCanSend(api && isValidAddressPolkadotAddress(address) && amount > 0);
+    setCanSend(api && isValidAddressPolkadotAddress(address) && amountNumber > 0);
     if (!api) {
       return;
     }
     setTokenSymbol(api.registry.getChainProperties().tokenSymbol.toHuman().toString());
-  }, [api, address, amount]);
+  }, [api, address, amountNumber]);
 
   async function handleSendClick() {
     if (!api) {
@@ -54,7 +61,7 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
       pair.unlock();
     }
     try {
-      const toSend = amount * 1_000_000_000_000;
+      const toSend = amountNumber * 1_000_000_000_000;
       await api.tx.balances.transfer(address, toSend).signAndSend(pair);
       toaster &&
         toaster.show({
@@ -98,10 +105,11 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
             large={true}
             leftIcon="send-to"
             placeholder="Amount"
-            onValueChange={setAmount}
+            onValueChange={handleAmountChange}
             value={amount}
             fill={true}
             min={0}
+            minorStepSize={0.001}
             rightElement={<Tag minimal={true}>{tokenSymbol}</Tag>}
           />
         </div>
