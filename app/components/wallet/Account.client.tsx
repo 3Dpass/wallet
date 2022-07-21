@@ -1,6 +1,5 @@
 import { Button, Intent, Menu, MenuDivider, MenuItem, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
-import keyring from "@polkadot/ui-keyring";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
 import { useState } from "react";
@@ -13,10 +12,11 @@ import { AddressIcon } from "../common/AddressIcon";
 type IProps = {
   pair: KeyringPair;
   handleSendClick: (pair: KeyringPair) => void;
+  handleDeleteClick: (pair: KeyringPair) => void;
   hideAddressOnSmallScreen?: boolean;
 };
 
-export default function Account({ pair, handleSendClick, hideAddressOnSmallScreen = true }: IProps) {
+export default function Account({ pair, handleSendClick, handleDeleteClick, hideAddressOnSmallScreen = true }: IProps) {
   const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
   const navigate = useNavigate();
@@ -78,13 +78,7 @@ export default function Account({ pair, handleSendClick, hideAddressOnSmallScree
         </>
       )}
       <MenuDivider />
-      <MenuItem
-        icon="delete"
-        text="Remove"
-        onClick={() => {
-          keyring.forgetAccount(pair.address);
-        }}
-      />
+      <MenuItem icon="delete" text="Remove" onClick={() => handleDeleteClick(pair)} />
     </Menu>
   );
 

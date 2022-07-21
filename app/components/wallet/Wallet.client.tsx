@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
-import { Alignment, Button, Intent, Menu, MenuDivider, MenuItem, NavbarGroup, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Alert, Alignment, Button, Intent, Menu, MenuDivider, MenuItem, NavbarGroup, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
@@ -9,7 +9,7 @@ import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
-import { KeyringPair } from "@polkadot/keyring/types";
+import type { KeyringPair } from "@polkadot/keyring/types";
 
 const ss58format = {
   test: 72,
@@ -22,17 +22,37 @@ export default function Wallet() {
   const toaster = useAtomValue(toasterAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [pairs, setPairs] = useState([]);
+  const [dialogPair, setDialogPair] = useState(null); // chosen pair for opened dialog window
+
   const [isDialogImportAddressMnemonicSeedOpen, setIsDialogImportAddressMnemonicSeedOpen] = useState(false);
+  const toggleImportAddressMnemonicSeedOpen = useCallback(() => {
+    setIsDialogImportAddressMnemonicSeedOpen(!isDialogImportAddressMnemonicSeedOpen);
+  }, [isDialogImportAddressMnemonicSeedOpen]);
+
   const [isDialogImportAddressJSONOpen, setIsDialogImportAddressJSONOpen] = useState(false);
+  const toggleImportAddressJSONOpen = useCallback(() => {
+    setIsDialogImportAddressJSONOpen(!isDialogImportAddressJSONOpen);
+  }, [isDialogImportAddressJSONOpen]);
+
   const [isDialogCreateAddressOpen, setIsDialogCreateAddressOpen] = useState(false);
+  const toggleDialogCreateAddressOpen = useCallback(() => {
+    setIsDialogCreateAddressOpen(!isDialogCreateAddressOpen);
+  }, [isDialogCreateAddressOpen]);
+
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
-  const [sendDialogPair, setSendDialogPair] = useState(null);
-  const handleSendDialogClose = useCallback(() => setIsSendDialogOpen(false), []);
+  const toggleSendDialog = useCallback(() => {
+    setIsSendDialogOpen(!isSendDialogOpen);
+  }, [isSendDialogOpen]);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const toggleDeleteDialog = useCallback(() => {
+    setIsDeleteDialogOpen(!isDeleteDialogOpen);
+  }, [isDeleteDialogOpen]);
 
   function handleSeedPhraseImportClick(value) {
     try {
       keyring.addUri(value);
-      setIsDialogImportAddressMnemonicSeedOpen(false);
+      toggleImportAddressMnemonicSeedOpen();
     } catch (e) {
       toaster &&
         toaster.show({
@@ -44,7 +64,7 @@ export default function Wallet() {
   }
 
   function handleSendClick(pair: KeyringPair) {
-    setSendDialogPair(pair);
+    setDialogPair(pair);
     setIsSendDialogOpen(true);
   }
 
@@ -52,7 +72,7 @@ export default function Wallet() {
     try {
       const pair = keyring.createFromJson(JSON.parse(value));
       keyring.addPair(pair, "");
-      setIsDialogImportAddressJSONOpen(false);
+      toggleImportAddressJSONOpen();
     } catch (e) {
       toaster &&
         toaster.show({
@@ -61,6 +81,16 @@ export default function Wallet() {
           message: e.message,
         });
     }
+  }
+
+  function handleDeleteClick(pair: KeyringPair) {
+    setDialogPair(pair);
+    toggleDeleteDialog();
+  }
+
+  function handleAddressDelete() {
+    keyring.forgetAccount(dialogPair.address);
+    toggleDeleteDialog();
   }
 
   useEffect(() => {
@@ -86,18 +116,29 @@ export default function Wallet() {
     <NavbarGroup align={Alignment.RIGHT}>
       <DialogImportAddress
         isOpen={isDialogImportAddressMnemonicSeedOpen}
-        onClose={() => setIsDialogImportAddressMnemonicSeedOpen(false)}
+        onClose={toggleImportAddressMnemonicSeedOpen}
         onImport={handleSeedPhraseImportClick}
       />
-      <DialogImportAddress
-        isOpen={isDialogImportAddressJSONOpen}
-        onClose={() => setIsDialogImportAddressJSONOpen(false)}
-        onImport={handleJSONWalletImportClick}
-      />
-      <DialogCreateAddress isOpen={isDialogCreateAddressOpen} onClose={() => setIsDialogCreateAddressOpen(false)} />
-      <DialogSendFunds pair={sendDialogPair} isOpen={isSendDialogOpen} onAfterSubmit={handleSendDialogClose} onClose={handleSendDialogClose} />
+      <DialogImportAddress isOpen={isDialogImportAddressJSONOpen} onClose={toggleImportAddressJSONOpen} onImport={handleJSONWalletImportClick} />
+      <DialogCreateAddress isOpen={isDialogCreateAddressOpen} onClose={toggleDialogCreateAddressOpen} />
+      <DialogSendFunds pair={dialogPair} isOpen={isSendDialogOpen} onAfterSubmit={toggleSendDialog} onClose={toggleSendDialog} />
+      <Alert
+        cancelButtonText="Cancel"
+        confirmButtonText="Delete"
+        icon="cross"
+        intent={Intent.DANGER}
+        isOpen={isDeleteDialogOpen}
+        canEscapeKeyCancel={true}
+        canOutsideClickCancel={true}
+        onCancel={toggleDeleteDialog}
+        onConfirm={handleAddressDelete}
+      >
+        <p>
+          Are you sure you want to delete address <code className="block my-3">{dialogPair && dialogPair.address}</code> from wallet?
+        </p>
+      </Alert>
       {pairs.slice(0, MAX_ADDRESSES_TO_SHOW).map((pair) => {
-        return <Account key={pair.address} pair={pair} handleSendClick={handleSendClick} />;
+        return <Account key={pair.address} pair={pair} handleSendClick={handleSendClick} handleDeleteClick={handleDeleteClick} />;
       })}
       {pairs.length > MAX_ADDRESSES_TO_SHOW && (
         <Popover2
@@ -108,7 +149,7 @@ export default function Wallet() {
               {pairs.slice(MAX_ADDRESSES_TO_SHOW).map((pair) => {
                 return (
                   <div key={pair.address}>
-                    <Account pair={pair} hideAddressOnSmallScreen={false} handleSendClick={handleSendClick} />
+                    <Account pair={pair} hideAddressOnSmallScreen={false} handleSendClick={handleSendClick} handleDeleteClick={handleDeleteClick} />
                   </div>
                 );
               })}
@@ -123,10 +164,10 @@ export default function Wallet() {
         position={Position.BOTTOM_LEFT}
         content={
           <Menu>
-            <MenuItem icon="new-object" text="Create new address..." onClick={() => setIsDialogCreateAddressOpen(true)} />
+            <MenuItem icon="new-object" text="Create new address..." onClick={toggleDialogCreateAddressOpen} />
             <MenuDivider />
-            <MenuItem icon="add" text="Import from seed phrase..." onClick={() => setIsDialogImportAddressMnemonicSeedOpen(true)} />
-            <MenuItem icon="import" text="Import from JSON..." onClick={() => setIsDialogImportAddressJSONOpen(true)} />
+            <MenuItem icon="add" text="Import from seed phrase..." onClick={toggleImportAddressMnemonicSeedOpen} />
+            <MenuItem icon="import" text="Import from JSON..." onClick={toggleImportAddressJSONOpen} />
           </Menu>
         }
       >
