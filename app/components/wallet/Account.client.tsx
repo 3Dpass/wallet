@@ -47,6 +47,19 @@ export default function Account({ pair, handleSendClick, handleDeleteClick, hide
       });
   }
 
+  async function handleUnlockFundsClick() {
+    if (!api) {
+      return;
+    }
+    await api.tx.rewards.unlock(pair.address);
+    toaster &&
+      toaster.show({
+        icon: "tick",
+        intent: Intent.SUCCESS,
+        message: "Unlock request sent",
+      });
+  }
+
   function loadAccount() {
     if (!api) {
       return;
@@ -73,8 +86,10 @@ export default function Account({ pair, handleSendClick, handleDeleteClick, hide
         <>
           <MenuItem disabled={true} icon="cube-add" text={`Total balance: ${formatBalance(balances.freeBalance, formatOptions)}`} />
           <MenuItem disabled={true} icon="cube" text={`Transferable: ${balances.availableBalance.toHuman()}`} />
-          <MenuItem disabled={true} icon="lock" text={`Locked: ${balances.lockedBalance.toHuman()}`} />
           <MenuItem icon="send-to" text="Send funds..." onClick={() => handleSendClick(pair)} />
+          <MenuDivider />
+          <MenuItem disabled={true} icon="lock" text={`Locked: ${balances.lockedBalance.toHuman()}`} />
+          {balances.lockedBalance.toBigInt() > 0 && <MenuItem icon="unlock" text="Unlock funds mined" onClick={handleUnlockFundsClick} />}
         </>
       )}
       <MenuDivider />
