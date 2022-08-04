@@ -14,7 +14,7 @@ import DialogSettings from "./components/dialogs/DialogSettings";
 
 export const meta = () => ({
   charset: "utf-8",
-  title: "3DP Wallet",
+  title: "3DPass Wallet",
   viewport: "width=device-width,initial-scale=1",
 });
 
@@ -88,9 +88,9 @@ function App() {
         <Toaster ref={toasterRef} />
         <Navbar>
           <NavbarGroup align={Alignment.LEFT}>
-            <NavbarHeading className="whitespace-nowrap">
-              <Link to="" style={{ color: "white" }}>
-                <strong>3DP</strong> Wallet
+            <NavbarHeading className="whitespace-nowrap flex">
+              <Link to="" style={{ color: "white" }} className="mt-[3px] mr-2">
+                <strong>3DPass</strong> Wallet
               </Link>
               <Button className="ml-2" icon="cog" minimal={true} onClick={() => setIsSettingsDialogOpen(true)} />
               <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
