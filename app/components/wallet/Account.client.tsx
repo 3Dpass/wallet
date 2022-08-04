@@ -22,6 +22,7 @@ export default function Account({ pair, handleSendClick, handleDeleteClick, hide
   const navigate = useNavigate();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const [formatOptions, setFormatOptions] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleOnMenuOpening() {
     loadAccount();
@@ -51,13 +52,29 @@ export default function Account({ pair, handleSendClick, handleDeleteClick, hide
     if (!api) {
       return;
     }
-    await api.tx.rewards.unlock(pair.address);
-    toaster &&
-      toaster.show({
-        icon: "tick",
-        intent: Intent.SUCCESS,
-        message: "Unlock request sent",
-      });
+    setIsLoading(true);
+    if (pair.isLocked) {
+      // TODO: show unlock dialog
+      pair.unlock();
+    }
+    try {
+      await api.tx.rewards.unlock(pair.address).signAndSend(pair);
+      toaster &&
+        toaster.show({
+          icon: "tick",
+          intent: Intent.SUCCESS,
+          message: "Unlock request sent",
+        });
+    } catch (e) {
+      toaster &&
+        toaster.show({
+          icon: "error",
+          intent: Intent.DANGER,
+          message: e.message,
+        });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function loadAccount() {
@@ -105,7 +122,7 @@ export default function Account({ pair, handleSendClick, handleDeleteClick, hide
   return (
     <>
       <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
-        <Button minimal={true} icon={<AddressIcon address={pair.address} className="mt-1" />}>
+        <Button minimal={true} icon={<AddressIcon address={pair.address} className="mt-1" />} disabled={isLoading}>
           <div className={addressClassName}>{pair.address}</div>
         </Button>
       </Popover2>
