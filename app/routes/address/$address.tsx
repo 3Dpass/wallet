@@ -14,9 +14,10 @@ const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
 
 export default function Address() {
+  const { address } = useParams();
   const api = useAtomValue(apiAtom);
   const apiExplorer = useAtomValue(apiExplorerAtom);
-  const { address } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
   const [transfers, setTransfers] = useState([]);
 
   useEffect(() => {
@@ -24,11 +25,13 @@ export default function Address() {
       if (!apiExplorer) {
         return false;
       }
+      setIsLoading(true);
       const accountIdHex = u8aToHex(decodeAddress(address));
       const result = await apiExplorer.query({
         query: getTransfers(accountIdHex),
       });
       setTransfers(result.data.getTransfers.objects);
+      setIsLoading(false);
     }
 
     loadTransfers();
@@ -42,36 +45,39 @@ export default function Address() {
     <Card>
       <TitledValue title="Address" value={address} fontMono={true} />
       <Divider className="my-5" />
-      <HTMLTable striped={true}>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>From</th>
-            <th>
-              <div className="text-right">Value</div>
-            </th>
-            <th>To</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transfers.map((transfer) => {
-            return (
-              <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
-                <td>{transfer.blockDatetime}</td>
-                <td>
-                  <AddressItem accountId={transfer.fromMultiAddressAccountId} />
-                </td>
-                <td className="font-mono">
-                  <div className="text-right">{transfer.value}</div>
-                </td>
-                <td>
-                  <AddressItem accountId={transfer.toMultiAddressAccountId} />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </HTMLTable>
+      {isLoading && <Spinner />}
+      {!isLoading && (
+        <HTMLTable striped={true}>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>From</th>
+              <th>
+                <div className="text-right">Value</div>
+              </th>
+              <th>To</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transfers.map((transfer) => {
+              return (
+                <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
+                  <td>{transfer.blockDatetime}</td>
+                  <td>
+                    <AddressItem accountId={transfer.fromMultiAddressAccountId} />
+                  </td>
+                  <td className="font-mono">
+                    <div className="text-right">{transfer.value}</div>
+                  </td>
+                  <td>
+                    <AddressItem accountId={transfer.toMultiAddressAccountId} />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </HTMLTable>
+      )}
     </Card>
   );
 }
