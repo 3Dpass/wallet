@@ -54,6 +54,10 @@ export default function Account({ pair }: IProps) {
   }
 
   async function handleCopyJson() {
+    if (pair.isLocked) {
+      handleUnlockAccount();
+      return;
+    }
     await navigator.clipboard.writeText(JSON.stringify(pair.toJson()));
     toaster &&
       toaster.show({

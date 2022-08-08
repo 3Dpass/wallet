@@ -1,4 +1,4 @@
-import { Button, Card, Classes, Dialog, Intent } from "@blueprintjs/core";
+import { Button, Card, Classes, Dialog, Icon, InputGroup, Intent } from "@blueprintjs/core";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { useState } from "react";
@@ -10,8 +10,10 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
   const toaster = useAtomValue(toasterAtom);
   const [mnemonic, setMnemonic] = useState("");
   const [address, setAddress] = useState("");
+  const [passphrase, setPassphrase] = useState("");
 
   function handleOpening() {
+    setPassphrase("");
     onGenerateClick();
   }
 
@@ -23,7 +25,7 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
   }
 
   function handleCreateClick() {
-    keyring.addUri(mnemonic);
+    keyring.addUri(mnemonic, passphrase);
     onClose();
   }
 
@@ -43,12 +45,22 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
         <div className={Classes.DIALOG_BODY}>
           <TitledValue title="Address" value={address} fontMono={true} />
           <div className="text-gray-500 my-3">Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.</div>
-          <Card>
+          <Card className="mb-2">
             <div className="text-center font-mono text-xl">{mnemonic}</div>
             <div className="text-center mt-4">
               <Button icon="duplicate" text="Copy" onClick={handleCopy} />
             </div>
           </Card>
+          <InputGroup
+            type="password"
+            large={true}
+            className="font-mono mb-2"
+            spellCheck={false}
+            placeholder="Passphrase"
+            onChange={(e) => setPassphrase(e.target.value)}
+            value={passphrase}
+            leftElement={<Icon icon="lock" />}
+          />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
