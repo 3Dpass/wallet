@@ -1,3 +1,8 @@
+export const ss58formats = {
+  test: 72,
+  live: 71,
+};
+export const ss58format = ss58formats.test;
 export const MAX_BLOCKS = 6;
 export const RPC_CONFIG = {
   poscan: {

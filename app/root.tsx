@@ -3,7 +3,7 @@ import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } fro
 import styles from "./styles/app.css";
 import { Alignment, Button, Classes, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
 import { useEffect, useRef, useState } from "react";
-import { apiAtom, apiEndpointAtom, toasterAtom } from "./atoms";
+import { apiAtom, apiEndpointAtom, apiExplorerAtom, apiExplorerEndpointAtom, toasterAtom } from "./atoms";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import Wallet from "./components/wallet/Wallet.client";
 import { RPC_CONFIG, RPC_TYPES } from "./api.config";
@@ -11,6 +11,7 @@ import { ClientOnly } from "remix-utils";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { withSentry } from "@sentry/remix";
 import DialogSettings from "./components/dialogs/DialogSettings";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -32,9 +33,11 @@ export function links() {
 function App() {
   const toasterRef = useRef<Toaster>();
   const [toaster, setToaster] = useAtom(toasterAtom);
-  const setApi = useSetAtom(apiAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+  const setApi = useSetAtom(apiAtom);
+  const setApiExplorer = useSetAtom(apiExplorerAtom);
   const apiEndpoint = useAtomValue(apiEndpointAtom);
+  const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
 
   useEffect(() => {
     setToaster(toasterRef.current);
@@ -47,7 +50,7 @@ function App() {
 
     setApi(false);
     const provider = new WsProvider(apiEndpoint, false);
-    provider.on("connected", (e) => {
+    provider.on("connected", () => {
       toaster &&
         toaster.show({
           icon: "tick",
@@ -77,6 +80,14 @@ function App() {
       });
     });
   }, [apiEndpoint, toaster]);
+
+  useEffect(() => {
+    const client = new ApolloClient({
+      uri: apiExplorerEndpoint,
+      cache: new InMemoryCache(),
+    });
+    setApiExplorer(client);
+  }, [apiExplorerEndpoint]);
 
   return (
     <html lang="en">

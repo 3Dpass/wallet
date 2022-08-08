@@ -8,11 +8,7 @@ import { apiAtom, toasterAtom } from "../../atoms";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
-
-const ss58format = {
-  test: 72,
-  live: 71,
-};
+import { ss58format } from "../../api.config";
 
 export default function Wallet() {
   const api = useAtomValue(apiAtom);
@@ -67,7 +63,7 @@ export default function Wallet() {
   useEffect(() => {
     let sub;
     cryptoWaitReady().then(() => {
-      keyring.loadAll({ ss58Format: ss58format.test, type: "sr25519" });
+      keyring.loadAll({ ss58Format: ss58format, type: "sr25519" });
       sub = keyring.accounts.subject.subscribe(() => {
         setPairs(keyring.getPairs());
       });
