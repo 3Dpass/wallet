@@ -1,4 +1,4 @@
-import { Beachball } from "@polkadot/react-identicon/icons";
+import { Polkadot } from "@polkadot/react-identicon/icons";
 
 type AddressIconProps = {
   address: string;
@@ -7,5 +7,5 @@ type AddressIconProps = {
 };
 
 export function AddressIcon({ address, size = 24, className }: AddressIconProps) {
-  return <Beachball address={address} size={size} className={className} publicKey={address} />;
+  return <Polkadot address={address} size={size} className={className} publicKey={address} />;
 }
