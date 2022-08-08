@@ -10,10 +10,11 @@ type IProps = {
   pair: KeyringPair;
   isOpen: boolean;
   onClose: () => void;
+  handleUnlockAccount: () => void;
   onAfterSubmit: () => void;
 };
 
-export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }: IProps) {
+export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAccount, onAfterSubmit }: IProps) {
   const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
   const [canSend, setCanSend] = useState(false);
@@ -23,15 +24,11 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
   const [amountNumber, setAmountNumber] = useState(0);
   const [tokenSymbol, setTokenSymbol] = useState("");
 
-  function resetForm() {
+  function handleOnOpening() {
     setIsLoading(false);
     setAddress("");
     setAmount("0");
     setAmountNumber(0);
-  }
-
-  function handleOnOpening() {
-    resetForm();
   }
 
   function handleAddressChange(e) {
@@ -56,11 +53,11 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
       return;
     }
     setIsLoading(true);
-    if (pair.isLocked) {
-      // TODO: show unlock dialog
-      pair.unlock();
-    }
     try {
+      if (pair.isLocked) {
+        handleUnlockAccount();
+        return;
+      }
       const toSend = amountNumber * 1_000_000_000_000;
       await api.tx.balances.transfer(address, toSend).signAndSend(pair);
       toaster &&
@@ -85,48 +82,47 @@ export default function DialogSendFunds({ pair, isOpen, onAfterSubmit, onClose }
   const addressIcon = isValidAddressPolkadotAddress(address) ? <AddressIcon address={address} className="m-2" /> : <Icon icon="asterisk" />;
 
   return (
-    <>
-      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
-        <div className={Classes.DIALOG_BODY}>
-          <InputGroup
-            disabled={isLoading}
-            large={true}
-            className="font-mono mb-2"
-            spellCheck={false}
-            placeholder="Enter address to send to"
-            onChange={handleAddressChange}
-            value={address}
-            leftElement={addressIcon}
-          />
-          <NumericInput
-            disabled={isLoading}
-            selectAllOnFocus={true}
-            buttonPosition={null}
-            large={true}
-            leftIcon="send-to"
-            placeholder="Amount"
-            onValueChange={handleAmountChange}
-            value={amount}
-            fill={true}
-            min={0}
-            minorStepSize={0.001}
-            rightElement={<Tag minimal={true}>{tokenSymbol}</Tag>}
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
+      <div className={Classes.DIALOG_BODY}>
+        <InputGroup
+          disabled={isLoading}
+          large={true}
+          className="font-mono mb-2"
+          spellCheck={false}
+          placeholder="Enter address to send to"
+          onChange={handleAddressChange}
+          value={address}
+          leftElement={addressIcon}
+        />
+        <NumericInput
+          disabled={isLoading}
+          selectAllOnFocus={true}
+          buttonPosition={null}
+          className="mb-2"
+          large={true}
+          leftIcon="send-to"
+          placeholder="Amount"
+          onValueChange={handleAmountChange}
+          value={amount}
+          fill={true}
+          min={0}
+          minorStepSize={0.001}
+          rightElement={<Tag minimal={true}>{tokenSymbol}</Tag>}
+        />
+      </div>
+      <div className={Classes.DIALOG_FOOTER}>
+        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+          <Button
+            intent={Intent.PRIMARY}
+            disabled={isLoading || !canSend}
+            onClick={handleSendClick}
+            icon="send-message"
+            loading={isLoading}
+            text="Send"
           />
         </div>
-        <div className={Classes.DIALOG_FOOTER}>
-          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={onClose} text="Cancel" disabled={isLoading} />
-            <Button
-              intent={Intent.PRIMARY}
-              disabled={isLoading || !canSend}
-              onClick={handleSendClick}
-              icon="send-message"
-              loading={isLoading}
-              text="Send"
-            />
-          </div>
-        </div>
-      </Dialog>
-    </>
+      </div>
+    </Dialog>
   );
 }

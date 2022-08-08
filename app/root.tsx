@@ -86,7 +86,7 @@ function App() {
       </head>
       <body className={Classes.DARK}>
         <Toaster ref={toasterRef} />
-        <Navbar>
+        <Navbar className="flex justify-between overflow-x-auto overflow-y-hidden">
           <NavbarGroup align={Alignment.LEFT}>
             <NavbarHeading className="whitespace-nowrap flex">
               <Link to="" style={{ color: "white" }} className="mt-[3px] mr-2">
