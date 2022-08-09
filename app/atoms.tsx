@@ -9,7 +9,7 @@ export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint", "wss://rpc
 export const apiAtom = atom<ApiPromise | false>(false);
 
 // Explorer GraphQL API
-export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpoint", "http://127.0.0.1:8000/graphql/");
+export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpoint", "https://explorer-api.3dpass.org/graphql/");
 export const apiExplorerAtom = atom<ApolloClient<NormalizedCacheObject> | false>(false);
 
 export const toasterAtom = atom<Toaster | false>(false);
