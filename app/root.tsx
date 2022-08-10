@@ -50,14 +50,6 @@ function App() {
 
     setApi(false);
     const provider = new WsProvider(apiEndpoint, false);
-    provider.on("connected", () => {
-      toaster &&
-        toaster.show({
-          icon: "tick",
-          intent: "success",
-          message: `API connected`,
-        });
-    });
     provider.on("disconnected", () => {
       toaster &&
         toaster.show({
