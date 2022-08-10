@@ -1,6 +1,6 @@
 import { useParams } from "@remix-run/react";
 import { Card, HTMLTable, Spinner } from "@blueprintjs/core";
-import { apiAtom, apiExplorerAtom, formatOptionsAtom } from "../../atoms";
+import { apiAtom, apiExplorerAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
 import { lazy, useEffect, useState } from "react";
 import { decodeAddress } from "@polkadot/keyring";
@@ -10,6 +10,7 @@ import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 import { ss58format } from "../../api.config";
 import { getTransfers } from "../../queries";
 import { FormattedAmount } from "../../components/common/FormattedAmount";
+import Moment from "react-moment";
 
 const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
@@ -65,7 +66,10 @@ export default function Address() {
               return (
                 <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
                   <td>{transfer.blockNumber}</td>
-                  <td>{transfer.blockDatetime}</td>
+                  <td>
+                    <Moment date={transfer.blockDatetime} format="DD.MM" interval={0} className="" />
+                    <Moment date={transfer.blockDatetime} format=".YYYY HH:MM" interval={0} className="opacity-50" />
+                  </td>
                   <td>
                     <AddressItem accountId={transfer.fromMultiAddressAccountId} />
                   </td>
