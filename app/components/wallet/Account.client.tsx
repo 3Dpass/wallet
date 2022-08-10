@@ -4,13 +4,13 @@ import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
 import { useCallback, useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
-import { formatBalance } from "@polkadot/util";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useNavigate } from "@remix-run/react";
 import { AddressIcon } from "../common/AddressIcon";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
 import keyring from "@polkadot/ui-keyring";
+import { FormattedAmount } from "../common/FormattedAmount";
 
 type IProps = {
   pair: KeyringPair;
@@ -21,7 +21,6 @@ export default function Account({ pair }: IProps) {
   const toaster = useAtomValue(toasterAtom);
   const navigate = useNavigate();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
-  const [formatOptions, setFormatOptions] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
@@ -116,11 +115,6 @@ export default function Account({ pair }: IProps) {
     setBalances(undefined);
     api.derive.balances.all(pair.address).then((balances) => {
       setBalances(balances);
-      setFormatOptions({
-        decimals: api.registry.chainDecimals[0],
-        withSi: true,
-        withUnit: api.registry.chainTokens[0],
-      });
     });
   }
 
@@ -133,7 +127,15 @@ export default function Account({ pair }: IProps) {
       {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
       {balances && (
         <>
-          <MenuItem disabled={true} icon="cube-add" text={`Total balance: ${formatBalance(balances.freeBalance, formatOptions)}`} />
+          <MenuItem
+            disabled={true}
+            icon="cube-add"
+            text={
+              <>
+                Total balance: <FormattedAmount value={balances.freeBalance} />
+              </>
+            }
+          />
           <MenuItem disabled={true} icon="cube" text={`Transferable: ${balances.availableBalance.toHuman()}`} />
           <MenuItem icon="send-to" text="Send funds..." onClick={handleSendClick} />
           <MenuDivider />

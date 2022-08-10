@@ -3,7 +3,7 @@ import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } fro
 import styles from "./styles/app.css";
 import { Alignment, Button, Classes, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
 import { useEffect, useRef, useState } from "react";
-import { apiAtom, apiEndpointAtom, apiExplorerAtom, apiExplorerEndpointAtom, toasterAtom } from "./atoms";
+import { apiAtom, apiEndpointAtom, apiExplorerAtom, apiExplorerEndpointAtom, formatOptionsAtom, toasterAtom } from "./atoms";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import Wallet from "./components/wallet/Wallet.client";
 import { RPC_CONFIG, RPC_TYPES } from "./api.config";
@@ -38,6 +38,7 @@ function App() {
   const setApiExplorer = useSetAtom(apiExplorerAtom);
   const apiEndpoint = useAtomValue(apiEndpointAtom);
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
+  const setFormatOptions = useSetAtom(formatOptionsAtom);
 
   useEffect(() => {
     setToaster(toasterRef.current);
@@ -69,6 +70,11 @@ function App() {
     provider.connect().then(() => {
       ApiPromise.create({ provider, rpc: RPC_CONFIG, types: RPC_TYPES }).then(async (api) => {
         setApi(api);
+        setFormatOptions({
+          decimals: api.registry.chainDecimals[0],
+          withSi: true,
+          withUnit: api.registry.chainTokens[0],
+        });
       });
     });
   }, [apiEndpoint, toaster]);

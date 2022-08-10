@@ -19,7 +19,6 @@ export function getTransfers(accountId) {
         }
         objects {
           blockNumber
-          extrinsicIdx
           fromMultiAddressAccountId
           toMultiAddressAccountId
           value

@@ -1,6 +1,6 @@
 import { useParams } from "@remix-run/react";
 import { Card, HTMLTable, Spinner } from "@blueprintjs/core";
-import { apiAtom, apiExplorerAtom } from "../../atoms";
+import { apiAtom, apiExplorerAtom, formatOptionsAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
 import { lazy, useEffect, useState } from "react";
 import { decodeAddress } from "@polkadot/keyring";
@@ -9,6 +9,7 @@ import { AddressIcon } from "../../components/common/AddressIcon";
 import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 import { ss58format } from "../../api.config";
 import { getTransfers } from "../../queries";
+import { FormattedAmount } from "../../components/common/FormattedAmount";
 
 const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
@@ -50,6 +51,7 @@ export default function Address() {
         <HTMLTable striped={true}>
           <thead>
             <tr>
+              <th>Block</th>
               <th>Date</th>
               <th>From</th>
               <th>
@@ -62,12 +64,15 @@ export default function Address() {
             {transfers.map((transfer) => {
               return (
                 <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
+                  <td>{transfer.blockNumber}</td>
                   <td>{transfer.blockDatetime}</td>
                   <td>
                     <AddressItem accountId={transfer.fromMultiAddressAccountId} />
                   </td>
                   <td className="font-mono">
-                    <div className="text-right">{transfer.value}</div>
+                    <div className="text-right">
+                      <FormattedAmount value={transfer.value} />
+                    </div>
                   </td>
                   <td>
                     <AddressItem accountId={transfer.toMultiAddressAccountId} />

@@ -7,6 +7,7 @@ import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 // RPC API
 export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint", "wss://rpc2.3dpass.org");
 export const apiAtom = atom<ApiPromise | false>(false);
+export const formatOptionsAtom = atom<object | false>(false);
 
 // Explorer GraphQL API
 export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpoint", "https://explorer-api.3dpass.org/graphql/");
