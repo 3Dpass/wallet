@@ -1,5 +1,5 @@
 import { useParams } from "@remix-run/react";
-import { Card, HTMLTable, Spinner } from "@blueprintjs/core";
+import { Card, HTMLTable, Icon, Spinner } from "@blueprintjs/core";
 import { apiAtom, apiExplorerAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
 import { lazy, useEffect, useState } from "react";
@@ -54,15 +54,18 @@ export default function Address() {
             <tr>
               <th>Block</th>
               <th>Date</th>
-              <th>From</th>
+              <th>Address</th>
+              <th></th>
               <th>
                 <div className="text-right">Value</div>
               </th>
-              <th>To</th>
             </tr>
           </thead>
           <tbody>
             {transfers.map((transfer) => {
+              const otherAddress =
+                transfer.fromMultiAddressAccountId != address ? transfer.fromMultiAddressAccountId : transfer.toMultiAddressAccountId;
+              const outgoing = transfer.fromMultiAddressAccountId == address;
               return (
                 <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
                   <td>{transfer.blockNumber}</td>
@@ -71,15 +74,13 @@ export default function Address() {
                     <Moment date={transfer.blockDatetime} format=".YYYY HH:MM" interval={0} className="opacity-50" />
                   </td>
                   <td>
-                    <AddressItem accountId={transfer.fromMultiAddressAccountId} />
+                    <AddressItem accountId={otherAddress} />
                   </td>
+                  <td>{outgoing ? <Icon icon="upload" className="text-red-500" /> : <Icon icon="download" className="text-green-500" />}</td>
                   <td className="font-mono">
                     <div className="text-right">
                       <FormattedAmount value={transfer.value} />
                     </div>
-                  </td>
-                  <td>
-                    <AddressItem accountId={transfer.toMultiAddressAccountId} />
                   </td>
                 </tr>
               );
