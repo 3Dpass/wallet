@@ -1,4 +1,4 @@
-import { useParams } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 import { Card, HTMLTable, Icon, Spinner } from "@blueprintjs/core";
 import { apiAtom, apiExplorerAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
@@ -6,11 +6,11 @@ import { lazy, useEffect, useState } from "react";
 import { decodeAddress } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
 import { AddressIcon } from "../../components/common/AddressIcon";
-import { encodeAddress } from "@polkadot/util-crypto/address/encode";
-import { ss58format } from "../../api.config";
 import { getTransfers } from "../../queries";
 import { FormattedAmount } from "../../components/common/FormattedAmount";
 import Moment from "react-moment";
+import { encodeAddress } from "@polkadot/util-crypto/address/encode";
+import { ss58format } from "../../api.config";
 
 const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
@@ -63,20 +63,20 @@ export default function Address() {
           </thead>
           <tbody>
             {transfers.map((transfer) => {
-              const otherAddress =
-                transfer.fromMultiAddressAccountId != address ? transfer.fromMultiAddressAccountId : transfer.toMultiAddressAccountId;
+              const fromAddress = encodeAddress(transfer.fromMultiAddressAccountId, ss58format);
+              const toAddress = encodeAddress(transfer.toMultiAddressAccountId, ss58format);
+              const otherAddress = fromAddress != address ? fromAddress : toAddress;
               const outgoing = transfer.fromMultiAddressAccountId == address;
               return (
                 <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
                   <td>{transfer.blockNumber}</td>
                   <td>
-                    <Moment date={transfer.blockDatetime} format="DD.MM" interval={0} className="" />
-                    <Moment date={transfer.blockDatetime} format=".YYYY HH:MM" interval={0} className="opacity-50" />
+                    <Moment date={transfer.blockDatetime} format="DD.MM.YY HH:MM" interval={0} />
                   </td>
                   <td>
-                    <AddressItem accountId={otherAddress} />
+                    <AddressItem address={otherAddress} />
                   </td>
-                  <td>{outgoing ? <Icon icon="upload" className="text-red-500" /> : <Icon icon="download" className="text-green-500" />}</td>
+                  <td>{outgoing ? <Icon icon="remove" className="text-red-500" /> : <Icon icon="add" className="text-green-500" />}</td>
                   <td className="font-mono">
                     <div className="text-right">
                       <FormattedAmount value={transfer.value} />
@@ -92,12 +92,11 @@ export default function Address() {
   );
 }
 
-function AddressItem({ accountId }) {
-  const address = encodeAddress(accountId, ss58format);
+function AddressItem({ address }) {
   return (
-    <div className="flex">
+    <Link to={`/address/${address}`} className="flex">
       <AddressIcon address={address} />
       <div className="font-mono ml-2">{address}</div>
-    </div>
+    </Link>
   );
 }
