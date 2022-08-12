@@ -69,7 +69,9 @@ export default function Address() {
               const outgoing = fromAddress == address;
               return (
                 <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
-                  <td>{transfer.blockNumber}</td>
+                  <td>
+                    <Link to={`/block/${transfer.blockNumber}`}>{transfer.blockNumber}</Link>
+                  </td>
                   <td>
                     <Moment date={transfer.blockDatetime} format="DD.MM.YY HH:MM" interval={0} />
                   </td>
