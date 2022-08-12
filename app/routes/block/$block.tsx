@@ -6,6 +6,7 @@ import type { IBlockData, ILogData } from "../../queries";
 import { getBlock, getLogs } from "../../queries";
 import { useAtomValue } from "jotai";
 import { apiExplorerAtom } from "../../atoms";
+import Moment from "react-moment";
 
 export default function Block() {
   const { block } = useParams();
@@ -41,11 +42,16 @@ export default function Block() {
 
   return (
     <Card>
-      <TitledValue title="Block" value={block} fontMono={true} className="mb-3" />
       {!blockData && <Spinner />}
       {blockData && (
         <>
-          <TitledValue title="Hash" value={blockData.hash} fontMono={true} className="mb-3" />
+          <div className="flex gap-4 mb-6">
+            <TitledValue title="Block" value={block} fontMono={true} className="mr-4" />
+            <TitledValue title="Date" value={<Moment date={blockData.datetime} format="DD.MM.YY HH:MM" interval={0} />} />
+          </div>
+          <div className="flex gap-4 mb-3">
+            <TitledValue title="Hash" value={blockData.hash} fontMono={true} />
+          </div>
           <div className="flex gap-4 mb-3">
             <TitledValue title="Spec Name" value={blockData.specName} fontMono={true} />
             <TitledValue title="Spec Version" value={blockData.specVersion} fontMono={true} />
