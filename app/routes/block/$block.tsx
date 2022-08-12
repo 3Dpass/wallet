@@ -47,7 +47,7 @@ export default function Block() {
         <>
           <div className="flex gap-4 mb-6">
             <TitledValue title="Block" value={block} fontMono={true} className="mr-4" />
-            <TitledValue title="Date" value={<Moment date={blockData.datetime} format="DD.MM.YY HH:MM" interval={0} />} />
+            <TitledValue title="Date" value={<Moment date={blockData.datetime} format="lll Z" interval={0} />} />
           </div>
           <div className="flex gap-4 mb-3">
             <TitledValue title="Hash" value={blockData.hash} fontMono={true} />
