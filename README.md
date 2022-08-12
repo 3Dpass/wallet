@@ -6,7 +6,7 @@ The wallet interacts directly from your browser to the blockchain [Node](https:/
 
 ### 3DPass API Endpoints:
 - `wss://rpc.3dpass.org`
-- `wss://rps2.3dpass.org`
+- `wss://rpc2.3dpass.org`
 
 In order to connect the wallet to the local Node you can set up `wss://127.0.0.1:9944` 
 
