@@ -6,14 +6,14 @@ import TitledValue from "../common/TitledValue";
 import { useAtomValue } from "jotai";
 import { toasterAtom } from "../../atoms";
 
-const dataInitial = {
-  address: "",
-  mnemonic: "",
-  passphrase: "",
-};
-
 export default function DialogCreateAddress({ isOpen, onClose }) {
   const toaster = useAtomValue(toasterAtom);
+
+  const dataInitial = {
+    address: "",
+    mnemonic: "",
+    passphrase: "",
+  };
   const [data, setData] = useState(dataInitial);
 
   function handleOpening() {

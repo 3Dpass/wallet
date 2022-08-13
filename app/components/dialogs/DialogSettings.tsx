@@ -6,18 +6,20 @@ import TitledValue from "../common/TitledValue";
 
 export default function DialogSettings({ isOpen, onClose }) {
   const [apiEndpoint, setApiEndpoint] = useAtom(apiEndpointAtom);
-  const [apiEndpointInput, setApiEndpointInput] = useState("");
   const [apiExplorerEndpoint, setApiExplorerEndpoint] = useAtom(apiExplorerEndpointAtom);
-  const [apiExplorerEndpointInput, setApiExplorerEndpointInput] = useState("");
+  const dataInitial = {
+    api_endpoint: apiEndpoint,
+    api_explorer_endpoint: apiExplorerEndpoint,
+  };
+  const [data, setData] = useState(dataInitial);
 
   function handleOnOpening() {
-    setApiEndpointInput(apiEndpoint);
-    setApiExplorerEndpointInput(apiExplorerEndpoint);
+    setData(dataInitial);
   }
 
   function handleSaveClick() {
-    setApiEndpoint(apiEndpointInput);
-    setApiExplorerEndpoint(apiExplorerEndpointInput);
+    setApiEndpoint(data.api_endpoint);
+    setApiExplorerEndpoint(data.api_explorer_endpoint);
     onClose();
   }
 
@@ -30,8 +32,8 @@ export default function DialogSettings({ isOpen, onClose }) {
             value={
               <input
                 className="border border-gray-600 p-1 px-2 mt-2 w-full"
-                value={apiEndpointInput}
-                onChange={(e) => setApiEndpointInput(e.target.value)}
+                value={data.api_endpoint}
+                onChange={(e) => setData((prev) => ({ ...prev, api_endpoint: e.target.value }))}
               />
             }
             fontMono={true}
@@ -42,8 +44,8 @@ export default function DialogSettings({ isOpen, onClose }) {
             value={
               <input
                 className="border border-gray-600 p-1 px-2 mt-2 w-full"
-                value={apiExplorerEndpointInput}
-                onChange={(e) => setApiExplorerEndpointInput(e.target.value)}
+                value={data.api_explorer_endpoint}
+                onChange={(e) => setData((prev) => ({ ...prev, api_explorer_endpoint: e.target.value }))}
               />
             }
             fontMono={true}

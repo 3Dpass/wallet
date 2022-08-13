@@ -19,34 +19,31 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
   const toaster = useAtomValue(toasterAtom);
   const [canSend, setCanSend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [address, setAddress] = useState("");
-  const [amount, setAmount] = useState("0");
-  const [amountNumber, setAmountNumber] = useState(0);
   const [tokenSymbol, setTokenSymbol] = useState("");
+
+  const dataInitial = {
+    address: "",
+    amount: "",
+    amount_number: 0,
+  };
+  const [data, setData] = useState(dataInitial);
 
   function handleOnOpening() {
     setIsLoading(false);
-    setAddress("");
-    setAmount("0");
-    setAmountNumber(0);
-  }
-
-  function handleAddressChange(e) {
-    setAddress(e.target.value);
+    setData(dataInitial);
   }
 
   function handleAmountChange(valueAsNumber, valueAsString) {
-    setAmount(valueAsString);
-    setAmountNumber(valueAsNumber);
+    setData((prev) => ({ ...prev, amount: valueAsString, amount_number: valueAsNumber }));
   }
 
   useEffect(() => {
-    setCanSend(api && isValidAddressPolkadotAddress(address) && amountNumber > 0);
-    if (!api) {
-      return;
-    }
-    setTokenSymbol(api.registry.getChainProperties().tokenSymbol.toHuman().toString());
-  }, [api, address, amountNumber]);
+    api && setTokenSymbol(api.registry.getChainProperties().tokenSymbol.toHuman().toString());
+  }, [api]);
+
+  useEffect(() => {
+    setCanSend(api && isValidAddressPolkadotAddress(data.address) && data.amount_number > 0);
+  }, [data]);
 
   async function handleSendClick() {
     if (!api) {
@@ -58,8 +55,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
         handleUnlockAccount();
         return;
       }
-      const toSend = amountNumber * 1_000_000_000_000;
-      await api.tx.balances.transfer(address, toSend).signAndSend(pair);
+      const toSend = data.amount_number * 1_000_000_000_000;
+      await api.tx.balances.transfer(data.address, toSend).signAndSend(pair);
       toaster &&
         toaster.show({
           icon: "endorsed",
@@ -79,7 +76,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
     }
   }
 
-  const addressIcon = isValidAddressPolkadotAddress(address) ? <AddressIcon address={address} className="m-2" /> : <Icon icon="asterisk" />;
+  const addressIcon = isValidAddressPolkadotAddress(data.address) ? <AddressIcon address={data.address} className="m-2" /> : <Icon icon="asterisk" />;
 
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
@@ -90,8 +87,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
           className="font-mono mb-2"
           spellCheck={false}
           placeholder="Enter address to send to"
-          onChange={handleAddressChange}
-          value={address}
+          onChange={(e) => setData((prev) => ({ ...prev, address: e.target.value }))}
+          value={data.address}
           leftElement={addressIcon}
         />
         <NumericInput
@@ -103,7 +100,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
           leftIcon="send-to"
           placeholder="Amount"
           onValueChange={handleAmountChange}
-          value={amount}
+          value={data.amount}
           fill={true}
           min={0}
           minorStepSize={0.001}
