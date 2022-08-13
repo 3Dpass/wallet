@@ -38,5 +38,17 @@ export const RPC_TYPES = {
   LookupSource: "AccountId",
   Weight: "u32",
   Difficulty: "u256",
-  Timestamp: "u64",
+  DifficultyAndTimestamp: {
+    difficulty: "Difficulty",
+    timestamp: "u64",
+  },
+  LockParameters: {
+    period: "u16",
+    divide: "u16",
+  },
+  StorageVersion: {
+    _enum: ["V0", "V1"],
+    V0: "u8",
+    V1: "u8",
+  },
 };
