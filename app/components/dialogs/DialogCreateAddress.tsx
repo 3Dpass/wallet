@@ -6,31 +6,34 @@ import TitledValue from "../common/TitledValue";
 import { useAtomValue } from "jotai";
 import { toasterAtom } from "../../atoms";
 
+const dataInitial = {
+  address: "",
+  mnemonic: "",
+  passphrase: "",
+};
+
 export default function DialogCreateAddress({ isOpen, onClose }) {
   const toaster = useAtomValue(toasterAtom);
-  const [mnemonic, setMnemonic] = useState("");
-  const [address, setAddress] = useState("");
-  const [passphrase, setPassphrase] = useState("");
+  const [data, setData] = useState(dataInitial);
 
   function handleOpening() {
-    setPassphrase("");
+    setData(dataInitial);
     onGenerateClick();
   }
 
   function onGenerateClick() {
     const mnemonic = mnemonicGenerate();
-    setMnemonic(mnemonic);
     const pair = keyring.createFromUri(mnemonic);
-    setAddress(pair.address);
+    setData((prev) => ({ ...prev, mnemonic, address: pair.address }));
   }
 
   function handleCreateClick() {
-    keyring.addUri(mnemonic, passphrase);
+    keyring.addUri(data.mnemonic, data.passphrase);
     onClose();
   }
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(mnemonic);
+    await navigator.clipboard.writeText(data.mnemonic);
     toaster &&
       toaster.show({
         icon: "tick",
@@ -43,10 +46,10 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
         <div className={Classes.DIALOG_BODY}>
-          <TitledValue title="Address" value={address} fontMono={true} />
+          <TitledValue title="Address" value={data.address} fontMono={true} />
           <div className="text-gray-500 my-3">Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.</div>
           <Card className="mb-2">
-            <div className="text-center font-mono text-xl">{mnemonic}</div>
+            <div className="text-center font-mono text-xl">{data.mnemonic}</div>
             <div className="text-center mt-4">
               <Button icon="duplicate" text="Copy" onClick={handleCopy} />
             </div>
@@ -57,8 +60,8 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
             className="font-mono mb-2"
             spellCheck={false}
             placeholder="Passphrase"
-            onChange={(e) => setPassphrase(e.target.value)}
-            value={passphrase}
+            onChange={(e) => setData((prev) => ({ ...prev, passphrase: e.target.value }))}
+            value={data.passphrase}
             leftElement={<Icon icon="lock" />}
           />
         </div>
