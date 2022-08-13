@@ -16,25 +16,20 @@ export default function Wallet() {
   const [isLoading, setIsLoading] = useState(true);
   const [pairs, setPairs] = useState([]);
 
-  const [isDialogImportAddressMnemonicSeedOpen, setIsDialogImportAddressMnemonicSeedOpen] = useState(false);
-  const toggleImportAddressMnemonicSeedOpen = useCallback(() => {
-    setIsDialogImportAddressMnemonicSeedOpen(!isDialogImportAddressMnemonicSeedOpen);
-  }, [isDialogImportAddressMnemonicSeedOpen]);
-
-  const [isDialogImportAddressJSONOpen, setIsDialogImportAddressJSONOpen] = useState(false);
-  const toggleImportAddressJSONOpen = useCallback(() => {
-    setIsDialogImportAddressJSONOpen(!isDialogImportAddressJSONOpen);
-  }, [isDialogImportAddressJSONOpen]);
-
-  const [isDialogCreateAddressOpen, setIsDialogCreateAddressOpen] = useState(false);
-  const toggleDialogCreateAddressOpen = useCallback(() => {
-    setIsDialogCreateAddressOpen(!isDialogCreateAddressOpen);
-  }, [isDialogCreateAddressOpen]);
+  const dialogsInitial = {
+    mnemonic: false,
+    json: false,
+    create: false,
+  };
+  const [dialogs, setDialogs] = useState(dialogsInitial);
+  const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
+    setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
+  }, []);
 
   function handleSeedPhraseImportClick(value) {
     try {
       keyring.addUri(value);
-      toggleImportAddressMnemonicSeedOpen();
+      dialogToggle("mnemonic");
     } catch (e) {
       toaster &&
         toaster.show({
@@ -49,7 +44,7 @@ export default function Wallet() {
     try {
       const pair = keyring.createFromJson(JSON.parse(value));
       keyring.addPair(pair, "");
-      toggleImportAddressJSONOpen();
+      dialogToggle("json");
     } catch (e) {
       toaster &&
         toaster.show({
@@ -81,13 +76,9 @@ export default function Wallet() {
 
   return (
     <NavbarGroup align={Alignment.RIGHT}>
-      <DialogImportAddress
-        isOpen={isDialogImportAddressMnemonicSeedOpen}
-        onClose={toggleImportAddressMnemonicSeedOpen}
-        onImport={handleSeedPhraseImportClick}
-      />
-      <DialogImportAddress isOpen={isDialogImportAddressJSONOpen} onClose={toggleImportAddressJSONOpen} onImport={handleJSONWalletImportClick} />
-      <DialogCreateAddress isOpen={isDialogCreateAddressOpen} onClose={toggleDialogCreateAddressOpen} />
+      <DialogImportAddress isOpen={dialogs.mnemonic} onClose={() => dialogToggle("mnemonic")} onImport={handleSeedPhraseImportClick} />
+      <DialogImportAddress isOpen={dialogs.json} onClose={() => dialogToggle("json")} onImport={handleJSONWalletImportClick} />
+      <DialogCreateAddress isOpen={dialogs.create} onClose={() => dialogToggle("create")} />
       {pairs.map((pair) => {
         return <Account key={pair.address} pair={pair} />;
       })}
@@ -96,10 +87,10 @@ export default function Wallet() {
         position={Position.BOTTOM_LEFT}
         content={
           <Menu>
-            <MenuItem icon="new-object" text="Create new address..." onClick={toggleDialogCreateAddressOpen} />
+            <MenuItem icon="new-object" text="Create new address..." onClick={() => dialogToggle("create")} />
             <MenuDivider />
-            <MenuItem icon="add" text="Import from seed phrase..." onClick={toggleImportAddressMnemonicSeedOpen} />
-            <MenuItem icon="import" text="Import from JSON..." onClick={toggleImportAddressJSONOpen} />
+            <MenuItem icon="add" text="Import from seed phrase..." onClick={() => dialogToggle("mnemonic")} />
+            <MenuItem icon="import" text="Import from JSON..." onClick={() => dialogToggle("json")} />
           </Menu>
         }
       >

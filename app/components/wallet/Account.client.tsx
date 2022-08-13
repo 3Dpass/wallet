@@ -23,23 +23,37 @@ export default function Account({ pair }: IProps) {
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
-  const toggleSendDialog = useCallback(() => {
-    setIsSendDialogOpen(!isSendDialogOpen);
-  }, [isSendDialogOpen]);
-
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const toggleDeleteDialog = useCallback(() => {
-    setIsDeleteDialogOpen(!isDeleteDialogOpen);
-  }, [isDeleteDialogOpen]);
-
-  const [isDialogUnlockAccountOpen, setIsDialogUnlockAccountOpen] = useState(false);
-  const toggleDialogUnlockAccount = useCallback(() => {
-    setIsDialogUnlockAccountOpen(!isDialogUnlockAccountOpen);
-  }, [isDialogUnlockAccountOpen]);
+  const dialogsInitial = {
+    send: false,
+    delete: false,
+    unlock: false,
+  };
+  const [dialogs, setDialogs] = useState(dialogsInitial);
+  const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
+    setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
+  }, []);
 
   function handleOnMenuOpening() {
     loadAccount();
+  }
+
+  function loadAccount() {
+    if (!api) {
+      return;
+    }
+    setBalances(undefined);
+    api.derive.balances.all(pair.address).then((balances) => {
+      setBalances(balances);
+    });
+  }
+
+  function handleUnlockAccount() {
+    dialogToggle("unlock");
+  }
+
+  function handleAddressDelete() {
+    keyring.forgetAccount(pair.address);
+    dialogToggle("delete");
   }
 
   async function handleCopyAddress() {
@@ -59,24 +73,11 @@ export default function Account({ pair }: IProps) {
     }
     await navigator.clipboard.writeText(JSON.stringify(pair.toJson()));
     toaster &&
-      toaster.show({
+      toaster?.show({
         icon: "tick",
         intent: Intent.SUCCESS,
         message: "Wallet JSON copied to clipboard",
       });
-  }
-
-  function handleUnlockAccount() {
-    setIsDialogUnlockAccountOpen(true);
-  }
-
-  function handleSendClick() {
-    setIsSendDialogOpen(true);
-  }
-
-  function handleAddressDelete() {
-    keyring.forgetAccount(pair.address);
-    toggleDeleteDialog();
   }
 
   async function handleUnlockFundsClick() {
@@ -108,16 +109,6 @@ export default function Account({ pair }: IProps) {
     }
   }
 
-  function loadAccount() {
-    if (!api) {
-      return;
-    }
-    setBalances(undefined);
-    api.derive.balances.all(pair.address).then((balances) => {
-      setBalances(balances);
-    });
-  }
-
   const menu = (
     <Menu>
       <MenuItem icon="id-number" text="View details..." onClick={() => navigate(`address/${pair.address}`)}></MenuItem>
@@ -137,14 +128,14 @@ export default function Account({ pair }: IProps) {
             }
           />
           <MenuItem disabled={true} icon="cube" text={`Transferable: ${balances.availableBalance.toHuman()}`} />
-          <MenuItem icon="send-to" text="Send funds..." onClick={handleSendClick} />
+          <MenuItem icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} />
           <MenuDivider />
           <MenuItem disabled={true} icon="lock" text={`Locked: ${balances.lockedBalance.toHuman()}`} />
           {balances.lockedBalance.toBigInt() > 0 && <MenuItem icon="unlock" text="Unlock funds mined" onClick={handleUnlockFundsClick} />}
         </>
       )}
       <MenuDivider />
-      <MenuItem icon="delete" text="Remove" onClick={toggleDeleteDialog} />
+      <MenuItem icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
     </Menu>
   );
 
@@ -152,27 +143,27 @@ export default function Account({ pair }: IProps) {
     <>
       <DialogSendFunds
         pair={pair}
-        isOpen={isSendDialogOpen}
-        onAfterSubmit={toggleSendDialog}
+        isOpen={dialogs.send}
+        onAfterSubmit={() => dialogToggle("send")}
         handleUnlockAccount={handleUnlockAccount}
-        onClose={toggleSendDialog}
+        onClose={() => dialogToggle("send")}
       />
       <Alert
         cancelButtonText="Cancel"
         confirmButtonText="Delete"
         icon="cross"
         intent={Intent.DANGER}
-        isOpen={isDeleteDialogOpen}
+        isOpen={dialogs.delete}
         canEscapeKeyCancel={true}
         canOutsideClickCancel={true}
-        onCancel={toggleDeleteDialog}
+        onCancel={() => dialogToggle("delete")}
         onConfirm={handleAddressDelete}
       >
         <p>
-          Are you sure you want to delete address <code className="block my-3">{pair && pair.address}</code> from wallet?
+          Are you sure you want to delete address <code className="block my-3">{pair?.address}</code> from wallet?
         </p>
       </Alert>
-      <DialogUnlockAccount pair={pair} isOpen={isDialogUnlockAccountOpen} onClose={toggleDialogUnlockAccount} />
+      <DialogUnlockAccount pair={pair} isOpen={dialogs.unlock} onClose={() => dialogToggle("unlock")} />
       <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
         <Button minimal={true} icon={<AddressIcon address={pair.address} />} disabled={isLoading}>
           <div className="font-mono max-w-[50px] lg:max-w-[200px] text-ellipsis overflow-hidden">{pair.address}</div>
