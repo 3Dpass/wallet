@@ -1,3 +1,4 @@
+import Moment from "react-moment";
 import { Link, useParams } from "@remix-run/react";
 import { Card, HTMLTable, Icon, Spinner } from "@blueprintjs/core";
 import { apiAtom, apiExplorerAtom } from "../../atoms";
@@ -6,9 +7,9 @@ import { lazy, useEffect, useState } from "react";
 import { decodeAddress } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
 import { AddressIcon } from "../../components/common/AddressIcon";
+import type { ITransfer } from "../../queries";
 import { getTransfers } from "../../queries";
 import { FormattedAmount } from "../../components/common/FormattedAmount";
-import Moment from "react-moment";
 import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 import { ss58format } from "../../api.config";
 
@@ -20,7 +21,7 @@ export default function Address() {
   const api = useAtomValue(apiAtom);
   const apiExplorer = useAtomValue(apiExplorerAtom);
   const [isLoading, setIsLoading] = useState(true);
-  const [transfers, setTransfers] = useState([]);
+  const [transfers, setTransfers] = useState<ITransfer[]>([]);
 
   useEffect(() => {
     async function loadTransfers() {
@@ -36,7 +37,7 @@ export default function Address() {
       setIsLoading(false);
     }
 
-    loadTransfers();
+    loadTransfers().then();
   }, [address, apiExplorer]);
 
   if (!api) {

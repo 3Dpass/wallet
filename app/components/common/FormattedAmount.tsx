@@ -7,5 +7,7 @@ export function FormattedAmount({ value }) {
   if (!formatOptions) {
     return null;
   }
-  return <>{formatBalance(value, formatOptions)}</>;
+  const bigIntValue = BigInt(value);
+  const formattedAmount = formatBalance(bigIntValue, formatOptions);
+  return <>{formattedAmount}</>;
 }

@@ -1,5 +1,15 @@
 import { gql } from "@apollo/client";
 
+export interface ITransfer {
+  blockNumber: number;
+  extrinsicIdx: number;
+  fromMultiAddressAccountId: string;
+  toMultiAddressAccountId: string;
+  value: number;
+  blockDatetime: string;
+  complete: boolean;
+}
+
 export function getTransfers(accountId) {
   return gql`
     query {
@@ -19,6 +29,7 @@ export function getTransfers(accountId) {
         }
         objects {
           blockNumber
+          extrinsicIdx
           fromMultiAddressAccountId
           toMultiAddressAccountId
           value
