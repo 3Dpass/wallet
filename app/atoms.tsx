@@ -3,10 +3,12 @@ import { atomWithStorage } from "jotai/utils";
 import type { ApiPromise } from "@polkadot/api";
 import type { Toaster } from "@blueprintjs/core";
 import type { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import { NETWORK_TEST } from "./api.config";
 
 // RPC API
 export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v1", "wss://rpc.3dpass.org");
 export const apiAtom = atom<ApiPromise | false>(false);
+export const networkAtom = atomWithStorage<string>("network_v1", NETWORK_TEST);
 export const formatOptionsAtom = atom<object | false>(false);
 
 // Explorer GraphQL API

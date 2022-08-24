@@ -8,13 +8,14 @@ import { apiAtom, toasterAtom } from "../../atoms";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
-import { ss58format } from "../../api.config";
+import { useSS58Format } from "../hooks";
 
 export default function Wallet() {
   const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [pairs, setPairs] = useState([]);
+  const ss58format = useSS58Format();
 
   const dialogsInitial = {
     mnemonic: false,

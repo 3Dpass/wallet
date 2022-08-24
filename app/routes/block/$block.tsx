@@ -33,7 +33,6 @@ export default function Block() {
         query: getLogs(block),
       });
       setLogs(result.data.getLogs.objects);
-      console.log(result.data.getLogs.objects);
     }
 
     loadBlock().then();

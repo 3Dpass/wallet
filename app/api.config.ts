@@ -1,8 +1,10 @@
+export const NETWORK_TEST = "test";
+export const NETWORK_MAINNET = "mainnet";
 export const ss58formats = {
-  test: 72,
-  live: 71,
+  [NETWORK_TEST]: 72,
+  [NETWORK_MAINNET]: 71,
 };
-export const ss58format = ss58formats.test;
+
 export const MAX_BLOCKS = 6;
 export const RPC_CONFIG = {
   poscan: {

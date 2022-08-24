@@ -11,7 +11,7 @@ import type { ITransfer } from "../../queries";
 import { getTransfers } from "../../queries";
 import { FormattedAmount } from "../../components/common/FormattedAmount";
 import { encodeAddress } from "@polkadot/util-crypto/address/encode";
-import { ss58format } from "../../api.config";
+import { useSS58Format } from "../../components/hooks";
 
 const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
@@ -20,6 +20,7 @@ export default function Address() {
   const { address } = useParams();
   const api = useAtomValue(apiAtom);
   const apiExplorer = useAtomValue(apiExplorerAtom);
+  const ss58format = useSS58Format();
   const [isLoading, setIsLoading] = useState(true);
   const [transfers, setTransfers] = useState<ITransfer[]>([]);
 
