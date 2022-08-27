@@ -111,7 +111,7 @@ function App() {
             </NavbarGroup>
           </Navbar>
           <Outlet />
-          <footer className="py-4">
+          <footer className="p-4">
             <div className="text-right">
               <a href="https://github.com/3Dpass/wallet" className="inline-block">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
