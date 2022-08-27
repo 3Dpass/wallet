@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Button, Card, Elevation, Icon } from "@blueprintjs/core";
+import { Button, Card, Classes, Elevation, Icon } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import Rock from "./Rock.client";
 import TitledValue from "../common/TitledValue";
@@ -32,7 +32,7 @@ export default function Block({ block }: IProps) {
       <div className="flex justify-between items-start">
         <TitledValue title="Block" value={block.block.header.number.toHuman()} />
         <div className="flex gap-2">
-          <a className="bp4-button" href={downloadUrl} download={downloadFilename}>
+          <a className={Classes.BUTTON} href={downloadUrl} download={downloadFilename}>
             <Icon icon="download" />
           </a>
           <Popover2 content={objectHashPopover}>
