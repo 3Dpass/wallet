@@ -13,11 +13,14 @@ export default function Block({ block }) {
         <TitledValue title="Block" value={block.block.header.number.toHuman()} />
         <Popover2
           content={
-            <code className="p-4 block text-xs">
-              {block.objectHashes.map((hash, index) => {
-                return <div key={index}>{hash}</div>;
-              })}
-            </code>
+            <div className="p-4">
+              <div className="pb-2">Object Hash</div>
+              <code className="block text-xs">
+                {block.objectHashes.map((hash, index) => {
+                  return <div key={index}>{hash}</div>;
+                })}
+              </code>
+            </div>
           }
         >
           <Button icon="info-sign" />
