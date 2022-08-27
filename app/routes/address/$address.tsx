@@ -13,6 +13,7 @@ import { useSS58Format } from "../../components/hooks";
 import { useQuery } from "@apollo/client";
 import { useAtomValue } from "jotai";
 import { apiAtom } from "../../atoms";
+import Error from "../../components/common/Error";
 
 const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
@@ -27,7 +28,7 @@ export default function Address() {
     variables: { accountId: accountIdHex },
   });
   if (loading) return <Spinner />;
-  if (error) return <div className="text-red-700">Error fetching transactions data, try reloading.</div>;
+  if (error) return <Error>Error fetching transactions data, try to reload.</Error>;
 
   return (
     <Card>

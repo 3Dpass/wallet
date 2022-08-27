@@ -5,6 +5,7 @@ import type { BlockData, BlockVars, LogsData, LogsVars } from "../../queries";
 import { GET_BLOCK, GET_LOGS } from "../../queries";
 import Moment from "react-moment";
 import { useQuery } from "@apollo/client";
+import Error from "../../components/common/Error";
 
 export default function Block() {
   const { block } = useParams();
@@ -18,7 +19,7 @@ export default function Block() {
   });
 
   if (queryBlock.loading || queryLogs.loading) return <Spinner />;
-  if (queryBlock.error || queryLogs.error) return <div className="text-red-700">Error loading block data.</div>;
+  if (queryBlock.error || queryLogs.error) return <Error>Error loading block data, try to reload.</Error>;
 
   return (
     <Card>
