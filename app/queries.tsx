@@ -21,7 +21,7 @@ export interface TransfersVars {
 }
 
 export const GET_TRANSFERS = gql`
-  query ($accountId: String!) {
+  query GetTransfers($accountId: String!) {
     getTransfers(pageSize: 100, pageKey: "1", filters: { or: [{ fromMultiAddressAccountId: $accountId }, { toMultiAddressAccountId: $accountId }] }) {
       pageInfo {
         pageSize
@@ -58,7 +58,7 @@ export type LogsVars = {
 };
 
 export const GET_LOGS = gql`
-  query ($blockId: ID!) {
+  query GetLogs($blockId: ID!) {
     getLogs(pageSize: 100, pageKey: "1", filters: { blockNumber: $blockId }) {
       pageInfo {
         pageSize
@@ -93,7 +93,7 @@ export type BlockVars = {
 };
 
 export const GET_BLOCK = gql`
-  query ($blockId: ID!) {
+  query GetBlock($blockId: ID!) {
     getBlock(filters: { number: $blockId }) {
       hash
       datetime
