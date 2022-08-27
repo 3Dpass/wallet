@@ -10,36 +10,35 @@ export interface ITransfer {
   complete: boolean;
 }
 
-export function getTransfers(accountId) {
-  return gql`
-    query {
-      getTransfers(
-        pageSize: 100
-        pageKey: "1"
-        filters: {
-          or: [
-            { fromMultiAddressAccountId: "${accountId}" }
-            { toMultiAddressAccountId: "${accountId}" }
-          ]
-        }
-      ) {
-        pageInfo {
-          pageSize
-          pageNext
-        }
-        objects {
-          blockNumber
-          extrinsicIdx
-          fromMultiAddressAccountId
-          toMultiAddressAccountId
-          value
-          blockDatetime
-          complete
-        }
+export interface TransfersData {
+  getTransfers: {
+    objects: ITransfer[];
+  };
+}
+
+export interface TransfersVars {
+  accountId: string;
+}
+
+export const GET_TRANSFERS = gql`
+  query ($accountId: String!) {
+    getTransfers(pageSize: 100, pageKey: "1", filters: { or: [{ fromMultiAddressAccountId: $accountId }, { toMultiAddressAccountId: $accountId }] }) {
+      pageInfo {
+        pageSize
+        pageNext
+      }
+      objects {
+        blockNumber
+        extrinsicIdx
+        fromMultiAddressAccountId
+        toMultiAddressAccountId
+        value
+        blockDatetime
+        complete
       }
     }
-  `;
-}
+  }
+`;
 
 export type ILogData = {
   logIdx: number;
@@ -48,30 +47,32 @@ export type ILogData = {
   data: string;
 };
 
-export function getLogs(blockId) {
-  return gql`
-    query {
-      getLogs(
-        pageSize: 100
-        pageKey: "1"
-        filters: {
-          blockNumber: ${blockId}
-        }
-      ) {
-        pageInfo {
-          pageSize
-          pageNext
-        }
-        objects {
-          logIdx
-          typeId
-          typeName
-          data
-        }
+export type LogsData = {
+  getLogs: {
+    objects: ILogData[];
+  };
+};
+
+export type LogsVars = {
+  blockId: number;
+};
+
+export const GET_LOGS = gql`
+  query ($blockId: ID!) {
+    getLogs(pageSize: 100, pageKey: "1", filters: { blockNumber: $blockId }) {
+      pageInfo {
+        pageSize
+        pageNext
+      }
+      objects {
+        logIdx
+        typeId
+        typeName
+        data
       }
     }
-  `;
-}
+  }
+`;
 
 export type IBlockData = {
   hash: string;
@@ -83,18 +84,24 @@ export type IBlockData = {
   specVersion: number;
 };
 
-export function getBlock(blockId) {
-  return gql`
-    query {
-      getBlock(filters: { number: ${blockId} }) {
-        hash
-        datetime
-        countExtrinsics
-        countEvents
-        countLogs
-        specName
-        specVersion
-      }
+export type BlockData = {
+  getBlock: IBlockData;
+};
+
+export type BlockVars = {
+  blockId: number;
+};
+
+export const GET_BLOCK = gql`
+  query ($blockId: ID!) {
+    getBlock(filters: { number: $blockId }) {
+      hash
+      datetime
+      countExtrinsics
+      countEvents
+      countLogs
+      specName
+      specVersion
     }
-  `;
-}
+  }
+`;
