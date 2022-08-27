@@ -166,7 +166,7 @@ export default function Account({ pair }: IProps) {
       <DialogUnlockAccount pair={pair} isOpen={dialogs.unlock} onClose={() => dialogToggle("unlock")} />
       <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
         <Button minimal={true} icon={<AddressIcon address={pair.address} />} disabled={isLoading}>
-          <div className="font-mono max-w-[50px] lg:max-w-[200px] text-ellipsis overflow-hidden">{pair.address}</div>
+          <div className="font-mono max-w-[80px] lg:max-w-[200px] text-ellipsis overflow-hidden">{pair.address}</div>
         </Button>
       </Popover2>
     </>

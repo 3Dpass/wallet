@@ -33,16 +33,16 @@ export default function Address() {
     <Card>
       <TitledValue title="Address" value={address} fontMono={true} />
       <Divider className="my-5" />
-      <HTMLTable striped={true}>
+      <HTMLTable striped={true} width="100%">
         <thead>
           <tr>
             <th>Block</th>
             <th>Date</th>
             <th>Address</th>
-            <th></th>
             <th>
               <div className="text-right">Value</div>
             </th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -62,13 +62,13 @@ export default function Address() {
                 <td>
                   <AddressItem address={otherAddress} />
                 </td>
-                <td>{outgoing ? <Icon icon="remove" className="text-red-500" /> : <Icon icon="add" className="text-green-500" />}</td>
                 <td className="font-mono">
                   <div className="text-right">
                     {!api && <div>{transfer.value}</div>}
                     {api && <FormattedAmount value={transfer.value} />}
                   </div>
                 </td>
+                <td>{outgoing ? <Icon icon="remove" className="text-red-500" /> : <Icon icon="add" className="text-green-500" />}</td>
               </tr>
             );
           })}
@@ -82,7 +82,7 @@ function AddressItem({ address }) {
   return (
     <Link to={`/address/${address}`} className="flex">
       <AddressIcon address={address} />
-      <div className="font-mono ml-2">{address}</div>
+      <div className="font-mono ml-2 max-w-[80px] lg:max-w-none text-ellipsis overflow-hidden">{address}</div>
     </Link>
   );
 }
