@@ -1,11 +1,12 @@
 import { useRef } from "react";
-import { MeshProps, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
+import type { Mesh } from "three";
 import * as THREE from "three";
 
 const COLOR = "#fff";
 
 export default function Rock({ geometry }) {
-  const rock = useRef<MeshProps>();
+  const rock = useRef<Mesh>();
   useFrame(({ clock }) => {
     if (!rock.current) {
       return;
@@ -18,7 +19,8 @@ export default function Rock({ geometry }) {
   const textureUrl = "/textures/space.jpg";
   const textureUrls = [textureUrl, textureUrl, textureUrl, textureUrl, textureUrl, textureUrl];
   const textureCube = new THREE.CubeTextureLoader().load(textureUrls);
-  textureCube.wrapping = THREE.MirroredRepeatWrapping;
+  textureCube.wrapS = THREE.MirroredRepeatWrapping;
+  textureCube.wrapT = THREE.MirroredRepeatWrapping;
   textureCube.mapping = THREE.CubeRefractionMapping;
 
   return (
@@ -27,7 +29,7 @@ export default function Rock({ geometry }) {
       <pointLight intensity={2} position={[-10, -10, -10]} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
       <mesh ref={rock} geometry={geometry}>
-        <meshPhongMaterial color={COLOR} roughness={0.8} envMap={textureCube} refractionRatio={0.7} reflectivity={1} flatShading={true} />
+        <meshPhongMaterial color={COLOR} envMap={textureCube} refractionRatio={0.7} reflectivity={1} flatShading={true} />
       </mesh>
     </>
   );
