@@ -1,11 +1,15 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import type { Mesh } from "three";
+import type { BufferGeometry, Mesh } from "three";
 import * as THREE from "three";
 
 const COLOR = "#fff";
 
-export default function Rock({ geometry }) {
+interface IProps {
+  geometry: BufferGeometry;
+}
+
+export default function Rock({ geometry }: IProps) {
   const rock = useRef<Mesh>();
   useFrame(({ clock }) => {
     if (!rock.current) {

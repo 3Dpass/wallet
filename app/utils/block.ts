@@ -1,7 +1,10 @@
 import { OBJLoader } from "three-stdlib";
 import type { ApiPromise } from "@polkadot/api";
+import type { IBlock } from "../components/types";
+import type { Mesh } from "three";
+import type { Text } from "@polkadot/types";
 
-export const loadBlock = async (api: ApiPromise, hash?: string) => {
+export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock> => {
   let signedBlock;
 
   if (hash === undefined) {
@@ -17,15 +20,18 @@ export const loadBlock = async (api: ApiPromise, hash?: string) => {
     objectHashes.push(objectHashesString.substring(i * 64, (i + 1) * 64));
   }
   // @ts-ignore
-  const data = await api.rpc.poscan.getMiningObject(blockHash);
+  const objectObjRaw: Text = await api.rpc.poscan.getMiningObject(blockHash);
+  const objectObj: string = objectObjRaw.toString();
 
   const loader = new OBJLoader();
-  const object = loader.parse(data).children[0];
+  // @ts-ignore
+  const object3d: Mesh = loader.parse(objectObj).children[0]; // typed as `Object3D` but really returns the `Mesh` objectẞ
 
   return {
-    block: block,
-    blockHash: blockHash,
-    objectHashes: objectHashes,
-    object: object,
+    block,
+    blockHash,
+    objectHashes,
+    objectObj,
+    object3d,
   };
 };
