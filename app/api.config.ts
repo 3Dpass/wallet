@@ -38,6 +38,7 @@ export const RPC_TYPES = {
   AccountInfo: "AccountInfoWithTripleRefCount",
   Address: "AccountId",
   LookupSource: "AccountId",
+  Keys: "SessionKeys2",
   Weight: "u32",
   Difficulty: "u256",
   DifficultyAndTimestamp: {
