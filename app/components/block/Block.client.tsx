@@ -13,10 +13,14 @@ interface IProps {
 }
 
 export default function Block({ block }: IProps) {
+  const objectHashAlgo = Buffer.from(block.objectHashHeader, "hex").toString("utf8");
   const objectHashPopover = (
     <div className="p-4">
-      <div className="font-mono mb-2">Object Hash</div>
-      {block.objectHashHeader && <div className="font-mono mb-2">Algo & params: {block.objectHashHeader}</div>}
+      {block.objectHashHeader && (
+        <div className="font-mono mb-2">
+          Object Hash Algo: <strong>{objectHashAlgo}</strong>
+        </div>
+      )}
       <code className="block text-xs">
         {block.objectHashes.map((hash, index) => {
           return <div key={index}>{hash}</div>;
