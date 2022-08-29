@@ -42,8 +42,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
   }, [api]);
 
   useEffect(() => {
-    setCanSend(api && isValidAddressPolkadotAddress(data.address) && data.amount_number > 0);
-  }, [data]);
+    api && setCanSend(isValidAddressPolkadotAddress(data.address) && data.amount_number > 0);
+  }, [api, data]);
 
   async function handleSendClick() {
     if (!api) {
@@ -52,10 +52,15 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
     setIsLoading(true);
     try {
       if (pair.isLocked) {
-        handleUnlockAccount();
-        return;
+        try {
+          // unlock with empty password
+          pair.unlock();
+        } catch (error) {
+          handleUnlockAccount();
+          return;
+        }
       }
-      const toSend = data.amount_number * 1_000_000_000_000;
+      const toSend = BigInt(data.amount_number * 1_000_000_000_000);
       await api.tx.balances.transfer(data.address, toSend).signAndSend(pair);
       toaster &&
         toaster.show({
