@@ -14,11 +14,18 @@ export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock>
   }
   const block = signedBlock.block;
   const blockHash = block.header.hash.toHex();
+
   const objectHashesString = block.header.digest.logs[2].asOther.toString().substring(2);
+  const objectHashLength = 64;
+  const objectHashCount = 10;
+  const objectHashHeaderSize = objectHashesString.length - objectHashLength * objectHashCount;
+  const objectHashHeader = objectHashesString.substring(0, objectHashHeaderSize);
   const objectHashes = [];
-  for (let i = 0; i < 10; i++) {
-    objectHashes.push(objectHashesString.substring(i * 64, (i + 1) * 64));
+  for (let i = 0; i < objectHashCount; i++) {
+    const offset = objectHashHeaderSize + i * objectHashLength;
+    objectHashes.push(objectHashesString.substring(offset, offset + objectHashLength));
   }
+
   // @ts-ignore
   const objectObjRaw: Text = await api.rpc.poscan.getMiningObject(blockHash);
   const objectObj: string = objectObjRaw.toString();
@@ -30,6 +37,7 @@ export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock>
   return {
     block,
     blockHash,
+    objectHashHeader,
     objectHashes,
     objectObj,
     object3d,

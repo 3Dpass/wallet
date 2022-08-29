@@ -15,7 +15,8 @@ interface IProps {
 export default function Block({ block }: IProps) {
   const objectHashPopover = (
     <div className="p-4">
-      <div className="pb-2">Object Hash</div>
+      <div className="font-mono mb-2">Object Hash</div>
+      {block.objectHashHeader && <div className="font-mono mb-2">Algo & params: {block.objectHashHeader}</div>}
       <code className="block text-xs">
         {block.objectHashes.map((hash, index) => {
           return <div key={index}>{hash}</div>;
