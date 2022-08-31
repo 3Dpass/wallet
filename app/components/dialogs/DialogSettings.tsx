@@ -39,8 +39,8 @@ export default function DialogSettings({ isOpen, onClose }) {
             title="Network address format"
             value={
               <RadioGroup onChange={handleNetworkChange} inline={true} selectedValue={network}>
-                <Radio label="Test" value={NETWORK_TEST} />
                 <Radio label="Mainnet" value={NETWORK_MAINNET} />
+                <Radio label="Test" value={NETWORK_TEST} />
               </RadioGroup>
             }
           />

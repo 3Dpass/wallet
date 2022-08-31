@@ -2,12 +2,12 @@ import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import type { ApiPromise } from "@polkadot/api";
 import type { Toaster } from "@blueprintjs/core";
-import { NETWORK_TEST } from "./api.config";
+import { NETWORK_MAINNET } from "./api.config";
 
 // RPC API
-export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v1", "wss://rpc.3dpass.org");
+export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v2", "wss://rpc.3dpass.org");
 export const apiAtom = atom<ApiPromise | false>(false);
-export const networkAtom = atomWithStorage<string>("network_v1", NETWORK_TEST);
+export const networkAtom = atomWithStorage<string>("network_v2", NETWORK_MAINNET);
 export const formatOptionsAtom = atom<object | false>(false);
 
 // Explorer GraphQL API
