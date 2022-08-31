@@ -90,7 +90,7 @@ export default function Account({ pair }: IProps) {
         handleUnlockAccount();
         return;
       }
-      await api.tx.rewards.unlock(pair.address).signAndSend(pair);
+      await api.tx.rewards.unlock().signAndSend(pair);
       toaster &&
         toaster.show({
           icon: "tick",
