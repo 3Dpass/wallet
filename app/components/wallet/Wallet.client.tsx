@@ -18,7 +18,7 @@ export default function Wallet() {
   const ss58format = useSS58Format();
 
   const dialogsInitial = {
-    mnemonic: false,
+    seed_phrase: false,
     json: false,
     create: false,
   };
@@ -27,10 +27,10 @@ export default function Wallet() {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
 
-  function handleSeedPhraseImportClick(value) {
+  function handleSeedPhraseImportClick(seed_phrase, password) {
     try {
-      keyring.addUri(value);
-      dialogToggle("mnemonic");
+      keyring.addUri(seed_phrase, password);
+      dialogToggle("seed_phrase");
     } catch (e) {
       toaster &&
         toaster.show({
@@ -41,9 +41,9 @@ export default function Wallet() {
     }
   }
 
-  function handleJSONWalletImportClick(value) {
+  function handleJSONWalletImportClick(json) {
     try {
-      const pair = keyring.createFromJson(JSON.parse(value));
+      const pair = keyring.createFromJson(JSON.parse(json));
       keyring.addPair(pair, "");
       dialogToggle("json");
     } catch (e) {
@@ -77,8 +77,13 @@ export default function Wallet() {
 
   return (
     <NavbarGroup align={Alignment.RIGHT}>
-      <DialogImportAddress isOpen={dialogs.mnemonic} onClose={() => dialogToggle("mnemonic")} onImport={handleSeedPhraseImportClick} />
-      <DialogImportAddress isOpen={dialogs.json} onClose={() => dialogToggle("json")} onImport={handleJSONWalletImportClick} />
+      <DialogImportAddress
+        isOpen={dialogs.seed_phrase}
+        showPassword={true}
+        onClose={() => dialogToggle("seed_phrase")}
+        onImport={handleSeedPhraseImportClick}
+      />
+      <DialogImportAddress isOpen={dialogs.json} showPassword={false} onClose={() => dialogToggle("json")} onImport={handleJSONWalletImportClick} />
       <DialogCreateAddress isOpen={dialogs.create} onClose={() => dialogToggle("create")} />
       {pairs.map((pair) => {
         return <Account key={pair.address} pair={pair} />;
@@ -90,7 +95,7 @@ export default function Wallet() {
           <Menu>
             <MenuItem icon="new-object" text="Create new address..." onClick={() => dialogToggle("create")} />
             <MenuDivider />
-            <MenuItem icon="add" text="Import from seed phrase..." onClick={() => dialogToggle("mnemonic")} />
+            <MenuItem icon="add" text="Import from seed phrase..." onClick={() => dialogToggle("seed_phrase")} />
             <MenuItem icon="import" text="Import from JSON..." onClick={() => dialogToggle("json")} />
           </Menu>
         }
