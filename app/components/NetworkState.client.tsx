@@ -3,19 +3,20 @@ import { blocksAtom } from "../atoms";
 import { lazy, useEffect, useState } from "react";
 import { Card, Spinner } from "@blueprintjs/core";
 import { formatDuration } from "../utils/time";
-import type { AnyJson } from "@polkadot/types-codec/types/helpers";
+import type { u128 } from "@polkadot/types-codec";
 import { loadBlock } from "../utils/block";
 import { MAX_BLOCKS } from "../api.config";
 import TitledValue from "./common/TitledValue";
 import type { ApiPromise } from "@polkadot/api";
+import { FormattedAmount } from "./common/FormattedAmount";
 
 const TimeAgo = lazy(() => import("react-timeago"));
 
 type INetworkState = {
-  totalIssuance: string;
+  totalIssuance: bigint;
   bestNumber: string;
   bestNumberFinalized: string;
-  timestamp: AnyJson;
+  timestamp: number;
   targetBlockTime: number;
 };
 
@@ -30,12 +31,13 @@ export default function NetworkState({ api }: IProps) {
 
   async function loadNetworkState(timestamp) {
     setIsLoading(true);
-    const totalIssuance = await api.query.balances.totalIssuance();
+    // @ts-ignore
+    const totalIssuance: u128 = await api.query.balances.totalIssuance();
     const bestNumber = await api.derive.chain.bestNumber();
     const bestNumberFinalized = await api.derive.chain.bestNumberFinalized();
     const targetBlockTime = await api.consts.difficulty.targetBlockTime;
     setNetworkState({
-      totalIssuance: totalIssuance.toHuman().toString(),
+      totalIssuance: totalIssuance.toBigInt(),
       bestNumber: bestNumber.toHuman().toString(),
       bestNumberFinalized: bestNumberFinalized.toHuman().toString(),
       timestamp: timestamp.toJSON(),
@@ -49,6 +51,10 @@ export default function NetworkState({ api }: IProps) {
   }
 
   useEffect(() => {
+    if (!api) {
+      return;
+    }
+
     let timestampUnsubscribe, newHeadsUnsubscribe;
 
     async function subscribe(api) {
@@ -92,7 +98,7 @@ export default function NetworkState({ api }: IProps) {
         <TitledValue title="Finalized" value={networkState.bestNumberFinalized} />
         <TitledValue title="Latest block" value={<TimeAgo date={networkState.timestamp} live={true} />} />
         <TitledValue title="Target" value={formatDuration(networkState.targetBlockTime)} />
-        <TitledValue title="Total issuance" value={networkState.totalIssuance} />
+        <TitledValue title="Total issuance" value={<FormattedAmount value={networkState.totalIssuance} />} />
       </div>
     </Card>
   );
