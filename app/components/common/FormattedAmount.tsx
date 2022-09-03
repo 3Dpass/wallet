@@ -8,6 +8,11 @@ export function FormattedAmount({ value }) {
     return null;
   }
   const bigIntValue = BigInt(value);
-  const formattedAmount = formatBalance(bigIntValue, formatOptions);
+  const options = {
+    withUnit: formatOptions.unit,
+    decimals: formatOptions.decimals,
+    withSi: true,
+  };
+  const formattedAmount = formatBalance(bigIntValue, options);
   return <>{formattedAmount}</>;
 }

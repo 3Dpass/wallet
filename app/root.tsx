@@ -71,8 +71,8 @@ function App() {
         setApi(api);
         setFormatOptions({
           decimals: api.registry.chainDecimals[0],
-          withSi: true,
-          withUnit: api.registry.chainTokens[0],
+          chainSS58: api.registry.chainSS58,
+          unit: api.registry.chainTokens[0],
         });
       });
     });

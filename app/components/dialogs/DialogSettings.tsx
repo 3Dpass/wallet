@@ -1,15 +1,12 @@
-import { Button, Classes, Dialog, Intent, Radio, RadioGroup } from "@blueprintjs/core";
+import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
 import { useAtom } from "jotai";
-import { apiEndpointAtom, apiExplorerEndpointAtom, networkAtom } from "../../atoms";
+import { apiEndpointAtom, apiExplorerEndpointAtom } from "../../atoms";
 import { useState } from "react";
 import TitledValue from "../common/TitledValue";
-import { NETWORK_MAINNET, NETWORK_TEST } from "../../api.config";
 
 export default function DialogSettings({ isOpen, onClose }) {
   const [apiEndpoint, setApiEndpoint] = useAtom(apiEndpointAtom);
   const [apiExplorerEndpoint, setApiExplorerEndpoint] = useAtom(apiExplorerEndpointAtom);
-  const [network, setNetwork] = useAtom(networkAtom);
-  const [needsRestart, setNeedsRestart] = useState(false);
   const dataInitial = {
     api_endpoint: apiEndpoint,
     api_explorer_endpoint: apiExplorerEndpoint,
@@ -26,31 +23,10 @@ export default function DialogSettings({ isOpen, onClose }) {
     onClose();
   }
 
-  function handleNetworkChange(event) {
-    setNetwork((event.target as HTMLInputElement).value);
-    setNeedsRestart(true);
-  }
-
   return (
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
         <div className={Classes.DIALOG_BODY}>
-          <TitledValue
-            title="Network address format"
-            value={
-              <RadioGroup onChange={handleNetworkChange} inline={true} selectedValue={network}>
-                <Radio label="Mainnet" value={NETWORK_MAINNET} />
-                <Radio label="Test" value={NETWORK_TEST} />
-              </RadioGroup>
-            }
-          />
-          {needsRestart && (
-            <div className="text-center">
-              <Button icon="refresh" intent="danger" onClick={() => window.location.reload()}>
-                Restart application to apply settings
-              </Button>
-            </div>
-          )}
           <TitledValue
             title="RPC API"
             value={

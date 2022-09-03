@@ -11,6 +11,7 @@ import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
 import keyring from "@polkadot/ui-keyring";
 import { FormattedAmount } from "../common/FormattedAmount";
+import { useIsMainnet } from "../hooks";
 
 type IProps = {
   pair: KeyringPair;
@@ -20,6 +21,7 @@ export default function Account({ pair }: IProps) {
   const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
   const navigate = useNavigate();
+  const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -90,7 +92,11 @@ export default function Account({ pair }: IProps) {
         handleUnlockAccount();
         return;
       }
-      await api.tx.rewards.unlock().signAndSend(pair);
+      if (isMainnet) {
+        await api.tx.rewards.unlock().signAndSend(pair);
+      } else {
+        await api.tx.rewards.unlock(pair.address).signAndSend(pair);
+      }
       toaster &&
         toaster.show({
           icon: "tick",

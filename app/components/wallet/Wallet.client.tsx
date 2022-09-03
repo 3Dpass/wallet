@@ -57,9 +57,25 @@ export default function Wallet() {
   }
 
   useEffect(() => {
+    if (!ss58format) {
+      return;
+    }
     let sub;
     cryptoWaitReady().then(() => {
-      keyring.loadAll({ ss58Format: ss58format, type: "sr25519" });
+      try {
+        keyring.loadAll({ ss58Format: ss58format, type: "sr25519" });
+      } catch (e) {
+        if (e.message == "Unable to initialise options more than once") {
+          window.location.reload();
+        } else {
+          toaster &&
+            toaster.show({
+              icon: "ban-circle",
+              intent: Intent.DANGER,
+              message: e.message,
+            });
+        }
+      }
       sub = keyring.accounts.subject.subscribe(() => {
         setPairs(keyring.getPairs());
       });
@@ -69,7 +85,7 @@ export default function Wallet() {
     return () => {
       sub.unsubscribe();
     };
-  }, []);
+  }, [ss58format]);
 
   if (isLoading || !api) {
     return <Spinner size={SpinnerSize.SMALL} />;
