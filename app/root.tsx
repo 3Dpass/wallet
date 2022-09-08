@@ -9,7 +9,6 @@ import Wallet from "./components/wallet/Wallet.client";
 import { RPC_CONFIG, RPC_TYPES } from "./api.config";
 import { ClientOnly } from "remix-utils";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { withSentry } from "@sentry/remix";
 import DialogSettings from "./components/dialogs/DialogSettings";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 
@@ -30,7 +29,7 @@ export function links() {
   ];
 }
 
-function App() {
+export default function App() {
   const toasterRef = useRef<Toaster>();
   const [toaster, setToaster] = useAtom(toasterAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
@@ -129,5 +128,3 @@ function App() {
     </html>
   );
 }
-
-export default withSentry(App);
