@@ -48,6 +48,7 @@ export default function Address() {
         </thead>
         <tbody>
           {data.getTransfers.objects.map((transfer) => {
+            console.log(transfer);
             const fromAddress = encodeAddress(transfer.fromMultiAddressAccountId, ss58format);
             const toAddress = encodeAddress(transfer.toMultiAddressAccountId, ss58format);
             const otherAddress = fromAddress != address ? fromAddress : toAddress;
@@ -65,8 +66,7 @@ export default function Address() {
                 </td>
                 <td className="font-mono">
                   <div className="text-right">
-                    {!api && <div>{transfer.value}</div>}
-                    {api && <FormattedAmount value={transfer.value} />}
+                    <FormattedAmount value={transfer.value} />
                   </div>
                 </td>
                 <td>{outgoing ? <Icon icon="remove" className="text-red-500" /> : <Icon icon="add" className="text-green-500" />}</td>
