@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Icon, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Alert, Button, Card, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
 import { useCallback, useEffect, useState } from "react";
@@ -10,6 +10,7 @@ import keyring from "@polkadot/ui-keyring";
 import { FormattedAmount } from "../common/FormattedAmount";
 import { useIsMainnet } from "../hooks";
 import { AddressItem } from "../common/AddressItem";
+import TitledValue from "../common/TitledValue";
 
 type IProps = {
   pair: KeyringPair;
@@ -150,27 +151,9 @@ export default function Account({ pair }: IProps) {
         {balances && (
           <>
             <div className="grid grid-cols-3 gap-1 py-2">
-              <div>
-                <Icon icon="cube-add" className="mr-2 opacity-50" />
-                Total balance:{" "}
-                <strong>
-                  <FormattedAmount value={balances.freeBalance} />
-                </strong>
-              </div>
-              <div>
-                <Icon icon="cube" className="mr-2 opacity-50" />
-                Transferable:{" "}
-                <strong>
-                  <FormattedAmount value={balances.availableBalance} />
-                </strong>
-              </div>
-              <div>
-                <Icon icon="lock" className="mr-2 opacity-50" />
-                Locked:{" "}
-                <strong>
-                  <FormattedAmount value={balances.lockedBalance} />
-                </strong>
-              </div>
+              <TitledValue title="Total balance" value={<FormattedAmount value={balances.freeBalance} />} />
+              <TitledValue title="Transferable" value={<FormattedAmount value={balances.availableBalance} />} />
+              <TitledValue title="Locked" value={<FormattedAmount value={balances.lockedBalance} />} />
             </div>
             <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} />
             {balances.lockedBalance.toBigInt() > 0 && (
