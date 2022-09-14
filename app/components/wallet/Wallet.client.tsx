@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
-import { Alignment, Button, Intent, Menu, MenuDivider, MenuItem, NavbarGroup, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
-import { Popover2 } from "@blueprintjs/popover2";
+import { Button, Card, Intent } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
@@ -88,11 +87,11 @@ export default function Wallet() {
   }, [ss58format]);
 
   if (isLoading || !api) {
-    return <Spinner size={SpinnerSize.SMALL} />;
+    return <div className="mb-4 w-100 h-[100px] animate-pulse bg-gray-600"></div>;
   }
 
   return (
-    <NavbarGroup align={Alignment.RIGHT}>
+    <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
       <DialogImportAddress
         isOpen={dialogs.seed_phrase}
         showPassword={true}
@@ -104,20 +103,11 @@ export default function Wallet() {
       {pairs.map((pair) => {
         return <Account key={pair.address} pair={pair} />;
       })}
-      <Popover2
-        minimal={true}
-        position={Position.BOTTOM_LEFT}
-        content={
-          <Menu>
-            <MenuItem icon="new-object" text="Create new address..." onClick={() => dialogToggle("create")} />
-            <MenuDivider />
-            <MenuItem icon="add" text="Import from seed phrase..." onClick={() => dialogToggle("seed_phrase")} />
-            <MenuItem icon="import" text="Import from JSON..." onClick={() => dialogToggle("json")} />
-          </Menu>
-        }
-      >
-        <Button icon="plus" minimal={true} />
-      </Popover2>
-    </NavbarGroup>
+      <Card className="grid gap-1">
+        <Button icon="new-object" text="Create new address..." onClick={() => dialogToggle("create")} />
+        <Button icon="add" text="Import from seed phrase..." onClick={() => dialogToggle("seed_phrase")} />
+        <Button icon="import" text="Import from JSON..." onClick={() => dialogToggle("json")} />
+      </Card>
+    </div>
   );
 }

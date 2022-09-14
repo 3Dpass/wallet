@@ -1,17 +1,15 @@
-import { Alert, Button, Intent, Menu, MenuDivider, MenuItem, Position, Spinner, SpinnerSize } from "@blueprintjs/core";
-import { Popover2 } from "@blueprintjs/popover2";
+import { Alert, Button, Card, Icon, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useNavigate } from "@remix-run/react";
-import { AddressIcon } from "../common/AddressIcon";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
 import keyring from "@polkadot/ui-keyring";
 import { FormattedAmount } from "../common/FormattedAmount";
 import { useIsMainnet } from "../hooks";
+import { AddressItem } from "../common/AddressItem";
 
 type IProps = {
   pair: KeyringPair;
@@ -20,10 +18,8 @@ type IProps = {
 export default function Account({ pair }: IProps) {
   const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
-  const navigate = useNavigate();
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(false);
 
   const dialogsInitial = {
     send: false,
@@ -35,9 +31,9 @@ export default function Account({ pair }: IProps) {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
 
-  function handleOnMenuOpening() {
+  useEffect(() => {
     loadAccount();
-  }
+  }, [api]);
 
   function loadAccount() {
     if (!api) {
@@ -86,7 +82,6 @@ export default function Account({ pair }: IProps) {
     if (!api) {
       return;
     }
-    setIsLoading(true);
     try {
       if (pair.isLocked) {
         handleUnlockAccount();
@@ -110,42 +105,10 @@ export default function Account({ pair }: IProps) {
           intent: Intent.DANGER,
           message: e.message,
         });
-    } finally {
-      setIsLoading(false);
     }
   }
 
-  const menu = (
-    <Menu>
-      <MenuItem icon="id-number" text="View details..." onClick={() => navigate(`address/${pair.address}`)}></MenuItem>
-      <MenuItem icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
-      <MenuItem icon="export" text="Copy JSON wallet" onClick={handleCopyJson} />
-      <MenuDivider />
-      {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
-      {balances && (
-        <>
-          <MenuItem
-            disabled={true}
-            icon="cube-add"
-            text={
-              <>
-                Total balance: <FormattedAmount value={balances.freeBalance} />
-              </>
-            }
-          />
-          <MenuItem disabled={true} icon="cube" text={`Transferable: ${balances.availableBalance.toHuman()}`} />
-          <MenuItem icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} />
-          <MenuDivider />
-          <MenuItem disabled={true} icon="lock" text={`Locked: ${balances.lockedBalance.toHuman()}`} />
-          {balances.lockedBalance.toBigInt() > 0 && <MenuItem icon="unlock" text="Unlock funds mined" onClick={handleUnlockFundsClick} />}
-        </>
-      )}
-      <MenuDivider />
-      <MenuItem icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
-    </Menu>
-  );
-
-  return (
+  const dialogElements = (
     <>
       <DialogSendFunds
         pair={pair}
@@ -170,11 +133,54 @@ export default function Account({ pair }: IProps) {
         </p>
       </Alert>
       <DialogUnlockAccount pair={pair} isOpen={dialogs.unlock} onClose={() => dialogToggle("unlock")} />
-      <Popover2 minimal={true} position={Position.BOTTOM_LEFT} content={menu} onOpening={handleOnMenuOpening}>
-        <Button minimal={true} icon={<AddressIcon address={pair.address} />} disabled={isLoading}>
-          <div className="font-mono max-w-[80px] lg:max-w-[200px] text-ellipsis overflow-hidden">{pair.address}</div>
-        </Button>
-      </Popover2>
     </>
+  );
+
+  return (
+    <Card>
+      {dialogElements}
+      <AddressItem address={pair.address} />
+      <div className="grid gap-1 mt-4">
+        <div className="grid grid-cols-3 gap-1 opacity-50">
+          <Button icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
+          <Button icon="export" text="Copy JSON" onClick={handleCopyJson} />
+          <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
+        </div>
+        {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
+        {balances && (
+          <>
+            <div className="grid grid-cols-3 gap-1 py-2">
+              <div>
+                <Icon icon="cube-add" className="mr-2 opacity-50" />
+                Total balance:{" "}
+                <strong>
+                  <FormattedAmount value={balances.freeBalance} />
+                </strong>
+              </div>
+              <div>
+                <Icon icon="cube" className="mr-2 opacity-50" />
+                Transferable:{" "}
+                <strong>
+                  <FormattedAmount value={balances.availableBalance} />
+                </strong>
+              </div>
+              <div>
+                <Icon icon="lock" className="mr-2 opacity-50" />
+                Locked:{" "}
+                <strong>
+                  <FormattedAmount value={balances.lockedBalance} />
+                </strong>
+              </div>
+            </div>
+            <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} />
+            {balances.lockedBalance.toBigInt() > 0 && (
+              <>
+                <Button icon="unlock" text="Unlock funds mined" onClick={handleUnlockFundsClick} />
+              </>
+            )}
+          </>
+        )}
+      </div>
+    </Card>
   );
 }

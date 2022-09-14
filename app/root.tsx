@@ -102,9 +102,6 @@ export default function App() {
                   <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
                 </NavbarHeading>
               </NavbarGroup>
-              <NavbarGroup align={Alignment.RIGHT}>
-                <ClientOnly>{() => <Wallet />}</ClientOnly>
-              </NavbarGroup>
             </Navbar>
             <Outlet />
             <footer className="p-4">

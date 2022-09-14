@@ -4,7 +4,6 @@ import { Card, HTMLTable, Icon, Spinner } from "@blueprintjs/core";
 import { lazy } from "react";
 import { decodeAddress } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
-import { AddressIcon } from "../../components/common/AddressIcon";
 import type { TransfersData, TransfersVars } from "../../queries";
 import { GET_TRANSFERS } from "../../queries";
 import { FormattedAmount } from "../../components/common/FormattedAmount";
@@ -14,6 +13,7 @@ import { useQuery } from "@apollo/client";
 import { useAtomValue } from "jotai";
 import { apiAtom } from "../../atoms";
 import Error from "../../components/common/Error";
+import { AddressItem } from "../../components/common/AddressItem";
 
 const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
@@ -76,14 +76,5 @@ export default function Address() {
         </tbody>
       </HTMLTable>
     </Card>
-  );
-}
-
-function AddressItem({ address }) {
-  return (
-    <Link to={`/address/${address}`} className="flex">
-      <AddressIcon address={address} />
-      <div className="font-mono ml-2 max-w-[80px] lg:max-w-none text-ellipsis overflow-hidden">{address}</div>
-    </Link>
   );
 }
