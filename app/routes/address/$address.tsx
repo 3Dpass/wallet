@@ -10,8 +10,6 @@ import { FormattedAmount } from "../../components/common/FormattedAmount";
 import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 import { useSS58Format } from "../../components/hooks";
 import { useQuery } from "@apollo/client";
-import { useAtomValue } from "jotai";
-import { apiAtom } from "../../atoms";
 import Error from "../../components/common/Error";
 import { AddressItem } from "../../components/common/AddressItem";
 
@@ -20,7 +18,6 @@ const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ defau
 
 export default function Address() {
   const { address } = useParams();
-  const api = useAtomValue(apiAtom);
   const accountIdHex = u8aToHex(decodeAddress(address));
   const ss58format = useSS58Format();
 
