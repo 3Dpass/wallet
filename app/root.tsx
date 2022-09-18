@@ -1,16 +1,16 @@
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 // @ts-ignore
 import styles from "./styles/app.css";
-import { Alignment, Button, Classes, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
+import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
+import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { apiAtom, apiEndpointAtom, apiExplorerEndpointAtom, formatOptionsAtom, toasterAtom } from "./atoms";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import Wallet from "./components/wallet/Wallet.client";
 import { RPC_CONFIG, RPC_TYPES } from "./api.config";
-import { ClientOnly } from "remix-utils";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import DialogSettings from "./components/dialogs/DialogSettings";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { isValidPolkadotAddress } from "./utils/address";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -33,6 +33,7 @@ export default function App() {
   const toasterRef = useRef<Toaster>();
   const [toaster, setToaster] = useAtom(toasterAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const setApi = useSetAtom(apiAtom);
   const apiEndpoint = useAtomValue(apiEndpointAtom);
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
@@ -82,6 +83,18 @@ export default function App() {
     cache: new InMemoryCache(),
   });
 
+  function handleSearchSubmit(e: FormEvent) {
+    e.preventDefault();
+    // if searchValue is integer redirect to block page
+    if (Number.isInteger(Number(searchValue))) {
+      window.location.href = `/block/${searchValue}`;
+    }
+    // if searchValue is a valid address redirect to address page
+    else if (isValidPolkadotAddress(searchValue)) {
+      window.location.href = `/address/${searchValue}`;
+    }
+  }
+
   return (
     <html lang="en">
       <head>
@@ -101,6 +114,18 @@ export default function App() {
                   <Button className="ml-2" icon="cog" minimal={true} onClick={() => setIsSettingsDialogOpen(true)} />
                   <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
                 </NavbarHeading>
+              </NavbarGroup>
+              <NavbarGroup align={Alignment.RIGHT}>
+                <form onSubmit={handleSearchSubmit}>
+                  <InputGroup
+                    leftIcon="search"
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    placeholder="Search for address or block number..."
+                    value={searchValue}
+                    size={40}
+                    type="search"
+                  />
+                </form>
               </NavbarGroup>
             </Navbar>
             <Outlet />

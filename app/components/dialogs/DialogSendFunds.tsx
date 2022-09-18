@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { apiAtom, toasterAtom } from "../../atoms";
-import { isValidAddressPolkadotAddress } from "../../utils/address";
+import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 
 type IProps = {
@@ -42,7 +42,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
   }, [api]);
 
   useEffect(() => {
-    api && setCanSend(isValidAddressPolkadotAddress(data.address) && data.amount_number > 0);
+    api && setCanSend(isValidPolkadotAddress(data.address) && data.amount_number > 0);
   }, [api, data]);
 
   async function handleSendClick() {
@@ -81,7 +81,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
     }
   }
 
-  const addressIcon = isValidAddressPolkadotAddress(data.address) ? <AddressIcon address={data.address} className="m-2" /> : <Icon icon="asterisk" />;
+  const addressIcon = isValidPolkadotAddress(data.address) ? <AddressIcon address={data.address} className="m-2" /> : <Icon icon="asterisk" />;
 
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
