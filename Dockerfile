@@ -10,18 +10,9 @@ FROM base as deps
 RUN mkdir /app
 WORKDIR /app
 
-ADD package.json yarn.lock ./
-RUN yarn install --production=false
-
-# Setup production node_modules
-FROM base as production-deps
-
-RUN mkdir /app
-WORKDIR /app
-
-COPY --from=deps /app/node_modules /app/node_modules
-ADD package.json yarn.lock ./
-RUN yarn install --production=true
+ADD package.json yarn.lock .yarnrc.yml ./
+ADD .yarn ./.yarn
+RUN yarn install
 
 # Build the app
 FROM base as build
@@ -31,11 +22,8 @@ ENV NODE_ENV=production
 RUN mkdir /app
 WORKDIR /app
 
+COPY --from=deps /app/.yarn /app/.yarn
 COPY --from=deps /app/node_modules /app/node_modules
-
-# If we're using Prisma, uncomment to cache the prisma schema
-# ADD prisma .
-# RUN npx prisma generate
 
 ADD . .
 RUN yarn build
@@ -48,10 +36,7 @@ ENV NODE_ENV=production
 RUN mkdir /app
 WORKDIR /app
 
-COPY --from=production-deps /app/node_modules /app/node_modules
-
-# Uncomment if using Prisma
-# COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
+COPY --from=deps /app/node_modules /app/node_modules
 
 COPY --from=build /app/build /app/build
 COPY --from=build /app/public /app/public
