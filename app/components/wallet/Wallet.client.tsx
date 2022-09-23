@@ -56,7 +56,7 @@ export default function Wallet() {
   }
 
   useEffect(() => {
-    if (!ss58format) {
+    if (!ss58format || !toaster) {
       return;
     }
     let sub;
@@ -67,12 +67,11 @@ export default function Wallet() {
         if (e.message == "Unable to initialise options more than once") {
           window.location.reload();
         } else {
-          toaster &&
-            toaster.show({
-              icon: "ban-circle",
-              intent: Intent.DANGER,
-              message: e.message,
-            });
+          toaster.show({
+            icon: "ban-circle",
+            intent: Intent.DANGER,
+            message: e.message,
+          });
         }
       }
       sub = keyring.accounts.subject.subscribe(() => {
@@ -84,7 +83,7 @@ export default function Wallet() {
     return () => {
       sub.unsubscribe();
     };
-  }, [ss58format]);
+  }, [ss58format, toaster]);
 
   if (isLoading || !api) {
     return <div className="mb-4 w-100 h-[100px] animate-pulse bg-gray-600"></div>;
