@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { blocksAtom } from "../atoms";
 import { lazy, useEffect, useState } from "react";
-import { Card, Spinner } from "@blueprintjs/core";
+import { Card, Elevation } from "@blueprintjs/core";
 import { formatDuration } from "../utils/time";
 import type { u128 } from "@polkadot/types-codec";
 import { loadBlock } from "../utils/block";
@@ -92,7 +92,7 @@ export default function NetworkState({ api }: IProps) {
   }
 
   return (
-    <Card className="mb-4">
+    <Card className="mb-4" elevation={Elevation.TWO}>
       <div className={cardClassName}>
         <TitledValue title="Best block" value={networkState.bestNumber} />
         <TitledValue title="Finalized" value={networkState.bestNumberFinalized} />

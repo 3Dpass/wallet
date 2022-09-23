@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
-import { Button, Card, Intent } from "@blueprintjs/core";
+import { Button, Card, Elevation, Intent } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
@@ -90,7 +90,7 @@ export default function Wallet() {
   }
 
   return (
-    <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+    <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
       <DialogImportAddress
         isOpen={dialogs.seed_phrase}
         showPassword={true}
@@ -102,7 +102,7 @@ export default function Wallet() {
       {pairs.map((pair) => {
         return <Account key={pair.address} pair={pair} />;
       })}
-      <Card className="grid gap-1">
+      <Card className="grid gap-1" elevation={Elevation.TWO}>
         <Button icon="new-object" text="Create new address..." onClick={() => dialogToggle("create")} />
         <Button icon="add" text="Import from seed phrase..." onClick={() => dialogToggle("seed_phrase")} />
         <Button icon="import" text="Import from JSON..." onClick={() => dialogToggle("json")} />

@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Alert, Button, Card, Elevation, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
 import { useCallback, useEffect, useState } from "react";
@@ -138,7 +138,7 @@ export default function Account({ pair }: IProps) {
   );
 
   return (
-    <Card>
+    <Card elevation={Elevation.TWO}>
       {dialogElements}
       <AddressItem address={pair.address} />
       <div className="grid gap-1 mt-4">
