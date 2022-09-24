@@ -11,7 +11,8 @@ RUN mkdir /app
 WORKDIR /app
 
 ADD package.json yarn.lock .yarnrc.yml ./
-ADD .yarn ./.yarn
+ADD .yarn/releases ./.yarn/releases
+ADD .yarn/plugins ./.yarn/plugins
 RUN yarn install
 
 # Build the app
@@ -22,7 +23,6 @@ ENV NODE_ENV=production
 RUN mkdir /app
 WORKDIR /app
 
-COPY --from=deps /app/.yarn /app/.yarn
 COPY --from=deps /app/node_modules /app/node_modules
 
 ADD . .
