@@ -10,14 +10,14 @@ __metadata:
   resolution: "3dp-frontend@workspace:."
   dependencies:
     "@apollo/client": 3.6.9
-    "@blueprintjs/core": 4.10.1
-    "@blueprintjs/popover2": 1.6.6
+    "@blueprintjs/core": 4.10.2
+    "@blueprintjs/popover2": 1.6.7
     "@polkadot/api": 9.4.2
     "@polkadot/keyring": 10.1.9
     "@polkadot/react-identicon": 2.9.10
     "@polkadot/ui-keyring": 2.9.10
-    "@react-three/drei": 9.32.0
-    "@react-three/fiber": 8.8.2
+    "@react-three/drei": 9.32.1
+    "@react-three/fiber": 8.8.3
     "@remix-run/dev": 1.7.2
     "@remix-run/eslint-config": 1.7.2
     "@remix-run/node": 1.7.2
@@ -38,7 +38,7 @@ __metadata:
     remix-utils: 3.3.0
     tailwindcss: 3.1.8
     three: 0.144.0
-    three-stdlib: 2.16.1
+    three-stdlib: 2.16.2
     typescript: 4.8.3
   languageName: unknown
   linkType: soft
@@ -1764,12 +1764,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blueprintjs/core@npm:4.10.1, @blueprintjs/core@npm:^4.10.1":
-  version: 4.10.1
-  resolution: "@blueprintjs/core@npm:4.10.1"
+"@blueprintjs/core@npm:4.10.2, @blueprintjs/core@npm:^4.10.2":
+  version: 4.10.2
+  resolution: "@blueprintjs/core@npm:4.10.2"
   dependencies:
     "@blueprintjs/colors": ^4.1.6
-    "@blueprintjs/icons": ^4.5.0
+    "@blueprintjs/icons": ^4.6.0
     "@juggle/resize-observer": ^3.3.1
     "@types/dom4": ^2.0.1
     classnames: ^2.2
@@ -1789,26 +1789,26 @@ __metadata:
   bin:
     upgrade-blueprint-2.0.0-rename: scripts/upgrade-blueprint-2.0.0-rename.sh
     upgrade-blueprint-3.0.0-rename: scripts/upgrade-blueprint-3.0.0-rename.sh
-  checksum: 5fd0f4a605ffe919b2ca7a809bf09396b649c47095271b706853b1d417f41704906eb5ca6eb69e93d52a51ab1346e413d070006ec822e8295f3984d3348d4dd0
+  checksum: b4842394f2273de4db07f309837787f27d3f0bc8dded9ffe3151a257289a252fca443b0ee3bc5c6b33893770def047e8f29f4af17ac369d99aa3a286b3aaa753
   languageName: node
   linkType: hard
 
-"@blueprintjs/icons@npm:^4.5.0":
-  version: 4.5.0
-  resolution: "@blueprintjs/icons@npm:4.5.0"
+"@blueprintjs/icons@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "@blueprintjs/icons@npm:4.6.0"
   dependencies:
     change-case: ^4.1.2
     classnames: ^2.2
     tslib: ~2.3.1
-  checksum: d532e0ef704398504e98d3513932a2db453922f7b67c5b2cef3aeb4a640ca1d6cf218d071cb622dcccbce758af5a82979c6918dbe9e050de245f58fb26c99ad9
+  checksum: 057698d98739403b9a24ea114a6947842868979f5674d4a0a299a88a1f85893a7e09ce834541c1743e960c055f25af149a5b30362cc2ca17c02e01b0a448ddad
   languageName: node
   linkType: hard
 
-"@blueprintjs/popover2@npm:1.6.6":
-  version: 1.6.6
-  resolution: "@blueprintjs/popover2@npm:1.6.6"
+"@blueprintjs/popover2@npm:1.6.7":
+  version: 1.6.7
+  resolution: "@blueprintjs/popover2@npm:1.6.7"
   dependencies:
-    "@blueprintjs/core": ^4.10.1
+    "@blueprintjs/core": ^4.10.2
     "@juggle/resize-observer": ^3.3.1
     "@popperjs/core": ^2.5.4
     classnames: ^2.2
@@ -1822,7 +1822,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: b7a389b2725a4b70f6aa1802dd0ef1928542baa3b1dd2e772f45fb0af128afc15e317d5bfd771d58d8d1cec99b13ac3a91bc7e06ccffc0257df9890e11241d0c
+  checksum: b94ba566c8b54e371a0efde0d69f6815422feabe9540105504d56059a7b9375b5463569ebc3a78cecfe1d673eb98896437caebd22de3300f864378fc082fdac8
   languageName: node
   linkType: hard
 
@@ -2709,9 +2709,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-three/drei@npm:9.32.0":
-  version: 9.32.0
-  resolution: "@react-three/drei@npm:9.32.0"
+"@react-three/drei@npm:9.32.1":
+  version: 9.32.1
+  resolution: "@react-three/drei@npm:9.32.1"
   dependencies:
     "@babel/runtime": ^7.11.2
     "@react-spring/three": ^9.3.1
@@ -2727,7 +2727,7 @@ __metadata:
     stats.js: ^0.17.0
     suspend-react: ^0.0.8
     three-mesh-bvh: ^0.5.15
-    three-stdlib: ^2.14.3
+    three-stdlib: ^2.16.2
     troika-three-text: ^0.46.4
     utility-types: ^3.10.0
     zustand: ^3.5.13
@@ -2739,13 +2739,13 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 128f48ba29107d588b38049a642865d732e8dd021719b1142770b7d9c9921e542acef33001d7f8619d6d6fb68bf293fe0bdaf59ab67d3bdc53770f7a92fd9e56
+  checksum: 02eaec690179d8d29aec1d5573faf1b24571923e6efd8f7a2d4417aa5d4cad1260d058ac42a91dd36beb9834b7ed17e4e844574854c99483d0ffdc5d5254bd7c
   languageName: node
   linkType: hard
 
-"@react-three/fiber@npm:8.8.2":
-  version: 8.8.2
-  resolution: "@react-three/fiber@npm:8.8.2"
+"@react-three/fiber@npm:8.8.3":
+  version: 8.8.3
+  resolution: "@react-three/fiber@npm:8.8.3"
   dependencies:
     "@babel/runtime": ^7.17.8
     "@types/react-reconciler": ^0.26.7
@@ -2774,7 +2774,7 @@ __metadata:
       optional: true
     react-native:
       optional: true
-  checksum: 1cd1616774102dee8a9e93d0568c7f08e7fa51c355922175c6749967284ab2aaa4d0f3a70a29e2cd2f26ff67d1237e4ef12b37c4449eb288f44e24cfb89ff042
+  checksum: 62aa01b98b127172a9af83a591817dc51df1b76d87d71103b051c58e87a33a4b6f73a83e64cfc212247e029480770abc6d6dfb45d23046db745b25a5d2ce0d1f
   languageName: node
   linkType: hard
 
@@ -11711,9 +11711,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"three-stdlib@npm:2.16.1, three-stdlib@npm:^2.14.3":
-  version: 2.16.1
-  resolution: "three-stdlib@npm:2.16.1"
+"three-stdlib@npm:2.16.2, three-stdlib@npm:^2.16.2":
+  version: 2.16.2
+  resolution: "three-stdlib@npm:2.16.2"
   dependencies:
     "@babel/runtime": ^7.16.7
     "@types/offscreencanvas": ^2019.6.4
@@ -11728,7 +11728,7 @@ __metadata:
     zstddec: ^0.0.2
   peerDependencies:
     three: ">=0.122.0"
-  checksum: 7f27a69d9eeceb9ecd0ddc91f472ccefbdbb39f41b87cd457ff00b34a2f560a7a3bb9b42e639f5917d04c6e803cba0f2ac928934972c428336cbc54e72c147fd
+  checksum: acf5a962c5a795c89171fd7f04fdb9895bca67ad1b59d17e51a5218881dcbf919074a0da30e5ffd99a16d89f2bc819c8ffb42512fa318a6c6dbe1b387bf059c4
   languageName: node
   linkType: hard
 
