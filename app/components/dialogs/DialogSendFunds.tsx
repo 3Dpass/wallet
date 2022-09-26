@@ -1,10 +1,11 @@
-import { Button, Classes, Dialog, Icon, InputGroup, Intent, NumericInput, Tag } from "@blueprintjs/core";
+import { Button, Classes, Dialog, Icon, InputGroup, Intent } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { apiAtom, toasterAtom } from "../../atoms";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
+import AmountInput from "../common/AmountInput";
 
 type IProps = {
   pair: KeyringPair;
@@ -16,9 +17,8 @@ type IProps = {
 export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
   const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
-  const [canSend, setCanSend] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [tokenSymbol, setTokenSymbol] = useState("");
 
   const dataInitial = {
     address: "",
@@ -37,26 +37,22 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
   }
 
   useEffect(() => {
-    api && setTokenSymbol(api.registry.getChainProperties().tokenSymbol.toHuman().toString());
-  }, [api]);
-
-  useEffect(() => {
-    api && setCanSend(isValidPolkadotAddress(data.address) && data.amount_number > 0);
+    api && setCanSubmit(isValidPolkadotAddress(data.address) && data.amount_number > 0);
   }, [api, data]);
 
-  async function handleSendClick() {
+  async function handleSubmitClick() {
     if (!api || pair.isLocked) {
       return;
     }
     setIsLoading(true);
     try {
-      const toSend = BigInt(data.amount_number * 1_000_000_000_000);
-      await api.tx.balances.transfer(data.address, toSend).signAndSend(pair);
+      const value = BigInt(data.amount_number * 1_000_000_000_000);
+      await api.tx.balances.transfer(data.address, value).signAndSend(pair);
       toaster &&
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: "Funds are sent",
+          message: "Send request submitted",
         });
       onAfterSubmit();
     } catch (e) {
@@ -86,29 +82,15 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
           value={data.address}
           leftElement={addressIcon}
         />
-        <NumericInput
-          disabled={isLoading}
-          selectAllOnFocus={true}
-          buttonPosition={null}
-          className="mb-2"
-          large={true}
-          leftIcon="send-to"
-          placeholder="Amount"
-          onValueChange={handleAmountChange}
-          value={data.amount}
-          fill={true}
-          min={0}
-          minorStepSize={0.001}
-          rightElement={<Tag minimal={true}>{tokenSymbol}</Tag>}
-        />
+        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button onClick={onClose} text="Cancel" disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
-            disabled={isLoading || !canSend}
-            onClick={handleSendClick}
+            disabled={isLoading || !canSubmit}
+            onClick={handleSubmitClick}
             icon="send-message"
             loading={isLoading}
             text="Send"

@@ -11,6 +11,7 @@ import { FormattedAmount } from "../common/FormattedAmount";
 import { useIsMainnet } from "../hooks";
 import { AddressItem } from "../common/AddressItem";
 import TitledValue from "../common/TitledValue";
+import DialogLockFunds from "../dialogs/DialogLockFunds";
 
 type IProps = {
   pair: KeyringPair;
@@ -26,6 +27,7 @@ export default function Account({ pair }: IProps) {
     send: false,
     delete: false,
     unlock: false,
+    lock_funds: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
@@ -109,9 +111,12 @@ export default function Account({ pair }: IProps) {
     }
   }
 
+  async function handleLockFundsClick() {
+    dialogToggle("lock_funds");
+  }
+
   const dialogElements = (
     <>
-      <DialogSendFunds pair={pair} isOpen={dialogs.send} onAfterSubmit={() => dialogToggle("send")} onClose={() => dialogToggle("send")} />
       <Alert
         cancelButtonText="Cancel"
         confirmButtonText="Delete"
@@ -127,11 +132,16 @@ export default function Account({ pair }: IProps) {
           Are you sure you want to delete address <code className="block my-3">{pair?.address}</code> from wallet?
         </p>
       </Alert>
+      <DialogSendFunds pair={pair} isOpen={dialogs.send} onAfterSubmit={() => dialogToggle("send")} onClose={() => dialogToggle("send")} />
       <DialogUnlockAccount pair={pair} isOpen={dialogs.unlock} onClose={() => dialogToggle("unlock")} />
+      <DialogLockFunds
+        pair={pair}
+        isOpen={dialogs.lock_funds}
+        onAfterSubmit={() => dialogToggle("lock_funds")}
+        onClose={() => dialogToggle("lock_funds")}
+      />
     </>
   );
-
-  const accountLockedClass = pair.isLocked ? "opacity-50 pointer-events-none" : "";
 
   return (
     <Card elevation={Elevation.TWO}>
@@ -149,21 +159,27 @@ export default function Account({ pair }: IProps) {
             {pair.isLocked && (
               <div className="my-2 text-center">
                 Account is <Icon icon="lock" /> password protected, you need to{" "}
-                <a href="#" onClick={handleUnlockAccount} className="text-white underline underline-offset-2">
+                <a href="#" onClick={handleUnlockAccount} className="text-white underline underline-offset-4">
                   unlock it
                 </a>{" "}
                 before use
               </div>
             )}
-            <div className={`grid grid-cols-2 gap-1 ${accountLockedClass}`}>
-              <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} />
-              <Button icon="unlock" text="Unlock mined" onClick={handleUnlockFundsClick} disabled={balances.lockedBalance.toBigInt() <= 0} />
+            <div className="grid grid-cols-3 gap-1">
+              <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} disabled={pair.isLocked} />
+              <Button
+                icon="unlock"
+                text="Unlock mined"
+                onClick={handleUnlockFundsClick}
+                disabled={balances.lockedBalance.toBigInt() <= 0 || pair.isLocked}
+              />
+              <Button icon="lock" text="Lock funds..." onClick={handleLockFundsClick} disabled={pair.isLocked} />
             </div>
           </>
         )}
         <div className="grid grid-cols-3 gap-1">
           <Button icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
-          <Button icon="export" text="Copy JSON" onClick={handleCopyJson} className={accountLockedClass} />
+          <Button icon="export" text="Copy JSON" onClick={handleCopyJson} disabled={pair.isLocked} />
           <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
         </div>
       </div>
