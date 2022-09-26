@@ -10,11 +10,10 @@ type IProps = {
   pair: KeyringPair;
   isOpen: boolean;
   onClose: () => void;
-  handleUnlockAccount: () => void;
   onAfterSubmit: () => void;
 };
 
-export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAccount, onAfterSubmit }: IProps) {
+export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
   const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
   const [canSend, setCanSend] = useState(false);
@@ -46,20 +45,11 @@ export default function DialogSendFunds({ pair, isOpen, onClose, handleUnlockAcc
   }, [api, data]);
 
   async function handleSendClick() {
-    if (!api) {
+    if (!api || pair.isLocked) {
       return;
     }
     setIsLoading(true);
     try {
-      if (pair.isLocked) {
-        try {
-          // unlock with empty password
-          pair.unlock();
-        } catch (error) {
-          handleUnlockAccount();
-          return;
-        }
-      }
       const toSend = BigInt(data.amount_number * 1_000_000_000_000);
       await api.tx.balances.transfer(data.address, toSend).signAndSend(pair);
       toaster &&

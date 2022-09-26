@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Elevation, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Alert, Button, Card, Elevation, Icon, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
 import { useCallback, useEffect, useState } from "react";
@@ -42,6 +42,11 @@ export default function Account({ pair }: IProps) {
     }
     setBalances(undefined);
     api.derive.balances.all(pair.address).then((balances) => {
+      try {
+        pair.unlock();
+      } catch {
+        // pair is password protected
+      }
       setBalances(balances);
     });
   }
@@ -67,7 +72,6 @@ export default function Account({ pair }: IProps) {
 
   async function handleCopyJson() {
     if (pair.isLocked) {
-      handleUnlockAccount();
       return;
     }
     await navigator.clipboard.writeText(JSON.stringify(pair.toJson()));
@@ -80,14 +84,10 @@ export default function Account({ pair }: IProps) {
   }
 
   async function handleUnlockFundsClick() {
-    if (!api) {
+    if (!api || pair.isLocked) {
       return;
     }
     try {
-      if (pair.isLocked) {
-        handleUnlockAccount();
-        return;
-      }
       if (isMainnet) {
         await api.tx.rewards.unlock().signAndSend(pair);
       } else {
@@ -111,13 +111,7 @@ export default function Account({ pair }: IProps) {
 
   const dialogElements = (
     <>
-      <DialogSendFunds
-        pair={pair}
-        isOpen={dialogs.send}
-        onAfterSubmit={() => dialogToggle("send")}
-        handleUnlockAccount={handleUnlockAccount}
-        onClose={() => dialogToggle("send")}
-      />
+      <DialogSendFunds pair={pair} isOpen={dialogs.send} onAfterSubmit={() => dialogToggle("send")} onClose={() => dialogToggle("send")} />
       <Alert
         cancelButtonText="Cancel"
         confirmButtonText="Delete"
@@ -137,16 +131,13 @@ export default function Account({ pair }: IProps) {
     </>
   );
 
+  const accountLockedClass = pair.isLocked ? "opacity-50 pointer-events-none" : "";
+
   return (
     <Card elevation={Elevation.TWO}>
       {dialogElements}
       <AddressItem address={pair.address} />
-      <div className="grid gap-1 mt-4">
-        <div className="grid grid-cols-3 gap-1 opacity-50">
-          <Button icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
-          <Button icon="export" text="Copy JSON" onClick={handleCopyJson} />
-          <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
-        </div>
+      <div className="grid gap-1">
         {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
         {balances && (
           <>
@@ -155,14 +146,26 @@ export default function Account({ pair }: IProps) {
               <TitledValue title="Transferable" value={<FormattedAmount value={balances.availableBalance} />} />
               <TitledValue title="Locked" value={<FormattedAmount value={balances.lockedBalance} />} />
             </div>
-            <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} />
-            {balances.lockedBalance.toBigInt() > 0 && (
-              <>
-                <Button icon="unlock" text="Unlock funds mined" onClick={handleUnlockFundsClick} />
-              </>
+            {pair.isLocked && (
+              <div className="my-2 text-center">
+                Account is <Icon icon="lock" /> password protected, you need to{" "}
+                <a href="#" onClick={handleUnlockAccount} className="text-white underline underline-offset-2">
+                  unlock it
+                </a>{" "}
+                before use
+              </div>
             )}
+            <div className={`grid grid-cols-2 gap-1 ${accountLockedClass}`}>
+              <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} />
+              <Button icon="unlock" text="Unlock mined" onClick={handleUnlockFundsClick} disabled={balances.lockedBalance.toBigInt() <= 0} />
+            </div>
           </>
         )}
+        <div className="grid grid-cols-3 gap-1">
+          <Button icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
+          <Button icon="export" text="Copy JSON" onClick={handleCopyJson} className={accountLockedClass} />
+          <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
+        </div>
       </div>
     </Card>
   );
