@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { BufferGeometry, Mesh } from "three";
 import * as THREE from "three";
@@ -11,13 +11,23 @@ interface IProps {
 
 export default function Rock({ geometry }: IProps) {
   const rock = useRef<Mesh>();
+  const [scaled, setScaled] = useState(false);
+
   useFrame(({ clock }) => {
     if (!rock.current) {
       return;
     }
-    rock.current.rotation.y = clock.getElapsedTime() / 10.0;
-    rock.current.rotation.z = clock.getElapsedTime() / 10.0;
-    rock.current.rotation.x = clock.getElapsedTime() / 10.0;
+    rock.current.rotation.set(clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0);
+
+    // scale object to fit in a viewport
+    if (!scaled) {
+      const bbox = new THREE.Box3().setFromObject(rock.current);
+      const size = bbox.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 1.0 / maxDim;
+      rock.current.scale.set(scale, scale, scale);
+      setScaled(true);
+    }
   });
 
   const textureUrl = "/textures/space.jpg";
