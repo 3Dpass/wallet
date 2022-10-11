@@ -45,6 +45,9 @@ export default function Address() {
         </thead>
         <tbody>
           {data.getTransfers.objects.map((transfer) => {
+            if (!ss58format) {
+              return null;
+            }
             const fromAddress = encodeAddress(transfer.fromMultiAddressAccountId, ss58format);
             const toAddress = encodeAddress(transfer.toMultiAddressAccountId, ss58format);
             const otherAddress = fromAddress != address ? fromAddress : toAddress;
