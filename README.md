@@ -41,3 +41,6 @@ npm start
 ```
 
 Now you'll need to pick a host to deploy it to.
+
+## Copyright
+3DPass web wallet  Copyright (C) 2022  3DPass 3dpass.org
