@@ -1,4 +1,4 @@
-# 3DP Wallet
+# 3DPass Web Wallet
 3DPass wallet is a WEB3 browser light wallet UI for ["The Ledger of Things"](https://github.com/3Dpass/3DP). It might also be used as a wallet app for [Substrate](https://github.com/paritytech/substrate)-based blockchains.
 
 The wallet page: https://wallet.3dpass.org/
