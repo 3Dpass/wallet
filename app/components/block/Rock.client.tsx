@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { BufferGeometry, Mesh } from "three";
 import * as THREE from "three";
@@ -13,12 +13,7 @@ export default function Rock({ geometry }: IProps) {
   const rock = useRef<Mesh>();
   const [scaled, setScaled] = useState(false);
 
-  useFrame(({ clock }) => {
-    if (!rock.current) {
-      return;
-    }
-    rock.current.rotation.set(clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0);
-
+  useEffect(() => {
     // scale object to fit in a viewport
     if (!scaled) {
       const bbox = new THREE.Box3().setFromObject(rock.current);
@@ -28,6 +23,13 @@ export default function Rock({ geometry }: IProps) {
       rock.current.scale.set(scale, scale, scale);
       setScaled(true);
     }
+  }, [rock]);
+
+  useFrame(({ clock }) => {
+    if (!rock.current) {
+      return;
+    }
+    rock.current.rotation.set(clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0);
   });
 
   const textureUrl = "/textures/space.jpg";
