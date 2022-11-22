@@ -21,7 +21,7 @@ type INetworkState = {
 };
 
 type IProps = {
-  api: ApiPromise;
+  api: false | ApiPromise;
 };
 
 export default function NetworkState({ api }: IProps) {
@@ -30,6 +30,9 @@ export default function NetworkState({ api }: IProps) {
   const [networkState, setNetworkState] = useState<INetworkState>();
 
   async function loadNetworkState(timestamp) {
+    if (!api) {
+      return;
+    }
     setIsLoading(true);
     // @ts-ignore
     const totalIssuance: u128 = await api.query.balances.totalIssuance();
