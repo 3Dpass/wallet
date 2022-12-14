@@ -10,7 +10,8 @@ export interface IFormatOptions {
 }
 
 // RPC API
-export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v3", "wss://rpc2.3dpass.org");
+export const defaultEndpoint = "wss://rpc2.3dpass.org";
+export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v3", defaultEndpoint);
 export const apiAtom = atom<ApiPromise | false>(false);
 export const formatOptionsAtom = atomWithStorage<IFormatOptions | false>("formatOptions_v1", false);
 

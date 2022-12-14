@@ -6,11 +6,10 @@ import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { apiAtom, apiEndpointAtom, apiExplorerEndpointAtom, formatOptionsAtom, toasterAtom } from "./atoms";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { RPC_CONFIG, RPC_TYPES } from "./api.config";
-import { ApiPromise, WsProvider } from "@polkadot/api";
 import DialogSettings from "./components/dialogs/DialogSettings";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { isValidPolkadotAddress } from "./utils/address";
+import { getApi, getProvider } from "./api";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -49,7 +48,7 @@ export default function App() {
     }
 
     setApi(false);
-    const provider = new WsProvider(apiEndpoint, false);
+    const provider = getProvider(apiEndpoint);
     provider.on("disconnected", () => {
       toaster &&
         toaster.show({
@@ -66,17 +65,15 @@ export default function App() {
           message: `API connection error: ${e.message}`,
         });
     });
-    provider.connect().then(() => {
-      ApiPromise.create({ provider, rpc: RPC_CONFIG, types: RPC_TYPES }).then(async (api) => {
-        setApi(api);
-        setFormatOptions({
-          decimals: api.registry.chainDecimals[0],
-          chainSS58: api.registry.chainSS58,
-          unit: api.registry.chainTokens[0],
-        });
+    getApi(provider).then((api) => {
+      setApi(api);
+      setFormatOptions({
+        decimals: api.registry.chainDecimals[0],
+        chainSS58: api.registry.chainSS58,
+        unit: api.registry.chainTokens[0],
       });
     });
-  }, [apiEndpoint, toaster]);
+  }, [apiEndpoint, toaster, setApi, setFormatOptions]);
 
   const client = new ApolloClient({
     uri: apiExplorerEndpoint,
