@@ -7,8 +7,11 @@ async function loadNetworkState() {
   const provider = getProvider(defaultEndpoint);
   const api = await getApi(provider);
   const totalIssuance = await api.query.balances.totalIssuance();
+  const budget = 33666666000000000000 * 3 + 110000000000000000000 + 60000000000000000000;
+  const circulatingSupply = totalIssuance.toPrimitive() - budget;
   return {
     totalIssuance: totalIssuance.toString(),
+    circulatingSupply: circulatingSupply.toString(),
   };
 }
 
