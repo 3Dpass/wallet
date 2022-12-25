@@ -9,11 +9,15 @@ const apiPromise = getApi(provider);
 async function loadNetworkState() {
   const api = await apiPromise;
   const totalIssuance = await api.query.balances.totalIssuance();
+  const totalIssuanceNumber = totalIssuance.toPrimitive() as number;
   const budget = 33666666000000000000 * 3 + 110000000000000000000 + 60000000000000000000;
-  const circulatingSupply = totalIssuance.toPrimitive() - budget;
+  const circulatingSupply = totalIssuanceNumber - budget;
+  const totalSupply = 1_000_000_000 * 1_000_000_000_000;
+
   return {
-    totalIssuance: totalIssuance.toString(),
-    circulatingSupply: circulatingSupply.toString(),
+    totalIssuance: numberToString(totalIssuanceNumber),
+    circulatingSupply: numberToString(circulatingSupply),
+    totalSupply: numberToString(totalSupply),
   };
 }
 
@@ -25,3 +29,7 @@ export async function loader({ params }: LoaderArgs) {
     },
   });
 }
+
+const numberToString = (number: number) => {
+  return number.toLocaleString("fullwide", { useGrouping: false });
+};
