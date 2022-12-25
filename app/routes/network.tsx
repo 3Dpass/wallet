@@ -13,5 +13,10 @@ async function loadNetworkState() {
 }
 
 export async function loader({ params }: LoaderArgs) {
-  return json(await loadNetworkState());
+  const networkState = await loadNetworkState();
+  return json(networkState, {
+    headers: {
+      "Cache-Control": "public, s-maxage=60",
+    },
+  });
 }
