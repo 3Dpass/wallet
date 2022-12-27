@@ -3,11 +3,9 @@ import { json } from "@remix-run/node";
 import { defaultEndpoint } from "../atoms";
 import { getApi, getProvider } from "../api";
 
-const provider = getProvider(defaultEndpoint);
-const apiPromise = getApi(provider);
-
 async function loadNetworkState() {
-  const api = await apiPromise;
+  const provider = getProvider(defaultEndpoint);
+  const api = await getApi(provider);
   const totalIssuance = await api.query.balances.totalIssuance();
   const totalIssuanceNumber = totalIssuance.toPrimitive() as number;
   const budget = 33666666000000000000 * 3 + 110000000000000000000 + 60000000000000000000;
