@@ -7,7 +7,7 @@ import type { Text } from "@polkadot/types";
 export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock> => {
   let signedBlock;
 
-  const algoNameLength = 16;
+  const algoNameLength = 32;
   const objectHashLength = 64;
 
   if (hash === undefined) {
@@ -22,7 +22,7 @@ export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock>
   const objectHashAlgo = objectHashesString.substring(0, algoNameLength);
 
   const objectHashes = [];
-  let offset = algoNameLength * 2;
+  let offset = algoNameLength;
   while (offset < objectHashesString.length) {
     objectHashes.push(objectHashesString.substring(offset, offset + objectHashLength));
     offset += objectHashLength;
