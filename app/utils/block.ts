@@ -7,6 +7,9 @@ import type { Text } from "@polkadot/types";
 export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock> => {
   let signedBlock;
 
+  const algoNameLength = 16;
+  const objectHashLength = 64;
+
   if (hash === undefined) {
     signedBlock = await api.rpc.chain.getBlock();
   } else {
@@ -16,14 +19,13 @@ export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock>
   const blockHash = block.header.hash.toHex();
 
   const objectHashesString = block.header.digest.logs[2].asOther.toString().substring(2);
-  const objectHashLength = 64;
-  const objectHashCount = 10;
-  const objectHashHeaderSize = objectHashesString.length - objectHashLength * objectHashCount;
-  const objectHashHeader = objectHashesString.substring(0, objectHashHeaderSize);
+  const objectHashAlgo = objectHashesString.substring(0, algoNameLength);
+
   const objectHashes = [];
-  for (let i = 0; i < objectHashCount; i++) {
-    const offset = objectHashHeaderSize + i * objectHashLength;
+  let offset = algoNameLength * 2;
+  while (offset < objectHashesString.length) {
     objectHashes.push(objectHashesString.substring(offset, offset + objectHashLength));
+    offset += objectHashLength;
   }
 
   // @ts-ignore
@@ -37,7 +39,7 @@ export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock>
   return {
     block,
     blockHash,
-    objectHashHeader,
+    objectHashAlgo,
     objectHashes,
     objectObj,
     object3d,
