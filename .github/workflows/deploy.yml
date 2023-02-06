@@ -53,7 +53,7 @@ jobs:
           password: ${{ secrets.FLY_API_TOKEN }}
 
       - name: 🐳 Docker build
-        uses: docker/build-push-action@v4.0.0
+        uses: docker/build-push-action@v3
         with:
           context: .
           push: true
