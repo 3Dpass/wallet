@@ -24,6 +24,7 @@ export async function loader({ params }: LoaderArgs) {
   return json(networkState, {
     headers: {
       "Cache-Control": "public, s-maxage=60",
+      "Access-Control-Allow-Origin": "*",
     },
   });
 }
