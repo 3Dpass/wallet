@@ -77,7 +77,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: "Lock reqeust is submitted",
+          message: "Lock request is submitted",
         });
       onAfterSubmit();
     } catch (e) {
