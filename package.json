@@ -14,7 +14,7 @@
     "@apollo/client": "3.7.10",
     "@blueprintjs/core": "4.17.5",
     "@blueprintjs/popover2": "1.13.9",
-    "@polkadot/api": "10.0.1",
+    "@polkadot/api": "9.14.2",
     "@polkadot/keyring": "11.0.1",
     "@polkadot/react-identicon": "3.0.1",
     "@polkadot/ui-keyring": "3.0.1",
