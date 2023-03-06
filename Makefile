@@ -1,3 +1,3 @@
 update:
-	yarn set version stable
-	yarn upgrade-interactive
+	corepack prepare pnpm@latest --activate
+	pnpm update --interactive --latest

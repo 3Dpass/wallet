@@ -2,8 +2,6 @@
 /.cache
 /build
 /node_modules
-/.yarn/cache
-/.yarn/install-state.gz
 /.git
 /public/build
 .DS_Store

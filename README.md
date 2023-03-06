@@ -4,14 +4,14 @@
 The wallet page: https://wallet.3dpass.org/
 
 ## Interaction
-The wallet interacts directly from your browser to the blockchain [Node](https://github.com/3Dpass/3DP) using either public or private API websocket endpoint. 
+The wallet interacts directly from your browser to the blockchain [Node](https://github.com/3Dpass/3DP) using either public or private API websocket endpoint.
 
 ### 3DPass API Endpoints:
 - Mainnet `wss://rpc.3dpass.org`
 - Mainnet `wss://rpc2.3dpass.org`
 - Testnet `wss://test-rpc.3dpass.org`
 
-In order to connect the wallet to the local Node you can set up `wss://127.0.0.1:9944` 
+In order to connect the wallet to the local Node you can set up `wss://127.0.0.1:9944`
 
 ## Explorer features Integration
 The wallet reaches out to [Block Explorer](https://github.com/3Dpass/explorer) API for block detais.
@@ -21,7 +21,7 @@ The wallet reaches out to [Block Explorer](https://github.com/3Dpass/explorer) A
 From your terminal:
 
 ```sh
-npm run dev
+pnpm dev
 ```
 
 This starts your app in development mode, rebuilding assets on file changes.
@@ -31,16 +31,18 @@ This starts your app in development mode, rebuilding assets on file changes.
 First, build your app for production:
 
 ```sh
-npm run build
+pnpm build
 ```
 
 Then run the app in production mode:
 
 ```sh
-npm start
+pnpm start
 ```
 
 Now you'll need to pick a host to deploy it to.
 
 ## Copyright
-3DPass web wallet  Copyright (C) 2022  3DPass 3dpass.org
+3DPass web wallet
+
+Copyright (C) 2022-2023  3DPass 3dpass.org
