@@ -95,7 +95,7 @@ export default function NetworkState({ api }: IProps) {
   }
 
   return (
-    <Card className="mb-4" elevation={Elevation.TWO}>
+    <Card className="mb-4" elevation={Elevation.ZERO}>
       <div className={cardClassName}>
         <TitledValue title="Best block" value={networkState.bestNumber} />
         <TitledValue title="Finalized" value={networkState.bestNumberFinalized} />
