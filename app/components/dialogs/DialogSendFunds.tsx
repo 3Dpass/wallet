@@ -6,7 +6,6 @@ import { apiAtom, toasterAtom } from "../../atoms";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
-import AmountTipInput from "../common/AmountTipInput";
 
 type IProps = {
   pair: KeyringPair;
@@ -57,8 +56,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
       const value = BigInt(data.amount_number * 1_000_000_000_000);
       const tips = BigInt(data.tips_number * 1_000_000_000_000);
       const tx = api.tx.balances.transfer(data.address, value);
-      const fee = tips > 0 ? { tip: tips.toString() } : undefined;
-      await tx.signAndSend(pair, fee);
+      const options = tips > 0 ? { tip: tips.toString() } : undefined;
+      await tx.signAndSend(pair, options);
       toaster &&
         toaster.show({
           icon: "endorsed",
@@ -93,8 +92,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
           value={data.address}
           leftElement={addressIcon}
         />
-        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
-        <AmountTipInput disabled={isLoading} onValueChange={handleTipsChange} />
+        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} placeholder="Amount"/>
+        <AmountInput disabled={isLoading} onValueChange={handleTipsChange} placeholder="Enter optional tips to increase transaction priority"/>
         
       </div>
       <div className={Classes.DIALOG_FOOTER}>

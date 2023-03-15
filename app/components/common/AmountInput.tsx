@@ -6,13 +6,15 @@ import { NumericInput, Tag } from "@blueprintjs/core";
 type IProps = {
   disabled: boolean;
   onValueChange: (valueAsNumber: number, valueAsString: string) => void;
+  placeholder?: string;
 };
 
-export default function AmountInput({ disabled, onValueChange }: IProps) {
+export default function AmountInput({ disabled, onValueChange, placeholder }: IProps) {
   const api = useAtomValue(apiAtom);
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [amount, setAmount] = useState("");
-
+  const [tip, setTip] = useState("");
+  
   useEffect(() => {
     api && setTokenSymbol(api.registry.getChainProperties().tokenSymbol.toHuman().toString());
   }, [api]);
@@ -21,6 +23,11 @@ export default function AmountInput({ disabled, onValueChange }: IProps) {
     setAmount(valueAsString);
     onValueChange(valueAsNumber, valueAsString);
   }
+  function handleTipsChange(valueAsNumber, valueAsString) {
+    setTip(valueAsString);
+    onValueChange(valueAsNumber, valueAsString);
+  }
+  
 
   return (
     <NumericInput
@@ -30,8 +37,8 @@ export default function AmountInput({ disabled, onValueChange }: IProps) {
       className="mb-2"
       large={true}
       leftIcon="send-to"
-      placeholder="Amount"
-      onValueChange={handleAmountChange}
+      placeholder={placeholder}
+      onValueChange={onValueChange}
       value={amount}
       fill={true}
       min={0}
@@ -40,3 +47,5 @@ export default function AmountInput({ disabled, onValueChange }: IProps) {
     />
   );
 }
+
+
