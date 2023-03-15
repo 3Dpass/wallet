@@ -30,11 +30,11 @@ export default function Wallet() {
     try {
       const currentPairs = keyring.getPairs();
       const result = keyring.addUri(seed_phrase, password);
-      
-      if(currentPairs.some((keyringAddress) => keyringAddress.address === result.pair.address)) {
+
+      if (currentPairs.some((keyringAddress) => keyringAddress.address === result.pair.address)) {
         throw new Error(`Wallet already imported`);
       }
-      
+
       dialogToggle("seed_phrase");
     } catch (e) {
       toaster &&
