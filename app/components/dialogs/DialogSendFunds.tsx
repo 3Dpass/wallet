@@ -6,12 +6,14 @@ import { apiAtom, toasterAtom } from "../../atoms";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
+import AmountTipInput from "../common/AmountTipInput";
 
 type IProps = {
   pair: KeyringPair;
   isOpen: boolean;
   onClose: () => void;
   onAfterSubmit: () => void;
+
 };
 
 export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
@@ -24,6 +26,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     address: "",
     amount: "",
     amount_number: 0,
+    tips: "",
+    tips_number: 0,
   };
   const [data, setData] = useState(dataInitial);
 
@@ -36,8 +40,12 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     setData((prev) => ({ ...prev, amount: valueAsString, amount_number: valueAsNumber }));
   }
 
+  function handleTipsChange(valueAsNumber, valueAsString){
+    setData((prev) => ({ ...prev, tips: valueAsString, tips_number: valueAsNumber }));
+  }
+
   useEffect(() => {
-    api && setCanSubmit(isValidPolkadotAddress(data.address) && data.amount_number > 0);
+    api && setCanSubmit(isValidPolkadotAddress(data.address) && data.amount_number > 0 );
   }, [api, data]);
 
   async function handleSubmitClick() {
@@ -47,7 +55,10 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     setIsLoading(true);
     try {
       const value = BigInt(data.amount_number * 1_000_000_000_000);
-      await api.tx.balances.transfer(data.address, value).signAndSend(pair);
+      const tips = BigInt(data.tips_number * 1_000_000_000_000);
+      const tx = api.tx.balances.transfer(data.address, value);
+      const fee = tips > 0 ? { tip: tips.toString() } : undefined;
+      await tx.signAndSend(pair, fee);
       toaster &&
         toaster.show({
           icon: "endorsed",
@@ -83,6 +94,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
           leftElement={addressIcon}
         />
         <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
+        <AmountTipInput disabled={isLoading} onValueChange={handleTipsChange} />
+        
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
