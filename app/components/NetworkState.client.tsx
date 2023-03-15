@@ -86,7 +86,7 @@ export default function NetworkState({ api }: IProps) {
   }, [api]);
 
   if (isLoading && !networkState) {
-    return <div className="mb-4 w-100 h-[100px] animate-pulse bg-gray-600"></div>;
+    return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed"></div>;
   }
 
   let cardClassName = "grid gap-y-2 grid-cols-2 md:grid-cols-4 lg:grid-cols-6";

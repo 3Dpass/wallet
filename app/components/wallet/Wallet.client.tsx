@@ -92,7 +92,7 @@ export default function Wallet() {
   }, [ss58format, toaster]);
 
   if (isLoading || !api) {
-    return <div className="mb-4 w-100 h-[100px] animate-pulse bg-gray-600"></div>;
+    return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed"></div>;
   }
 
   return (
