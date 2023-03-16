@@ -112,3 +112,4 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     </Dialog>
   );
 }
+
