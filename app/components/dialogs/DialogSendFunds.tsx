@@ -12,7 +12,6 @@ type IProps = {
   isOpen: boolean;
   onClose: () => void;
   onAfterSubmit: () => void;
-
 };
 
 export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
@@ -39,12 +38,12 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     setData((prev) => ({ ...prev, amount: valueAsString, amount_number: valueAsNumber }));
   }
 
-  function handleTipsChange(valueAsNumber, valueAsString){
+  function handleTipsChange(valueAsNumber, valueAsString) {
     setData((prev) => ({ ...prev, tips: valueAsString, tips_number: valueAsNumber }));
   }
 
   useEffect(() => {
-    api && setCanSubmit(isValidPolkadotAddress(data.address) && data.amount_number > 0 );
+    api && setCanSubmit(isValidPolkadotAddress(data.address) && data.amount_number > 0);
   }, [api, data]);
 
   async function handleSubmitClick() {
@@ -94,7 +93,6 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
         />
         <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
         <AmountInput disabled={isLoading} onValueChange={handleTipsChange} placeholder="Enter optional tips to increase transaction priority" />
-        
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -112,4 +110,3 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     </Dialog>
   );
 }
-

@@ -13,8 +13,7 @@ export default function AmountInput({ disabled, onValueChange, placeholder }: IP
   const api = useAtomValue(apiAtom);
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [amount, setAmount] = useState("");
-  
-  
+
   useEffect(() => {
     api && setTokenSymbol(api.registry.getChainProperties().tokenSymbol.toHuman().toString());
   }, [api]);
@@ -23,7 +22,7 @@ export default function AmountInput({ disabled, onValueChange, placeholder }: IP
     setAmount(valueAsString);
     onValueChange(valueAsNumber, valueAsString);
   }
- 
+
   return (
     <NumericInput
       disabled={disabled}
@@ -32,7 +31,7 @@ export default function AmountInput({ disabled, onValueChange, placeholder }: IP
       className="mb-2"
       large={true}
       leftIcon="send-to"
-      placeholder={ placeholder || "Amount" }
+      placeholder={placeholder || "Amount"}
       onValueChange={handleAmountChange}
       value={amount}
       fill={true}
@@ -42,6 +41,3 @@ export default function AmountInput({ disabled, onValueChange, placeholder }: IP
     />
   );
 }
-
-
-
