@@ -92,8 +92,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
           value={data.address}
           leftElement={addressIcon}
         />
-        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} placeholder="Amount"/>
-        <AmountInput disabled={isLoading} onValueChange={handleTipsChange} placeholder="Enter optional tips to increase transaction priority"/>
+        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
+        <AmountInput disabled={isLoading} onValueChange={handleTipsChange} placeholder="Enter optional tips to increase transaction priority" />
         
       </div>
       <div className={Classes.DIALOG_FOOTER}>
