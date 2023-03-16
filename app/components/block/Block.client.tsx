@@ -33,7 +33,7 @@ export default function Block({ block }: IProps) {
   const downloadFilename = `3dpass-${block.block.header.number.toString()}.obj`;
 
   return (
-    <Card elevation={Elevation.TWO}>
+    <Card elevation={Elevation.ZERO}>
       <div className="flex justify-between items-start">
         <TitledValue title="Block" value={block.block.header.number.toHuman()} />
         <div className="flex gap-2">

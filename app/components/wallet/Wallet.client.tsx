@@ -30,11 +30,11 @@ export default function Wallet() {
     try {
       const currentPairs = keyring.getPairs();
       const result = keyring.addUri(seed_phrase, password);
-      
-      if(currentPairs.some((keyringAddress) => keyringAddress.address === result.pair.address)) {
+
+      if (currentPairs.some((keyringAddress) => keyringAddress.address === result.pair.address)) {
         throw new Error(`Wallet already imported`);
       }
-      
+
       dialogToggle("seed_phrase");
     } catch (e) {
       toaster &&
@@ -92,7 +92,7 @@ export default function Wallet() {
   }, [ss58format, toaster]);
 
   if (isLoading || !api) {
-    return <div className="mb-4 w-100 h-[100px] animate-pulse bg-gray-600"></div>;
+    return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed"></div>;
   }
 
   return (
