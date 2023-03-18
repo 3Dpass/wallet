@@ -2,8 +2,9 @@ import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { useEffect, useState } from "react";
 import { useSS58Format } from "../components/hooks";
+import type { KeyringPair } from "@polkadot/keyring/types";
 
-export default function useAccounts() {
+export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boolean } {
   const [accounts, setAccounts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const ss58format = useSS58Format();
@@ -12,7 +13,9 @@ export default function useAccounts() {
     if (!ss58format) {
       return;
     }
-    let sub;
+
+    let subscription;
+
     cryptoWaitReady().then(() => {
       try {
         keyring.loadAll({ ss58Format: ss58format, type: "sr25519" });
@@ -22,14 +25,14 @@ export default function useAccounts() {
         }
         throw e;
       }
-      sub = keyring.accounts.subject.subscribe(() => {
+      subscription = keyring.accounts.subject.subscribe(() => {
         setAccounts(keyring.getPairs());
       });
       setIsLoading(false);
     });
 
     return () => {
-      sub.unsubscribe();
+      subscription.unsubscribe();
     };
   }, [ss58format]);
 
