@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { blocksAtom } from "../atoms";
+import { blocksAtom, bestNumberFinalizedAtom } from "../atoms";
 import { lazy, useEffect, useState } from "react";
 import { Card, Elevation } from "@blueprintjs/core";
 import { formatDuration } from "../utils/time";
@@ -27,6 +27,7 @@ export default function NetworkState({ api }: IProps) {
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [networkState, setNetworkState] = useState<INetworkState>();
+  const [bestNumberFinalized, setBestNumberFinalized] = useAtom(bestNumberFinalizedAtom);
 
   async function loadNetworkState(timestamp) {
     if (!api) {
@@ -48,6 +49,9 @@ export default function NetworkState({ api }: IProps) {
       timestamp: timestamp.toJSON(),
       targetBlockTime: parseInt(targetBlockTime.toString()) / 1000,
     });
+
+    setBestNumberFinalized(bestNumberFinalized.toHuman().toString());
+
     setIsLoading(false);
   }
 

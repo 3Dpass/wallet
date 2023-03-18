@@ -1,10 +1,13 @@
-import { lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
+import { Link } from "@remix-run/react";
 import { Button, Card, Classes, Elevation, Icon } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
 import Rock from "./Rock.client";
 import TitledValue from "../common/TitledValue";
 import type { IBlock } from "../types";
 import { Buffer } from "buffer";
+import { useAtom } from "jotai";
+import { bestNumberFinalizedAtom } from "../../atoms";
 
 const Canvas = lazy(() => import("@react-three/fiber").then((module) => ({ default: module.Canvas })));
 
@@ -13,6 +16,8 @@ interface IProps {
 }
 
 export default function Block({ block }: IProps) {
+  const [bestNumberFinalizedd] = useAtom(bestNumberFinalizedAtom);
+  const bestNumberFinalized = parseInt(bestNumberFinalizedd.toString().replace(/,/g, ""));
   const objectHashAlgo = Buffer.from(block.objectHashAlgo, "hex").toString("utf8");
   const objectHashPopover = (
     <div className="p-4">
@@ -32,11 +37,30 @@ export default function Block({ block }: IProps) {
   const downloadUrl = `data:text/plain;base64,${objectBase64}`;
   const downloadFilename = `3dpass-${block.block.header.number.toString()}.obj`;
 
+  const [isFinalized, setIsFinalized] = useState(false);
+
+  useEffect(() => {
+    setIsFinalized(block.block.header.number.toNumber() <= bestNumberFinalized);
+  }, [bestNumberFinalized, block.block.header.number.toNumber()]);
+
   return (
     <Card elevation={Elevation.ZERO}>
       <div className="flex justify-between items-start">
-        <TitledValue title="Block" value={block.block.header.number.toHuman()} />
-        <TitledValue title="Blocks" value={block.block.header.number.toHuman()} />
+        <TitledValue
+          title="Block"
+          value={
+            isFinalized ? (
+              <span>
+                <Link to={`/block/${block.block.header.number.toNumber()}`} target="_blank" rel="noopener noreferrer">
+                  {block.block.header.number.toNumber()}
+                </Link>{" "}
+                Finalized
+              </span>
+            ) : (
+              `${block.block.header.number.toNumber()} not Finalized`
+            )
+          }
+        />
         <div className="flex gap-2">
           <a className={Classes.BUTTON} href={downloadUrl} download={downloadFilename}>
             <Icon icon="download" />
