@@ -75,7 +75,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
         const injected = await web3FromAddress(pair.address);
         options.signer = injected.signer;
       }
-      await tx.signAndSend(pair.address, options);
+      await tx.signAndSend(options.signer ? pair.address : pair, options);
       toaster &&
         toaster.show({
           icon: "endorsed",
