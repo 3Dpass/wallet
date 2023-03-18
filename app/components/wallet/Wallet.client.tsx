@@ -75,7 +75,7 @@ export default function Wallet() {
       {accounts.map((pair) => {
         return <Account key={pair.address} pair={pair} />;
       })}
-      <Card className="grid gap-1" elevation={Elevation.TWO}>
+      <Card className="grid gap-1" elevation={Elevation.ZERO}>
         <Button icon="new-object" text="Create new address..." onClick={() => dialogToggle("create")} />
         <Button icon="add" text="Import from seed phrase..." onClick={() => dialogToggle("seed_phrase")} />
         <Button icon="import" text="Import from JSON..." onClick={() => dialogToggle("json")} />
