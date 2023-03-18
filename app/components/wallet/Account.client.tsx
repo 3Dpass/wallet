@@ -187,7 +187,16 @@ export default function Account({ pair }: IProps) {
           )}
         </div>
       </div>
-      {pair.meta.isInjected && <div className="absolute top-0 right-0 text-xs px-2 py-1 bg-gray-600 rounded-bl">Extension</div>}
+      {pair.meta.isInjected && (
+        <div className="absolute top-0 right-0 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
+          {pair.meta.name && (
+            <span>
+              <span className="font-bold text-white">{pair.meta.name as string}</span> —{" "}
+            </span>
+          )}
+          extension
+        </div>
+      )}
     </Card>
   );
 }
