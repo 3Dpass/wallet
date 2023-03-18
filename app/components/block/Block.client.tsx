@@ -6,7 +6,6 @@ import TitledValue from "../common/TitledValue";
 import type { IBlock } from "../types";
 import { Buffer } from "buffer";
 
-
 const Canvas = lazy(() => import("@react-three/fiber").then((module) => ({ default: module.Canvas })));
 
 interface IProps {
@@ -36,6 +35,7 @@ export default function Block({ block }: IProps) {
   return (
     <Card elevation={Elevation.ZERO}>
       <div className="flex justify-between items-start">
+        <TitledValue title="Block" value={block.block.header.number.toHuman()} />
         <TitledValue title="Blocks" value={block.block.header.number.toHuman()} />
         <div className="flex gap-2">
           <a className={Classes.BUTTON} href={downloadUrl} download={downloadFilename}>

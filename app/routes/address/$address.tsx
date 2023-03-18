@@ -30,15 +30,7 @@ export default function Address() {
 
   return (
     <Card>
-      <TitledValue
-        title="Address"
-        value={
-          <Link to={ExplorerUrl.account({address})}>
-            {address}
-          </Link>
-        }
-        fontMono={true}
-      />
+      <TitledValue title="Address" value={<Link to={ExplorerUrl.account({ address })}>{address}</Link>} fontMono={true} />
       <Divider className="my-5" />
       <HTMLTable striped={true} width="100%">
         <thead>
@@ -65,18 +57,15 @@ export default function Address() {
             return (
               <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
                 <td>
-                  <Link to={`/block/${transfer.blockNumber}`}>
-                    {" "}
-                    {transfer.blockNumber}
-                  </Link>
+                  <Link to={`/block/${transfer.blockNumber}`}> {transfer.blockNumber}</Link>
                 </td>
                 <td>
                   <Moment date={transfer.blockDatetime} format="DD.MM.YY HH:MM" interval={0} />
                 </td>
                 <td>
-                <Link to={ExplorerUrl.extrinsic(transfer.blockNumber, transfer.extrinsicIdx)} target="_self">
-                  {transfer.extrinsicIdx}
-                </Link>
+                  <Link to={ExplorerUrl.extrinsic(transfer.blockNumber, transfer.extrinsicIdx)} target="_self">
+                    {transfer.extrinsicIdx}
+                  </Link>
                 </td>
                 <td>
                   <AddressItem address={otherAddress} />

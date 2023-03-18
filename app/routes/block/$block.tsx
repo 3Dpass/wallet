@@ -25,7 +25,7 @@ export default function Block() {
   return (
     <Card>
       <div className="flex gap-4 mb-6">
-        <TitledValue title="Block" value={<Link to={ExplorerUrl.block({block})}>{block}</Link>} fontMono={true} className="mr-4" />
+        <TitledValue title="Block" value={<Link to={ExplorerUrl.block({ block })}>{block}</Link>} fontMono={true} className="mr-4" />
         <TitledValue title="Date" value={<Moment date={queryBlock.data.getBlock.datetime} format="lll Z" interval={0} />} />
       </div>
       <div className="flex gap-4 mb-3">
