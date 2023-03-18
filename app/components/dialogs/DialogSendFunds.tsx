@@ -67,10 +67,6 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
       const value = BigInt(data.amount_number * 1_000_000_000_000);
       const tips = BigInt(data.tips_number * 1_000_000_000_000);
       const tx = api.tx.balances.transfer(data.address, value);
-<<<<<<< HEAD
-      const options = tips > 0 ? { tip: tips.toString() } : undefined;
-      await tx.signAndSend(pair, options);
-=======
       const options: Partial<SignerOptions> = {};
       if (tips > 0) {
         options.tip = tips.toString();
@@ -80,7 +76,6 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
         options.signer = injected.signer;
       }
       await tx.signAndSend(options.signer ? pair.address : pair, options);
->>>>>>> e7929e665f8b27f489c1d0fe8c9e61067a3658f7
       toaster &&
         toaster.show({
           icon: "endorsed",
