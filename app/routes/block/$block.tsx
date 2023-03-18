@@ -1,4 +1,4 @@
-import { useParams } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 import { Card, Spinner } from "@blueprintjs/core";
 import TitledValue from "../../components/common/TitledValue";
 import type { BlockData, BlockVars, LogsData, LogsVars } from "../../queries";
@@ -6,6 +6,7 @@ import { GET_BLOCK, GET_LOGS } from "../../queries";
 import Moment from "react-moment";
 import { useQuery } from "@apollo/client";
 import Error from "../../components/common/Error";
+import { ExplorerUrl } from "../../components/common/ExplorerForward";
 
 export default function Block() {
   const { block } = useParams();
@@ -24,7 +25,7 @@ export default function Block() {
   return (
     <Card>
       <div className="flex gap-4 mb-6">
-        <TitledValue title="Block" value={block} fontMono={true} className="mr-4" />
+        <TitledValue title="Block" value={<Link to={ExplorerUrl.block({block})}>{block}</Link>} fontMono={true} className="mr-4" />
         <TitledValue title="Date" value={<Moment date={queryBlock.data.getBlock.datetime} format="lll Z" interval={0} />} />
       </div>
       <div className="flex gap-4 mb-3">

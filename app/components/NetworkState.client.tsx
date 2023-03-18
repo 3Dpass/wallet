@@ -3,7 +3,6 @@ import { blocksAtom } from "../atoms";
 import { lazy, useEffect, useState } from "react";
 import { Card, Elevation } from "@blueprintjs/core";
 import { formatDuration } from "../utils/time";
-import type { u128 } from "@polkadot/types-codec";
 import { loadBlock } from "../utils/block";
 import { MAX_BLOCKS } from "../api.config";
 import TitledValue from "./common/TitledValue";
@@ -20,6 +19,7 @@ type INetworkState = {
   targetBlockTime: number;
 };
 
+
 type IProps = {
   api: false | ApiPromise;
 };
@@ -28,19 +28,23 @@ export default function NetworkState({ api }: IProps) {
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [networkState, setNetworkState] = useState<INetworkState>();
+ 
 
   async function loadNetworkState(timestamp) {
     if (!api) {
       return;
     }
+    
     setIsLoading(true);
     // @ts-ignore
-    const totalIssuance: u128 = await api.query.balances.totalIssuance();
-    const bestNumber = await api.derive.chain.bestNumber();
-    const bestNumberFinalized = await api.derive.chain.bestNumberFinalized();
-    const targetBlockTime = await api.consts.difficulty.targetBlockTime;
+    const [totalIssuance, bestNumber, bestNumberFinalized, targetBlockTime] = await Promise.all([
+      api.query.balances.totalIssuance(),
+      api.derive.chain.bestNumber(),
+      api.derive.chain.bestNumberFinalized(),
+      api.consts.difficulty.targetBlockTime,
+    ]);
     setNetworkState({
-      totalIssuance: totalIssuance.toBigInt(),
+      totalIssuance: totalIssuance.toString(),
       bestNumber: bestNumber.toHuman().toString(),
       bestNumberFinalized: bestNumberFinalized.toHuman().toString(),
       timestamp: timestamp.toJSON(),
@@ -48,7 +52,7 @@ export default function NetworkState({ api }: IProps) {
     });
     setIsLoading(false);
   }
-
+  
   function isBlockAlreadyLoaded(hash) {
     return blocks.some((block) => block.blockHash === hash);
   }
@@ -61,19 +65,21 @@ export default function NetworkState({ api }: IProps) {
     let timestampUnsubscribe, newHeadsUnsubscribe;
 
     async function subscribe(api) {
-      timestampUnsubscribe = await api.query.timestamp.now(loadNetworkState);
-      newHeadsUnsubscribe = await api.rpc.chain.subscribeNewHeads((head) => {
-        const hash = head.hash.toHex();
-        if (isBlockAlreadyLoaded(hash)) {
-          return;
-        }
-        loadBlock(api, hash).then((block) => {
-          setBlocks((prevBlocks) => {
-            const newBlocks = [block, ...prevBlocks];
-            return newBlocks.slice(0, MAX_BLOCKS);
+      [timestampUnsubscribe, newHeadsUnsubscribe] = await Promise.all([
+        api.query.timestamp.now(loadNetworkState),
+        api.rpc.chain.subscribeNewHeads((head) => {
+          const hash = head.hash.toHex();
+          if (isBlockAlreadyLoaded(hash)) {
+            return;
+          }
+          loadBlock(api, hash).then((block) => {
+            setBlocks((prevBlocks) => {
+              const newBlocks = [block, ...prevBlocks];
+              return newBlocks.slice(0, MAX_BLOCKS);
+            });
           });
-        });
-      });
+        }),
+      ]);
     }
 
     function unsubscribe() {
