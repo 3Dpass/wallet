@@ -166,7 +166,7 @@ export default function Account({ pair }: IProps) {
               </div>
             )}
             <div className="grid grid-cols-3 gap-1">
-              <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} disabled={pair.isLocked} />
+              <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} disabled={pair.isLocked && !pair.meta.isInjected} />
               <Button
                 icon="unlock"
                 text="Unlock mined"

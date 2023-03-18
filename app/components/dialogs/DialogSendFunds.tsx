@@ -6,6 +6,8 @@ import { apiAtom, toasterAtom } from "../../atoms";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
+import { web3FromSource } from "@polkadot/extension-dapp";
+import type { SignerOptions } from "@polkadot/api/types";
 
 type IProps = {
   pair: KeyringPair;
@@ -47,7 +49,16 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
   }, [api, data]);
 
   async function handleSubmitClick() {
-    if (!api || pair.isLocked) {
+    if (!api) {
+      return;
+    }
+    if (pair.isLocked && !pair.meta.isInjected) {
+      toaster &&
+        toaster.show({
+          icon: "error",
+          intent: Intent.DANGER,
+          message: "Account is locked",
+        });
       return;
     }
     setIsLoading(true);
@@ -55,7 +66,14 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
       const value = BigInt(data.amount_number * 1_000_000_000_000);
       const tips = BigInt(data.tips_number * 1_000_000_000_000);
       const tx = api.tx.balances.transfer(data.address, value);
-      const options = tips > 0 ? { tip: tips.toString() } : undefined;
+      const options: Partial<SignerOptions> = {};
+      if (tips > 0) {
+        options.tip = tips.toString();
+      }
+      if (pair.meta.isInjected) {
+        const injected = await web3FromSource(pair.meta.source as string);
+        options.signer = injected.signer;
+      }
       await tx.signAndSend(pair, options);
       toaster &&
         toaster.show({
