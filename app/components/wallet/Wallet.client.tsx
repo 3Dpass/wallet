@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
-import { cryptoWaitReady } from "@polkadot/util-crypto";
+import { useCallback, useState } from "react";
 import keyring from "@polkadot/ui-keyring";
 import { Button, Card, Elevation, Intent } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
@@ -7,14 +6,12 @@ import { apiAtom, toasterAtom } from "../../atoms";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
-import { useSS58Format } from "../hooks";
+import useAccounts from "../../hooks/useAccounts";
 
 export default function Wallet() {
   const api = useAtomValue(apiAtom);
   const toaster = useAtomValue(toasterAtom);
-  const [isLoading, setIsLoading] = useState(true);
-  const [pairs, setPairs] = useState([]);
-  const ss58format = useSS58Format();
+  const { accounts, isLoading } = useAccounts();
 
   const dialogsInitial = {
     seed_phrase: false,
@@ -61,36 +58,6 @@ export default function Wallet() {
     }
   }
 
-  useEffect(() => {
-    if (!ss58format || !toaster) {
-      return;
-    }
-    let sub;
-    cryptoWaitReady().then(() => {
-      try {
-        keyring.loadAll({ ss58Format: ss58format, type: "sr25519" });
-      } catch (e) {
-        if (e.message == "Unable to initialise options more than once") {
-          window.location.reload();
-        } else {
-          toaster.show({
-            icon: "ban-circle",
-            intent: Intent.DANGER,
-            message: e.message,
-          });
-        }
-      }
-      sub = keyring.accounts.subject.subscribe(() => {
-        setPairs(keyring.getPairs());
-      });
-      setIsLoading(false);
-    });
-
-    return () => {
-      sub.unsubscribe();
-    };
-  }, [ss58format, toaster]);
-
   if (isLoading || !api) {
     return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed"></div>;
   }
@@ -105,7 +72,7 @@ export default function Wallet() {
       />
       <DialogImportAddress isOpen={dialogs.json} showPassword={false} onClose={() => dialogToggle("json")} onImport={handleJSONWalletImportClick} />
       <DialogCreateAddress isOpen={dialogs.create} onClose={() => dialogToggle("create")} />
-      {pairs.map((pair) => {
+      {accounts.map((pair) => {
         return <Account key={pair.address} pair={pair} />;
       })}
       <Card className="grid gap-1" elevation={Elevation.TWO}>
