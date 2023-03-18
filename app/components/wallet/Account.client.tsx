@@ -2,7 +2,6 @@ import { Alert, Button, Card, Elevation, Icon, Intent, Spinner, SpinnerSize } fr
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
 import { useCallback, useEffect, useState } from "react";
-import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
@@ -12,6 +11,7 @@ import { useIsMainnet } from "../hooks";
 import { AddressItem } from "../common/AddressItem";
 import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
+import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 
 type IProps = {
   pair: KeyringPair;
@@ -144,7 +144,7 @@ export default function Account({ pair }: IProps) {
   );
 
   return (
-    <Card elevation={Elevation.TWO}>
+    <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
       {dialogElements}
       <AddressItem address={pair.address} />
       <div className="grid gap-1">
@@ -156,7 +156,7 @@ export default function Account({ pair }: IProps) {
               <TitledValue title="Transferable" value={<FormattedAmount value={balances.availableBalance} />} />
               <TitledValue title="Locked" value={<FormattedAmount value={balances.lockedBalance} />} />
             </div>
-            {pair.isLocked && (
+            {pair.isLocked && !pair.meta.isInjected && (
               <div className="my-2 text-center">
                 Account is <Icon icon="lock" /> password protected, you need to{" "}
                 <a href="#" onClick={handleUnlockAccount} className="text-white underline underline-offset-4">
@@ -166,7 +166,7 @@ export default function Account({ pair }: IProps) {
               </div>
             )}
             <div className="grid grid-cols-3 gap-1">
-              <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} disabled={pair.isLocked} />
+              <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} disabled={pair.isLocked && !pair.meta.isInjected} />
               <Button
                 icon="unlock"
                 text="Unlock mined"
@@ -179,10 +179,24 @@ export default function Account({ pair }: IProps) {
         )}
         <div className="grid grid-cols-3 gap-1">
           <Button icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
-          <Button icon="export" text="Copy JSON" onClick={handleCopyJson} disabled={pair.isLocked} />
-          <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
+          {!pair.meta.isInjected && (
+            <>
+              <Button icon="export" text="Copy JSON" onClick={handleCopyJson} disabled={pair.isLocked} />
+              <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
+            </>
+          )}
         </div>
       </div>
+      {pair.meta.isInjected && (
+        <div className="absolute top-0 right-0 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
+          {pair.meta.name && (
+            <span>
+              <span className="font-bold text-white">{pair.meta.name as string}</span> —{" "}
+            </span>
+          )}
+          extension
+        </div>
+      )}
     </Card>
   );
 }
