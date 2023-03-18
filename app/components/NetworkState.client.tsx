@@ -20,6 +20,7 @@ type INetworkState = {
   targetBlockTime: number;
 };
 
+
 type IProps = {
   api: false | ApiPromise;
 };
@@ -28,11 +29,13 @@ export default function NetworkState({ api }: IProps) {
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [networkState, setNetworkState] = useState<INetworkState>();
+ 
 
   async function loadNetworkState(timestamp) {
     if (!api) {
       return;
     }
+    
     setIsLoading(true);
     // @ts-ignore
     const totalIssuance: u128 = await api.query.balances.totalIssuance();
@@ -48,7 +51,7 @@ export default function NetworkState({ api }: IProps) {
     });
     setIsLoading(false);
   }
-
+  
   function isBlockAlreadyLoaded(hash) {
     return blocks.some((block) => block.blockHash === hash);
   }

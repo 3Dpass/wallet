@@ -12,6 +12,7 @@ import { useSS58Format } from "../../components/hooks";
 import { useQuery } from "@apollo/client";
 import Error from "../../components/common/Error";
 import { AddressItem } from "../../components/common/AddressItem";
+import { ExplorerUrl } from "../../components/common/ExplorerForward";
 
 const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
@@ -29,13 +30,22 @@ export default function Address() {
 
   return (
     <Card>
-      <TitledValue title="Address" value={address} fontMono={true} />
+      <TitledValue
+        title="Address"
+        value={
+          <Link to={ExplorerUrl.account({address})}>
+            {address}
+          </Link>
+        }
+        fontMono={true}
+      />
       <Divider className="my-5" />
       <HTMLTable striped={true} width="100%">
         <thead>
           <tr>
             <th>Block</th>
             <th>Date</th>
+            <th>Extrinsic</th>
             <th>Address</th>
             <th>
               <div className="text-right">Value</div>
@@ -55,10 +65,18 @@ export default function Address() {
             return (
               <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
                 <td>
-                  <Link to={`/block/${transfer.blockNumber}`}>{transfer.blockNumber}</Link>
+                  <Link to={`/block/${transfer.blockNumber}`}>
+                    {" "}
+                    {transfer.blockNumber}
+                  </Link>
                 </td>
                 <td>
                   <Moment date={transfer.blockDatetime} format="DD.MM.YY HH:MM" interval={0} />
+                </td>
+                <td>
+                <Link to={ExplorerUrl.extrinsic(transfer.blockNumber, transfer.extrinsicIdx)} target="_self">
+                  {transfer.extrinsicIdx}
+                </Link>
                 </td>
                 <td>
                   <AddressItem address={otherAddress} />
