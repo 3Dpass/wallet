@@ -10,17 +10,17 @@ export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boo
   const [accounts, setAccounts] = useState([]);
   const ss58Format = useSS58Format();
 
-  async function loadWeb3Accounts() {
+  async function loadWeb3Accounts(ss58Format) {
     const extensions = await web3Enable("3dpass/wallet");
     if (extensions.length === 0) {
       return;
     }
-    return await web3Accounts();
+    return await web3Accounts({ ss58Format });
   }
 
   async function loadAllAccounts(ss58Format) {
     await cryptoWaitReady();
-    const injected = await loadWeb3Accounts();
+    const injected = await loadWeb3Accounts(ss58Format);
     keyring.loadAll({ ss58Format, type: "sr25519" }, injected);
   }
 

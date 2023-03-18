@@ -6,8 +6,8 @@ import { apiAtom, toasterAtom } from "../../atoms";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
-import { web3FromSource } from "@polkadot/extension-dapp";
 import type { SignerOptions } from "@polkadot/api/types";
+import { web3FromAddress } from "@polkadot/extension-dapp/bundle";
 
 type IProps = {
   pair: KeyringPair;
@@ -52,7 +52,8 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     if (!api) {
       return;
     }
-    if (pair.isLocked && !pair.meta.isInjected) {
+    const isLocked = pair.isLocked && !pair.meta.isInjected;
+    if (isLocked) {
       toaster &&
         toaster.show({
           icon: "error",
@@ -71,10 +72,10 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
         options.tip = tips.toString();
       }
       if (pair.meta.isInjected) {
-        const injected = await web3FromSource(pair.meta.source as string);
+        const injected = await web3FromAddress(pair.address);
         options.signer = injected.signer;
       }
-      await tx.signAndSend(pair, options);
+      await tx.signAndSend(pair.address, options);
       toaster &&
         toaster.show({
           icon: "endorsed",
