@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { BufferGeometry, Mesh } from "three";
 import * as THREE from "three";
@@ -23,7 +23,7 @@ export default function Rock({ geometry }: IProps) {
       rock.current.scale.set(scale, scale, scale);
       setScaled(true);
     }
-  }, [rock]);
+  }, [rock, scaled]);
 
   useFrame(({ clock }) => {
     if (!rock.current) {
@@ -33,11 +33,15 @@ export default function Rock({ geometry }: IProps) {
   });
 
   const textureUrl = "/textures/space.jpg";
-  const textureUrls = [textureUrl, textureUrl, textureUrl, textureUrl, textureUrl, textureUrl];
-  const textureCube = new THREE.CubeTextureLoader().load(textureUrls);
-  textureCube.wrapS = THREE.MirroredRepeatWrapping;
-  textureCube.wrapT = THREE.MirroredRepeatWrapping;
-  textureCube.mapping = THREE.CubeRefractionMapping;
+  const textureUrls = useMemo(() => [textureUrl, textureUrl, textureUrl, textureUrl, textureUrl, textureUrl], [textureUrl]);
+  const textureCube = useMemo(() => {
+    const cubeTextureLoader = new THREE.CubeTextureLoader();
+    const loadedTextureCube = cubeTextureLoader.load(textureUrls);
+    loadedTextureCube.wrapS = THREE.MirroredRepeatWrapping;
+    loadedTextureCube.wrapT = THREE.MirroredRepeatWrapping;
+    loadedTextureCube.mapping = THREE.CubeRefractionMapping;
+    return loadedTextureCube;
+  }, [textureUrls]);
 
   return (
     <>
