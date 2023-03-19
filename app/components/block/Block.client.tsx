@@ -55,10 +55,12 @@ export default function Block({ block }: IProps) {
                 <Link to={`/block/${blockNumber}`} target="_blank" rel="noopener noreferrer">
                   {blockNumber}
                 </Link>{" "}
-                Finalized
+                <TitledValue title="Finalized" />
               </span>
             ) : (
-              `${blockNumber} not Finalized`
+              <span>
+                {blockNumber} <TitledValue title="not Finalized" />
+              </span>
             )
           }
         />
