@@ -8,8 +8,20 @@ async function loadNetworkState() {
   const api = await getApi(provider);
   const totalIssuance = await api.query.balances.totalIssuance();
   const totalIssuanceNumber = totalIssuance.toPrimitive() as number;
-  const budget = 33666666000000000000 * 3 + 110000000000000000000 + 60000000000000000000;
-  const circulatingSupply = totalIssuanceNumber - budget;
+  const addresses = [
+    "d1CNDotJXNPvnSA5EQXpSbkUyXBVmaggkARY7kcgXim4BqeBJ",
+    "d1GZ8GxP3KzKJGRYmp9HMwxurnSKx3ACcqeZqLY5kpbLEyjzE",
+    "d1GA9xWx3WgpQHp8LHCXHbYoZdvjY3NHhU6gR2fsdVCiC4TdF",
+    "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
+    "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
+  ];
+  let balanceSum = 0;
+  for (const address of addresses) {
+    const accountInfo = await api.query.system.account(address);
+    const balance = Number(accountInfo.data.free.toString());
+    balanceSum += balance;
+  }
+  const circulatingSupply = totalIssuanceNumber - balanceSum;
   const totalSupply = 1_000_000_000 * 1_000_000_000_000;
 
   return {
