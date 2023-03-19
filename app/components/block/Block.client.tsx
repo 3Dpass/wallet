@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Link } from "@remix-run/react";
 import { Button, Card, Classes, Elevation, Icon } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
@@ -18,30 +18,10 @@ interface IProps {
 export default function Block({ block }: IProps) {
   const bestNumberFinalized = useAtomValue(bestNumberFinalizedAtom);
   const objectHashAlgo = Buffer.from(block.objectHashAlgo, "hex").toString("utf8");
-  const objectHashPopover = (
-    <div className="p-4">
-      {block.objectHashAlgo && (
-        <div className="font-mono mb-2">
-          Object Hash Algo: <strong>{objectHashAlgo}</strong>
-        </div>
-      )}
-      <code className="block text-xs">
-        {block.objectHashes.map((hash, index) => {
-          return <div key={index}>{hash}</div>;
-        })}
-      </code>
-    </div>
-  );
   const blockNumber = block.block.header.number.toNumber();
   const objectBase64 = Buffer.from(block.objectObj).toString("base64");
   const downloadUrl = `data:text/plain;base64,${objectBase64}`;
   const downloadFilename = `3dpass-${block.block.header.number.toString()}.obj`;
-
-  const [isFinalized, setIsFinalized] = useState(false);
-
-  useEffect(() => {
-    setIsFinalized(blockNumber <= bestNumberFinalized);
-  }, [bestNumberFinalized, blockNumber]);
 
   return (
     <Card elevation={Elevation.ZERO}>
@@ -49,18 +29,18 @@ export default function Block({ block }: IProps) {
         <TitledValue
           title="Block"
           value={
-            isFinalized ? (
-              <span>
+            blockNumber <= bestNumberFinalized ? (
+              <>
                 <Link to={`/block/${blockNumber}`} target="_blank" rel="noopener noreferrer">
                   {blockNumber}
                 </Link>{" "}
                 <div className="small-title">✓ Finalized</div>
-              </span>
+              </>
             ) : (
-              <span>
+              <>
                 {blockNumber}
                 <div className="small-title">Not finalized</div>
-              </span>
+              </>
             )
           }
         />
@@ -68,7 +48,22 @@ export default function Block({ block }: IProps) {
           <a className={Classes.BUTTON} href={downloadUrl} download={downloadFilename}>
             <Icon icon="download" />
           </a>
-          <Popover2 content={objectHashPopover}>
+          <Popover2
+            content={
+              <div className="p-4">
+                {block.objectHashAlgo && (
+                  <div className="font-mono mb-2">
+                    Object Hash Algo: <strong>{objectHashAlgo}</strong>
+                  </div>
+                )}
+                <code className="block text-xs">
+                  {block.objectHashes.map((hash, index) => {
+                    return <div key={index}>{hash}</div>;
+                  })}
+                </code>
+              </div>
+            }
+          >
             <Button icon="info-sign" />
           </Popover2>
         </div>
