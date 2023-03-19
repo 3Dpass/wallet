@@ -50,7 +50,7 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
           onChange={(e) => setPassphrase(e.target.value)}
           value={passphrase}
           leftElement={<Icon icon="lock" />}
-          onKeyDown={(e) => {
+          onKeyUp={(e) => {
             if (e.key === 'Enter') {
               handleSendClick();
             }
