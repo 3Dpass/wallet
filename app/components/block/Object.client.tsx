@@ -15,27 +15,27 @@ interface IProps {
   geometry: BufferGeometry;
 }
 
-export default function Rock({ geometry }: IProps) {
-  const rock = useRef<Mesh>();
+export default function Object({ geometry }: IProps) {
+  const meshRef = useRef<Mesh>();
   const [scaled, setScaled] = useState(false);
 
   useEffect(() => {
     // scale object to fit in a viewport
     if (!scaled) {
-      const bbox = new THREE.Box3().setFromObject(rock.current);
+      const bbox = new THREE.Box3().setFromObject(meshRef.current);
       const size = bbox.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = 1.0 / maxDim;
-      rock.current.scale.set(scale, scale, scale);
+      meshRef.current.scale.set(scale, scale, scale);
       setScaled(true);
     }
-  }, [rock, scaled]);
+  }, [meshRef, scaled]);
 
   useFrame(({ clock }) => {
-    if (!rock.current) {
+    if (!meshRef.current) {
       return;
     }
-    rock.current.rotation.set(clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0);
+    meshRef.current.rotation.set(clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0);
   });
 
   return (
@@ -43,7 +43,7 @@ export default function Rock({ geometry }: IProps) {
       <ambientLight color={[1, 1, 1]} />
       <pointLight intensity={2} position={[-10, -10, -10]} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-      <mesh ref={rock} geometry={geometry}>
+      <mesh ref={meshRef} geometry={geometry}>
         <meshPhongMaterial color="#fff" envMap={textureCube} refractionRatio={0.7} reflectivity={1} flatShading={true} />
       </mesh>
     </>

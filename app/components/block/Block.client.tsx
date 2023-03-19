@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Link } from "@remix-run/react";
 import { Button, Card, Classes, Elevation, Icon } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
-import Rock from "./Rock.client";
+import Object from "./Object.client";
 import TitledValue from "../common/TitledValue";
 import type { IBlock } from "../types";
 import { Buffer } from "buffer";
@@ -78,7 +78,7 @@ export default function Block({ block }: IProps) {
           }}
         >
           <Suspense fallback={null}>
-            <Rock geometry={block.object3d.geometry} />
+            <Object geometry={block.object3d.geometry} />
           </Suspense>
         </Canvas>
       </div>
