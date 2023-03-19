@@ -1,9 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { BufferGeometry, Mesh } from "three";
 import * as THREE from "three";
 
-const COLOR = "#fff";
+const textureUrl = "/textures/space.jpg";
+const textureUrls = [textureUrl, textureUrl, textureUrl, textureUrl, textureUrl, textureUrl];
+const cubeTextureLoader = new THREE.CubeTextureLoader();
+const textureCube = cubeTextureLoader.load(textureUrls);
+textureCube.wrapS = THREE.MirroredRepeatWrapping;
+textureCube.wrapT = THREE.MirroredRepeatWrapping;
+textureCube.mapping = THREE.CubeRefractionMapping;
 
 interface IProps {
   geometry: BufferGeometry;
@@ -32,24 +38,13 @@ export default function Rock({ geometry }: IProps) {
     rock.current.rotation.set(clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0, clock.getElapsedTime() / 10.0);
   });
 
-  const textureUrl = "/textures/space.jpg";
-  const textureUrls = useMemo(() => [textureUrl, textureUrl, textureUrl, textureUrl, textureUrl, textureUrl], [textureUrl]);
-  const textureCube = useMemo(() => {
-    const cubeTextureLoader = new THREE.CubeTextureLoader();
-    const loadedTextureCube = cubeTextureLoader.load(textureUrls);
-    loadedTextureCube.wrapS = THREE.MirroredRepeatWrapping;
-    loadedTextureCube.wrapT = THREE.MirroredRepeatWrapping;
-    loadedTextureCube.mapping = THREE.CubeRefractionMapping;
-    return loadedTextureCube;
-  }, [textureUrls]);
-
   return (
     <>
       <ambientLight color={[1, 1, 1]} />
       <pointLight intensity={2} position={[-10, -10, -10]} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
       <mesh ref={rock} geometry={geometry}>
-        <meshPhongMaterial color={COLOR} envMap={textureCube} refractionRatio={0.7} reflectivity={1} flatShading={true} />
+        <meshPhongMaterial color="#fff" envMap={textureCube} refractionRatio={0.7} reflectivity={1} flatShading={true} />
       </mesh>
     </>
   );
