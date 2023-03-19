@@ -15,12 +15,14 @@ async function loadNetworkState() {
     "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
     "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
   ];
-  let balanceSum = 0;
-  for (const address of addresses) {
+  const balancePromises = addresses.map(async (address) => {
     const accountInfo = await api.query.system.account(address);
     const balance = Number(accountInfo.data.free.toString());
-    balanceSum += balance;
-  }
+    return balance;
+  });
+
+  const balances = await Promise.all(balancePromises);
+  const balanceSum = balances.reduce((acc, val) => acc + val, 0);
   const circulatingSupply = totalIssuanceNumber - balanceSum;
   const totalSupply = 1_000_000_000 * 1_000_000_000_000;
 
