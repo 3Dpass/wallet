@@ -21,11 +21,11 @@ export default function Block() {
 
   if (queryBlock.loading || queryLogs.loading) return <Spinner />;
   if (queryBlock.error || queryLogs.error) return <Error>Error loading block data, try to reload.</Error>;
-
+  const blockUrl = ExplorerUrl.block({ block });
   return (
     <Card>
       <div className="flex gap-4 mb-6">
-        <TitledValue title="Block" value={<Link to={ExplorerUrl.block({ block })}>{block}</Link>} fontMono={true} className="mr-4" />
+        <TitledValue title="Block" value={<Link to={blockUrl}>{block}</Link>} fontMono={true} className="mr-4" />
         <TitledValue title="Date" value={<Moment date={queryBlock.data.getBlock.datetime} format="lll Z" interval={0} />} />
       </div>
       <div className="flex gap-4 mb-3">
@@ -36,9 +36,9 @@ export default function Block() {
         <TitledValue title="Spec Version" value={queryBlock.data.getBlock.specVersion} fontMono={true} />
       </div>
       <div className="flex gap-4 mb-3">
-        <TitledValue title="Extrinsics" value={queryBlock.data.getBlock.countExtrinsics} fontMono={true} />
-        <TitledValue title="Events" value={queryBlock.data.getBlock.countEvents} fontMono={true} />
-        <TitledValue title="Logs" value={queryBlock.data.getBlock.countLogs} fontMono={true} />
+        <TitledValue title="Extrinsics" value={<Link to={blockUrl}>{queryBlock.data.getBlock.countExtrinsics}</Link>} fontMono={true} />
+        <TitledValue title="Events" value={<Link to={blockUrl}>{queryBlock.data.getBlock.countEvents}</Link>} fontMono={true} />
+        <TitledValue title="Logs" value={<Link to={blockUrl}>{queryBlock.data.getBlock.countLogs}</Link>} fontMono={true} />
       </div>
       <div className="flex flex-col gap-4 mt-6">
         {queryLogs.data.getLogs.objects.map((log) => (
