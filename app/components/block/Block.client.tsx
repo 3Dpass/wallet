@@ -33,15 +33,16 @@ export default function Block({ block }: IProps) {
       </code>
     </div>
   );
+  const blockNumber = block.block.header.number.toString();
   const objectBase64 = Buffer.from(block.objectObj).toString("base64");
   const downloadUrl = `data:text/plain;base64,${objectBase64}`;
-  const downloadFilename = `3dpass-${block.block.header.number.toString()}.obj`;
+  const downloadFilename = `3dpass-${blockNumber}.obj`;
 
   const [isFinalized, setIsFinalized] = useState(false);
-
+   
   useEffect(() => {
-    setIsFinalized(block.block.header.number.toNumber() <= bestNumberFinalized);
-  }, [bestNumberFinalized, block.block.header.number.toNumber()]);
+    setIsFinalized(blockNumber <= bestNumberFinalized);
+  }, [bestNumberFinalized, blockNumber]);
 
   return (
     <Card elevation={Elevation.ZERO}>
@@ -51,13 +52,13 @@ export default function Block({ block }: IProps) {
           value={
             isFinalized ? (
               <span>
-                <Link to={`/block/${block.block.header.number.toNumber()}`} target="_blank" rel="noopener noreferrer">
-                  {block.block.header.number.toNumber()}
+                <Link to={`/block/${blockNumber}`} target="_blank" rel="noopener noreferrer">
+                  {blockNumber}
                 </Link>{" "}
                 Finalized
               </span>
             ) : (
-              `${block.block.header.number.toNumber()} not Finalized`
+              `${blockNumber} not Finalized`
             )
           }
         />
