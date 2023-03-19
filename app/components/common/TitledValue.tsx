@@ -9,7 +9,7 @@ export default function TitledValue({ title, value, fontMono = false, fontSmall 
 
   return (
     <div {...attrs}>
-      <div className="text-sm text-gray-500">{title}</div>
+      <div className="small-title">{title}</div>
       <div className={valueClassName}>{value}</div>
     </div>
   );

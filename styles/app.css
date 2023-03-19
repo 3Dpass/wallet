@@ -8,3 +8,9 @@
 body {
   background: #2f343c;
 }
+
+@layer components {
+  .small-title {
+    @apply text-sm text-gray-500;
+  }
+}

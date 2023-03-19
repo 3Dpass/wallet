@@ -6,7 +6,7 @@ import Rock from "./Rock.client";
 import TitledValue from "../common/TitledValue";
 import type { IBlock } from "../types";
 import { Buffer } from "buffer";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { bestNumberFinalizedAtom } from "../../atoms";
 
 const Canvas = lazy(() => import("@react-three/fiber").then((module) => ({ default: module.Canvas })));
@@ -16,8 +16,7 @@ interface IProps {
 }
 
 export default function Block({ block }: IProps) {
-  const [bestNumberFinalizedd] = useAtom(bestNumberFinalizedAtom);
-  const bestNumberFinalized = parseInt(bestNumberFinalizedd.toString().replace(/,/g, ""));
+  const bestNumberFinalized = useAtomValue(bestNumberFinalizedAtom);
   const objectHashAlgo = Buffer.from(block.objectHashAlgo, "hex").toString("utf8");
   const objectHashPopover = (
     <div className="p-4">
@@ -55,11 +54,12 @@ export default function Block({ block }: IProps) {
                 <Link to={`/block/${blockNumber}`} target="_blank" rel="noopener noreferrer">
                   {blockNumber}
                 </Link>{" "}
-                <TitledValue title="Finalized" />
+                <div className="small-title">✓ Finalized</div>
               </span>
             ) : (
               <span>
-                {blockNumber} <TitledValue title="not Finalized" />
+                {blockNumber}
+                <div className="small-title">Not finalized</div>
               </span>
             )
           }
