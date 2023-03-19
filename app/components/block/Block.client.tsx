@@ -33,13 +33,13 @@ export default function Block({ block }: IProps) {
       </code>
     </div>
   );
-  const blockNumber = block.block.header.number.toString();
+  const blockNumber = block.block.header.number.toNumber();
   const objectBase64 = Buffer.from(block.objectObj).toString("base64");
   const downloadUrl = `data:text/plain;base64,${objectBase64}`;
-  const downloadFilename = `3dpass-${blockNumber}.obj`;
+  const downloadFilename = `3dpass-${block.block.header.number.toString()}.obj`;
 
   const [isFinalized, setIsFinalized] = useState(false);
-   
+
   useEffect(() => {
     setIsFinalized(blockNumber <= bestNumberFinalized);
   }, [bestNumberFinalized, blockNumber]);
