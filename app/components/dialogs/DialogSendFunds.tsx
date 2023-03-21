@@ -7,7 +7,7 @@ import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
 import type { SignerOptions } from "@polkadot/api/types";
-import { signTx } from "../../utils/sign";
+import { signAndSend } from "../../utils/sign";
 
 type IProps = {
   pair: KeyringPair;
@@ -71,7 +71,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
       if (tips > 0) {
         options.tip = tips.toString();
       }
-      await signTx(tx, pair, options);
+      await signAndSend(tx, pair, options);
       toaster &&
         toaster.show({
           icon: "endorsed",

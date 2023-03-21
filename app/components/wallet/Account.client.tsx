@@ -12,7 +12,7 @@ import { AddressItem } from "../common/AddressItem";
 import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
-import { signTx } from "../../utils/sign";
+import { signAndSend } from "../../utils/sign";
 
 type IProps = {
   pair: KeyringPair;
@@ -91,13 +91,13 @@ export default function Account({ pair }: IProps) {
       return;
     }
     try {
+      let tx;
       if (isMainnet) {
-        const tx = api.tx.rewards.unlock();
-        await signTx(tx, pair);
+        tx = api.tx.rewards.unlock();
       } else {
-        const tx = api.tx.rewards.unlock(pair.address);
-        await signTx(tx, pair);
+        tx = api.tx.rewards.unlock(pair.address);
       }
+      await signAndSend(tx, pair);
       toaster &&
         toaster.show({
           icon: "tick",

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AmountInput from "../common/AmountInput";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
-import { signTx } from "../../utils/sign";
+import { signAndSend } from "../../utils/sign";
 
 type IProps = {
   pair: KeyringPair;
@@ -81,7 +81,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
     try {
       const value = BigInt(data.amount_number * 1_000_000_000_000);
       const tx = api.tx.validatorSet.lock(value, data.block_number, data.auto_extend ?? autoExtendPeriod);
-      await signTx(tx, pair);
+      await signAndSend(tx, pair);
       toaster &&
         toaster.show({
           icon: "endorsed",

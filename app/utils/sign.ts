@@ -7,7 +7,7 @@ type Options = {
   signer?: Signer;
 };
 
-export async function signTx(tx: SubmittableExtrinsic, pair: KeyringPair, options: Options = {}) {
+export async function signAndSend(tx: SubmittableExtrinsic, pair: KeyringPair, options: Options = {}) {
   options = options || {};
   if (pair.meta.isInjected) {
     const injected = await web3FromAddress(pair.address);
