@@ -1,9 +1,10 @@
-import { Button, Classes, Dialog, Intent, NumericInput, Tag } from "@blueprintjs/core";
+import { Button, Checkbox, Classes, Dialog, Intent, NumericInput, Tag } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
 import AmountInput from "../common/AmountInput";
 import { useAtomValue } from "jotai";
 import { apiAtom, toasterAtom } from "../../atoms";
+import { signTx } from "../../utils/sign";
 
 type IProps = {
   pair: KeyringPair;
@@ -11,6 +12,8 @@ type IProps = {
   onClose: () => void;
   onAfterSubmit: () => void;
 };
+
+const autoExtendPeriod = 45000;
 
 export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
   const api = useAtomValue(apiAtom);
@@ -24,6 +27,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
     block: "",
     block_number: 0,
     current_block: null,
+    auto_extend: false,
   };
   const [data, setData] = useState(dataInitial);
 
@@ -43,7 +47,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
       }
       const bestNumber = await api.derive.chain.bestNumber();
       const blockNumber = bestNumber.toJSON();
-      setData((prev) => ({ ...prev, current_block: blockNumber, block: blockNumber + 1, block_number: blockNumber + 1 }));
+      setData((prev) => ({ ...prev, current_block: blockNumber, block: blockNumber + autoExtendPeriod, block_number: blockNumber + autoExtendPeriod }));
     }
 
     load().then();
@@ -54,7 +58,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
     if (!isOpen || !api) {
       return;
     }
-    setCanSubmit(data.amount_number > 0 && data.block_number > data.current_block);
+    setCanSubmit(data.amount_number > 0 && data.block_number >= data.current_block + autoExtendPeriod);
   }, [isOpen, api, data]);
 
   function handleAmountChange(valueAsNumber, valueAsString) {
@@ -65,14 +69,19 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
     setData((prev) => ({ ...prev, block: valueAsString, block_number: valueAsNumber }));
   }
 
+  function handleAutoExtendChange() {
+    setData((prev) => ({ ...prev, auto_extend: !prev.auto_extend }));
+  }
+
   async function handleSubmitClick() {
-    if (!api || pair.isLocked) {
+    if (!api) {
       return;
     }
     setIsLoading(true);
     try {
       const value = BigInt(data.amount_number * 1_000_000_000_000);
-      await api.tx.rewards.lock(value, data.block_number).signAndSend(pair);
+      const tx = api.tx.validatorSet.lock(value, data.block_number, data.auto_extend ?? autoExtendPeriod);
+      await signTx(tx, pair);
       toaster &&
         toaster.show({
           icon: "endorsed",
@@ -94,7 +103,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
 
   return (
     <Dialog isOpen={isOpen} usePortal={true} onClose={onClose} onOpening={handleOnOpening} className="w-[90%] sm:w-[640px]">
-      <div className={Classes.DIALOG_BODY}>
+      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
         <NumericInput
           disabled={isLoading}
@@ -107,6 +116,9 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
           value={data.block}
           rightElement={<Tag minimal={true}>Block Number</Tag>}
         />
+        <Checkbox checked={data.auto_extend} large={true} onChange={handleAutoExtendChange}>
+          Automatically extend each {autoExtendPeriod} blocks
+        </Checkbox>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>

@@ -173,7 +173,7 @@ export default function Account({ pair }: IProps) {
                 onClick={handleUnlockFundsClick}
                 disabled={balances.lockedBalance.toBigInt() <= 0 || pair.isLocked}
               />
-              <Button icon="lock" text="Lock funds..." onClick={handleLockFundsClick} disabled={pair.isLocked} />
+              <Button icon="lock" text="Lock funds..." onClick={handleLockFundsClick} disabled={pair.isLocked && !pair.meta.isInjected} />
             </div>
           </>
         )}
