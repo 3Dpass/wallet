@@ -95,11 +95,11 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
 
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
-      <div className={Classes.DIALOG_BODY}>
+      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <InputGroup
           disabled={isLoading}
           large={true}
-          className="font-mono mb-2"
+          className="font-mono"
           spellCheck={false}
           placeholder="Enter address to send to"
           onChange={(e) => setData((prev) => ({ ...prev, address: e.target.value }))}

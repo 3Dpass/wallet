@@ -40,18 +40,18 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Unlock account">
-      <div className={Classes.DIALOG_BODY}>
+      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <InputGroup
           type="password"
           large={true}
-          className="font-mono mb-2"
+          className="font-mono"
           spellCheck={false}
           placeholder="Passphrase"
           onChange={(e) => setPassphrase(e.target.value)}
           value={passphrase}
           leftElement={<Icon icon="lock" />}
           onKeyUp={(e) => {
-            if (e.key === 'Enter') {
+            if (e.key === "Enter") {
               handleSendClick();
             }
           }}

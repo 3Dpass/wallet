@@ -26,7 +26,7 @@ export default function DialogSettings({ isOpen, onClose }) {
   return (
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
-        <div className={Classes.DIALOG_BODY}>
+        <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
           <TitledValue
             title="RPC API"
             value={
@@ -37,7 +37,6 @@ export default function DialogSettings({ isOpen, onClose }) {
               />
             }
             fontMono={true}
-            className="mb-4"
           />
           <TitledValue
             title="Explorer GraphQL"

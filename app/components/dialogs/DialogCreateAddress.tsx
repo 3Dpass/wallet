@@ -45,10 +45,10 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
   return (
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
-        <div className={Classes.DIALOG_BODY}>
+        <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
           <TitledValue title="Address" value={data.address} fontMono={true} />
-          <div className="text-gray-500 my-3">Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.</div>
-          <Card className="mb-2">
+          <div className="text-gray-500">Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.</div>
+          <Card>
             <div className="text-center font-mono text-xl">{data.mnemonic}</div>
             <div className="text-center mt-4">
               <Button icon="duplicate" text="Copy" onClick={handleCopy} />
@@ -57,7 +57,7 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
           <InputGroup
             type="password"
             large={true}
-            className="font-mono mb-2"
+            className="font-mono"
             spellCheck={false}
             placeholder="Passphrase"
             onChange={(e) => setData((prev) => ({ ...prev, passphrase: e.target.value }))}

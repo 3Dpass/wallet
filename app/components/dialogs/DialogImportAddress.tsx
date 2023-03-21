@@ -36,10 +36,10 @@ export default function DialogImportAddress({ isOpen, showPassword, onImport, on
   return (
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
-        <div className={Classes.DIALOG_BODY}>
+        <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
           <TextArea className="w-full font-mono" rows={5} onChange={handleSeedPhraseChange} value={data.seed_phrase} />
           {canPaste && (
-            <div className="text-center mt-4">
+            <div className="text-center">
               <Button icon="clipboard" text="Paste" onClick={handlePaste} />
             </div>
           )}
@@ -47,7 +47,7 @@ export default function DialogImportAddress({ isOpen, showPassword, onImport, on
             <InputGroup
               type="password"
               large={true}
-              className="font-mono my-2"
+              className="font-mono"
               spellCheck={false}
               placeholder="Passphrase"
               onChange={(e) => setData((prev) => ({ ...prev, passphrase: e.target.value }))}
