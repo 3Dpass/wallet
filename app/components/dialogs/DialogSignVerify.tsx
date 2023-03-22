@@ -90,10 +90,10 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             intent: Intent.SUCCESS,
             message: "Signature is valid",
           });
-          setFormattedMessage(
-            `-- Start message --\n${address} ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --`
-          );
-          setShowFormattedMessage(true);
+        setFormattedMessage(
+          `-- Start message --\n${address} ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --`
+        );
+        setShowFormattedMessage(true);
       } else {
         toaster &&
           toaster.show({
@@ -125,13 +125,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
   return (
     <>
-      <Dialog
-        isOpen={isOpen}
-        onClose={onClose}
-        onOpening={handleOnOpening}
-        title="Sign and Verify Message"
-        style={{ width: "550px" }}
-      >
+      <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Sign and Verify Message" style={{ width: "550px" }}>
         <div className={Classes.DIALOG_BODY}>
           <h6>Address</h6>
           <InputGroup
@@ -173,30 +167,25 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
           </div>
         </div>
       </Dialog>
-      <Dialog
-      isOpen={showFormattedMessage}
-      onClose={() => setShowFormattedMessage(false)}
-      title="Formatted Message"
-      style={{ width: "550px" }}
-    >
-      <div className={Classes.DIALOG_BODY}>
-        <pre
-          style={{
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
-            textAlign: 'center',
-          }}
-        >
-          {formattedMessage}
-        </pre>
-      </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={() => setShowFormattedMessage(false)} text="Close" />
-          <Button intent={Intent.PRIMARY} onClick={copyFormattedMessage} text="Copy" />
+      <Dialog isOpen={showFormattedMessage} onClose={() => setShowFormattedMessage(false)} title="Formatted Message" style={{ width: "550px" }}>
+        <div className={Classes.DIALOG_BODY}>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              wordWrap: "break-word",
+              textAlign: "center",
+            }}
+          >
+            {formattedMessage}
+          </pre>
         </div>
-      </div>
-    </Dialog>
-  </>
-);
+        <div className={Classes.DIALOG_FOOTER}>
+          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+            <Button onClick={() => setShowFormattedMessage(false)} text="Close" />
+            <Button intent={Intent.PRIMARY} onClick={copyFormattedMessage} text="Copy" />
+          </div>
+        </div>
+      </Dialog>
+    </>
+  );
 }
