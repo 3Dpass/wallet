@@ -13,6 +13,7 @@ import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
+import { signAndSend } from "../../utils/sign";
 
 
 type IProps = {
@@ -93,11 +94,13 @@ export default function Account({ pair }: IProps) {
       return;
     }
     try {
+      let tx;
       if (isMainnet) {
-        await api.tx.rewards.unlock().signAndSend(pair);
+        tx = api.tx.rewards.unlock();
       } else {
-        await api.tx.rewards.unlock(pair.address).signAndSend(pair);
+        tx = api.tx.rewards.unlock(pair.address);
       }
+      await signAndSend(tx, pair);
       toaster &&
         toaster.show({
           icon: "tick",
@@ -173,9 +176,9 @@ export default function Account({ pair }: IProps) {
                 icon="unlock"
                 text="Unlock mined"
                 onClick={handleUnlockFundsClick}
-                disabled={balances.lockedBalance.toBigInt() <= 0 || pair.isLocked}
+                disabled={balances.lockedBalance.toBigInt() <= 0 || (pair.isLocked && !pair.meta.isInjected)}
               />
-              <Button icon="lock" text="Lock funds..." onClick={handleLockFundsClick} disabled={pair.isLocked} />
+              <Button icon="lock" text="Lock funds..." onClick={handleLockFundsClick} disabled={pair.isLocked && !pair.meta.isInjected} />
             </div>
           </>
         )}

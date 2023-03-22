@@ -7,7 +7,7 @@ import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
 import type { SignerOptions } from "@polkadot/api/types";
-import { web3FromAddress } from "@polkadot/extension-dapp/bundle";
+import { signAndSend } from "../../utils/sign";
 
 type IProps = {
   pair: KeyringPair;
@@ -71,11 +71,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
       if (tips > 0) {
         options.tip = tips.toString();
       }
-      if (pair.meta.isInjected) {
-        const injected = await web3FromAddress(pair.address);
-        options.signer = injected.signer;
-      }
-      await tx.signAndSend(options.signer ? pair.address : pair, options);
+      await signAndSend(tx, pair, options);
       toaster &&
         toaster.show({
           icon: "endorsed",
@@ -99,11 +95,11 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
 
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
-      <div className={Classes.DIALOG_BODY}>
+      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <InputGroup
           disabled={isLoading}
           large={true}
-          className="font-mono mb-2"
+          className="font-mono"
           spellCheck={false}
           placeholder="Enter address to send to"
           onChange={(e) => setData((prev) => ({ ...prev, address: e.target.value }))}

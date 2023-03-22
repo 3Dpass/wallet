@@ -28,7 +28,6 @@ export default function AmountInput({ disabled, onValueChange, placeholder }: IP
       disabled={disabled}
       selectAllOnFocus={true}
       buttonPosition={null}
-      className="mb-2"
       large={true}
       leftIcon="send-to"
       placeholder={placeholder || "Amount"}
