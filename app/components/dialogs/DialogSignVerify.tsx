@@ -83,19 +83,12 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       if (messageType === "verify") {
         // Extract message and signedMessage from pastedData
         const messageRegex = /--\s*Start message\s*--\n?([\s\S]*?)\n?--\s*End message\s*--/g;
-const signatureRegex = /--\s*Start P3D wallet signature\s*--\n?([\s\S]*?)\n?--\s*End P3D wallet signature\s*--/g;
-const publicKeyRegex = /--\s*Start public key\s*--\n?([\s\S]*?)\n?--\s*End public key\s*--/g;
-
-        console.log("Message matchR:", messageRegex);
-console.log("Signature matchR:", signatureRegex);
-console.log("Public key matchR:", publicKeyRegex);
+        const signatureRegex = /--\s*Start P3D wallet signature\s*--\n?([\s\S]*?)\n?--\s*End P3D wallet signature\s*--/g;
+        const publicKeyRegex = /--\s*Start public key\s*--\n?([\s\S]*?)\n?--\s*End public key\s*--/g;
   
         const messageMatch = messageRegex.exec(pastedData);
         const signatureMatch = signatureRegex.exec(pastedData);
         const publicKeyMatch = publicKeyRegex.exec(pastedData);
-        console.log("Message match:", messageMatch);
-console.log("Signature match:", signatureMatch);
-console.log("Public key match:", publicKeyMatch);
         
         if (messageMatch && signatureMatch && publicKeyMatch) {
           const message = messageMatch[1].trim();
@@ -190,7 +183,7 @@ console.log("Public key match:", publicKeyMatch);
             disabled={false}
           />
           <h6>Message</h6>
-          {messageType === "sign" ? (
+          {messageType === "sign" && (
             <>
               <InputGroup
                 large={true}
