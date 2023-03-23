@@ -95,26 +95,15 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
           const message = messageMatch[1].trim();
           const signedMessage = signatureMatch[1].trim();
           const publicKey = publicKeyMatch[1].trim();
-          console.log("message: ", message);
-          console.log("signedMessage: ", signedMessage);
-          console.log("publicKey: ", publicKey);
 
-          // Convert hex signatures to U8a
           const signatureU8a = hexToU8a(signedMessage);
           const messageHash = blake2AsHex(message, 256);
           const publicKeyU8a = hexToU8a(publicKey);
 
-          // Call the verification function with extracted data
           const isSigned = await signatureVerify(messageHash, signatureU8a, publicKeyU8a);
 
           if (isSigned.isValid) {
             setIsSignatureValid(true);
-            toaster &&
-              toaster.show({
-                icon: "endorsed",
-                intent: Intent.SUCCESS,
-                message: "Signature is valid",
-              });
           } else {
             setIsSignatureValid(false);
             toaster &&
@@ -156,7 +145,6 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       try {
         const text = await navigator.clipboard.readText();
         setPastedData(text);
-        console.log("Pasted text:", text);
       } catch (err) {
         console.error("Failed to paste content: ", err);
       }
@@ -249,7 +237,6 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                   value={pastedData}
                   onChange={(e) => setPastedData(e.target.value)}
                 />
-
                 <Button
                   className="bp3-dark"
                   onClick={handlePasteClick}
@@ -267,7 +254,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                     {isSignatureValid && messageType === "verify" && (
                       <>
                         <Icon className="verified-icon" icon="endorsed" intent={Intent.SUCCESS} />
-                        <span className="verified-text">Verified!</span>
+                        <span style={{ paddingLeft: "5px" }} className="verified-text"> Verified!</span>
                       </>
                     )}
                   </div>
