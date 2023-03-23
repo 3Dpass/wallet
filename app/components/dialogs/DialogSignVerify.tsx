@@ -254,7 +254,10 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                     {isSignatureValid && messageType === "verify" && (
                       <>
                         <Icon className="verified-icon" icon="endorsed" intent={Intent.SUCCESS} />
-                        <span style={{ paddingLeft: "5px" }} className="verified-text"> Verified!</span>
+                        <span style={{ paddingLeft: "5px" }} className="verified-text">
+                          {" "}
+                          Verified!
+                        </span>
                       </>
                     )}
                   </div>
