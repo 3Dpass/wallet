@@ -23,6 +23,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const [formattedMessage, setFormattedMessage] = useState("");
   const [messageType, setMessageType] = useState("sign");
   const [pastedData, setPastedData] = useState("");
+  const [isSignatureValid, setIsSignatureValid] = useState(false);
 
   function handleOnOpening() {
     setMessage("");
@@ -85,28 +86,29 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         const messageRegex = /--\s*Start message\s*--\n?([\s\S]*?)\n?--\s*End message\s*--/g;
         const signatureRegex = /--\s*Start P3D wallet signature\s*--\n?([\s\S]*?)\n?--\s*End P3D wallet signature\s*--/g;
         const publicKeyRegex = /--\s*Start public key\s*--\n?([\s\S]*?)\n?--\s*End public key\s*--/g;
-  
+
         const messageMatch = messageRegex.exec(pastedData);
         const signatureMatch = signatureRegex.exec(pastedData);
         const publicKeyMatch = publicKeyRegex.exec(pastedData);
-        
+
         if (messageMatch && signatureMatch && publicKeyMatch) {
           const message = messageMatch[1].trim();
           const signedMessage = signatureMatch[1].trim();
           const publicKey = publicKeyMatch[1].trim();
           console.log("message: ", message);
           console.log("signedMessage: ", signedMessage);
-          console.log("publicKey: ", publicKey );
-  
+          console.log("publicKey: ", publicKey);
+
           // Convert hex signatures to U8a
           const signatureU8a = hexToU8a(signedMessage);
           const messageHash = blake2AsHex(message, 256);
           const publicKeyU8a = hexToU8a(publicKey);
-  
+
           // Call the verification function with extracted data
           const isSigned = await signatureVerify(messageHash, signatureU8a, publicKeyU8a);
-  
+
           if (isSigned.isValid) {
+            setIsSignatureValid(true);
             toaster &&
               toaster.show({
                 icon: "endorsed",
@@ -114,6 +116,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                 message: "Signature is valid",
               });
           } else {
+            setIsSignatureValid(false);
             toaster &&
               toaster.show({
                 icon: "error",
@@ -136,9 +139,8 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   }
   const handleCopyClick = () => {
     const messageToCopy =
-  setFormattedMessage &&
-  `-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`;
-
+      setFormattedMessage &&
+      `-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`;
 
     navigator.clipboard.writeText(messageToCopy).then(() => {
       toaster.show({
@@ -171,19 +173,23 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
               <Radio label="Verify" value="verify" />
             </RadioGroup>
           </div>
-          <h6>Address</h6>
-          <InputGroup
-            large={true}
-            className="mb-2"
-            spellCheck={false}
-            placeholder="Address"
-            onChange={(e) => setAddress(e.target.value)}
-            value={address}
-            leftElement={<Icon icon="credit-card" />}
-            disabled={false}
-          />
-          <h6>Message</h6>
           {messageType === "sign" && (
+            <>
+              <h6>Address</h6>
+              <InputGroup
+                large={true}
+                className="mb-2"
+                spellCheck={false}
+                placeholder="Address"
+                onChange={(e) => setAddress(e.target.value)}
+                value={address}
+                leftElement={<Icon icon="credit-card" />}
+                disabled={false}
+              />
+            </>
+          )}
+          <h6>Message</h6>
+          {messageType === "sign" ? (
             <>
               <InputGroup
                 large={true}
@@ -217,8 +223,8 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                   text="Copy"
                   style={{
                     position: "absolute",
-                    bottom: "10px",
-                    right: "10px",
+                    bottom: "5px",
+                    right: "25px",
                   }}
                 />
               </div>
@@ -231,29 +237,44 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             </>
           ) : (
             <>
-              <TextArea
-                className="bp4-code-block bp4-docs-code-block blueprint-dark"
-                style={{
-                  height: "220px",
-                  width: "100%",
-                  padding: "10px",
-                  textAlign: "left",
-                }}
-                value={pastedData}
-                onChange={(e) => setPastedData(e.target.value)}
-              />
-              <Button
-                intent={Intent.PRIMARY}
-                onClick={handlePasteClick}
-                text="Paste"
-                style={{
-                  marginTop: "10px",
-                }}
-              />
+              <div style={{ position: "relative" }}>
+                <TextArea
+                  className="bp4-code-block bp4-docs-code-block blueprint-dark"
+                  style={{
+                    height: "220px",
+                    width: "100%",
+                    padding: "10px",
+                    textAlign: "left",
+                  }}
+                  value={pastedData}
+                  onChange={(e) => setPastedData(e.target.value)}
+                />
+
+                <Button
+                  className="bp3-dark"
+                  onClick={handlePasteClick}
+                  text="Paste"
+                  style={{
+                    position: "absolute",
+                    bottom: "5px",
+                    right: "22px",
+                  }}
+                />
+              </div>
               <div className={Classes.DIALOG_FOOTER}>
-                <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-                  <Button onClick={onClose} text="Cancel" />
-                  <Button intent={Intent.PRIMARY} onClick={handleVerifyClick} text="Verify" />
+                <div className={`${Classes.DIALOG_FOOTER_ACTIONS} footer-actions`}>
+                  <div>
+                    {isSignatureValid && messageType === "verify" && (
+                      <>
+                        <Icon className="verified-icon" icon="endorsed" intent={Intent.SUCCESS} />
+                        <span className="verified-text">Verified!</span>
+                      </>
+                    )}
+                  </div>
+                  <div>
+                    <Button onClick={onClose} text="Cancel" />
+                    <Button intent={Intent.PRIMARY} onClick={handleVerifyClick} text="Verify" />
+                  </div>
                 </div>
               </div>
             </>
