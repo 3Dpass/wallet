@@ -87,7 +87,7 @@ export default function Account({ pair }: IProps) {
   }
 
   async function handleUnlockFundsClick() {
-    if (!api || pair.isLocked) {
+    if (!api) {
       return;
     }
     try {
