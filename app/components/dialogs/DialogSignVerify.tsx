@@ -6,7 +6,7 @@ import { u8aToHex, hexToU8a } from "@polkadot/util";
 import { keyring } from "@polkadot/ui-keyring";
 import { toasterAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 type IProps = {
   pair: KeyringPair;
@@ -127,9 +127,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     }
   }
   const handleCopyClick = () => {
-    const messageToCopy =
-      setFormattedMessage &&
-      `-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`;
+    const messageToCopy = `-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`;
 
     navigator.clipboard.writeText(messageToCopy).then(() => {
       toaster.show({
@@ -139,7 +137,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       });
     });
   };
-  const textareaRef = useRef();
+
   const handlePasteClick = async () => {
     if (messageType === "verify") {
       try {
@@ -190,31 +188,16 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                 disabled={false}
               />
               <h6>Signed message</h6>
-              <div style={{ position: "relative" }}>
+              <div className="relative">
                 <TextArea
-                  className="bp4-code-block bp4-docs-code-block blueprint-dark"
-                  style={{
-                    height: "220px",
-                    width: "100%",
-                    padding: "10px",
-                    textAlign: "left",
-                  }}
+                  className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
                   readOnly
                   value={
                     setFormattedMessage &&
                     `-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`
                   }
                 />
-                <Button
-                  className="bp3-dark"
-                  onClick={handleCopyClick}
-                  text="Copy"
-                  style={{
-                    position: "absolute",
-                    bottom: "5px",
-                    right: "25px",
-                  }}
-                />
+                <Button className="bp3-dark absolute bottom-2 right-8" onClick={handleCopyClick} text="Copy" />
               </div>
               <div className={Classes.DIALOG_FOOTER}>
                 <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -225,39 +208,21 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             </>
           ) : (
             <>
-              <div style={{ position: "relative" }}>
+              <div className="relative">
                 <TextArea
-                  className="bp4-code-block bp4-docs-code-block blueprint-dark"
-                  style={{
-                    height: "220px",
-                    width: "100%",
-                    padding: "10px",
-                    textAlign: "left",
-                  }}
+                  className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
                   value={pastedData}
                   onChange={(e) => setPastedData(e.target.value)}
                 />
-                <Button
-                  className="bp3-dark"
-                  onClick={handlePasteClick}
-                  text="Paste"
-                  style={{
-                    position: "absolute",
-                    bottom: "5px",
-                    right: "22px",
-                  }}
-                />
+                <Button className="bp3-dark absolute bottom-2 right-8" onClick={handlePasteClick} text="Paste" />
               </div>
               <div className={Classes.DIALOG_FOOTER}>
-                <div className={`${Classes.DIALOG_FOOTER_ACTIONS} footer-actions`}>
+                <div className="flex justify-between items-center footer-actions">
                   <div>
                     {isSignatureValid && messageType === "verify" && (
                       <>
                         <Icon className="verified-icon" icon="endorsed" intent={Intent.SUCCESS} />
-                        <span style={{ paddingLeft: "5px" }} className="verified-text">
-                          {" "}
-                          Verified!
-                        </span>
+                        <span className="pl-2 text-white font-bold text-lg verified-text">Verified!</span>
                       </>
                     )}
                   </div>

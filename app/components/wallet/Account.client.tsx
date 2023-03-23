@@ -15,7 +15,6 @@ import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 
-
 type IProps = {
   pair: KeyringPair;
 };
@@ -25,7 +24,6 @@ export default function Account({ pair }: IProps) {
   const toaster = useAtomValue(toasterAtom);
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const dialogsInitial = {
     send: false,
@@ -121,7 +119,7 @@ export default function Account({ pair }: IProps) {
     dialogToggle("lock_funds");
   }
   function handleSignVerify() {
-    setIsDialogOpen(true);
+    dialogToggle("sign_verify");
   }
 
   const dialogElements = (
@@ -143,11 +141,15 @@ export default function Account({ pair }: IProps) {
       </Alert>
       <DialogSendFunds pair={pair} isOpen={dialogs.send} onAfterSubmit={() => dialogToggle("send")} onClose={() => dialogToggle("send")} />
       <DialogUnlockAccount pair={pair} isOpen={dialogs.unlock} onClose={() => dialogToggle("unlock")} />
-      <DialogLockFunds pair={pair} isOpen={dialogs.lock_funds} onAfterSubmit={() => dialogToggle("lock_funds")} onClose={() => dialogToggle("lock_funds")}
+      <DialogLockFunds
+        pair={pair}
+        isOpen={dialogs.lock_funds}
+        onAfterSubmit={() => dialogToggle("lock_funds")}
+        onClose={() => dialogToggle("lock_funds")}
       />
     </>
   );
-  
+
   return (
     <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
       {dialogElements}
@@ -195,7 +197,7 @@ export default function Account({ pair }: IProps) {
           <div className="grid grid-cols-3 gap-1">
             <Button icon="duplicate" text="Sign and Verify" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
           </div>
-          <DialogSignAndVerify isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} pair={pair} />
+          <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
         </>
       </div>
       {pair.meta.isInjected && (

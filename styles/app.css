@@ -14,18 +14,3 @@ body {
     @apply text-sm text-gray-500;
   }
 }
-.footer-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.footer-actions .verified-text {
-  font-weight: bold;
-  font-size: 1.1em;
-  color: #FFFFFF;
-}
-
-.footer-actions .verified-icon {
-  font-size: 1.3em;
-}
