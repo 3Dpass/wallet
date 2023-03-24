@@ -23,7 +23,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const [formattedMessage, setFormattedMessage] = useState("");
   const [messageType, setMessageType] = useState("sign");
   const [pastedData, setPastedData] = useState("");
-  const [isSignatureValid, setIsSignatureValid] = useState(false);
+  const [isSignatureValid, setIsSignatureValid] = useState();
 
   function handleOnOpening() {
     setMessage("");
@@ -81,40 +81,29 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
   async function handleVerifyClick() {
     try {
-      if (messageType === "verify") {
-        // Extract message and signedMessage from pastedData
-        const messageRegex = /--\s*Start message\s*--\n?([\s\S]*?)\n?--\s*End message\s*--/g;
-        const signatureRegex = /--\s*Start P3D wallet signature\s*--\n?([\s\S]*?)\n?--\s*End P3D wallet signature\s*--/g;
-        const publicKeyRegex = /--\s*Start public key\s*--\n?([\s\S]*?)\n?--\s*End public key\s*--/g;
+      const messageRegex = /--\s*Start message\s*--\n?([\s\S]*?)\n?--\s*End message\s*--/g;
+      const signatureRegex = /--\s*Start P3D wallet signature\s*--\n?([\s\S]*?)\n?--\s*End P3D wallet signature\s*--/g;
+      const publicKeyRegex = /--\s*Start public key\s*--\n?([\s\S]*?)\n?--\s*End public key\s*--/g;
 
-        const messageMatch = messageRegex.exec(pastedData);
-        const signatureMatch = signatureRegex.exec(pastedData);
-        const publicKeyMatch = publicKeyRegex.exec(pastedData);
+      const messageMatch = messageRegex.exec(pastedData);
+      const signatureMatch = signatureRegex.exec(pastedData);
+      const publicKeyMatch = publicKeyRegex.exec(pastedData);
 
-        if (messageMatch && signatureMatch && publicKeyMatch) {
-          const message = messageMatch[1].trim();
-          const signedMessage = signatureMatch[1].trim();
-          const publicKey = publicKeyMatch[1].trim();
+      if (messageMatch && signatureMatch && publicKeyMatch) {
+        const message = messageMatch[1].trim();
+        const signedMessage = signatureMatch[1].trim();
+        const publicKey = publicKeyMatch[1].trim();
 
-          const signatureU8a = hexToU8a(signedMessage);
-          const messageHash = blake2AsHex(message, 256);
-          const publicKeyU8a = hexToU8a(publicKey);
+        const signatureU8a = hexToU8a(signedMessage);
+        const messageHash = blake2AsHex(message, 256);
+        const publicKeyU8a = hexToU8a(publicKey);
 
-          const isSigned = await signatureVerify(messageHash, signatureU8a, publicKeyU8a);
+        const isSigned = await signatureVerify(messageHash, signatureU8a, publicKeyU8a);
 
-          if (isSigned.isValid) {
-            setIsSignatureValid(true);
-          } else {
-            setIsSignatureValid(false);
-            toaster &&
-              toaster.show({
-                icon: "error",
-                intent: Intent.DANGER,
-                message: "Signature is invalid",
-              });
-          }
+        if (isSigned.isValid) {
+          setIsSignatureValid(true);
         } else {
-          console.error("Unable to extract message and signature from pasted data");
+          setIsSignatureValid(false);
         }
       }
     } catch (e) {
@@ -139,13 +128,16 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   };
 
   const handlePasteClick = async () => {
-    if (messageType === "verify") {
-      try {
-        const text = await navigator.clipboard.readText();
-        setPastedData(text);
-      } catch (err) {
-        console.error("Failed to paste content: ", err);
-      }
+    try {
+      const text = await navigator.clipboard.readText();
+      setPastedData(text);
+    } catch (err) {
+      toaster &&
+        toaster.show({
+          icon: "error",
+          intent: Intent.DANGER,
+          message: `Failed to paste content: ${err.message}`,
+        });
     }
   };
 
@@ -219,12 +211,17 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
               <div className={Classes.DIALOG_FOOTER}>
                 <div className="flex justify-between items-center footer-actions">
                   <div>
-                    {isSignatureValid && messageType === "verify" && (
+                    {isSignatureValid === true && messageType === "verify" ? (
                       <>
                         <Icon className="verified-icon" icon="endorsed" intent={Intent.SUCCESS} />
                         <span className="pl-2 text-white font-bold text-lg verified-text">Verified!</span>
                       </>
-                    )}
+                    ) : isSignatureValid === false ? (
+                      <>
+                        <Icon className="verified-icon" icon="warning-sign" intent={Intent.DANGER} />
+                        <span className="pl-2 text-white font-bold text-lg error-text">Invalid signature</span>
+                      </>
+                    ) : null}
                   </div>
                   <div>
                     <Button onClick={onClose} text="Cancel" />

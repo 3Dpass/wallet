@@ -30,6 +30,7 @@ export default function Account({ pair }: IProps) {
     delete: false,
     unlock: false,
     lock_funds: false,
+    sign_verify: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
