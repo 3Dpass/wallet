@@ -23,7 +23,14 @@ async function loadNetworkState() {
 
   const balances = await Promise.all(balancePromises);
   const balanceSum = balances.reduce((acc, val) => acc + val, 0);
-  const circulatingSupply = totalIssuanceNumber - balanceSum;
+  const accounts = await api.query.system.account.entries();
+  const totalMiscFrozen = accounts.reduce(
+    (accumulator, [accountId, accountData]) => accumulator + parseFloat(accountData.data.miscFrozen.toHuman().replaceAll(",", "")),
+    0
+  );
+  const locked = totalMiscFrozen;
+
+  const circulatingSupply = totalIssuanceNumber - balanceSum - locked;
   const totalSupply = 1_000_000_000 * 1_000_000_000_000;
 
   return {
