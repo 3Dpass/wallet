@@ -20,7 +20,6 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const [signedMessage, setSignedMessage] = useState("");
   const [publicKey, setPublicKey] = useState("");
   const [address, setAddress] = useState("");
-  const [formattedMessage, setFormattedMessage] = useState("");
   const [messageType, setMessageType] = useState("sign");
   const [pastedData, setPastedData] = useState("");
   const [isSignatureValid, setIsSignatureValid] = useState();
@@ -100,11 +99,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
         const isSigned = await signatureVerify(messageHash, signatureU8a, publicKeyU8a);
 
-        if (isSigned.isValid) {
-          setIsSignatureValid(true);
-        } else {
-          setIsSignatureValid(false);
-        }
+        setIsSignatureValid(isSigned.isValid ? true : false);
       }
     } catch (e) {
       toaster &&
@@ -185,7 +180,6 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                   className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
                   readOnly
                   value={
-                    setFormattedMessage &&
                     `-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`
                   }
                 />
@@ -209,9 +203,9 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                 <Button className="bp3-dark absolute bottom-2 right-8" onClick={handlePasteClick} text="Paste" />
               </div>
               <div className={Classes.DIALOG_FOOTER}>
-                <div className="flex justify-between items-center footer-actions">
+                <div className="flex justify-between items-center">
                   <div>
-                    {isSignatureValid === true && messageType === "verify" ? (
+                    {isSignatureValid === true ? (
                       <>
                         <Icon className="verified-icon" icon="endorsed" intent={Intent.SUCCESS} />
                         <span className="pl-2 text-white font-bold text-lg verified-text">Verified!</span>
