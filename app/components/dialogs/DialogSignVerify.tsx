@@ -23,6 +23,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const [messageType, setMessageType] = useState("sign");
   const [pastedData, setPastedData] = useState("");
   const [isSignatureValid, setIsSignatureValid] = useState();
+  const [showValidationResults, setshowValidationResults] = useState(false);
 
   function handleOnOpening() {
     setMessage("");
@@ -99,7 +100,8 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
         const isSigned = await signatureVerify(messageHash, signatureU8a, publicKeyU8a);
 
-        setIsSignatureValid(isSigned.isValid ? true : false);
+        setIsSignatureValid(isSigned.isValid);
+        setshowValidationResults(true);
       }
     } catch (e) {
       toaster &&
@@ -140,7 +142,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     <>
       <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Sign and Verify Message" style={{ width: "550px" }}>
         <div className={Classes.DIALOG_BODY}>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div className="flex justify-end">
             <RadioGroup inline onChange={(e) => setMessageType(e.currentTarget.value)} selectedValue={messageType}>
               <Radio label="Sign" value="sign" />
               <Radio label="Verify" value="verify" />
@@ -179,9 +181,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                 <TextArea
                   className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
                   readOnly
-                  value={
-                    `-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`
-                  }
+                  value={`-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`}
                 />
                 <Button className="bp3-dark absolute bottom-2 right-8" onClick={handleCopyClick} text="Copy" />
               </div>
@@ -205,17 +205,18 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
               <div className={Classes.DIALOG_FOOTER}>
                 <div className="flex justify-between items-center">
                   <div>
-                    {isSignatureValid === true ? (
+                    {showValidationResults && isSignatureValid && (
                       <>
                         <Icon className="verified-icon" icon="endorsed" intent={Intent.SUCCESS} />
-                        <span className="pl-2 text-white font-bold text-lg verified-text">Verified!</span>
+                        <span className="pl-2 text-white font-bold">Verified!</span>
                       </>
-                    ) : isSignatureValid === false ? (
+                    )}
+                    {showValidationResults && !isSignatureValid && (
                       <>
                         <Icon className="verified-icon" icon="warning-sign" intent={Intent.DANGER} />
-                        <span className="pl-2 text-white font-bold text-lg error-text">Invalid signature</span>
+                        <span className="pl-2 text-white font-bold">Invalid signature</span>
                       </>
-                    ) : null}
+                    )}
                   </div>
                   <div>
                     <Button onClick={onClose} text="Cancel" />
