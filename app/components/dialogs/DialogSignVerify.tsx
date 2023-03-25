@@ -14,23 +14,35 @@ type IProps = {
   onClose: () => void;
 };
 
+type IData = {
+  pastedData: string;
+  isSignatureValid: boolean | undefined;
+  showValidationResults: boolean;
+  publicKey: string;
+  address: string;
+  messageType: "sign" | "verify";
+  signedMessage: string;
+  message: string;
+};
+
+const dataInitial: IData = {
+  pastedData: "",
+  isSignatureValid: undefined,
+  showValidationResults: false,
+  publicKey: "",
+  address: "",
+  messageType: "sign",
+  signedMessage: "",
+  message: "",
+};
+
 export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const toaster = useAtomValue(toasterAtom);
-  const [message, setMessage] = useState("");
-  const [signedMessage, setSignedMessage] = useState("");
-  const [publicKey, setPublicKey] = useState("");
-  const [address, setAddress] = useState("");
-  const [messageType, setMessageType] = useState("sign");
-  const [pastedData, setPastedData] = useState("");
-  const [isSignatureValid, setIsSignatureValid] = useState();
-  const [showValidationResults, setshowValidationResults] = useState(false);
+  const [data, setData] = useState<IData>(dataInitial);
 
   function handleOnOpening() {
-    setMessage("");
-    setSignedMessage("");
-    setPublicKey("");
-    setAddress(pair.address);
-    setMessageType("sign");
+    setData(dataInitial);
+    setData((prevState) => ({ ...prevState, address: pair.address }));
   }
 
   async function handleSignClick() {
@@ -42,10 +54,10 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         const injected = await web3FromSource(pair.meta.source);
         signer = injected.signer;
       } else {
-        signer = keyring.getPair(address);
+        signer = keyring.getPair(data.address);
       }
 
-      const messageHash = blake2AsHex(message, 256);
+      const messageHash = blake2AsHex(data.message, 256);
 
       let signature;
       if (pair.meta.isInjected) {
@@ -67,8 +79,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       }
 
       const signatureU8a = new Uint8Array(signature);
-      setSignedMessage(u8aToHex(signatureU8a));
-      setPublicKey(u8aToHex(publicKey));
+      setData((prevState) => ({
+        ...prevState,
+        signedMessage: u8aToHex(signatureU8a),
+        publicKey: u8aToHex(publicKey),
+      }));
     } catch (e) {
       toaster &&
         toaster.show({
@@ -85,9 +100,9 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       const signatureRegex = /--\s*Start P3D wallet signature\s*--\n?([\s\S]*?)\n?--\s*End P3D wallet signature\s*--/g;
       const publicKeyRegex = /--\s*Start public key\s*--\n?([\s\S]*?)\n?--\s*End public key\s*--/g;
 
-      const messageMatch = messageRegex.exec(pastedData);
-      const signatureMatch = signatureRegex.exec(pastedData);
-      const publicKeyMatch = publicKeyRegex.exec(pastedData);
+      const messageMatch = messageRegex.exec(data.pastedData);
+      const signatureMatch = signatureRegex.exec(data.pastedData);
+      const publicKeyMatch = publicKeyRegex.exec(data.pastedData);
 
       if (messageMatch && signatureMatch && publicKeyMatch) {
         const message = messageMatch[1].trim();
@@ -100,8 +115,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
         const isSigned = await signatureVerify(messageHash, signatureU8a, publicKeyU8a);
 
-        setIsSignatureValid(isSigned.isValid);
-        setshowValidationResults(true);
+        setData((prevState) => ({
+          ...prevState,
+          isSignatureValid: isSigned.isValid,
+          showValidationResults: true,
+        }));
       }
     } catch (e) {
       toaster &&
@@ -112,8 +130,9 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         });
     }
   }
+  const inputMessage = `-- Start message --\n ${data.message}\n-- End message --\n\n-- Start P3D wallet signature --\n${data.signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${data.publicKey}\n-- End public key --`;
   const handleCopyClick = () => {
-    const messageToCopy = `-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`;
+    const messageToCopy = inputMessage;
 
     navigator.clipboard.writeText(messageToCopy).then(() => {
       toaster.show({
@@ -125,17 +144,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   };
 
   const handlePasteClick = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      setPastedData(text);
-    } catch (err) {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: `Failed to paste content: ${err.message}`,
-        });
-    }
+    const text = await navigator.clipboard.readText();
+    setData((prevState) => ({
+      ...prevState,
+      pastedData: text,
+    }));
   };
 
   return (
@@ -143,12 +156,21 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Sign and Verify Message" style={{ width: "550px" }}>
         <div className={Classes.DIALOG_BODY}>
           <div className="flex justify-end">
-            <RadioGroup inline onChange={(e) => setMessageType(e.currentTarget.value)} selectedValue={messageType}>
+            <RadioGroup
+              inline
+              onChange={(e) =>
+                setData((prevState) => ({
+                  ...prevState,
+                  messageType: e.currentTarget.value,
+                }))
+              }
+              selectedValue={data.messageType}
+            >
               <Radio label="Sign" value="sign" />
               <Radio label="Verify" value="verify" />
             </RadioGroup>
           </div>
-          {messageType === "sign" && (
+          {data.messageType === "sign" && (
             <>
               <h6>Address</h6>
               <InputGroup
@@ -156,33 +178,39 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                 className="mb-2"
                 spellCheck={false}
                 placeholder="Address"
-                onChange={(e) => setAddress(e.target.value)}
-                value={address}
+                onChange={(e) =>
+                  setData((prevState) => ({
+                    ...prevState,
+                    address: e.target.value,
+                  }))
+                }
+                value={data.address}
                 leftElement={<Icon icon="credit-card" />}
                 disabled={false}
               />
             </>
           )}
           <h6>Message</h6>
-          {messageType === "sign" ? (
+          {data.messageType === "sign" ? (
             <>
               <InputGroup
                 large={true}
                 className="mb-2"
                 spellCheck={false}
                 placeholder="Message"
-                onChange={(e) => setMessage(e.target.value)}
-                value={message}
+                onChange={(e) =>
+                  setData((prevState) => ({
+                    ...prevState,
+                    message: e.target.value,
+                  }))
+                }
+                value={data.message}
                 leftElement={<Icon icon="edit" />}
                 disabled={false}
               />
               <h6>Signed message</h6>
               <div className="relative">
-                <TextArea
-                  className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
-                  readOnly
-                  value={`-- Start message --\n ${message}\n-- End message --\n\n-- Start P3D wallet signature --\n${signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${publicKey}\n-- End public key --`}
-                />
+                <TextArea className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left" readOnly value={inputMessage} />
                 <Button className="bp3-dark absolute bottom-2 right-8" onClick={handleCopyClick} text="Copy" />
               </div>
               <div className={Classes.DIALOG_FOOTER}>
@@ -197,23 +225,28 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
               <div className="relative">
                 <TextArea
                   className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
-                  value={pastedData}
-                  onChange={(e) => setPastedData(e.target.value)}
+                  value={data.pastedData}
+                  onChange={(e) =>
+                    setData((prevState) => ({
+                      ...prevState,
+                      pastedData: e.target.value,
+                    }))
+                  }
                 />
                 <Button className="bp3-dark absolute bottom-2 right-8" onClick={handlePasteClick} text="Paste" />
               </div>
               <div className={Classes.DIALOG_FOOTER}>
                 <div className="flex justify-between items-center">
                   <div>
-                    {showValidationResults && isSignatureValid && (
+                    {data.showValidationResults && data.isSignatureValid && (
                       <>
-                        <Icon className="verified-icon" icon="endorsed" intent={Intent.SUCCESS} />
+                        <Icon icon="endorsed" intent={Intent.SUCCESS} />
                         <span className="pl-2 text-white font-bold">Verified!</span>
                       </>
                     )}
-                    {showValidationResults && !isSignatureValid && (
+                    {data.showValidationResults && !data.isSignatureValid && (
                       <>
-                        <Icon className="verified-icon" icon="warning-sign" intent={Intent.DANGER} />
+                        <Icon icon="warning-sign" intent={Intent.DANGER} />
                         <span className="pl-2 text-white font-bold">Invalid signature</span>
                       </>
                     )}
