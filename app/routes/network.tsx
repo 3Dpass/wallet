@@ -10,10 +10,10 @@ async function loadNetworkState() {
 
   const totalIssuance = await api.query.balances.totalIssuance();
   const totalIssuanceNumber = BigInt(totalIssuance.toPrimitive() as number);
-  const totalSupply = BigInt(1_000_000_000 * 1_000_000_000_000);
+  const totalSupply = 1_000_000_000n * 1_000_000_000_000n;
 
-  let frozen = BigInt(0);
-  let circulating = BigInt(0);
+  let frozen = 0n;
+  let circulating = 0n;
   const accounts = await api.query.system.account.entries<AccountInfo>();
   accounts.map(([_, account]) => {
     const data = account.data as AccountData;
