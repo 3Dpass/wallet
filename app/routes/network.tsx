@@ -1,39 +1,36 @@
-import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { defaultEndpoint } from "../atoms";
 import { getApi, getProvider } from "../api";
+import type { AccountInfo } from "@polkadot/types/interfaces/system/types";
+import type { AccountData } from "@polkadot/types/interfaces";
 
 async function loadNetworkState() {
   const provider = getProvider(defaultEndpoint);
   const api = await getApi(provider);
+
   const totalIssuance = await api.query.balances.totalIssuance();
-  const totalIssuanceNumber = totalIssuance.toPrimitive() as number;
-  const addresses = [
-    "d1CNDotJXNPvnSA5EQXpSbkUyXBVmaggkARY7kcgXim4BqeBJ",
-    "d1GZ8GxP3KzKJGRYmp9HMwxurnSKx3ACcqeZqLY5kpbLEyjzE",
-    "d1GA9xWx3WgpQHp8LHCXHbYoZdvjY3NHhU6gR2fsdVCiC4TdF",
-    "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
-    "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
-  ];
-  const balancePromises = addresses.map(async (address) => {
-    const accountInfo = await api.query.system.account(address);
-    const balance = Number(accountInfo.data.free.toString());
-    return balance;
+  const totalIssuanceNumber = BigInt(totalIssuance.toPrimitive() as number);
+  const totalSupply = BigInt(1_000_000_000 * 1_000_000_000_000);
+
+  let frozen = BigInt(0);
+  let circulating = BigInt(0);
+  const accounts = await api.query.system.account.entries<AccountInfo>();
+  accounts.map(([_, account]) => {
+    const data = account.data as AccountData;
+    frozen += data.miscFrozen.toBigInt();
+    circulating += data.free.toBigInt();
+    return null;
   });
 
-  const balances = await Promise.all(balancePromises);
-  const balanceSum = balances.reduce((acc, val) => acc + val, 0);
-  const circulatingSupply = totalIssuanceNumber - balanceSum;
-  const totalSupply = 1_000_000_000 * 1_000_000_000_000;
-
   return {
-    totalIssuance: numberToString(totalIssuanceNumber),
-    circulatingSupply: numberToString(circulatingSupply),
-    totalSupply: numberToString(totalSupply),
+    totalIssuance: totalIssuanceNumber.toString(),
+    circulatingSupply: (circulating - frozen).toString(),
+    totalSupply: totalSupply.toString(),
   };
 }
 
-export async function loader({ params }: LoaderArgs) {
+// noinspection JSUnusedGlobalSymbols
+export async function loader() {
   const networkState = await loadNetworkState();
   return json(networkState, {
     headers: {
@@ -42,7 +39,3 @@ export async function loader({ params }: LoaderArgs) {
     },
   });
 }
-
-const numberToString = (number: number) => {
-  return number.toLocaleString("fullwide", { useGrouping: false });
-};
