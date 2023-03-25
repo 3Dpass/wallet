@@ -1,8 +1,8 @@
-import { Button, Classes, Dialog, Icon, InputGroup, Intent, RadioGroup, Radio, TextArea } from "@blueprintjs/core";
-import { cryptoWaitReady, blake2AsHex, signatureVerify, decodeAddress } from "@polkadot/util-crypto";
+import { Button, Classes, Dialog, Icon, InputGroup, Intent, Radio, RadioGroup, TextArea } from "@blueprintjs/core";
+import { blake2AsHex, cryptoWaitReady, decodeAddress, signatureVerify } from "@polkadot/util-crypto";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3FromSource } from "@polkadot/extension-dapp";
-import { u8aToHex, hexToU8a } from "@polkadot/util";
+import { hexToU8a, u8aToHex } from "@polkadot/util";
 import { keyring } from "@polkadot/ui-keyring";
 import { toasterAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
@@ -16,7 +16,7 @@ type IProps = {
 
 type IData = {
   pastedData: string;
-  isSignatureValid: boolean | undefined;
+  isSignatureValid: boolean;
   showValidationResults: boolean;
   publicKey: string;
   address: string;
@@ -25,24 +25,22 @@ type IData = {
   message: string;
 };
 
-const dataInitial: IData = {
-  pastedData: "",
-  isSignatureValid: undefined,
-  showValidationResults: false,
-  publicKey: "",
-  address: "",
-  messageType: "sign",
-  signedMessage: "",
-  message: "",
-};
-
 export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const toaster = useAtomValue(toasterAtom);
+  const dataInitial: IData = {
+    pastedData: "",
+    isSignatureValid: false,
+    showValidationResults: false,
+    publicKey: "",
+    address: pair.address,
+    messageType: "sign",
+    signedMessage: "",
+    message: "",
+  };
   const [data, setData] = useState<IData>(dataInitial);
 
   function handleOnOpening() {
     setData(dataInitial);
-    setData((prevState) => ({ ...prevState, address: pair.address }));
   }
 
   async function handleSignClick() {
@@ -71,7 +69,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         signature = await signer.sign(messageHash);
       }
 
-      let publicKey;
+      let publicKey: Uint8Array;
       if (pair.meta.isInjected) {
         publicKey = decodeAddress(pair.address);
       } else {
@@ -130,16 +128,16 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         });
     }
   }
-  const inputMessage = `-- Start message --\n ${data.message}\n-- End message --\n\n-- Start P3D wallet signature --\n${data.signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${data.publicKey}\n-- End public key --`;
-  const handleCopyClick = () => {
-    const messageToCopy = inputMessage;
 
-    navigator.clipboard.writeText(messageToCopy).then(() => {
-      toaster.show({
-        message: "Message copied to clipboard!",
-        intent: Intent.SUCCESS,
-        icon: "tick",
-      });
+  const inputMessage = `-- Start message --\n${data.message}\n-- End message --\n\n-- Start P3D wallet signature --\n${data.signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${data.publicKey}\n-- End public key --`;
+  const handleCopyClick = () => {
+    navigator.clipboard.writeText(inputMessage).then(() => {
+      toaster &&
+        toaster.show({
+          message: "Message copied to clipboard!",
+          intent: Intent.SUCCESS,
+          icon: "tick",
+        });
     });
   };
 
@@ -152,115 +150,113 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   };
 
   return (
-    <>
-      <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Sign and Verify Message" style={{ width: "550px" }}>
-        <div className={Classes.DIALOG_BODY}>
-          <div className="flex justify-end">
-            <RadioGroup
-              inline
+    <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Sign and Verify Message" style={{ width: "550px" }}>
+      <div className={Classes.DIALOG_BODY}>
+        <div className="flex justify-end">
+          <RadioGroup
+            inline
+            onChange={(e) =>
+              setData((prevState) => ({
+                ...prevState,
+                messageType: e.currentTarget.value,
+              }))
+            }
+            selectedValue={data.messageType}
+          >
+            <Radio label="Sign" value="sign" />
+            <Radio label="Verify" value="verify" />
+          </RadioGroup>
+        </div>
+        {data.messageType === "sign" && (
+          <>
+            <h6>Address</h6>
+            <InputGroup
+              large={true}
+              className="mb-2"
+              spellCheck={false}
+              placeholder="Address"
               onChange={(e) =>
                 setData((prevState) => ({
                   ...prevState,
-                  messageType: e.currentTarget.value,
+                  address: e.target.value,
                 }))
               }
-              selectedValue={data.messageType}
-            >
-              <Radio label="Sign" value="sign" />
-              <Radio label="Verify" value="verify" />
-            </RadioGroup>
-          </div>
-          {data.messageType === "sign" && (
-            <>
-              <h6>Address</h6>
-              <InputGroup
-                large={true}
-                className="mb-2"
-                spellCheck={false}
-                placeholder="Address"
-                onChange={(e) =>
-                  setData((prevState) => ({
-                    ...prevState,
-                    address: e.target.value,
-                  }))
-                }
-                value={data.address}
-                leftElement={<Icon icon="credit-card" />}
-                disabled={false}
-              />
-            </>
-          )}
-          <h6>Message</h6>
-          {data.messageType === "sign" ? (
-            <>
-              <InputGroup
-                large={true}
-                className="mb-2"
-                spellCheck={false}
-                placeholder="Message"
-                onChange={(e) =>
-                  setData((prevState) => ({
-                    ...prevState,
-                    message: e.target.value,
-                  }))
-                }
-                value={data.message}
-                leftElement={<Icon icon="edit" />}
-                disabled={false}
-              />
-              <h6>Signed message</h6>
-              <div className="relative">
-                <TextArea className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left" readOnly value={inputMessage} />
-                <Button className="bp3-dark absolute bottom-2 right-8" onClick={handleCopyClick} text="Copy" />
+              value={data.address}
+              leftElement={<Icon icon="credit-card" />}
+              disabled={false}
+            />
+          </>
+        )}
+        <h6>Message</h6>
+        {data.messageType === "sign" ? (
+          <>
+            <InputGroup
+              large={true}
+              className="mb-2"
+              spellCheck={false}
+              placeholder="Message"
+              onChange={(e) =>
+                setData((prevState) => ({
+                  ...prevState,
+                  message: e.target.value,
+                }))
+              }
+              value={data.message}
+              leftElement={<Icon icon="edit" />}
+              disabled={false}
+            />
+            <h6>Signed message</h6>
+            <div className="relative">
+              <TextArea className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left" readOnly value={inputMessage} />
+              <Button className="bp3-dark absolute bottom-2 right-8" onClick={handleCopyClick} text="Copy" />
+            </div>
+            <div className={Classes.DIALOG_FOOTER}>
+              <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+                <Button onClick={onClose} text="Cancel" />
+                <Button intent={Intent.PRIMARY} onClick={handleSignClick} text="Sign" />
               </div>
-              <div className={Classes.DIALOG_FOOTER}>
-                <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="relative">
+              <TextArea
+                className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
+                value={data.pastedData}
+                onChange={(e) =>
+                  setData((prevState) => ({
+                    ...prevState,
+                    pastedData: e.target.value,
+                  }))
+                }
+              />
+              <Button className="bp3-dark absolute bottom-2 right-8" onClick={handlePasteClick} text="Paste" />
+            </div>
+            <div className={Classes.DIALOG_FOOTER}>
+              <div className="flex justify-between items-center">
+                <div>
+                  {data.showValidationResults && data.isSignatureValid && (
+                    <>
+                      <Icon icon="endorsed" intent={Intent.SUCCESS} />
+                      <span className="pl-2 text-white font-bold">Verified!</span>
+                    </>
+                  )}
+                  {data.showValidationResults && !data.isSignatureValid && (
+                    <>
+                      <Icon icon="warning-sign" intent={Intent.DANGER} />
+                      <span className="pl-2 text-white font-bold">Invalid signature</span>
+                    </>
+                  )}
+                </div>
+                <div>
                   <Button onClick={onClose} text="Cancel" />
-                  <Button intent={Intent.PRIMARY} onClick={handleSignClick} text="Sign" />
+                  <Button intent={Intent.PRIMARY} onClick={handleVerifyClick} text="Verify" />
                 </div>
               </div>
-            </>
-          ) : (
-            <>
-              <div className="relative">
-                <TextArea
-                  className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
-                  value={data.pastedData}
-                  onChange={(e) =>
-                    setData((prevState) => ({
-                      ...prevState,
-                      pastedData: e.target.value,
-                    }))
-                  }
-                />
-                <Button className="bp3-dark absolute bottom-2 right-8" onClick={handlePasteClick} text="Paste" />
-              </div>
-              <div className={Classes.DIALOG_FOOTER}>
-                <div className="flex justify-between items-center">
-                  <div>
-                    {data.showValidationResults && data.isSignatureValid && (
-                      <>
-                        <Icon icon="endorsed" intent={Intent.SUCCESS} />
-                        <span className="pl-2 text-white font-bold">Verified!</span>
-                      </>
-                    )}
-                    {data.showValidationResults && !data.isSignatureValid && (
-                      <>
-                        <Icon icon="warning-sign" intent={Intent.DANGER} />
-                        <span className="pl-2 text-white font-bold">Invalid signature</span>
-                      </>
-                    )}
-                  </div>
-                  <div>
-                    <Button onClick={onClose} text="Cancel" />
-                    <Button intent={Intent.PRIMARY} onClick={handleVerifyClick} text="Verify" />
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </Dialog>
-    </>
+            </div>
+          </>
+        )}
+      </div>
+    </Dialog>
   );
 }
