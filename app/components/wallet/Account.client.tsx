@@ -11,6 +11,7 @@ import { useIsMainnet } from "../hooks";
 import { AddressItem } from "../common/AddressItem";
 import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
+import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 
@@ -29,6 +30,7 @@ export default function Account({ pair }: IProps) {
     delete: false,
     unlock: false,
     lock_funds: false,
+    sign_verify: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
@@ -117,6 +119,9 @@ export default function Account({ pair }: IProps) {
   async function handleLockFundsClick() {
     dialogToggle("lock_funds");
   }
+  function handleSignVerify() {
+    dialogToggle("sign_verify");
+  }
 
   const dialogElements = (
     <>
@@ -189,6 +194,12 @@ export default function Account({ pair }: IProps) {
             </>
           )}
         </div>
+        <>
+          <div className="grid grid-cols-3 gap-1">
+            <Button icon="duplicate" text="Sign and Verify" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
+          </div>
+          <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
+        </>
       </div>
       {pair.meta.isInjected && (
         <div className="absolute top-0 right-0 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
