@@ -6,7 +6,7 @@ import { hexToU8a, u8aToHex } from "@polkadot/util";
 import { keyring } from "@polkadot/ui-keyring";
 import { toasterAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
-import { useState } from "react";
+import React, { useState } from "react";
 
 type IProps = {
   pair: KeyringPair;
@@ -49,7 +49,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
       let signer;
       if (pair.meta.isInjected) {
-        const injected = await web3FromSource(pair.meta.source);
+        const injected = await web3FromSource(pair.meta.source as string);
         signer = injected.signer;
       } else {
         signer = keyring.getPair(data.address);
@@ -82,7 +82,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         signedMessage: u8aToHex(signatureU8a),
         publicKey: u8aToHex(publicKey),
       }));
-    } catch (e) {
+    } catch (e: any) {
       toaster &&
         toaster.show({
           icon: "error",
@@ -119,7 +119,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
           showValidationResults: true,
         }));
       }
-    } catch (e) {
+    } catch (e: any) {
       toaster &&
         toaster.show({
           icon: "error",

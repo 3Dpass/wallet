@@ -8,7 +8,7 @@
     "strict": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "noEmit": true,
     "resolveJsonModule": true,
     "moduleResolution": "node"

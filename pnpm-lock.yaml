@@ -20,6 +20,7 @@ specifiers:
   '@remix-run/node': 1.14.3
   '@remix-run/react': 1.14.3
   '@remix-run/serve': 1.14.3
+  '@types/react': 18.0.29
   '@types/three': 0.149.0
   autoprefixer: 10.4.14
   concurrently: 7.6.0
@@ -40,8 +41,8 @@ specifiers:
 
 dependencies:
   '@apollo/client': 3.7.10_ownuwdn4hwp345slsheqvjokby
-  '@blueprintjs/core': 4.17.8_jcdes5xylqb2vzhrhrmgr7gbi4
-  '@blueprintjs/popover2': 1.13.12_jcdes5xylqb2vzhrhrmgr7gbi4
+  '@blueprintjs/core': 4.17.8_k3ap47kmvbodueszoz3om3jlu4
+  '@blueprintjs/popover2': 1.13.12_k3ap47kmvbodueszoz3om3jlu4
   '@polkadot/api': 10.2.1
   '@polkadot/api-derive': 10.2.1
   '@polkadot/extension-dapp': 0.45.4_hv7zp6giiy3qexus4txdio5avi
@@ -58,6 +59,7 @@ dependencies:
   '@remix-run/node': 1.14.3
   '@remix-run/react': 1.14.3_jcdes5xylqb2vzhrhrmgr7gbi4
   '@remix-run/serve': 1.14.3
+  '@types/react': 18.0.29
   '@types/three': 0.149.0
   autoprefixer: 10.4.14_postcss@8.4.21
   concurrently: 7.6.0
@@ -1420,7 +1422,7 @@ packages:
     resolution: {integrity: sha512-5csitaTn1xyHktMRyXAcvWzsbrgtP9pK7ZmYX9f0TGjB1UG5zNaTGLexX0aFqop44SpfsSP5mbA8xGBniy8nZA==}
     dev: false
 
-  /@blueprintjs/core/4.17.8_jcdes5xylqb2vzhrhrmgr7gbi4:
+  /@blueprintjs/core/4.17.8_k3ap47kmvbodueszoz3om3jlu4:
     resolution: {integrity: sha512-hPspPY3luquQlVBlEyJVQT6nYXNl+ABOcqXFiURaneFsweKh/cjlp0ERmiypVh4XsewzmpOa2REePtfI1defAw==}
     hasBin: true
     peerDependencies:
@@ -1435,6 +1437,7 @@ packages:
       '@blueprintjs/icons': 4.14.5
       '@juggle/resize-observer': 3.4.0
       '@types/dom4': 2.0.2
+      '@types/react': 18.0.29
       classnames: 2.3.2
       dom4: 2.1.6
       normalize.css: 8.0.1
@@ -1454,7 +1457,7 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /@blueprintjs/popover2/1.13.12_jcdes5xylqb2vzhrhrmgr7gbi4:
+  /@blueprintjs/popover2/1.13.12_k3ap47kmvbodueszoz3om3jlu4:
     resolution: {integrity: sha512-1pn7eRnI/FAqgJT0SDFJRUMKQnP1mhGGd7bOpCpg+Q2hiuk8YTlYClPgYneoRGtLhK3JLyby66UofdAyFklWWQ==}
     peerDependencies:
       '@types/react': ^16.14.32 || 17 || 18
@@ -1464,9 +1467,10 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@blueprintjs/core': 4.17.8_jcdes5xylqb2vzhrhrmgr7gbi4
+      '@blueprintjs/core': 4.17.8_k3ap47kmvbodueszoz3om3jlu4
       '@juggle/resize-observer': 3.4.0
       '@popperjs/core': 2.11.7
+      '@types/react': 18.0.29
       classnames: 2.3.2
       dom4: 2.1.6
       react: 18.3.0-next-9c54b29b4-20230322
@@ -2929,7 +2933,7 @@ packages:
     dependencies:
       '@remix-run/router': 1.3.3
       '@types/cookie': 0.4.1
-      '@types/react': 18.0.28
+      '@types/react': 18.0.29
       '@web3-storage/multipart-parser': 1.0.0
       cookie: 0.4.2
       set-cookie-parser: 2.5.1
@@ -3166,17 +3170,17 @@ packages:
   /@types/react-reconciler/0.26.7:
     resolution: {integrity: sha512-mBDYl8x+oyPX/VBb3E638N0B7xG+SPk/EAMcVPeexqus/5aTpTphQi0curhhshOqRrc9t6OPoJfEUkbymse/lQ==}
     dependencies:
-      '@types/react': 18.0.28
+      '@types/react': 18.0.29
     dev: false
 
   /@types/react-reconciler/0.28.2:
     resolution: {integrity: sha512-8tu6lHzEgYPlfDf/J6GOQdIc+gs+S2yAqlby3zTsB3SP2svlqTYe5fwZNtZyfactP74ShooP2vvi1BOp9ZemWw==}
     dependencies:
-      '@types/react': 18.0.28
+      '@types/react': 18.0.29
     dev: false
 
-  /@types/react/18.0.28:
-    resolution: {integrity: sha512-RD0ivG1kEztNBdoAK7lekI9M+azSnitIn85h4iOiaLjaTrMjzslhaqCGaI4IyCJ1RljWiLCEu4jyrLLgqxBTew==}
+  /@types/react/18.0.29:
+    resolution: {integrity: sha512-wXHktgUABxplw1+UnljseDq4+uztQyp2tlWZRIxHlpchsCFqiYkvaDS8JR7eKOQm8wziTH/el5qL7D6gYNkYcw==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
