@@ -12,6 +12,21 @@ async function loadNetworkState() {
   const totalIssuanceNumber = BigInt(totalIssuance.toPrimitive() as number);
   const totalSupply = 1_000_000_000n * 1_000_000_000_000n;
 
+  const staffAndInvestors = [
+    "d1CNDotJXNPvnSA5EQXpSbkUyXBVmaggkARY7kcgXim4BqeBJ",
+    "d1GZ8GxP3KzKJGRYmp9HMwxurnSKx3ACcqeZqLY5kpbLEyjzE",
+    "d1GA9xWx3WgpQHp8LHCXHbYoZdvjY3NHhU6gR2fsdVCiC4TdF",
+    "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
+    "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
+  ];
+  // @ts-ignore
+  const balances = await api.query.system.account.multi<AccountInfo>(staffAndInvestors);
+  const balancesNumber = balances.map((balance) => {
+    const data = balance.data as AccountData;
+    return data.free.toBigInt();
+  });
+  const staffAndInvestorsSum = balancesNumber.reduce((a, b) => a + b, 0n);
+
   let frozen = 0n;
   let circulating = 0n;
   const accounts = await api.query.system.account.entries<AccountInfo>();
@@ -24,7 +39,7 @@ async function loadNetworkState() {
 
   return {
     totalIssuance: totalIssuanceNumber.toString(),
-    circulatingSupply: (circulating - frozen).toString(),
+    circulatingSupply: (circulating - frozen - staffAndInvestorsSum).toString(),
     totalSupply: totalSupply.toString(),
   };
 }
