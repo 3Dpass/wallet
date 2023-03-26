@@ -1,5 +1,5 @@
 import { Button, Classes, Dialog, Icon, InputGroup, Intent, Label, Radio, RadioGroup, TextArea } from "@blueprintjs/core";
-import { blake2AsHex, decodeAddress, signatureVerify } from "@polkadot/util-crypto";
+import { blake2AsHex, signatureVerify } from "@polkadot/util-crypto";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import { hexToU8a, u8aToHex } from "@polkadot/util";
@@ -96,18 +96,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       signature = await signer.sign(messageHash);
     }
 
-    let publicKey: Uint8Array;
-    if (pair.meta.isInjected) {
-      publicKey = decodeAddress(pair.address);
-    } else {
-      publicKey = signer.publicKey;
-    }
-
     const signatureU8a = new Uint8Array(signature);
     setData((prevState) => ({
       ...prevState,
       signedMessage: u8aToHex(signatureU8a),
-      publicKey: u8aToHex(publicKey),
+      publicKey: pair.address,
     }));
   }
 
