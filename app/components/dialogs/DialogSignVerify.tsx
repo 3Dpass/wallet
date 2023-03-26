@@ -1,5 +1,5 @@
-import { Button, Classes, Dialog, Icon, InputGroup, Intent, Radio, RadioGroup, TextArea } from "@blueprintjs/core";
-import { blake2AsHex, cryptoWaitReady, decodeAddress, signatureVerify } from "@polkadot/util-crypto";
+import { Button, Classes, Dialog, Icon, InputGroup, Intent, Label, TextArea } from "@blueprintjs/core";
+import { blake2AsHex, decodeAddress, signatureVerify } from "@polkadot/util-crypto";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import { hexToU8a, u8aToHex } from "@polkadot/util";
@@ -48,8 +48,6 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
   async function handleSignClick() {
     try {
-      await cryptoWaitReady();
-
       let signer;
       if (pair.meta.isInjected) {
         const injected = await web3FromSource(pair.meta.source as string);
@@ -152,74 +150,45 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     }));
   };
 
+  const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData((prevState) => ({
+      ...prevState,
+      message: e.target.value,
+    }));
+    void handleSignClick();
+  };
+
   return (
     <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Sign and Verify Message" style={{ width: "550px" }}>
-      <div className={Classes.DIALOG_BODY}>
-        <div className="flex justify-end">
-          <RadioGroup
-            inline
-            onChange={(e) =>
-              setData((prevState) => ({
-                ...prevState,
-                messageType: e.target.value,
-              }))
-            }
-            selectedValue={data.messageType}
-          >
-            <Radio label="Sign" value={DIALOG_SIGN} />
-            <Radio label="Verify" value={DIALOG_VERIFY} />
-          </RadioGroup>
-        </div>
+      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-2`}>
         {data.messageType === DIALOG_SIGN && (
           <>
-            <h6>Address</h6>
-            <InputGroup
-              large={true}
-              className="mb-2"
-              spellCheck={false}
-              placeholder="Address"
-              onChange={(e) =>
-                setData((prevState) => ({
-                  ...prevState,
-                  address: e.target.value,
-                }))
-              }
-              value={data.address}
-              leftElement={<Icon icon="credit-card" />}
-              disabled={false}
-            />
-          </>
-        )}
-        <h6>Message</h6>
-        {data.messageType === DIALOG_SIGN && (
-          <>
-            <InputGroup
-              large={true}
-              className="mb-2"
-              spellCheck={false}
-              placeholder="Message"
-              onChange={(e) =>
-                setData((prevState) => ({
-                  ...prevState,
-                  message: e.target.value,
-                }))
-              }
-              value={data.message}
-              leftElement={<Icon icon="edit" />}
-              disabled={false}
-            />
-            <h6>Signed message</h6>
-            <div className="relative">
-              <TextArea className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left" readOnly value={inputMessage} />
-              <Button className="bp3-dark absolute bottom-2 right-2" onClick={handleCopyClick} text="Copy" />
-            </div>
+            <Label>
+              Message
+              <InputGroup
+                large={true}
+                spellCheck={false}
+                placeholder="Message"
+                onChange={handleMessageChange}
+                value={data.message}
+                leftElement={<Icon icon="edit" />}
+                disabled={false}
+              />
+            </Label>
+            <Label>
+              Signed message
+              <div className="relative">
+                <TextArea className="font-mono h-80 w-full p-2 text-left" readOnly value={inputMessage} />
+                <Button className="bp3-dark absolute bottom-2 right-2" onClick={handleCopyClick} text="Copy" />
+              </div>
+            </Label>
           </>
         )}
         {data.messageType === DIALOG_VERIFY && (
           <>
             <div className="relative">
               <TextArea
-                className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left"
+                className="bp4-code-block bp4-docs-code-block blueprint-dark h-80 w-full p-2 text-left"
                 value={data.pastedData}
                 onChange={(e) =>
                   setData((prevState) => ({

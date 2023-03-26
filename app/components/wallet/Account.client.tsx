@@ -197,7 +197,7 @@ export default function Account({ pair }: IProps) {
         </div>
         <>
           <div className="grid grid-cols-3 gap-1">
-            <Button icon="endorsed" text="Sign and Verify" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
+            <Button icon="endorsed" text="Sign Message" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
           </div>
           <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
         </>
