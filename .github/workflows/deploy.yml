@@ -12,7 +12,7 @@ permissions:
 jobs:
   build:
     name: 🐳 Build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     concurrency:
       group: ${{ github.ref }}
@@ -71,7 +71,7 @@ jobs:
 
   deploy:
     name: 🚀 Deploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [ build ]
 
     concurrency:
