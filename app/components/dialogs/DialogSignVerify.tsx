@@ -155,7 +155,6 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       ...prevState,
       message: e.target.value,
     }));
-    void handleSignClick();
   };
 
   return (
