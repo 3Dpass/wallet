@@ -1,7 +1,7 @@
 name: GitHub Actions Version Updater
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
   schedule:
     # Automatically run every day
     - cron:  '0 0 * * *'
