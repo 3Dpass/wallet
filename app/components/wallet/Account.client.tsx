@@ -38,10 +38,6 @@ export default function Account({ pair }: IProps) {
   }, []);
 
   useEffect(() => {
-    loadAccount();
-  }, [api]);
-
-  function loadAccount() {
     if (!api) {
       return;
     }
@@ -54,7 +50,7 @@ export default function Account({ pair }: IProps) {
       }
       setBalances(balances);
     });
-  }
+  }, [api, pair]);
 
   function handleUnlockAccount() {
     dialogToggle("unlock");
@@ -106,12 +102,12 @@ export default function Account({ pair }: IProps) {
           intent: Intent.SUCCESS,
           message: "Unlock request sent",
         });
-    } catch (e) {
+    } catch (exception: any) {
       toaster &&
         toaster.show({
           icon: "error",
           intent: Intent.DANGER,
-          message: e.message,
+          message: exception.message,
         });
     }
   }
@@ -198,9 +194,9 @@ export default function Account({ pair }: IProps) {
           </>
         )}
       </div>
-      {pair.meta.isInjected && (
+      {Boolean(pair.meta.isInjected) && (
         <div className="absolute top-0 right-0 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
-          {pair.meta.name && (
+          {Boolean(pair.meta.name) && (
             <span>
               <span className="font-bold text-white">{pair.meta.name as string}</span> —{" "}
             </span>
