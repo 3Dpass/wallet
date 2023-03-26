@@ -44,6 +44,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
   function handleOnOpening() {
     setData(dataInitial);
+    setMessageToVerify("");
   }
 
   const handleCopyClick = () => {
@@ -109,6 +110,10 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   }
 
   async function verify() {
+    if (!messageToVerify.trim()) {
+      return;
+    }
+
     const messageRegex = /-- Start message --\n(.*)\n-- End message --/g;
     const signatureRegex = /-- Start P3D wallet signature --\n(.*)\n-- End P3D wallet signature --/g;
     const publicKeyRegex = /-- Start public key --\n(.*)\n-- End public key --/g;
