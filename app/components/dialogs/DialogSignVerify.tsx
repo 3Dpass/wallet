@@ -63,7 +63,6 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const handlePasteClick = async () => {
     const text = await navigator.clipboard.readText();
     setMessageToVerify(text);
-    return;
   };
 
   const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
