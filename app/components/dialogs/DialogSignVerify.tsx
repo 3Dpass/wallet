@@ -74,32 +74,27 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   };
 
   async function sign() {
-    let signer;
+    let signature: string;
     if (pair.meta.isInjected) {
       const injected = await web3FromSource(pair.meta.source as string);
-      signer = injected.signer;
-    } else {
-      signer = keyring.getPair(data.address);
-    }
-
-    const messageHash = blake2AsHex(data.message, 256);
-
-    let signature;
-    if (pair.meta.isInjected) {
-      const { signature: sig } = await signer.signRaw({
+      const signer = injected.signer;
+      if (!signer.signRaw) {
+        throw new Error("Signer does not support signing raw messages");
+      }
+      const signed = await signer.signRaw({
         address: pair.address,
-        data: u8aToHex(hexToU8a(messageHash)),
+        data: data.message,
         type: "bytes",
       });
-      signature = hexToU8a(sig);
+      signature = signed.signature;
     } else {
-      signature = await signer.sign(messageHash);
+      const signer = keyring.getPair(data.address);
+      signature = u8aToHex(await signer.sign(data.message));
     }
 
-    const signatureU8a = new Uint8Array(signature);
     setData((prevState) => ({
       ...prevState,
-      signedMessage: u8aToHex(signatureU8a),
+      signedMessage: signature,
       publicKey: pair.address,
     }));
   }
@@ -172,12 +167,13 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         <div className="flex justify-center mt-2 text-lg">
           <RadioGroup
             inline
-            onChange={(event: React.FormEvent<HTMLInputElement>) =>
+            onChange={(event: React.FormEvent<HTMLInputElement>) => {
+              const inputElement = event.target as HTMLInputElement;
               setData((prevState) => ({
                 ...prevState,
-                messageType: event.target.value,
-              }))
-            }
+                messageType: inputElement.value as "sign" | "verify",
+              }));
+            }}
             selectedValue={data.messageType}
           >
             <Radio label="Sign" value={DIALOG_SIGN} />
