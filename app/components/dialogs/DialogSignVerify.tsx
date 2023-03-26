@@ -161,7 +161,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             onChange={(e) =>
               setData((prevState) => ({
                 ...prevState,
-                messageType: e.currentTarget.value,
+                messageType: e.target.value,
               }))
             }
             selectedValue={data.messageType}
