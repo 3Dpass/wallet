@@ -176,16 +176,16 @@ export default function Account({ pair }: IProps) {
               <Button icon="duplicate" text="Copy" onClick={handleCopyAddress} />
               <Button icon="endorsed" text="Sign & Verify" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
             </div>
-            <div className="grid grid-cols-4 gap-1">
+            <div className={`grid ${pair.meta.isInjected ? `grid-cols-2` : `grid-cols-4`} gap-1`}>
+              <Button
+                icon="unlock"
+                text="Unlock"
+                onClick={handleUnlockFundsClick}
+                disabled={balances.lockedBalance.toBigInt() <= 0 || (pair.isLocked && !pair.meta.isInjected)}
+              />
+              <Button icon="lock" text="Lock..." onClick={handleLockFundsClick} disabled={pair.isLocked && !pair.meta.isInjected} />
               {!pair.meta.isInjected && (
                 <>
-                  <Button
-                    icon="unlock"
-                    text="Unlock"
-                    onClick={handleUnlockFundsClick}
-                    disabled={balances.lockedBalance.toBigInt() <= 0 || (pair.isLocked && !pair.meta.isInjected)}
-                  />
-                  <Button icon="lock" text="Lock..." onClick={handleLockFundsClick} disabled={pair.isLocked && !pair.meta.isInjected} />
                   <Button icon="export" text="JSON" onClick={handleCopyJson} disabled={pair.isLocked} />
                   <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
                 </>
