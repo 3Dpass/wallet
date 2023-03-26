@@ -14,6 +14,9 @@ type IProps = {
   onClose: () => void;
 };
 
+const DIALOG_SIGN = "sign";
+const DIALOG_VERIFY = "verify";
+
 type IData = {
   pastedData: string;
   isSignatureValid: boolean;
@@ -33,7 +36,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     showValidationResults: false,
     publicKey: "",
     address: pair.address,
-    messageType: "sign",
+    messageType: DIALOG_SIGN,
     signedMessage: "",
     message: "",
   };
@@ -163,11 +166,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             }
             selectedValue={data.messageType}
           >
-            <Radio label="Sign" value="sign" />
-            <Radio label="Verify" value="verify" />
+            <Radio label="Sign" value={DIALOG_SIGN} />
+            <Radio label="Verify" value={DIALOG_VERIFY} />
           </RadioGroup>
         </div>
-        {data.messageType === "sign" && (
+        {data.messageType === DIALOG_SIGN && (
           <>
             <h6>Address</h6>
             <InputGroup
@@ -188,7 +191,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
           </>
         )}
         <h6>Message</h6>
-        {data.messageType === "sign" && (
+        {data.messageType === DIALOG_SIGN && (
           <>
             <InputGroup
               large={true}
@@ -212,7 +215,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             </div>
           </>
         )}
-        {data.messageType === "verify" && (
+        {data.messageType === DIALOG_VERIFY && (
           <>
             <div className="relative">
               <TextArea
@@ -231,13 +234,13 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
-        {data.messageType === "sign" && (
+        {data.messageType === DIALOG_SIGN && (
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
             <Button onClick={onClose} text="Cancel" />
             <Button intent={Intent.PRIMARY} onClick={handleSignClick} text="Sign" />
           </div>
         )}
-        {data.messageType === "verify" && (
+        {data.messageType === DIALOG_VERIFY && (
           <>
             {data.showValidationResults && (
               <div className="flex justify-between items-center">
