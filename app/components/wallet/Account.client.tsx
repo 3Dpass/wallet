@@ -149,6 +149,7 @@ export default function Account({ pair }: IProps) {
         onAfterSubmit={() => dialogToggle("lock_funds")}
         onClose={() => dialogToggle("lock_funds")}
       />
+      <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
     </>
   );
 
@@ -175,32 +176,27 @@ export default function Account({ pair }: IProps) {
               </div>
             )}
             <div className="grid grid-cols-3 gap-1">
-              <Button icon="send-to" text="Send funds..." onClick={() => dialogToggle("send")} disabled={pair.isLocked && !pair.meta.isInjected} />
-              <Button
-                icon="unlock"
-                text="Unlock mined"
-                onClick={handleUnlockFundsClick}
-                disabled={balances.lockedBalance.toBigInt() <= 0 || (pair.isLocked && !pair.meta.isInjected)}
-              />
-              <Button icon="lock" text="Lock funds..." onClick={handleLockFundsClick} disabled={pair.isLocked && !pair.meta.isInjected} />
+              <Button icon="send-to" text="Send..." onClick={() => dialogToggle("send")} disabled={pair.isLocked && !pair.meta.isInjected} />
+              <Button icon="duplicate" text="Copy" onClick={handleCopyAddress} />
+              <Button icon="endorsed" text="Sign & Verify" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
+            </div>
+            <div className="grid grid-cols-4 gap-1">
+              {!pair.meta.isInjected && (
+                <>
+                  <Button
+                    icon="unlock"
+                    text="Unlock"
+                    onClick={handleUnlockFundsClick}
+                    disabled={balances.lockedBalance.toBigInt() <= 0 || (pair.isLocked && !pair.meta.isInjected)}
+                  />
+                  <Button icon="lock" text="Lock..." onClick={handleLockFundsClick} disabled={pair.isLocked && !pair.meta.isInjected} />
+                  <Button icon="export" text="JSON" onClick={handleCopyJson} disabled={pair.isLocked} />
+                  <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
+                </>
+              )}
             </div>
           </>
         )}
-        <div className="grid grid-cols-3 gap-1">
-          <Button icon="duplicate" text="Copy Address" onClick={handleCopyAddress} />
-          {!pair.meta.isInjected && (
-            <>
-              <Button icon="export" text="Copy JSON" onClick={handleCopyJson} disabled={pair.isLocked} />
-              <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
-            </>
-          )}
-        </div>
-        <>
-          <div className="grid grid-cols-3 gap-1">
-            <Button icon="endorsed" text="Sign & Verify" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
-          </div>
-          <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
-        </>
       </div>
       {pair.meta.isInjected && (
         <div className="absolute top-0 right-0 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
