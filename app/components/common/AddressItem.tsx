@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
 import { AddressIcon } from "./AddressIcon";
 
-export function AddressItem({ address }) {
+export function AddressItem({ address }: { address: string }) {
   return (
     <Link to={`/address/${address}`} className="flex text-white no-underline group">
       <AddressIcon address={address} />

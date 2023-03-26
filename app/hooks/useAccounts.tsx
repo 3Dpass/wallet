@@ -7,10 +7,10 @@ import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 
 export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boolean } {
   const [isInitialized, setIsInitialized] = useState(false);
-  const [accounts, setAccounts] = useState([]);
+  const [accounts, setAccounts] = useState<KeyringPair[]>([]);
   const ss58Format = useSS58Format();
 
-  async function loadWeb3Accounts(ss58Format) {
+  async function loadWeb3Accounts(ss58Format: any) {
     const extensions = await web3Enable("3dpass/wallet");
     if (extensions.length === 0) {
       return;
@@ -18,18 +18,18 @@ export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boo
     return await web3Accounts({ ss58Format });
   }
 
-  async function loadAllAccounts(ss58Format) {
-    await cryptoWaitReady();
-    const injected = await loadWeb3Accounts(ss58Format);
-    keyring.loadAll({ ss58Format, type: "sr25519" }, injected);
-  }
-
   useEffect(() => {
     if (isInitialized || !ss58Format) {
       return;
     }
 
-    let subscription;
+    async function loadAllAccounts(ss58Format: any) {
+      await cryptoWaitReady();
+      const injected = await loadWeb3Accounts(ss58Format);
+      keyring.loadAll({ ss58Format, type: "sr25519" }, injected);
+    }
+
+    let subscription: any;
 
     loadAllAccounts(ss58Format).then(() => {
       subscription = keyring.accounts.subject.subscribe(() => {
@@ -41,7 +41,7 @@ export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boo
     return () => {
       subscription.unsubscribe();
     };
-  }, [ss58Format]);
+  }, [isInitialized, ss58Format]);
 
   return { accounts, isLoading: !setIsInitialized };
 }
