@@ -188,7 +188,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
           </>
         )}
         <h6>Message</h6>
-        {data.messageType === "sign" ? (
+        {data.messageType === "sign" && (
           <>
             <InputGroup
               large={true}
@@ -208,16 +208,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             <h6>Signed message</h6>
             <div className="relative">
               <TextArea className="bp4-code-block bp4-docs-code-block blueprint-dark h-56 w-full p-2 text-left" readOnly value={inputMessage} />
-              <Button className="bp3-dark absolute bottom-2 right-8" onClick={handleCopyClick} text="Copy" />
-            </div>
-            <div className={Classes.DIALOG_FOOTER}>
-              <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-                <Button onClick={onClose} text="Cancel" />
-                <Button intent={Intent.PRIMARY} onClick={handleSignClick} text="Sign" />
-              </div>
+              <Button className="bp3-dark absolute bottom-2 right-2" onClick={handleCopyClick} text="Copy" />
             </div>
           </>
-        ) : (
+        )}
+        {data.messageType === "verify" && (
           <>
             <div className="relative">
               <TextArea
@@ -230,29 +225,39 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                   }))
                 }
               />
-              <Button className="bp3-dark absolute bottom-2 right-8" onClick={handlePasteClick} text="Paste" />
+              <Button className="bp3-dark absolute bottom-2 right-2" onClick={handlePasteClick} text="Paste" />
             </div>
-            <div className={Classes.DIALOG_FOOTER}>
+          </>
+        )}
+      </div>
+      <div className={Classes.DIALOG_FOOTER}>
+        {data.messageType === "sign" && (
+          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+            <Button onClick={onClose} text="Cancel" />
+            <Button intent={Intent.PRIMARY} onClick={handleSignClick} text="Sign" />
+          </div>
+        )}
+        {data.messageType === "verify" && (
+          <>
+            {data.showValidationResults && (
               <div className="flex justify-between items-center">
-                <div>
-                  {data.showValidationResults && data.isSignatureValid && (
-                    <>
-                      <Icon icon="endorsed" intent={Intent.SUCCESS} />
-                      <span className="pl-2 text-white font-bold">Verified!</span>
-                    </>
-                  )}
-                  {data.showValidationResults && !data.isSignatureValid && (
-                    <>
-                      <Icon icon="warning-sign" intent={Intent.DANGER} />
-                      <span className="pl-2 text-white font-bold">Invalid signature</span>
-                    </>
-                  )}
-                </div>
-                <div>
-                  <Button onClick={onClose} text="Cancel" />
-                  <Button intent={Intent.PRIMARY} onClick={handleVerifyClick} text="Verify" />
-                </div>
+                {data.isSignatureValid && (
+                  <>
+                    <Icon icon="endorsed" intent={Intent.SUCCESS} />
+                    <span className="pl-2 text-white font-bold">Verified!</span>
+                  </>
+                )}
+                {!data.isSignatureValid && (
+                  <>
+                    <Icon icon="warning-sign" intent={Intent.DANGER} />
+                    <span className="pl-2 text-white font-bold">Invalid signature</span>
+                  </>
+                )}
               </div>
+            )}
+            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+              <Button onClick={onClose} text="Cancel" />
+              <Button intent={Intent.PRIMARY} onClick={handleVerifyClick} text="Verify" />
             </div>
           </>
         )}
