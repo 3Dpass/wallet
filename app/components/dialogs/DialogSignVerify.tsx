@@ -1,12 +1,12 @@
 import { Button, Classes, Dialog, Icon, InputGroup, Intent, Label, Radio, RadioGroup, TextArea } from "@blueprintjs/core";
-import { blake2AsHex, signatureVerify } from "@polkadot/util-crypto";
+import { signatureVerify } from "@polkadot/util-crypto";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3FromSource } from "@polkadot/extension-dapp";
-import { hexToU8a, u8aToHex } from "@polkadot/util";
+import { u8aToHex } from "@polkadot/util";
 import { keyring } from "@polkadot/ui-keyring";
 import { toasterAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type IProps = {
   pair: KeyringPair;
@@ -18,7 +18,6 @@ const DIALOG_SIGN = "sign";
 const DIALOG_VERIFY = "verify";
 
 type IData = {
-  messageToVerify: string;
   isSignatureValid: boolean;
   showValidationResults: boolean;
   publicKey: string;
@@ -31,7 +30,6 @@ type IData = {
 export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const toaster = useAtomValue(toasterAtom);
   const dataInitial: IData = {
-    messageToVerify: "",
     isSignatureValid: false,
     showValidationResults: false,
     publicKey: "",
@@ -41,14 +39,15 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     message: "",
   };
   const [data, setData] = useState<IData>(dataInitial);
-  const inputMessage = `-- Start message --\n${data.message}\n-- End message --\n\n-- Start P3D wallet signature --\n${data.signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${data.publicKey}\n-- End public key --`;
+  const [messageToVerify, setMessageToVerify] = useState<string>("");
+  const signatureTemplate = `-- Start message --\n${data.message}\n-- End message --\n\n-- Start P3D wallet signature --\n${data.signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${data.publicKey}\n-- End public key --`;
 
   function handleOnOpening() {
     setData(dataInitial);
   }
 
   const handleCopyClick = () => {
-    navigator.clipboard.writeText(inputMessage).then(() => {
+    navigator.clipboard.writeText(signatureTemplate).then(() => {
       toaster &&
         toaster.show({
           message: "Message copied to clipboard!",
@@ -60,10 +59,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
   const handlePasteClick = async () => {
     const text = await navigator.clipboard.readText();
-    setData((prevState) => ({
-      ...prevState,
-      messageToVerify: text,
-    }));
+    setMessageToVerify(text);
   };
 
   const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,27 +109,32 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   }
 
   async function verify() {
-    const messageRegex = /--\s*Start message\s*--\n?([\s\S]*?)\n?--\s*End message\s*--/g;
-    const signatureRegex = /--\s*Start P3D wallet signature\s*--\n?([\s\S]*?)\n?--\s*End P3D wallet signature\s*--/g;
-    const publicKeyRegex = /--\s*Start public key\s*--\n?([\s\S]*?)\n?--\s*End public key\s*--/g;
+    const messageRegex = /-- Start message --\n(.*)\n-- End message --/g;
+    const signatureRegex = /-- Start P3D wallet signature --\n(.*)\n-- End P3D wallet signature --/g;
+    const publicKeyRegex = /-- Start public key --\n(.*)\n-- End public key --/g;
 
-    const messageMatch = messageRegex.exec(data.messageToVerify);
-    const signatureMatch = signatureRegex.exec(data.messageToVerify);
-    const publicKeyMatch = publicKeyRegex.exec(data.messageToVerify);
+    const messageMatch = messageRegex.exec(messageToVerify);
+    const signatureMatch = signatureRegex.exec(messageToVerify);
+    const publicKeyMatch = publicKeyRegex.exec(messageToVerify);
 
     let isValid = false;
 
     if (messageMatch && signatureMatch && publicKeyMatch) {
       const message = messageMatch[1].trim();
-      const signedMessage = signatureMatch[1].trim();
+      const signature = signatureMatch[1].trim();
       const publicKey = publicKeyMatch[1].trim();
 
-      const signatureU8a = hexToU8a(signedMessage);
-      const messageHash = blake2AsHex(message, 256);
-      const publicKeyU8a = hexToU8a(publicKey);
-
-      const signature = await signatureVerify(messageHash, signatureU8a, publicKeyU8a);
-      isValid = signature.isValid;
+      try {
+        const verification = await signatureVerify(message, signature, publicKey);
+        isValid = verification.isValid;
+      } catch (e: any) {
+        toaster &&
+          toaster.show({
+            icon: "error",
+            intent: Intent.DANGER,
+            message: e.message,
+          });
+      }
     }
 
     setData((prevState) => ({
@@ -143,22 +144,27 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     }));
   }
 
+  useEffect(() => {
+    if (data.messageType === DIALOG_VERIFY) {
+      try {
+        void verify();
+      } catch (e: any) {
+        toaster &&
+          toaster.show({
+            icon: "error",
+            intent: Intent.DANGER,
+            message: e.message,
+          });
+      }
+    }
+  }, [data.messageType, messageToVerify]);
+
   async function handleVerifyMessageChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setData((prevState) => ({
       ...prevState,
-      messageToVerify: event.target.value,
       showValidationResults: false,
     }));
-    try {
-      await verify();
-    } catch (e: any) {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
-    }
+    setMessageToVerify(event.target.value);
   }
 
   return (
@@ -197,7 +203,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             <Label>
               Signed message
               <div className="relative">
-                <TextArea className="font-mono h-80 w-full p-2 text-left" value={inputMessage} />
+                <TextArea className="font-mono h-80 w-full p-2 text-left" value={signatureTemplate} />
                 <Button className="bp3-dark absolute bottom-2 right-2" onClick={handleCopyClick} text="Copy" />
               </div>
             </Label>
@@ -206,7 +212,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         {data.messageType === DIALOG_VERIFY && (
           <>
             <div className="relative">
-              <TextArea className="font-mono h-80 w-full p-2 text-left" value={data.messageToVerify} onChange={handleVerifyMessageChange} />
+              <TextArea className="font-mono h-80 w-full p-2 text-left" value={messageToVerify} onChange={handleVerifyMessageChange} />
               <Button className="bp3-dark absolute bottom-2 right-2" onClick={handlePasteClick} text="Paste" />
             </div>
           </>
