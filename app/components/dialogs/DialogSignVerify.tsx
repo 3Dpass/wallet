@@ -41,6 +41,8 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const [data, setData] = useState<IData>(dataInitial);
   const [messageToVerify, setMessageToVerify] = useState<string>("");
   const signatureTemplate = `-- Start message --\n${data.message}\n-- End message --\n\n-- Start P3D wallet signature --\n${data.signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${data.publicKey}\n-- End public key --`;
+  const canCopyToClipboard: boolean = navigator.clipboard?.writeText !== undefined;
+  const canPasteFromClipboard: boolean = navigator.clipboard?.readText !== undefined;
 
   function handleOnOpening() {
     setData(dataInitial);
@@ -61,6 +63,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   const handlePasteClick = async () => {
     const text = await navigator.clipboard.readText();
     setMessageToVerify(text);
+    return;
   };
 
   const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -209,7 +212,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
               Signed message
               <div className="relative">
                 <TextArea className="font-mono h-80 w-full p-2 text-left" value={signatureTemplate} />
-                <Button className="bp3-dark absolute bottom-2 right-2" onClick={handleCopyClick} text="Copy" />
+                {canCopyToClipboard && <Button className="bp3-dark absolute bottom-2 right-2" onClick={handleCopyClick} text="Copy" />}
               </div>
             </Label>
           </>
@@ -218,7 +221,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
           <>
             <div className="relative">
               <TextArea className="font-mono h-80 w-full p-2 text-left" value={messageToVerify} onChange={handleVerifyMessageChange} />
-              <Button className="bp3-dark absolute bottom-2 right-2" onClick={handlePasteClick} text="Paste" />
+              {canPasteFromClipboard && <Button className="bp3-dark absolute bottom-2 right-2" onClick={handlePasteClick} text="Paste" />}
             </div>
           </>
         )}
