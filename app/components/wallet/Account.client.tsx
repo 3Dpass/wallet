@@ -71,19 +71,6 @@ export default function Account({ pair }: IProps) {
       });
   }
 
-  async function handleCopyJson() {
-    if (pair.isLocked) {
-      return;
-    }
-    await navigator.clipboard.writeText(JSON.stringify(pair.toJson()));
-    toaster &&
-      toaster?.show({
-        icon: "tick",
-        intent: Intent.SUCCESS,
-        message: "Wallet JSON copied to clipboard",
-      });
-  }
-
   async function handleUnlockFundsClick() {
     if (!api) {
       return;
@@ -175,8 +162,6 @@ export default function Account({ pair }: IProps) {
               <Button icon="send-to" text="Send..." onClick={() => dialogToggle("send")} disabled={pair.isLocked && !pair.meta.isInjected} />
               <Button icon="duplicate" text="Copy" onClick={handleCopyAddress} />
               <Button icon="endorsed" text="Sign & Verify" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
-            </div>
-            <div className={`grid ${pair.meta.isInjected ? `grid-cols-2` : `grid-cols-4`} gap-1`}>
               <Button
                 icon="unlock"
                 text="Unlock"
@@ -186,7 +171,6 @@ export default function Account({ pair }: IProps) {
               <Button icon="lock" text="Lock..." onClick={handleLockFundsClick} disabled={pair.isLocked && !pair.meta.isInjected} />
               {!pair.meta.isInjected && (
                 <>
-                  <Button icon="export" text="JSON" onClick={handleCopyJson} disabled={pair.isLocked} />
                   <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
                 </>
               )}
