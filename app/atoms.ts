@@ -20,4 +20,4 @@ export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpo
 
 export const toasterAtom = atom<Toaster | false>(false);
 export const blocksAtom = atom([]);
-export const bestNumberFinalizedAtom = atom<bigint>(0n);
+export const bestNumberFinalizedAtom = atom<bigint>(BigInt(0));

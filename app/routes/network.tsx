@@ -10,7 +10,7 @@ async function loadNetworkState() {
 
   const totalIssuance = await api.query.balances.totalIssuance();
   const totalIssuanceNumber = BigInt(totalIssuance.toPrimitive() as number);
-  const totalSupply = 1_000_000_000n * 1_000_000_000_000n;
+  const totalSupply = BigInt(1_000_000_000) * BigInt(1_000_000_000_000);
 
   const staffAndInvestors = [
     "d1CNDotJXNPvnSA5EQXpSbkUyXBVmaggkARY7kcgXim4BqeBJ",
@@ -25,10 +25,10 @@ async function loadNetworkState() {
     const data = balance.data as AccountData;
     return data.free.toBigInt();
   });
-  const staffAndInvestorsSum = balancesNumber.reduce((a, b) => a + b, 0n);
+  const staffAndInvestorsSum = balancesNumber.reduce((a, b) => a + b, BigInt(0));
 
-  let frozen = 0n;
-  let circulating = 0n;
+  let frozen = BigInt(0);
+  let circulating = BigInt(0);
   const accounts = await api.query.system.account.entries<AccountInfo>();
   accounts.map(([_, account]) => {
     const data = account.data as AccountData;
