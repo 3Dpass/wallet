@@ -1,5 +1,12 @@
-export default function TitledValue({ title, value, fontMono = false, fontSmall = false, ...attrs }) {
-  let valueClassName = "text-xl overflow-x-auto";
+interface TitledValueProps {
+  title: string;
+  value: string;
+  fontMono?: boolean;
+  fontSmall?: boolean;
+}
+
+export default function TitledValue({ title, value, fontMono = false, fontSmall = false, ...attrs }: TitledValueProps) {
+  let valueClassName = "text-lg truncate";
   if (fontMono) {
     valueClassName += " font-mono";
   }

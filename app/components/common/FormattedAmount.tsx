@@ -2,7 +2,7 @@ import { useAtomValue } from "jotai";
 import { formatOptionsAtom } from "../../atoms";
 import { formatBalance } from "@polkadot/util";
 
-export function FormattedAmount({ value }) {
+export function FormattedAmount({ value }: { value: string }) {
   const formatOptions = useAtomValue(formatOptionsAtom);
   if (!formatOptions) {
     return null;
