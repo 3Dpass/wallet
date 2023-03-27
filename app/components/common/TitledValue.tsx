@@ -1,6 +1,9 @@
+import React from "react";
+
 interface TitledValueProps {
   title: string;
-  value: string;
+  // value is string or ReactNode
+  value: string | React.ReactNode;
   fontMono?: boolean;
   fontSmall?: boolean;
 }
