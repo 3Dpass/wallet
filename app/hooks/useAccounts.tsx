@@ -4,18 +4,22 @@ import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import { useSS58Format } from "./useSS58Format";
+import { genesisHashes, NETWORK_MAINNET, NETWORK_TEST } from "../api.config";
+import { useIsMainnet } from "./useIsMainnet";
 
 export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boolean } {
   const [isInitialized, setIsInitialized] = useState(false);
   const [accounts, setAccounts] = useState<KeyringPair[]>([]);
   const ss58Format = useSS58Format();
+  const isMainnet = useIsMainnet();
 
   async function loadWeb3Accounts(ss58Format: any) {
     const extensions = await web3Enable("3dpass/wallet");
     if (extensions.length === 0) {
       return;
     }
-    return await web3Accounts({ ss58Format });
+    const genesisHash = genesisHashes[isMainnet ? NETWORK_MAINNET : NETWORK_TEST];
+    return await web3Accounts({ genesisHash, ss58Format });
   }
 
   useEffect(() => {

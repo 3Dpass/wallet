@@ -4,6 +4,10 @@ export const ss58formats = {
   [NETWORK_TEST]: 72,
   [NETWORK_MAINNET]: 71,
 };
+export const genesisHashes = {
+  [NETWORK_TEST]: "0x07ac0e270ed6a2686770900de69995d7f2c53a89122b58f02045d93e9ec32c8e",
+  [NETWORK_MAINNET]: "0x6c5894837ad89b6d92b114a2fb3eafa8fe3d26a54848e3447015442cd6ef4e66",
+}
 
 export const MAX_BLOCKS = 6;
 export const RPC_CONFIG = {
