@@ -2,6 +2,7 @@ import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import type { ApiPromise } from "@polkadot/api";
 import type { Toaster } from "@blueprintjs/core";
+import { IBlock } from "./components/types";
 
 export interface IFormatOptions {
   decimals: number;
@@ -19,5 +20,5 @@ export const formatOptionsAtom = atomWithStorage<IFormatOptions | false>("format
 export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpoint_v1", "https://explorer-api.3dpass.org/graphql/");
 
 export const toasterAtom = atom<Toaster | false>(false);
-export const blocksAtom = atom([]);
+export const blocksAtom = atom<IBlock[]>([]);
 export const bestNumberFinalizedAtom = atom<bigint>(BigInt(0));

@@ -8,6 +8,7 @@ import { MAX_BLOCKS } from "../api.config";
 import TitledValue from "./common/TitledValue";
 import type { ApiPromise } from "@polkadot/api";
 import { FormattedAmount } from "./common/FormattedAmount";
+import type { Int } from "@polkadot/types/codec";
 
 const TimeAgo = lazy(() => import("react-timeago"));
 
@@ -29,7 +30,7 @@ export default function NetworkState({ api }: IProps) {
   const [networkState, setNetworkState] = useState<INetworkState>();
   const setBestNumberFinalized = useSetAtom(bestNumberFinalizedAtom);
 
-  async function loadNetworkState(timestamp) {
+  async function loadNetworkState(timestamp: Int) {
     if (!api) {
       return;
     }
@@ -43,7 +44,7 @@ export default function NetworkState({ api }: IProps) {
       api.consts.difficulty.targetBlockTime,
     ]);
     setNetworkState({
-      totalIssuance: totalIssuance.toString(),
+      totalIssuance: BigInt(totalIssuance.toString()),
       bestNumber: bestNumber.toHuman().toString(),
       bestNumberFinalized: bestNumberFinalized.toHuman().toString(),
       timestamp: timestamp.toJSON(),
@@ -55,7 +56,7 @@ export default function NetworkState({ api }: IProps) {
     setIsLoading(false);
   }
 
-  function isBlockAlreadyLoaded(hash) {
+  function isBlockAlreadyLoaded(hash: string) {
     return blocks.some((block) => block.blockHash === hash);
   }
 
@@ -64,10 +65,10 @@ export default function NetworkState({ api }: IProps) {
       return;
     }
 
-    let timestampUnsubscribe, newHeadsUnsubscribe;
+    let newHeadsUnsubscribe: () => void;
 
-    async function subscribe(api) {
-      [timestampUnsubscribe, newHeadsUnsubscribe] = await Promise.all([
+    async function subscribe(api: ApiPromise) {
+      [, newHeadsUnsubscribe] = await Promise.all([
         api.query.timestamp.now(loadNetworkState),
         api.rpc.chain.subscribeNewHeads((head) => {
           const hash = head.hash.toHex();
@@ -84,16 +85,14 @@ export default function NetworkState({ api }: IProps) {
       ]);
     }
 
-    function unsubscribe() {
-      timestampUnsubscribe && timestampUnsubscribe();
-      newHeadsUnsubscribe && newHeadsUnsubscribe();
-    }
+    void subscribe(api);
 
-    subscribe(api).then(() => {});
-    return unsubscribe;
+    return () => {
+      newHeadsUnsubscribe && newHeadsUnsubscribe();
+    };
   }, [api]);
 
-  if (isLoading && !networkState) {
+  if (!networkState) {
     return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed"></div>;
   }
 

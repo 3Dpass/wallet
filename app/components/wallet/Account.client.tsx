@@ -145,9 +145,9 @@ export default function Account({ pair }: IProps) {
         {balances && (
           <>
             <div className="grid grid-cols-3 gap-1 py-2">
-              <TitledValue title="Total balance" value={<FormattedAmount value={balances.freeBalance} />} />
-              <TitledValue title="Transferable" value={<FormattedAmount value={balances.availableBalance} />} />
-              <TitledValue title="Locked" value={<FormattedAmount value={balances.lockedBalance} />} />
+              <TitledValue title="Total balance" value={<FormattedAmount value={balances.freeBalance.toBigInt()} />} />
+              <TitledValue title="Transferable" value={<FormattedAmount value={balances.availableBalance.toBigInt()} />} />
+              <TitledValue title="Locked" value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />} />
             </div>
             {pair.isLocked && !pair.meta.isInjected && (
               <div className="my-2 text-center">

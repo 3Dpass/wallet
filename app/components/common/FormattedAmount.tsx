@@ -2,17 +2,16 @@ import { useAtomValue } from "jotai";
 import { formatOptionsAtom } from "../../atoms";
 import { formatBalance } from "@polkadot/util";
 
-export function FormattedAmount({ value }: { value: string }) {
+export function FormattedAmount({ value }: { value: number | bigint }) {
   const formatOptions = useAtomValue(formatOptionsAtom);
   if (!formatOptions) {
     return null;
   }
-  const bigIntValue = BigInt(value);
   const options = {
     withUnit: formatOptions.unit,
     decimals: formatOptions.decimals,
     withSi: true,
   };
-  const formattedAmount = formatBalance(bigIntValue, options);
+  const formattedAmount = formatBalance(value, options);
   return <>{formattedAmount}</>;
 }
