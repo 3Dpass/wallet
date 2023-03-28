@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { Link } from "@remix-run/react";
 import { Button, Card, Classes, Elevation, Icon } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
@@ -8,8 +8,7 @@ import type { IBlock } from "../types";
 import { Buffer } from "buffer";
 import { useAtomValue } from "jotai";
 import { bestNumberFinalizedAtom } from "../../atoms";
-
-const Canvas = lazy(() => import("@react-three/fiber").then((module) => ({ default: module.Canvas })));
+import { Canvas } from "@react-three/fiber";
 
 interface IProps {
   block: IBlock;

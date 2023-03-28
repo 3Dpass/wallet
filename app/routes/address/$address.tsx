@@ -1,7 +1,6 @@
 import Moment from "react-moment";
 import { Link, useParams } from "@remix-run/react";
-import { Card, HTMLTable, Icon, Spinner } from "@blueprintjs/core";
-import { lazy } from "react";
+import { Card, Divider, HTMLTable, Icon, Spinner } from "@blueprintjs/core";
 import { decodeAddress } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
 import type { TransfersData, TransfersVars } from "../../queries";
@@ -13,9 +12,7 @@ import Error from "../../components/common/Error";
 import { AddressItem } from "../../components/common/AddressItem";
 import { ExplorerUrl } from "../../components/common/ExplorerForward";
 import { useSS58Format } from "../../hooks/useSS58Format";
-
-const TitledValue = lazy(() => import("../../components/common/TitledValue"));
-const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));
+import TitledValue from "../../components/common/TitledValue";
 
 export default function Address() {
   const { address } = useParams();

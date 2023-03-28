@@ -12,6 +12,6 @@ export function FormattedAmount({ value }: { value: number | bigint }) {
     decimals: formatOptions.decimals,
     withSi: true,
   };
-  const formattedAmount = formatBalance(value, options);
+  const formattedAmount = formatBalance(BigInt(value), options);
   return <>{formattedAmount}</>;
 }
