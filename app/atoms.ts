@@ -19,6 +19,6 @@ export const formatOptionsAtom = atom<IFormatOptions | false>(false);
 // Explorer GraphQL API
 export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpoint_v1", "https://explorer-api.3dpass.org/graphql/");
 
-export const toasterAtom = atom<Toaster | false>(false);
+export const toasterAtom = atom<Toaster | undefined>(undefined);
 export const blocksAtom = atom<IBlock[]>([]);
 export const bestNumberFinalizedAtom = atom<bigint>(BigInt(0));

@@ -2,7 +2,7 @@ import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } fro
 // @ts-ignore
 import styles from "./styles/app.css";
 import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
-import type { FormEvent } from "react";
+import type { FormEvent, LegacyRef } from "react";
 import { useEffect, useRef, useState } from "react";
 import { apiAtom, apiEndpointAtom, apiExplorerEndpointAtom, formatOptionsAtom, toasterAtom } from "./atoms";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -10,6 +10,7 @@ import DialogSettings from "./components/dialogs/DialogSettings";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { isValidPolkadotAddress } from "./utils/address";
 import { getApi, getProvider } from "./api";
+import { NETWORK_MAINNET, ss58formats } from "./api.config";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -69,7 +70,7 @@ export default function App() {
       setApi(api);
       setFormatOptions({
         decimals: api.registry.chainDecimals[0],
-        chainSS58: api.registry.chainSS58,
+        chainSS58: api.registry.chainSS58 || ss58formats[NETWORK_MAINNET],
         unit: api.registry.chainTokens[0],
       });
     });
@@ -99,7 +100,7 @@ export default function App() {
         <Links />
       </head>
       <body className={Classes.DARK}>
-        <Toaster ref={toasterRef} />
+        <Toaster ref={toasterRef as LegacyRef<Toaster>} />
         <ApolloProvider client={client}>
           <div className="container mx-auto px-4">
             <Navbar className="flex justify-between overflow-x-auto overflow-y-hidden mb-4">
