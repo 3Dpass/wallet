@@ -8,11 +8,11 @@ import type { TransfersData, TransfersVars } from "../../queries";
 import { GET_TRANSFERS } from "../../queries";
 import { FormattedAmount } from "../../components/common/FormattedAmount";
 import { encodeAddress } from "@polkadot/util-crypto/address/encode";
-import { useSS58Format } from "../../components/hooks";
 import { useQuery } from "@apollo/client";
 import Error from "../../components/common/Error";
 import { AddressItem } from "../../components/common/AddressItem";
 import { ExplorerUrl } from "../../components/common/ExplorerForward";
+import { useSS58Format } from "../../hooks/useSS58Format";
 
 const TitledValue = lazy(() => import("../../components/common/TitledValue"));
 const Divider = lazy(() => import("@blueprintjs/core").then((module) => ({ default: module.Divider })));

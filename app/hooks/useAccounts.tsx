@@ -1,9 +1,9 @@
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { useEffect, useState } from "react";
-import { useSS58Format } from "../components/hooks";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
+import { useSS58Format } from "./useSS58Format";
 
 export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boolean } {
   const [isInitialized, setIsInitialized] = useState(false);

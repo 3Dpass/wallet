@@ -7,13 +7,13 @@ import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
 import keyring from "@polkadot/ui-keyring";
 import { FormattedAmount } from "../common/FormattedAmount";
-import { useIsMainnet } from "../hooks";
 import { AddressItem } from "../common/AddressItem";
 import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
+import { useIsMainnet } from "../../hooks/useIsMainnet";
 
 type IProps = {
   pair: KeyringPair;
