@@ -1,6 +1,6 @@
 import { useAtom, useSetAtom } from "jotai";
 import { bestNumberFinalizedAtom, blocksAtom } from "../atoms";
-import { lazy, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Elevation } from "@blueprintjs/core";
 import { formatDuration } from "../utils/time";
 import { loadBlock } from "../utils/block";
@@ -9,8 +9,7 @@ import TitledValue from "./common/TitledValue";
 import type { ApiPromise } from "@polkadot/api";
 import { FormattedAmount } from "./common/FormattedAmount";
 import type { Int } from "@polkadot/types/codec";
-
-const TimeAgo = lazy(() => import("react-timeago"));
+import TimeAgo from "react-timeago";
 
 type INetworkState = {
   totalIssuance: bigint;
@@ -90,6 +89,7 @@ export default function NetworkState({ api }: IProps) {
     return () => {
       newHeadsUnsubscribe && newHeadsUnsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [api]);
 
   if (!networkState) {
