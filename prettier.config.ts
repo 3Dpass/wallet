@@ -1,7 +1,6 @@
-/**
- * @type {import('prettier').Options}
- */
-module.exports = {
+import type { Options } from "prettier";
+
+export default {
   trailingComma: "es5",
   tabWidth: 2,
   semi: true,
@@ -10,4 +9,4 @@ module.exports = {
   bracketSpacing: true,
   bracketSameLine: false,
   arrowParens: "always",
-};
+} satisfies Options;
