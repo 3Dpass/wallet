@@ -1,7 +1,7 @@
-import { useAtomValue } from "jotai";
-import { apiAtom } from "../../atoms";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NumericInput, Tag } from "@blueprintjs/core";
+import { formatOptionsAtom } from "../../atoms";
+import { useAtomValue } from "jotai";
 
 type IProps = {
   disabled: boolean;
@@ -10,15 +10,10 @@ type IProps = {
 };
 
 export default function AmountInput({ disabled, onValueChange, placeholder }: IProps) {
-  const api = useAtomValue(apiAtom);
-  const [tokenSymbol, setTokenSymbol] = useState("");
   const [amount, setAmount] = useState("");
+  const formatOptions = useAtomValue(formatOptionsAtom);
 
-  useEffect(() => {
-    api && setTokenSymbol(api.registry.getChainProperties().tokenSymbol.toHuman().toString());
-  }, [api]);
-
-  function handleAmountChange(valueAsNumber, valueAsString) {
+  function handleAmountChange(valueAsNumber: number, valueAsString: string) {
     setAmount(valueAsString);
     onValueChange(valueAsNumber, valueAsString);
   }
@@ -27,8 +22,8 @@ export default function AmountInput({ disabled, onValueChange, placeholder }: IP
     <NumericInput
       disabled={disabled}
       selectAllOnFocus={true}
-      buttonPosition={null}
       large={true}
+      buttonPosition={"none"}
       leftIcon="send-to"
       placeholder={placeholder || "Amount"}
       onValueChange={handleAmountChange}
@@ -36,7 +31,7 @@ export default function AmountInput({ disabled, onValueChange, placeholder }: IP
       fill={true}
       min={0}
       minorStepSize={0.001}
-      rightElement={<Tag minimal={true}>{tokenSymbol}</Tag>}
+      rightElement={<Tag minimal={true}>{formatOptions && formatOptions.unit}</Tag>}
     />
   );
 }

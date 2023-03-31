@@ -1,12 +1,14 @@
 import { json } from "@remix-run/node";
 import { defaultEndpoint } from "../atoms";
-import { getApi, getProvider } from "../api";
 import type { AccountInfo } from "@polkadot/types/interfaces/system/types";
 import type { AccountData } from "@polkadot/types/interfaces";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import { RPC_CONFIG, RPC_TYPES } from "../api.config";
 
 async function loadNetworkState() {
-  const provider = getProvider(defaultEndpoint);
-  const api = await getApi(provider);
+  const provider = new WsProvider(defaultEndpoint, false);
+  await provider.connect();
+  const api = await ApiPromise.create({ provider, rpc: RPC_CONFIG, types: RPC_TYPES });
 
   const totalIssuance = await api.query.balances.totalIssuance();
   const totalIssuanceNumber = BigInt(totalIssuance.toPrimitive() as number);

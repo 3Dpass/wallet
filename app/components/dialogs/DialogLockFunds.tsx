@@ -3,8 +3,9 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
 import AmountInput from "../common/AmountInput";
 import { useAtomValue } from "jotai";
-import { apiAtom, toasterAtom } from "../../atoms";
+import { toasterAtom } from "../../atoms";
 import { signAndSend } from "../../utils/sign";
+import { useApi } from "../../hooks/useApi";
 
 type IProps = {
   pair: KeyringPair;
@@ -16,7 +17,7 @@ type IProps = {
 const autoExtendPeriod = 45000;
 
 export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
-  const api = useAtomValue(apiAtom);
+  const { api } = useApi();
   const toaster = useAtomValue(toasterAtom);
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

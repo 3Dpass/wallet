@@ -4,13 +4,13 @@ import styles from "./styles/app.css";
 import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
 import type { FormEvent, LegacyRef } from "react";
 import { useEffect, useRef, useState } from "react";
-import { apiAtom, apiEndpointAtom, apiExplorerEndpointAtom, formatOptionsAtom, toasterAtom } from "./atoms";
+import { apiExplorerEndpointAtom, formatOptionsAtom, toasterAtom } from "./atoms";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import DialogSettings from "./components/dialogs/DialogSettings";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { isValidPolkadotAddress } from "./utils/address";
-import { getApi, getProvider } from "./api";
 import { NETWORK_MAINNET, ss58formats } from "./api.config";
+import { useApi } from "./hooks/useApi";
 
 export const meta = () => ({
   charset: "utf-8",
@@ -34,8 +34,7 @@ export default function App() {
   const [toaster, setToaster] = useAtom(toasterAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const setApi = useSetAtom(apiAtom);
-  const apiEndpoint = useAtomValue(apiEndpointAtom);
+  const { api } = useApi();
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
   const setFormatOptions = useSetAtom(formatOptionsAtom);
 
@@ -44,37 +43,15 @@ export default function App() {
   }, [setToaster, toasterRef]);
 
   useEffect(() => {
-    if (!toaster) {
+    if (!toaster || !api) {
       return;
     }
-
-    setApi(false);
-    const provider = getProvider(apiEndpoint);
-    provider.on("disconnected", () => {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: "warning",
-          message: `API disconnected`,
-        });
+    setFormatOptions({
+      decimals: api.registry.chainDecimals[0],
+      chainSS58: api.registry.chainSS58 || ss58formats[NETWORK_MAINNET],
+      unit: api.registry.chainTokens[0],
     });
-    provider.on("error", (e) => {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: "danger",
-          message: `API connection error: ${e.message}`,
-        });
-    });
-    getApi(provider).then((api) => {
-      setApi(api);
-      setFormatOptions({
-        decimals: api.registry.chainDecimals[0],
-        chainSS58: api.registry.chainSS58 || ss58formats[NETWORK_MAINNET],
-        unit: api.registry.chainTokens[0],
-      });
-    });
-  }, [apiEndpoint, toaster, setApi, setFormatOptions]);
+  }, [toaster, api, setFormatOptions]);
 
   const client = new ApolloClient({
     uri: apiExplorerEndpoint,

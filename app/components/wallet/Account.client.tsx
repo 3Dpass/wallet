@@ -1,6 +1,6 @@
 import { Alert, Button, Card, Elevation, Icon, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
-import { apiAtom, toasterAtom } from "../../atoms";
+import { toasterAtom } from "../../atoms";
 import { useCallback, useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
@@ -14,13 +14,14 @@ import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 import { useIsMainnet } from "../../hooks/useIsMainnet";
+import { useApi } from "../../hooks/useApi";
 
 type IProps = {
   pair: KeyringPair;
 };
 
 export default function Account({ pair }: IProps) {
-  const api = useAtomValue(apiAtom);
+  const { api } = useApi();
   const toaster = useAtomValue(toasterAtom);
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);

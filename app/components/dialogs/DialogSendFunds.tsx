@@ -2,12 +2,13 @@ import { Button, Classes, Dialog, Icon, InputGroup, Intent } from "@blueprintjs/
 import { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { apiAtom, toasterAtom } from "../../atoms";
+import { toasterAtom } from "../../atoms";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
+import { useApi } from "../../hooks/useApi";
 
 type IProps = {
   pair: KeyringPair;
@@ -17,7 +18,7 @@ type IProps = {
 };
 
 export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
-  const api = useAtomValue(apiAtom);
+  const { api } = useApi();
   const toaster = useAtomValue(toasterAtom);
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

@@ -2,14 +2,15 @@ import { useCallback, useState } from "react";
 import keyring from "@polkadot/ui-keyring";
 import { Button, Card, Elevation, Intent } from "@blueprintjs/core";
 import { useAtomValue } from "jotai";
-import { apiAtom, toasterAtom } from "../../atoms";
+import { toasterAtom } from "../../atoms";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
 import useAccounts from "../../hooks/useAccounts";
+import { useApi } from "../../hooks/useApi";
 
 export default function Wallet() {
-  const api = useAtomValue(apiAtom);
+  const { api } = useApi();
   const toaster = useAtomValue(toasterAtom);
   const { accounts, isLoading } = useAccounts();
 
@@ -23,7 +24,7 @@ export default function Wallet() {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
 
-  function handleSeedPhraseImportClick(seed_phrase, password) {
+  function handleSeedPhraseImportClick(seed_phrase: string, password: string) {
     try {
       const currentPairs = keyring.getPairs();
       const result = keyring.addUri(seed_phrase, password);
@@ -33,7 +34,7 @@ export default function Wallet() {
       }
 
       dialogToggle("seed_phrase");
-    } catch (e) {
+    } catch (e: any) {
       toaster &&
         toaster.show({
           icon: "ban-circle",
@@ -43,12 +44,12 @@ export default function Wallet() {
     }
   }
 
-  function handleJSONWalletImportClick(json) {
+  function handleJSONWalletImportClick(json: string) {
     try {
       const pair = keyring.createFromJson(JSON.parse(json));
       keyring.addPair(pair, "");
       dialogToggle("json");
-    } catch (e) {
+    } catch (e: any) {
       toaster &&
         toaster.show({
           icon: "ban-circle",
