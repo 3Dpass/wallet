@@ -5,5 +5,6 @@
 /public/build
 /app/styles
 .env
+.DS_Store
 
 .pnp.*
