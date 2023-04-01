@@ -10,3 +10,4 @@ deploy:
 	@echo "Creating and pushing tag $(NEXT_TAG)"
 	git tag -a $(NEXT_TAG) -m "Version $(NEXT_TAG)"
 	git push origin $(NEXT_TAG)
+	git push
