@@ -12,11 +12,9 @@ import { isValidPolkadotAddress } from "./utils/address";
 import { NETWORK_MAINNET, ss58formats } from "./api.config";
 import { useApi } from "./hooks/useApi";
 
-export const meta = () => ({
-  charset: "utf-8",
-  title: "3DPass Wallet",
-  viewport: "width=device-width,initial-scale=1",
-});
+export function meta() {
+  return [{ charset: "utf-8" }, { title: "3DPass Wallet" }, { viewport: "width=device-width,initial-scale=1" }];
+}
 
 export function links() {
   return [

@@ -3,16 +3,16 @@ import { Link, useParams } from "@remix-run/react";
 import { Card, Divider, HTMLTable, Icon, Spinner } from "@blueprintjs/core";
 import { decodeAddress } from "@polkadot/keyring";
 import { u8aToHex } from "@polkadot/util";
-import type { TransfersData, TransfersVars } from "../../queries";
-import { GET_TRANSFERS } from "../../queries";
-import { FormattedAmount } from "../../components/common/FormattedAmount";
+import type { TransfersData, TransfersVars } from "../queries";
+import { GET_TRANSFERS } from "../queries";
+import { FormattedAmount } from "../components/common/FormattedAmount";
 import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 import { useQuery } from "@apollo/client";
-import Error from "../../components/common/Error";
-import { AddressItem } from "../../components/common/AddressItem";
-import { ExplorerUrl } from "../../components/common/ExplorerForward";
-import { useSS58Format } from "../../hooks/useSS58Format";
-import TitledValue from "../../components/common/TitledValue";
+import Error from "../components/common/Error";
+import { AddressItem } from "../components/common/AddressItem";
+import { ExplorerUrl } from "../components/common/ExplorerForward";
+import { useSS58Format } from "../hooks/useSS58Format";
+import TitledValue from "../components/common/TitledValue";
 
 export default function Address() {
   const { address } = useParams();
