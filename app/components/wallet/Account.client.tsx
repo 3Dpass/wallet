@@ -1,6 +1,4 @@
 import { Alert, Button, Card, Elevation, Icon, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
-import { useAtomValue } from "jotai";
-import { toasterAtom } from "../../atoms";
 import { useCallback, useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
@@ -15,6 +13,7 @@ import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 import { useIsMainnet } from "../../hooks/useIsMainnet";
 import { useApi } from "../../hooks/useApi";
+import useToaster from "../../hooks/useToaster";
 
 type IProps = {
   pair: KeyringPair;
@@ -22,7 +21,7 @@ type IProps = {
 
 export default function Account({ pair }: IProps) {
   const { api } = useApi();
-  const toaster = useAtomValue(toasterAtom);
+  const toaster = useToaster();
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
 
@@ -64,12 +63,11 @@ export default function Account({ pair }: IProps) {
 
   async function handleCopyAddress() {
     await navigator.clipboard.writeText(pair.address);
-    toaster &&
-      toaster.show({
-        icon: "tick",
-        intent: Intent.SUCCESS,
-        message: "Address copied to clipboard",
-      });
+    toaster.show({
+      icon: "tick",
+      intent: Intent.SUCCESS,
+      message: "Address copied to clipboard",
+    });
   }
 
   async function handleUnlockFundsClick() {
@@ -84,19 +82,17 @@ export default function Account({ pair }: IProps) {
         tx = api.tx.rewards.unlock(pair.address);
       }
       await signAndSend(tx, pair);
-      toaster &&
-        toaster.show({
-          icon: "tick",
-          intent: Intent.SUCCESS,
-          message: "Unlock request sent",
-        });
-    } catch (exception: any) {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: exception.message,
-        });
+      toaster.show({
+        icon: "tick",
+        intent: Intent.SUCCESS,
+        message: "Unlock request sent",
+      });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
     }
   }
 

@@ -2,10 +2,9 @@ import { Button, Checkbox, Classes, Dialog, Intent, NumericInput, Tag } from "@b
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
 import AmountInput from "../common/AmountInput";
-import { useAtomValue } from "jotai";
-import { toasterAtom } from "../../atoms";
 import { signAndSend } from "../../utils/sign";
 import { useApi } from "../../hooks/useApi";
+import useToaster from "../../hooks/useToaster";
 
 type IProps = {
   pair: KeyringPair;
@@ -18,7 +17,7 @@ const autoExtendPeriod = 45000;
 
 export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
   const { api } = useApi();
-  const toaster = useAtomValue(toasterAtom);
+  const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -56,17 +55,17 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
 
   useEffect(() => {
     setCanSubmit(false);
-    if (!isOpen || !api) {
+    if (!isOpen || !api || data.current_block === null) {
       return;
     }
     setCanSubmit(data.amount_number > 0 && data.block_number >= data.current_block + autoExtendPeriod);
   }, [isOpen, api, data]);
 
-  function handleAmountChange(valueAsNumber, valueAsString) {
+  function handleAmountChange(valueAsNumber: number, valueAsString: string) {
     setData((prev) => ({ ...prev, amount: valueAsString, amount_number: valueAsNumber }));
   }
 
-  function handleBlockChange(valueAsNumber, valueAsString) {
+  function handleBlockChange(valueAsNumber: number, valueAsString: string) {
     setData((prev) => ({ ...prev, block: valueAsString, block_number: valueAsNumber }));
   }
 
@@ -83,20 +82,18 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
       const value = BigInt(data.amount_number * 1_000_000_000_000);
       const tx = api.tx.validatorSet.lock(value, data.block_number, data.auto_extend ?? autoExtendPeriod);
       await signAndSend(tx, pair);
-      toaster &&
-        toaster.show({
-          icon: "endorsed",
-          intent: Intent.SUCCESS,
-          message: "Lock request is submitted",
-        });
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: "Lock request is submitted",
+      });
       onAfterSubmit();
-    } catch (e) {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +105,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
         <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
         <NumericInput
           disabled={isLoading}
-          buttonPosition={null}
+          buttonPosition={"none"}
           large={true}
           fill={true}
           placeholder="Release funds after this block"

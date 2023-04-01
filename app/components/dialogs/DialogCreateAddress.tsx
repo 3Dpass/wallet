@@ -3,12 +3,15 @@ import { mnemonicGenerate } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import { useState } from "react";
 import TitledValue from "../common/TitledValue";
-import { useAtomValue } from "jotai";
-import { toasterAtom } from "../../atoms";
+import useToaster from "../../hooks/useToaster";
 
-export default function DialogCreateAddress({ isOpen, onClose }) {
-  const toaster = useAtomValue(toasterAtom);
+interface IProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
+export default function DialogCreateAddress({ isOpen, onClose }: IProps) {
+  const toaster = useToaster();
   const dataInitial = {
     address: "",
     mnemonic: "",
@@ -34,12 +37,11 @@ export default function DialogCreateAddress({ isOpen, onClose }) {
 
   async function handleCopy() {
     await navigator.clipboard.writeText(data.mnemonic);
-    toaster &&
-      toaster.show({
-        icon: "tick",
-        intent: Intent.SUCCESS,
-        message: "Seed phrase copied to clipboard",
-      });
+    toaster.show({
+      icon: "tick",
+      intent: Intent.SUCCESS,
+      message: "Seed phrase copied to clipboard",
+    });
   }
 
   return (

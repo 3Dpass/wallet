@@ -1,8 +1,7 @@
 import { Button, Classes, Dialog, Icon, InputGroup, Intent } from "@blueprintjs/core";
 import { useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useAtomValue } from "jotai";
-import { toasterAtom } from "../../atoms";
+import useToaster from "../../hooks/useToaster";
 
 type IProps = {
   pair: KeyringPair;
@@ -11,7 +10,7 @@ type IProps = {
 };
 
 export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
-  const toaster = useAtomValue(toasterAtom);
+  const toaster = useToaster();
   const [passphrase, setPassphrase] = useState("");
 
   function handleOnOpening() {
@@ -21,20 +20,18 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
   async function handleSendClick() {
     try {
       await pair.unlock(passphrase);
-      toaster &&
-        toaster.show({
-          icon: "endorsed",
-          intent: Intent.SUCCESS,
-          message: "Account is unlocked",
-        });
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: "Account is unlocked",
+      });
       onClose();
-    } catch (e) {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
     }
   }
 
@@ -52,7 +49,7 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
           leftElement={<Icon icon="lock" />}
           onKeyUp={(e) => {
             if (e.key === "Enter") {
-              handleSendClick();
+              void handleSendClick();
             }
           }}
         />

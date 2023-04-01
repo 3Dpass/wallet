@@ -43,7 +43,7 @@ export default function App() {
   }, [setToaster, toasterRef]);
 
   useEffect(() => {
-    if (!toaster || !api) {
+    if (!api) {
       return;
     }
     setFormatOptions({
@@ -51,7 +51,7 @@ export default function App() {
       chainSS58: api.registry.chainSS58 || ss58formats[NETWORK_MAINNET],
       unit: api.registry.chainTokens[0],
     });
-  }, [toaster, api, setFormatOptions]);
+  }, [api, setFormatOptions]);
 
   const client = new ApolloClient({
     uri: apiExplorerEndpoint,

@@ -4,9 +4,8 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import { u8aToHex } from "@polkadot/util";
 import { keyring } from "@polkadot/ui-keyring";
-import { toasterAtom } from "../../atoms";
-import { useAtomValue } from "jotai";
 import React, { useEffect, useState } from "react";
+import useToaster from "../../hooks/useToaster";
 
 type IProps = {
   pair: KeyringPair;
@@ -28,7 +27,7 @@ type IData = {
 };
 
 export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
-  const toaster = useAtomValue(toasterAtom);
+  const toaster = useToaster();
   const dataInitial: IData = {
     isSignatureValid: false,
     showValidationResults: false,
@@ -51,12 +50,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
 
   const handleCopyClick = () => {
     navigator.clipboard.writeText(signatureTemplate).then(() => {
-      toaster &&
-        toaster.show({
-          message: "Message copied to clipboard!",
-          intent: Intent.SUCCESS,
-          icon: "tick",
-        });
+      toaster.show({
+        message: "Message copied to clipboard!",
+        intent: Intent.SUCCESS,
+        icon: "tick",
+      });
     });
   };
 
@@ -102,12 +100,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     try {
       await sign();
     } catch (e: any) {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
     }
   }
 
@@ -135,12 +132,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         const verification = await signatureVerify(message, signature, publicKey);
         isValid = verification.isValid;
       } catch (e: any) {
-        toaster &&
-          toaster.show({
-            icon: "error",
-            intent: Intent.DANGER,
-            message: e.message,
-          });
+        toaster.show({
+          icon: "error",
+          intent: Intent.DANGER,
+          message: e.message,
+        });
       }
     }
 
@@ -156,12 +152,11 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       try {
         void verify();
       } catch (e: any) {
-        toaster &&
-          toaster.show({
-            icon: "error",
-            intent: Intent.DANGER,
-            message: e.message,
-          });
+        toaster.show({
+          icon: "error",
+          intent: Intent.DANGER,
+          message: e.message,
+        });
       }
     }
   }, [data.messageType, messageToVerify]);

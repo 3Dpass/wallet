@@ -1,17 +1,16 @@
 import { useCallback, useState } from "react";
 import keyring from "@polkadot/ui-keyring";
 import { Button, Card, Elevation, Intent } from "@blueprintjs/core";
-import { useAtomValue } from "jotai";
-import { toasterAtom } from "../../atoms";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
 import useAccounts from "../../hooks/useAccounts";
 import { useApi } from "../../hooks/useApi";
+import useToaster from "../../hooks/useToaster";
 
 export default function Wallet() {
   const { api } = useApi();
-  const toaster = useAtomValue(toasterAtom);
+  const toaster = useToaster();
   const { accounts, isLoading } = useAccounts();
 
   const dialogsInitial = {
@@ -35,12 +34,11 @@ export default function Wallet() {
 
       dialogToggle("seed_phrase");
     } catch (e: any) {
-      toaster &&
-        toaster.show({
-          icon: "ban-circle",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
+      toaster.show({
+        icon: "ban-circle",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
     }
   }
 
@@ -50,12 +48,11 @@ export default function Wallet() {
       keyring.addPair(pair, "");
       dialogToggle("json");
     } catch (e: any) {
-      toaster &&
-        toaster.show({
-          icon: "ban-circle",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
+      toaster.show({
+        icon: "ban-circle",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
     }
   }
 

@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import type { Toaster } from "@blueprintjs/core";
 import type { IBlock } from "./components/types";
+import type { ToasterInstance } from "@blueprintjs/core";
 
 export interface IFormatOptions {
   decimals: number;
@@ -17,6 +17,6 @@ export const formatOptionsAtom = atom<IFormatOptions | false>(false);
 // Explorer GraphQL API
 export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpoint_v1", "https://explorer-api.3dpass.org/graphql/");
 
-export const toasterAtom = atom<Toaster | undefined>(undefined);
+export const toasterAtom = atom<ToasterInstance | undefined>(undefined);
 export const blocksAtom = atom<IBlock[]>([]);
 export const bestNumberFinalizedAtom = atom<bigint>(BigInt(0));

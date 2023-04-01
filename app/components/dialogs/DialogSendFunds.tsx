@@ -1,14 +1,13 @@
 import { Button, Classes, Dialog, Icon, InputGroup, Intent } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import { useAtomValue } from "jotai";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { toasterAtom } from "../../atoms";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import { useApi } from "../../hooks/useApi";
+import useToaster from "../../hooks/useToaster";
 
 type IProps = {
   pair: KeyringPair;
@@ -19,7 +18,7 @@ type IProps = {
 
 export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
   const { api } = useApi();
-  const toaster = useAtomValue(toasterAtom);
+  const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,11 +36,11 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     setData(dataInitial);
   }
 
-  function handleAmountChange(valueAsNumber, valueAsString) {
+  function handleAmountChange(valueAsNumber: number, valueAsString: string) {
     setData((prev) => ({ ...prev, amount: valueAsString, amount_number: valueAsNumber }));
   }
 
-  function handleTipsChange(valueAsNumber, valueAsString) {
+  function handleTipsChange(valueAsNumber: number, valueAsString: string) {
     setData((prev) => ({ ...prev, tips: valueAsString, tips_number: valueAsNumber }));
   }
 
@@ -55,12 +54,11 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
     if (isLocked) {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: "Account is locked",
-        });
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "Account is locked",
+      });
       return;
     }
     setIsLoading(true);
@@ -73,20 +71,18 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
         options.tip = tips.toString();
       }
       await signAndSend(tx, pair, options);
-      toaster &&
-        toaster.show({
-          icon: "endorsed",
-          intent: Intent.SUCCESS,
-          message: "Send request submitted",
-        });
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: "Send request submitted",
+      });
       onAfterSubmit();
-    } catch (e) {
-      toaster &&
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
     } finally {
       setIsLoading(false);
     }
