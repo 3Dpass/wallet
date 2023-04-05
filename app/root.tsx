@@ -81,8 +81,9 @@ export default function App() {
             <Navbar className="flex justify-between overflow-x-auto overflow-y-hidden mb-4">
               <NavbarGroup align={Alignment.LEFT}>
                 <NavbarHeading className="whitespace-nowrap flex">
-                  <Link to="" style={{ color: "white" }} className="mt-[3px] mr-2">
-                    <strong>3DPass</strong> Wallet
+                  <Link to="" className="text-white hover:no-underline flex items-center gap-2">
+                    <img src="/logo.svg" alt="3Dpass Logo" className="h-7" />
+                    <span className="mb-[-3px]">wallet</span>
                   </Link>
                   <Button className="ml-2" icon="cog" minimal={true} onClick={() => setIsSettingsDialogOpen(true)} />
                   <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
