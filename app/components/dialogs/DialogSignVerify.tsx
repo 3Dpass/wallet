@@ -108,46 +108,47 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     }
   }
 
-  async function verify() {
-    if (!messageToVerify.trim()) {
-      return;
-    }
-
-    const messageRegex = /-- Start message --\n(.*)\n-- End message --/g;
-    const signatureRegex = /-- Start P3D wallet signature --\n(.*)\n-- End P3D wallet signature --/g;
-    const publicKeyRegex = /-- Start public key --\n(.*)\n-- End public key --/g;
-
-    const messageMatch = messageRegex.exec(messageToVerify);
-    const signatureMatch = signatureRegex.exec(messageToVerify);
-    const publicKeyMatch = publicKeyRegex.exec(messageToVerify);
-
-    let isValid = false;
-
-    if (messageMatch && signatureMatch && publicKeyMatch) {
-      const message = messageMatch[1].trim();
-      const signature = signatureMatch[1].trim();
-      const publicKey = publicKeyMatch[1].trim();
-
-      try {
-        const verification = await signatureVerify(message, signature, publicKey);
-        isValid = verification.isValid;
-      } catch (e: any) {
-        toaster.show({
-          icon: "error",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
-      }
-    }
-
-    setData((prevState) => ({
-      ...prevState,
-      isSignatureValid: isValid,
-      showValidationResults: true,
-    }));
-  }
-
+  // on message change, verify signature
   useEffect(() => {
+    async function verify() {
+      if (!messageToVerify.trim()) {
+        return;
+      }
+
+      const messageRegex = /-- Start message --\n(.*)\n-- End message --/g;
+      const signatureRegex = /-- Start P3D wallet signature --\n(.*)\n-- End P3D wallet signature --/g;
+      const publicKeyRegex = /-- Start public key --\n(.*)\n-- End public key --/g;
+
+      const messageMatch = messageRegex.exec(messageToVerify);
+      const signatureMatch = signatureRegex.exec(messageToVerify);
+      const publicKeyMatch = publicKeyRegex.exec(messageToVerify);
+
+      let isValid = false;
+
+      if (messageMatch && signatureMatch && publicKeyMatch) {
+        const message = messageMatch[1].trim();
+        const signature = signatureMatch[1].trim();
+        const publicKey = publicKeyMatch[1].trim();
+
+        try {
+          const verification = await signatureVerify(message, signature, publicKey);
+          isValid = verification.isValid;
+        } catch (e: any) {
+          toaster.show({
+            icon: "error",
+            intent: Intent.DANGER,
+            message: e.message,
+          });
+        }
+      }
+
+      setData((prevState) => ({
+        ...prevState,
+        isSignatureValid: isValid,
+        showValidationResults: true,
+      }));
+    }
+
     if (data.messageType === DIALOG_VERIFY) {
       try {
         void verify();
@@ -159,7 +160,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         });
       }
     }
-  }, [data.messageType, messageToVerify]);
+  }, [toaster, data.messageType, messageToVerify]);
 
   async function handleVerifyMessageChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setData((prevState) => ({
