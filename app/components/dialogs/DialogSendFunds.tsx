@@ -6,7 +6,7 @@ import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
-import { useApi } from "../../hooks/useApi";
+import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
 type IProps = {
@@ -17,7 +17,7 @@ type IProps = {
 };
 
 export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
-  const { api } = useApi();
+  const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

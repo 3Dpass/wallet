@@ -11,8 +11,8 @@ import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
-import { useIsMainnet } from "../../hooks/useIsMainnet";
-import { useApi } from "../../hooks/useApi";
+import useIsMainnet from "../../hooks/useIsMainnet";
+import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
 type IProps = {
@@ -20,7 +20,7 @@ type IProps = {
 };
 
 export default function Account({ pair }: IProps) {
-  const { api } = useApi();
+  const api = useApi();
   const toaster = useToaster();
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);

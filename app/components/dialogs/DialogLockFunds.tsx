@@ -3,7 +3,7 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
 import AmountInput from "../common/AmountInput";
 import { signAndSend } from "../../utils/sign";
-import { useApi } from "../../hooks/useApi";
+import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
 type IProps = {
@@ -16,7 +16,7 @@ type IProps = {
 const autoExtendPeriod = 45000;
 
 export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
-  const { api } = useApi();
+  const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

@@ -10,7 +10,7 @@ import type { ApiPromise } from "@polkadot/api";
 import { FormattedAmount } from "./common/FormattedAmount";
 import type { Int } from "@polkadot/types/codec";
 import TimeAgo from "react-timeago";
-import { useApi } from "../hooks/useApi";
+import useApi from "../hooks/useApi";
 
 type INetworkState = {
   totalIssuance: bigint;
@@ -21,7 +21,7 @@ type INetworkState = {
 };
 
 export default function NetworkState() {
-  const { api } = useApi();
+  const api = useApi();
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const [isLoading, setIsLoading] = useState(true);
   const [networkState, setNetworkState] = useState<INetworkState>();

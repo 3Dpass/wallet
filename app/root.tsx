@@ -5,12 +5,12 @@ import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHead
 import type { FormEvent, LegacyRef } from "react";
 import { useEffect, useRef, useState } from "react";
 import { apiExplorerEndpointAtom, formatOptionsAtom, toasterAtom } from "./atoms";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import DialogSettings from "./components/dialogs/DialogSettings";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { isValidPolkadotAddress } from "./utils/address";
 import { NETWORK_MAINNET, ss58formats } from "./api.config";
-import { useApi } from "./hooks/useApi";
+import useApi from "./hooks/useApi";
 
 export function meta() {
   return [{ charset: "utf-8" }, { title: "3DPass Wallet" }, { viewport: "width=device-width,initial-scale=1" }];
@@ -28,11 +28,11 @@ export function links() {
 }
 
 export default function App() {
+  const api = useApi();
   const toasterRef = useRef<Toaster>();
-  const [toaster, setToaster] = useAtom(toasterAtom);
+  const setToaster = useSetAtom(toasterAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const { api } = useApi();
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
   const setFormatOptions = useSetAtom(formatOptionsAtom);
 

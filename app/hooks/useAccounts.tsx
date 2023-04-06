@@ -5,7 +5,7 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import { useSS58Format } from "./useSS58Format";
 import { genesisHashes, NETWORK_MAINNET, NETWORK_TEST } from "../api.config";
-import { useIsMainnet } from "./useIsMainnet";
+import useIsMainnet from "./useIsMainnet";
 
 export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boolean } {
   const [isInitialized, setIsInitialized] = useState(false);
