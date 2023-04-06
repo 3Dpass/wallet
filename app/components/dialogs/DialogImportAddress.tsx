@@ -1,5 +1,5 @@
 import { Button, Classes, Dialog, Icon, InputGroup, Intent, TextArea } from "@blueprintjs/core";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 interface Props {
   isOpen: boolean;
@@ -14,18 +14,14 @@ export default function DialogImportAddress({ isOpen, showPassword, onImport, on
     passphrase: "",
   };
   const [data, setData] = useState(dataInitial);
-  const [canPaste, setCanPaste] = useState(false);
-
-  useEffect(() => {
-    setCanPaste(navigator.clipboard.readText !== undefined);
-  }, []);
+  const canPaste = navigator.clipboard.readText !== undefined;
 
   function handleOnOpening() {
     setData(dataInitial);
   }
 
-  function handleSeedPhraseChange(e) {
-    setData((prev) => ({ ...prev, seed_phrase: e.target.value }));
+  function handleSeedPhraseChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    setData((prev) => ({ ...prev, seed_phrase: event.target.value }));
   }
 
   async function handlePaste() {

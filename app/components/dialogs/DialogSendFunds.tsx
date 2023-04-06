@@ -45,7 +45,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
   }
 
   useEffect(() => {
-    api && setCanSubmit(isValidPolkadotAddress(data.address) && data.amount_number > 0);
+    setCanSubmit(api !== undefined && isValidPolkadotAddress(data.address) && data.amount_number > 0);
   }, [api, data]);
 
   async function handleSubmitClick() {
