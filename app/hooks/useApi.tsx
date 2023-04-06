@@ -20,16 +20,17 @@ export default function useApi(): ApiPromise | undefined {
   const [apiEndpoint] = useAtom(apiEndpointAtom);
 
   useEffect(() => {
-    if (!sharedApiInstance) {
-      createApiInstance(apiEndpoint)
-        .then((apiInstance) => {
-          sharedApiInstance = apiInstance;
-          setApi(apiInstance);
-        })
-        .catch((error: Error) => {
-          console.error("Failed to connect to Polkadot API:", error);
-        });
+    if (sharedApiInstance) {
+      return;
     }
+    createApiInstance(apiEndpoint)
+      .then((apiInstance) => {
+        sharedApiInstance = apiInstance;
+        setApi(apiInstance);
+      })
+      .catch((error: Error) => {
+        console.error("Failed to connect to Polkadot API:", error);
+      });
   }, [apiEndpoint]);
 
   return api;

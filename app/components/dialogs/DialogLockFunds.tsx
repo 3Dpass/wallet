@@ -50,7 +50,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
       setData((prev) => ({ ...prev, current_block: blockNumber, block: blockNumber + autoExtendPeriod, block_number: blockNumber + autoExtendPeriod }));
     }
 
-    load().then();
+    void load();
   }, [isOpen, api]);
 
   useEffect(() => {
