@@ -13,18 +13,18 @@ export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boo
   const ss58Format = useSS58Format();
   const isMainnet = useIsMainnet();
 
-  async function loadWeb3Accounts(ss58Format: any) {
-    const extensions = await web3Enable("3dpass/wallet");
-    if (extensions.length === 0) {
-      return;
-    }
-    const genesisHash = genesisHashes[isMainnet ? NETWORK_MAINNET : NETWORK_TEST];
-    return await web3Accounts({ genesisHash, ss58Format });
-  }
-
   useEffect(() => {
     if (isInitialized || !ss58Format) {
       return;
+    }
+
+    async function loadWeb3Accounts(ss58Format: any) {
+      const extensions = await web3Enable("3dpass/wallet");
+      if (extensions.length === 0) {
+        return;
+      }
+      const genesisHash = genesisHashes[isMainnet ? NETWORK_MAINNET : NETWORK_TEST];
+      return await web3Accounts({ genesisHash, ss58Format });
     }
 
     async function loadAllAccounts(ss58Format: any) {
@@ -45,7 +45,7 @@ export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boo
     return () => {
       subscription.unsubscribe();
     };
-  }, [isInitialized, ss58Format]);
+  }, [isInitialized, ss58Format, isMainnet]);
 
   return { accounts, isLoading: !setIsInitialized };
 }
