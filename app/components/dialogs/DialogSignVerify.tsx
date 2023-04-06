@@ -4,7 +4,7 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { web3FromSource } from "@polkadot/extension-dapp";
 import { u8aToHex } from "@polkadot/util";
 import { keyring } from "@polkadot/ui-keyring";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import useToaster from "../../hooks/useToaster";
 
 type IProps = {
@@ -15,15 +15,17 @@ type IProps = {
 
 const DIALOG_SIGN = "sign";
 const DIALOG_VERIFY = "verify";
+type DialogType = typeof DIALOG_SIGN | typeof DIALOG_VERIFY;
 
 type IData = {
   isSignatureValid: boolean;
   showValidationResults: boolean;
   publicKey: string;
   address: string;
-  messageType: "sign" | "verify";
+  messageType: DialogType;
   signedMessage: string;
   message: string;
+  messageToVerify: string;
 };
 
 export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
@@ -34,21 +36,20 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     publicKey: "",
     address: pair.address,
     messageType: DIALOG_SIGN,
-    signedMessage: "",
     message: "",
+    messageToVerify: "",
+    signedMessage: "",
   };
   const [data, setData] = useState<IData>(dataInitial);
-  const [messageToVerify, setMessageToVerify] = useState<string>("");
   const signatureTemplate = `-- Start message --\n${data.message}\n-- End message --\n\n-- Start P3D wallet signature --\n${data.signedMessage}\n-- End P3D wallet signature --\n\n-- Start public key --\n${data.publicKey}\n-- End public key --`;
   const canCopyToClipboard: boolean = navigator.clipboard?.writeText !== undefined;
   const canPasteFromClipboard: boolean = navigator.clipboard?.readText !== undefined;
 
   function handleOnOpening() {
     setData(dataInitial);
-    setMessageToVerify("");
   }
 
-  const handleCopyClick = () => {
+  function handleCopyClick() {
     navigator.clipboard.writeText(signatureTemplate).then(() => {
       toaster.show({
         message: "Message copied to clipboard!",
@@ -56,19 +57,14 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         icon: "tick",
       });
     });
-  };
+  }
 
-  const handlePasteClick = async () => {
-    const text = await navigator.clipboard.readText();
-    setMessageToVerify(text);
-  };
-
-  const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleMessageChange(event: React.ChangeEvent<HTMLInputElement>) {
     setData((prevState) => ({
       ...prevState,
       message: event.target.value,
     }));
-  };
+  }
 
   async function sign() {
     let signature: string;
@@ -108,50 +104,29 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     }
   }
 
-  // on message change, verify signature
-  useEffect(() => {
-    async function verify() {
-      if (!messageToVerify.trim()) {
-        return;
-      }
-
-      const messageRegex = /-- Start message --\n(.*)\n-- End message --/g;
-      const signatureRegex = /-- Start P3D wallet signature --\n(.*)\n-- End P3D wallet signature --/g;
-      const publicKeyRegex = /-- Start public key --\n(.*)\n-- End public key --/g;
-
-      const messageMatch = messageRegex.exec(messageToVerify);
-      const signatureMatch = signatureRegex.exec(messageToVerify);
-      const publicKeyMatch = publicKeyRegex.exec(messageToVerify);
-
-      let isValid = false;
-
-      if (messageMatch && signatureMatch && publicKeyMatch) {
-        const message = messageMatch[1].trim();
-        const signature = signatureMatch[1].trim();
-        const publicKey = publicKeyMatch[1].trim();
-
-        try {
-          const verification = await signatureVerify(message, signature, publicKey);
-          isValid = verification.isValid;
-        } catch (e: any) {
-          toaster.show({
-            icon: "error",
-            intent: Intent.DANGER,
-            message: e.message,
-          });
-        }
-      }
-
-      setData((prevState) => ({
-        ...prevState,
-        isSignatureValid: isValid,
-        showValidationResults: true,
-      }));
+  async function verify(messageToVerify: string) {
+    if (data.messageType !== DIALOG_VERIFY || !messageToVerify.trim()) {
+      return;
     }
 
-    if (data.messageType === DIALOG_VERIFY) {
+    const messageRegex = /-- Start message --\n(.*)\n-- End message --/g;
+    const signatureRegex = /-- Start P3D wallet signature --\n(.*)\n-- End P3D wallet signature --/g;
+    const publicKeyRegex = /-- Start public key --\n(.*)\n-- End public key --/g;
+
+    const messageMatch = messageRegex.exec(messageToVerify);
+    const signatureMatch = signatureRegex.exec(messageToVerify);
+    const publicKeyMatch = publicKeyRegex.exec(messageToVerify);
+
+    let isValid = false;
+
+    if (messageMatch && signatureMatch && publicKeyMatch) {
+      const message = messageMatch[1].trim();
+      const signature = signatureMatch[1].trim();
+      const publicKey = publicKeyMatch[1].trim();
+
       try {
-        void verify();
+        const verification = await signatureVerify(message, signature, publicKey);
+        isValid = verification.isValid;
       } catch (e: any) {
         toaster.show({
           icon: "error",
@@ -160,14 +135,39 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         });
       }
     }
-  }, [toaster, data.messageType, messageToVerify]);
 
-  async function handleVerifyMessageChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    setData((prevState) => ({
+      ...prevState,
+      isSignatureValid: isValid,
+      showValidationResults: true,
+    }));
+  }
+
+  function setMessageAndVerify(message: string) {
     setData((prevState) => ({
       ...prevState,
       showValidationResults: false,
+      messageToVerify: message,
     }));
-    setMessageToVerify(event.target.value);
+    try {
+      void verify(message);
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
+    }
+  }
+
+  async function handlePasteClick() {
+    const text = await navigator.clipboard.readText();
+    setMessageAndVerify(text);
+  }
+
+  function handleVerifyMessageChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    const text = event.target.value;
+    setMessageAndVerify(text);
   }
 
   return (
@@ -180,7 +180,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
               const inputElement = event.target as HTMLInputElement;
               setData((prevState) => ({
                 ...prevState,
-                messageType: inputElement.value as "sign" | "verify",
+                messageType: inputElement.value as DialogType,
               }));
             }}
             selectedValue={data.messageType}
@@ -215,7 +215,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
         {data.messageType === DIALOG_VERIFY && (
           <>
             <div className="relative">
-              <TextArea className="font-mono h-80 w-full p-2 text-left" value={messageToVerify} onChange={handleVerifyMessageChange} />
+              <TextArea className="font-mono h-80 w-full p-2 text-left" value={data.messageToVerify} onChange={handleVerifyMessageChange} />
               {canPasteFromClipboard && <Button className="bp3-dark absolute bottom-2 right-2" onClick={handlePasteClick} text="Paste" />}
             </div>
           </>
