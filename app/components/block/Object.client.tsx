@@ -16,12 +16,12 @@ interface IProps {
 }
 
 export default function Object({ geometry }: IProps) {
-  const meshRef = useRef<Mesh>();
+  const meshRef = useRef<Mesh>(null);
   const [scaled, setScaled] = useState(false);
 
   useEffect(() => {
     // scale object to fit in a viewport
-    if (!scaled) {
+    if (!scaled && meshRef.current) {
       const bbox = new THREE.Box3().setFromObject(meshRef.current);
       const size = bbox.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
