@@ -10,8 +10,8 @@ export interface IFormatOptions {
 }
 
 // RPC API
-export const defaultEndpoint = "wss://rpc2.3dpass.org";
-export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v3", defaultEndpoint);
+export const defaultEndpoint = "wss://rpc.3dpass.org";
+export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v4", defaultEndpoint);
 export const formatOptionsAtom = atom<IFormatOptions | false>(false);
 
 // Explorer GraphQL API
