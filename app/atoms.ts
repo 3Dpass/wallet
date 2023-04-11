@@ -13,6 +13,7 @@ export interface IFormatOptions {
 export const defaultEndpoint = "wss://rpc.3dpass.org";
 export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v4", defaultEndpoint);
 export const formatOptionsAtom = atom<IFormatOptions | false>(false);
+export const apiAdvancedModeAtom = atomWithStorage<boolean>("apiAdvancedMode_v1", false);
 
 // Explorer GraphQL API
 export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpoint_v1", "https://explorer-api.3dpass.org/graphql/");
