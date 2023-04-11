@@ -1,15 +1,17 @@
-import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import { Button, Checkbox, Classes, Dialog, Intent } from "@blueprintjs/core";
 import { useAtom } from "jotai";
-import { apiEndpointAtom, apiExplorerEndpointAtom } from "../../atoms";
+import { apiEndpointAtom, apiExplorerEndpointAtom, apiAdvancedModeAtom } from "../../atoms";
 import { useState } from "react";
 import TitledValue from "../common/TitledValue";
 
 export default function DialogSettings({ isOpen, onClose }) {
   const [apiEndpoint, setApiEndpoint] = useAtom(apiEndpointAtom);
   const [apiExplorerEndpoint, setApiExplorerEndpoint] = useAtom(apiExplorerEndpointAtom);
+  const [apiAdvancedMode, setApiAdvancedMode] = useAtom(apiAdvancedModeAtom);
   const dataInitial = {
     api_endpoint: apiEndpoint,
     api_explorer_endpoint: apiExplorerEndpoint,
+    api_advanced_sign: apiAdvancedMode,
   };
   const [data, setData] = useState(dataInitial);
 
@@ -20,6 +22,7 @@ export default function DialogSettings({ isOpen, onClose }) {
   function handleSaveClick() {
     setApiEndpoint(data.api_endpoint);
     setApiExplorerEndpoint(data.api_explorer_endpoint);
+    setApiAdvancedMode(data.api_advanced_sign);
     onClose();
   }
 
@@ -51,6 +54,11 @@ export default function DialogSettings({ isOpen, onClose }) {
           />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
+          <Checkbox checked={data.api_advanced_sign} large={false}
+            className="bp4-control absolute"
+            onChange={(e: any) => setData((prev) => ({ ...prev, api_advanced_sign: e.target.checked }))}>
+            Advanced
+          </Checkbox>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
             <Button onClick={onClose} text="Cancel" />
             <Button intent={Intent.PRIMARY} onClick={handleSaveClick} icon="tick" text="Save" />
