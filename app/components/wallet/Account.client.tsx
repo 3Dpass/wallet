@@ -1,6 +1,6 @@
 import { Alert, Button, Card, Text, Elevation, Icon, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { apiAdvancedModeAtom } from "../../atoms";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
@@ -26,7 +26,7 @@ export default function Account({ pair }: IProps) {
   const toaster = useToaster();
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
-  const [apiAdvancedMode] = useAtom(apiAdvancedModeAtom);
+  const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
 
   const dialogsInitial = {
     send: false,
@@ -176,19 +176,21 @@ export default function Account({ pair }: IProps) {
               )}
             </div>
             {apiAdvancedMode && (
-            <div className="text-right">
-              <Text className="font-bold">Advanced</Text>
-            </div>)}
+              <div className="text-right">
+                <Text className="font-bold">Advanced</Text>
+              </div>
+            )}
             {apiAdvancedMode && (
-            <div className="grid grid-cols-3 gap-1">
-              <Button text="Create a pool" onClick={() => console.log('hit1')} />
-              <Button text="Set up pool fee" onClick={() => console.log('hit2')} />
-              <Button className="text-center" text="Set up pool difficulty" onClick={() => console.log('hit3')} />
-              <Button text="Join a pool" onClick={() => console.log('hit4')} />
-              <Button text="Set up session" onClick={() => console.log('hit5')} />
-              <Button className="text-center" text="Rejoin the validator set" onClick={() => console.log('hit6')} />
-              <Button text="Unlock collateral" onClick={() => console.log('hit7')} />
-            </div>)}
+              <div className="grid grid-cols-3 gap-1">
+                <Button text="Create a pool" onClick={() => console.log("hit1")} />
+                <Button text="Set up pool fee" onClick={() => console.log("hit2")} />
+                <Button className="text-center" text="Set up pool difficulty" onClick={() => console.log("hit3")} />
+                <Button text="Join a pool" onClick={() => console.log("hit4")} />
+                <Button text="Set up session" onClick={() => console.log("hit5")} />
+                <Button className="text-center" text="Rejoin the validator set" onClick={() => console.log("hit6")} />
+                <Button text="Unlock collateral" onClick={() => console.log("hit7")} />
+              </div>
+            )}
           </>
         )}
       </div>
