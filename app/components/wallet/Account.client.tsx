@@ -11,6 +11,7 @@ import { AddressItem } from "../common/AddressItem";
 import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
+import DialogCreatePool from "../dialogs/DialogCreatePool";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 import useIsMainnet from "../../hooks/useIsMainnet";
@@ -34,6 +35,7 @@ export default function Account({ pair }: IProps) {
     unlock: false,
     lock_funds: false,
     sign_verify: false,
+    create_pool: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
@@ -133,6 +135,7 @@ export default function Account({ pair }: IProps) {
         onClose={() => dialogToggle("lock_funds")}
       />
       <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
+      <DialogCreatePool isOpen={dialogs.create_pool} onClose={() => dialogToggle("create_pool")} pair={pair} />
     </>
   );
 
@@ -182,7 +185,7 @@ export default function Account({ pair }: IProps) {
             )}
             {apiAdvancedMode && (
               <div className="grid grid-cols-3 gap-1">
-                <Button text="Create a pool" onClick={() => console.log("hit1")} />
+                <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
                 <Button text="Set up pool fee" onClick={() => console.log("hit2")} />
                 <Button className="text-center" text="Set up pool difficulty" onClick={() => console.log("hit3")} />
                 <Button text="Join a pool" onClick={() => console.log("hit4")} />
