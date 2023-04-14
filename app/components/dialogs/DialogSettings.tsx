@@ -4,7 +4,12 @@ import { apiEndpointAtom, apiExplorerEndpointAtom, apiAdvancedModeAtom } from ".
 import { useState } from "react";
 import TitledValue from "../common/TitledValue";
 
-export default function DialogSettings({ isOpen, onClose }) {
+type IProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export default function DialogSettings({ isOpen, onClose }: IProps) {
   const [apiEndpoint, setApiEndpoint] = useAtom(apiEndpointAtom);
   const [apiExplorerEndpoint, setApiExplorerEndpoint] = useAtom(apiExplorerEndpointAtom);
   const [apiAdvancedMode, setApiAdvancedMode] = useAtom(apiAdvancedModeAtom);
