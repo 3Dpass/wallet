@@ -13,6 +13,7 @@ import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import DialogCreatePool from "../dialogs/DialogCreatePool";
 import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
+import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 import useIsMainnet from "../../hooks/useIsMainnet";
@@ -38,6 +39,7 @@ export default function Account({ pair }: IProps) {
     sign_verify: false,
     create_pool: false,
     set_pool_interest: false,
+    set_pool_difficulty: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
@@ -139,6 +141,7 @@ export default function Account({ pair }: IProps) {
       <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
       <DialogCreatePool isOpen={dialogs.create_pool} onClose={() => dialogToggle("create_pool")} pair={pair} />
       <DialogSetPoolInterest isOpen={dialogs.set_pool_interest} onClose={() => dialogToggle("set_pool_interest")} pair={pair} />
+      <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => dialogToggle("set_pool_difficulty")} pair={pair} />
     </>
   );
 
@@ -190,7 +193,7 @@ export default function Account({ pair }: IProps) {
               <div className="grid grid-cols-3 gap-1">
                 <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
                 <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={pair.isLocked && !pair.meta.isInjected} />
-                <Button className="text-center" text="Set up pool difficulty" onClick={() => console.log("hit3")} />
+                <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")} disabled={pair.isLocked && !pair.meta.isInjected} />
                 <Button text="Join a pool" onClick={() => console.log("hit4")} />
                 <Button text="Set up session" onClick={() => console.log("hit5")} />
                 <Button className="text-center" text="Rejoin the validator set" onClick={() => console.log("hit6")} />
