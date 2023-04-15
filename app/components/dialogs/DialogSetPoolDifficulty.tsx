@@ -1,4 +1,4 @@
-import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import { Button, Classes, Dialog, Intent, NumericInput } from "@blueprintjs/core";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
@@ -8,7 +8,7 @@ import { miningPoolAtom } from "../../atoms";
 import { signAndSend } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
-import InterestInput from "../common/InterestInput";
+import { TypeRegistry, u256 } from "@polkadot/types";
 
 type IProps = {
   pair: KeyringPair;
@@ -16,7 +16,7 @@ type IProps = {
   onClose: () => void;
 };
 
-export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps) {
+export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -24,7 +24,7 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
   const [miningPool, setMiningPool] = useAtom(miningPoolAtom);
   const dataInitial = {
     mining_pool: miningPool,
-    interest: 0,
+    difficulty: 0,
   };
   const [data, setData] = useState(dataInitial);
 
@@ -37,8 +37,10 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
     setCanSubmit(api !== undefined);
   }, [api, {}]);
 
-  function handleInterestChange(valueAsNumber: number) {
-    setData((prev) => ({ ...prev, interest: valueAsNumber }));
+  function handleDifficultyChange(valueAsNumber: number) {
+    if (!isNaN(valueAsNumber)) {
+      setData((prev) => ({ ...prev, difficulty: valueAsNumber }));
+    }
   }
 
   async function handleSubmitClick() {
@@ -56,7 +58,7 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
     }
     setIsLoading(true);
     try {
-      const tx = api.tx.miningPool.setPoolInterest(data.interest);
+      const tx = api.tx.miningPool.setPoolDifficulty(data.difficulty);
       const options: Partial<SignerOptions> = {};
       const res = await signAndSend(tx, pair, options);
       console.log(res);
@@ -64,7 +66,7 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Pool interest was set",
+        message: "Pool difficulty was set",
       });
     } catch (e: any) {
       toaster.show({
@@ -80,9 +82,17 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
   }
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Set pool interest" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Set pool difficulty" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <InterestInput disabled={isLoading} onValueChange={handleInterestChange} placeholder="percent" />
+        <NumericInput
+          disabled={isLoading}
+          buttonPosition={"none"}
+          large={true}
+          fill={true}
+          placeholder="Pool difficulty"
+          onValueChange={handleDifficultyChange}
+          value={data.difficulty}
+        />
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -93,7 +103,7 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
             onClick={handleSubmitClick}
             icon="arrow-right"
             loading={isLoading}
-            text="Set interest"
+            text="Set difficulty"
           />
         </div>
       </div>
