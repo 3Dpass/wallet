@@ -1,4 +1,4 @@
-import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import { Button, Classes, Dialog, Intent, NumericInput } from "@blueprintjs/core";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
@@ -8,6 +8,7 @@ import { miningPoolAtom } from "../../atoms";
 import { signAndSend } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
+import InterestInput from "../common/InterestInput";
 
 type IProps = {
   pair: KeyringPair;
@@ -15,7 +16,7 @@ type IProps = {
   onClose: () => void;
 };
 
-export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
+export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -23,18 +24,22 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
   const [miningPool, setMiningPool] = useAtom(miningPoolAtom);
   const dataInitial = {
     mining_pool: miningPool,
+    interest: 0,
   };
   const [data, setData] = useState(dataInitial);
 
   function handleOnOpening() {
     setIsLoading(false);
     setData(dataInitial);
-    console.dir(api?.tx.miningPool);
   }
 
   useEffect(() => {
     setCanSubmit(api !== undefined);
   }, [api, {}]);
+
+  function handleInterestChange(valueAsNumber: number) {
+    setData((prev) => ({ ...prev, interest: valueAsNumber }));
+  }
 
   async function handleSubmitClick() {
     if (!api) {
@@ -51,7 +56,7 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
-      const tx = api.tx.miningPool.createPool();
+      const tx = api.tx.miningPool.setPoolInterest(data.interest);
       const options: Partial<SignerOptions> = {};
       const res = await signAndSend(tx, pair, options);
       console.log(res);
@@ -76,6 +81,9 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
 
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Create a new mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
+      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
+        <InterestInput disabled={isLoading} onValueChange={handleInterestChange} placeholder="percent" />
+      </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button onClick={onClose} text="Cancel" disabled={isLoading} />
