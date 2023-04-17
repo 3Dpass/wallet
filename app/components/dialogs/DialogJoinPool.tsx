@@ -1,11 +1,11 @@
-import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
-import { useEffect, useState } from "react";
+import { Button, Classes, Dialog, Intent, MenuItem } from "@blueprintjs/core";
+import { ItemPredicate, ItemRenderer, Select2 } from "@blueprintjs/select";
+import { MouseEventHandler, useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import { convertPool, IPool } from "../../utils/pool";
-import CustomSelect from "../common/Select";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
@@ -92,16 +92,46 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     setData((prev) => ({ ...prev, poolToJoin: poolId }));
   }
 
+  const filterPool: ItemPredicate<string> = (query, poolId, _index, exactMatch) => {
+    const normalizedId = poolId.toLowerCase();
+    const normalizedQuery = query.toLowerCase();
+    if (exactMatch) {
+        return normalizedId === normalizedQuery;
+    } else {
+        return normalizedId.indexOf(normalizedQuery) >= 0;
+    }
+  };
+
+  const renderPoolId: ItemRenderer<string> = (poolId, { handleClick, handleFocus, modifiers, query }) => {
+    if (!modifiers.matchesPredicate) {
+        return null;
+    }
+    return (
+        <MenuItem
+            active={modifiers.active}
+            disabled={modifiers.disabled}
+            key={poolId}
+            label={poolId}
+            onClick={handleClick as MouseEventHandler}
+            onFocus={handleFocus}
+            roleStructure="listoption"
+            text=""
+        />
+    );
+  };
+
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Join a mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <CustomSelect<string>
-          value={data.poolToJoin}
-          onChange={setPool}
-          options={data.poolIds}
-          mapOptionToLabel={(poolId: string) => poolId}
-          mapOptionToValue={(poolId: string) => poolId}
-        />
+        <Select2<string>
+          items={data.poolIds}
+          itemPredicate={filterPool}
+          itemRenderer={renderPoolId}
+          noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
+          onItemSelect={setPool}
+        >
+          <Button text={data.poolToJoin} rightIcon="double-caret-vertical" placeholder="Select a pool" className="bp4-context-menu" />
+        </Select2>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
