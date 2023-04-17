@@ -4,7 +4,7 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
-import { convertPool, filterPool, IPool } from "../../utils/pool";
+import { convertPool, poolsWithMember, IPool } from "../../utils/pool";
 import CustomSelect from "../common/Select";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
@@ -40,7 +40,7 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
     }
     console.log(pair.address);
     const pools = Array.from(await api.query.miningPool.pools.entries());
-    const poolsFiltered = filterPool(convertPool(pools), pair.address);
+    const poolsFiltered = poolsWithMember(convertPool(pools), pair.address);
     setData((prev) => ({ ...prev, pools: poolsFiltered.pools, poolIds: poolsFiltered.poolIds, poolToLeave: poolsFiltered.poolIds[0] }));
   }
 
