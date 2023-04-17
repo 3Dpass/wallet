@@ -4,7 +4,7 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
-import { convertPool, IPool } from "../../utils/pool";
+import { convertPool, filterPool, IPool } from "../../utils/pool";
 import CustomSelect from "../common/Select";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
@@ -38,18 +38,15 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
     if (!api) {
       return;
     }
-    const pools = await api.query.miningPool.pools(pair.address);
-    console.log(pools.toHuman());
-    // const pools = JSON.parse("[[[\"qwerty\"], [\"a\", \"b\"]], [[\"asdfg\"], [\"c\",\"d\"]]]");
-    const poolsConverted = convertPool(pools.toHuman());
-    // const poolsConverted = convertPool(pools);
-    setData((prev) => ({ ...prev, pools: poolsConverted.pools, poolIds: poolsConverted.poolIds, poolToLeave: poolsConverted.poolIds[0] }));
+    console.log(pair.address);
+    const pools = Array.from(await api.query.miningPool.pools.entries());
+    const poolsFiltered = filterPool(convertPool(pools), pair.address);
+    setData((prev) => ({ ...prev, pools: poolsFiltered.pools, poolIds: poolsFiltered.poolIds, poolToLeave: poolsFiltered.poolIds[0] }));
   }
 
   function handleOnOpening() {
     setIsLoading(false);
     setData(dataInitial);
-    console.dir(api?.tx.miningPool);
     loadPools().then(() => {});
   }
 

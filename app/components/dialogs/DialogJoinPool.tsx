@@ -38,17 +38,14 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     if (!api) {
       return;
     }
-    const pools = await api.query.miningPool.pools("");
-    console.log(pools.toHuman());
-    // const pools = JSON.parse("[[[\"qwerty\"], [\"a\", \"b\"]], [[\"asdfg\"], [\"c\",\"d\"]]]");
-    const poolsConverted = convertPool(pools.toHuman());
+    const pools = Array.from(await api.query.miningPool.pools.entries());
+    const poolsConverted = convertPool(pools);
     setData((prev) => ({ ...prev, pools: poolsConverted.pools, poolIds: poolsConverted.poolIds, poolToJoin: poolsConverted.poolIds[0] }));
   }
 
   function handleOnOpening() {
     setIsLoading(false);
     setData(dataInitial);
-    console.dir(api?.tx.miningPool);
     loadPools().then(() => {});
   }
 

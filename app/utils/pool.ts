@@ -1,7 +1,8 @@
-import { AnyJson } from "@polkadot/types/types";
+import { StorageKey } from "@polkadot/types";
+import { AnyTuple, Codec } from "@polkadot/types/types";
 
 export type IPool = {
-  poolId: string[];
+  poolId: string;
   poolMembers: string[];
 };
 
@@ -10,17 +11,34 @@ export type IPoolBox = {
   poolIds: string[];
 }
 
-export const convertPool = (poolsSource: AnyJson): IPoolBox => {
+export const convertPool = (poolsSource: [StorageKey<AnyTuple>, Codec][]): IPoolBox => {
   let pools: IPool[] = [];
   let poolIds: string[] = [];
-  (poolsSource as string[][][]).forEach(function (p: string[][]) {
-    pools.push({ poolId: p[0], poolMembers: p[1] });
-    if (p[0] && p[0][0]) {
-      poolIds.push(p[0][0]);
+  let currentPoolId: string;
+  poolsSource.forEach(function (p: [StorageKey<AnyTuple>, Codec]) {
+    currentPoolId = (p[0].toHuman() as string[])[0];
+    if (currentPoolId && p[1]) {
+      pools.push({ poolId: currentPoolId, poolMembers: (p[1].toHuman() as string[]) });
+      poolIds.push(currentPoolId);
     }
   })
   return {
     pools: pools,
     poolIds: poolIds,
+  }
+};
+
+export const filterPool = (poolBox: IPoolBox, accountId: string): IPoolBox => {
+  let poolsNew: IPool[] = [];
+  let poolIdsNew: string[] = [];
+  poolBox.pools.forEach(function (p: IPool) {
+    if (p.poolMembers.includes(accountId)) {
+      poolsNew.push(p);
+      poolIdsNew.push(p.poolId);
+    }
+  });
+  return {
+    pools: poolsNew,
+    poolIds: poolIdsNew,
   }
 };
