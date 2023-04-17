@@ -16,7 +16,7 @@ export default function DialogSettings({ isOpen, onClose }: IProps) {
   const dataInitial = {
     api_endpoint: apiEndpoint,
     api_explorer_endpoint: apiExplorerEndpoint,
-    api_advanced_sign: apiAdvancedMode,
+    api_advanced_mode: apiAdvancedMode,
   };
   const [data, setData] = useState(dataInitial);
 
@@ -27,7 +27,7 @@ export default function DialogSettings({ isOpen, onClose }: IProps) {
   function handleSaveClick() {
     setApiEndpoint(data.api_endpoint);
     setApiExplorerEndpoint(data.api_explorer_endpoint);
-    setApiAdvancedMode(data.api_advanced_sign);
+    setApiAdvancedMode(data.api_advanced_mode);
     onClose();
   }
 
@@ -59,10 +59,10 @@ export default function DialogSettings({ isOpen, onClose }: IProps) {
           />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
-          <Checkbox checked={data.api_advanced_sign} large={false}
+          <Checkbox checked={data.api_advanced_mode} large={false}
             className="bp4-control absolute"
-            onChange={(e: any) => setData((prev) => ({ ...prev, api_advanced_sign: e.target.checked }))}>
-            Advanced
+            onChange={(e: any) => setData((prev) => ({ ...prev, api_advanced_mode: e.target.checked }))}>
+            Advanced mode
           </Checkbox>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
             <Button onClick={onClose} text="Cancel" />

@@ -46,7 +46,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
   function handleOnOpening() {
     setIsLoading(false);
     setData(dataInitial);
-    loadPools().then(() => {});
+    void loadPools();
   }
 
   useEffect(() => {
