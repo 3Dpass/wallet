@@ -4,9 +4,9 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
+import CustomSelect from "../common/Select";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
-import InterestInput from "../common/InterestInput";
 
 type IProps = {
   pair: KeyringPair;
@@ -14,28 +14,59 @@ type IProps = {
   onClose: () => void;
 };
 
-export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps) {
+type IPool = {
+  poolId: string[];
+  poolMembers: string[];
+};
+
+type IPoolBox = {
+  pools: IPool[];
+  poolIds: string[];
+  poolToJoin: string;
+}
+
+export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const dataInitial = {
-    interest: 0,
+
+  const dataInitial: IPoolBox = {
+    pools: [],
+    poolIds: [],
+    poolToJoin: "",
   };
   const [data, setData] = useState(dataInitial);
+
+  async function loadPools() {
+    if (!api) {
+      return;
+    }
+    const pools = await api.query.miningPool.pools("");
+    console.log(pools.toHuman());
+    // const pools = JSON.parse("[[[\"qwerty\"], [\"a\", \"b\"]], [[\"asdfg\"], [\"c\",\"d\"]]]");
+    let pools_updated: IPool[] = [];
+    let pool_ids: string[] = [];
+    (pools.toHuman() as string[][][]).forEach(function(p: string[][]) {
+    // (pools as string[][][]).forEach(function(p: string[][]) {
+        pools_updated.push({poolId: p[0], poolMembers: p[1]});
+        if (p[0] && p[0][0]) {
+          pool_ids.push(p[0][0]);
+        }
+    })
+    setData((prev) => ({ ...prev, pools: pools_updated, poolIds: pool_ids, poolToJoin: pool_ids[0] }));
+  }
 
   function handleOnOpening() {
     setIsLoading(false);
     setData(dataInitial);
+    console.dir(api?.tx.miningPool);
+    loadPools().then(() => {});
   }
 
   useEffect(() => {
     setCanSubmit(api !== undefined);
   }, [api, {}]);
-
-  function handleInterestChange(valueAsNumber: number) {
-    setData((prev) => ({ ...prev, interest: valueAsNumber }));
-  }
 
   async function handleSubmitClick() {
     if (!api) {
@@ -52,13 +83,13 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
     }
     setIsLoading(true);
     try {
-      const tx = api.tx.miningPool.setPoolInterest(data.interest);
+      const tx = api.tx.miningPool.addMemberSelf(data.poolToJoin);
       const options: Partial<SignerOptions> = {};
       await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Pool interest was set",
+        message: "You have joined the mining pool",
       });
     } catch (e: any) {
       toaster.show({
@@ -72,10 +103,20 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
     }
   }
 
+  function setPool(poolId: string) {
+    setData((prev) => ({ ...prev, poolToJoin: poolId }));
+  }
+
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Set pool interest" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Join a mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <InterestInput disabled={isLoading} onValueChange={handleInterestChange} placeholder="percent" />
+        <CustomSelect<string>
+          value={data.poolToJoin}
+          onChange={setPool}
+          options={data.poolIds}
+          mapOptionToLabel={(poolId: string) => poolId}
+          mapOptionToValue={(poolId: string) => poolId}
+        />
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -84,9 +125,9 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
-            icon="arrow-right"
+            icon="add"
             loading={isLoading}
-            text="Set interest"
+            text="Join the pool"
           />
         </div>
       </div>
