@@ -18,10 +18,10 @@ type IProps = {
 type IPoolData = {
   pools: IPool[];
   poolIds: string[];
-  poolToJoin: string;
+  poolToLeave: string;
 }
 
-export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
+export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -30,7 +30,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
   const dataInitial: IPoolData = {
     pools: [],
     poolIds: [],
-    poolToJoin: "",
+    poolToLeave: "",
   };
   const [data, setData] = useState(dataInitial);
 
@@ -38,11 +38,12 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     if (!api) {
       return;
     }
-    const pools = await api.query.miningPool.pools("");
+    const pools = await api.query.miningPool.pools(pair.address);
     console.log(pools.toHuman());
     // const pools = JSON.parse("[[[\"qwerty\"], [\"a\", \"b\"]], [[\"asdfg\"], [\"c\",\"d\"]]]");
     const poolsConverted = convertPool(pools.toHuman());
-    setData((prev) => ({ ...prev, pools: poolsConverted.pools, poolIds: poolsConverted.poolIds, poolToJoin: poolsConverted.poolIds[0] }));
+    // const poolsConverted = convertPool(pools);
+    setData((prev) => ({ ...prev, pools: poolsConverted.pools, poolIds: poolsConverted.poolIds, poolToLeave: poolsConverted.poolIds[0] }));
   }
 
   function handleOnOpening() {
@@ -71,13 +72,13 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
-      const tx = api.tx.miningPool.addMemberSelf(data.poolToJoin);
+      const tx = api.tx.miningPool.removeMemberSelf(data.poolToLeave);
       const options: Partial<SignerOptions> = {};
       await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "You have joined the mining pool",
+        message: "You have left the mining pool",
       });
     } catch (e: any) {
       toaster.show({
@@ -92,14 +93,14 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
   }
 
   function setPool(poolId: string) {
-    setData((prev) => ({ ...prev, poolToJoin: poolId }));
+    setData((prev) => ({ ...prev, poolToLeave: poolId }));
   }
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Join a mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Leave a mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <CustomSelect<string>
-          value={data.poolToJoin}
+          value={data.poolToLeave}
           onChange={setPool}
           options={data.poolIds}
           mapOptionToLabel={(poolId: string) => poolId}
@@ -115,7 +116,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
             onClick={handleSubmitClick}
             icon="add"
             loading={isLoading}
-            text="Join the pool"
+            text="Leave the pool"
           />
         </div>
       </div>
