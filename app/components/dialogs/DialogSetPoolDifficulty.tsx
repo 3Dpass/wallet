@@ -4,11 +4,9 @@ import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
-import { miningPoolAtom } from "../../atoms";
 import { signAndSend } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
-import { TypeRegistry, u256 } from "@polkadot/types";
 
 type IProps = {
   pair: KeyringPair;
@@ -21,9 +19,7 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [miningPool, setMiningPool] = useAtom(miningPoolAtom);
   const dataInitial = {
-    mining_pool: miningPool,
     difficulty: 0,
   };
   const [data, setData] = useState(dataInitial);
@@ -60,9 +56,7 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
     try {
       const tx = api.tx.miningPool.setPoolDifficulty(data.difficulty);
       const options: Partial<SignerOptions> = {};
-      const res = await signAndSend(tx, pair, options);
-      console.log(res);
-      setData((prev) => ({ ...prev, mining_pool: res }))
+      await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
@@ -75,7 +69,6 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
         message: e.message,
       });
     } finally {
-      setMiningPool(data.mining_pool);
       setIsLoading(false);
       onClose();
     }

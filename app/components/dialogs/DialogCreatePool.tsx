@@ -1,10 +1,8 @@
 import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
-import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
-import { miningPoolAtom } from "../../atoms";
 import { signAndSend } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
@@ -20,16 +18,9 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [miningPool, setMiningPool] = useAtom(miningPoolAtom);
-  const dataInitial = {
-    mining_pool: miningPool,
-  };
-  const [data, setData] = useState(dataInitial);
 
   function handleOnOpening() {
     setIsLoading(false);
-    setData(dataInitial);
-    console.dir(api?.tx.miningPool);
   }
 
   useEffect(() => {
@@ -53,9 +44,7 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
     try {
       const tx = api.tx.miningPool.createPool();
       const options: Partial<SignerOptions> = {};
-      const res = await signAndSend(tx, pair, options);
-      console.log(res);
-      setData((prev) => ({ ...prev, mining_pool: res }))
+      await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
@@ -68,7 +57,6 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
         message: e.message,
       });
     } finally {
-      setMiningPool(data.mining_pool);
       setIsLoading(false);
       onClose();
     }

@@ -14,6 +14,7 @@ import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import DialogCreatePool from "../dialogs/DialogCreatePool";
 import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
+import DialogJoinPool from "../dialogs/DialogJoinPool";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 import useIsMainnet from "../../hooks/useIsMainnet";
@@ -40,11 +41,18 @@ export default function Account({ pair }: IProps) {
     create_pool: false,
     set_pool_interest: false,
     set_pool_difficulty: false,
+    join_pool: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
+
+  function updateBalances() {
+    api?.derive.balances.all(pair.address).then((balances) => {
+      setBalances(balances);
+    });
+  }
 
   useEffect(() => {
     if (!api) {
@@ -113,6 +121,11 @@ export default function Account({ pair }: IProps) {
     dialogToggle("sign_verify");
   }
 
+  function onCloseTransactionDialog(name: keyof typeof dialogsInitial) {
+    updateBalances();
+    dialogToggle(name);
+  }
+
   const dialogElements = (
     <>
       <Alert
@@ -139,9 +152,10 @@ export default function Account({ pair }: IProps) {
         onClose={() => dialogToggle("lock_funds")}
       />
       <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
-      <DialogCreatePool isOpen={dialogs.create_pool} onClose={() => dialogToggle("create_pool")} pair={pair} />
-      <DialogSetPoolInterest isOpen={dialogs.set_pool_interest} onClose={() => dialogToggle("set_pool_interest")} pair={pair} />
-      <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => dialogToggle("set_pool_difficulty")} pair={pair} />
+      <DialogCreatePool isOpen={dialogs.create_pool} onClose={() => onCloseTransactionDialog("create_pool")} pair={pair} />
+      <DialogSetPoolInterest isOpen={dialogs.set_pool_interest} onClose={() => onCloseTransactionDialog("set_pool_interest")} pair={pair} />
+      <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => onCloseTransactionDialog("set_pool_difficulty")} pair={pair} />
+      <DialogJoinPool isOpen={dialogs.join_pool} onClose={() => onCloseTransactionDialog("join_pool")} pair={pair} />
     </>
   );
 
@@ -194,10 +208,8 @@ export default function Account({ pair }: IProps) {
                 <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
                 <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={pair.isLocked && !pair.meta.isInjected} />
                 <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")} disabled={pair.isLocked && !pair.meta.isInjected} />
-                <Button text="Join a pool" onClick={() => console.log("hit4")} />
-                <Button text="Set up session" onClick={() => console.log("hit5")} />
-                <Button className="text-center" text="Rejoin the validator set" onClick={() => console.log("hit6")} />
-                <Button text="Unlock collateral" onClick={() => console.log("hit7")} />
+                <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
+                <Button text="Leave a pool" onClick={() => console.log("hit5")} />
               </div>
             )}
           </>
