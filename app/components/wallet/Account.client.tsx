@@ -15,6 +15,7 @@ import DialogCreatePool from "../dialogs/DialogCreatePool";
 import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
 import DialogJoinPool from "../dialogs/DialogJoinPool";
+import DialogLeavePool from "../dialogs/DialogLeavePool";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 import useIsMainnet from "../../hooks/useIsMainnet";
@@ -42,6 +43,7 @@ export default function Account({ pair }: IProps) {
     set_pool_interest: false,
     set_pool_difficulty: false,
     join_pool: false,
+    leave_pool: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
@@ -156,6 +158,7 @@ export default function Account({ pair }: IProps) {
       <DialogSetPoolInterest isOpen={dialogs.set_pool_interest} onClose={() => onCloseTransactionDialog("set_pool_interest")} pair={pair} />
       <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => onCloseTransactionDialog("set_pool_difficulty")} pair={pair} />
       <DialogJoinPool isOpen={dialogs.join_pool} onClose={() => onCloseTransactionDialog("join_pool")} pair={pair} />
+      <DialogLeavePool isOpen={dialogs.leave_pool} onClose={() => onCloseTransactionDialog("leave_pool")} pair={pair} />
     </>
   );
 
@@ -209,7 +212,7 @@ export default function Account({ pair }: IProps) {
                 <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={pair.isLocked && !pair.meta.isInjected} />
                 <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")} disabled={pair.isLocked && !pair.meta.isInjected} />
                 <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
-                <Button text="Leave a pool" onClick={() => console.log("hit5")} />
+                <Button text="Leave a pool" onClick={() => dialogToggle("leave_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
               </div>
             )}
           </>
