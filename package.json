@@ -14,6 +14,7 @@
     "@apollo/client": "3.7.11",
     "@blueprintjs/core": "4.17.8",
     "@blueprintjs/popover2": "1.13.12",
+    "@blueprintjs/select": "4.9.1",
     "@polkadot/api": "10.2.2",
     "@polkadot/api-derive": "10.2.2",
     "@polkadot/extension-dapp": "0.45.5",
