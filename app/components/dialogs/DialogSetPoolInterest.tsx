@@ -6,7 +6,7 @@ import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
-import InterestInput from "../common/InterestInput";
+import AmountInput from "../common/AmountInput";
 
 type IProps = {
   pair: KeyringPair;
@@ -75,7 +75,7 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Set pool interest" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <InterestInput disabled={isLoading} onValueChange={handleInterestChange} placeholder="percent" />
+        <AmountInput disabled={isLoading} onValueChange={handleInterestChange} placeholder="percent" formatOptionsUnit="%" />
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>

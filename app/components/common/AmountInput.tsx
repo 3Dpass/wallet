@@ -7,9 +7,10 @@ type IProps = {
   disabled: boolean;
   onValueChange: (valueAsNumber: number, valueAsString: string) => void;
   placeholder?: string;
+  formatOptionsUnit?: string | null
 };
 
-export default function AmountInput({ disabled, onValueChange, placeholder }: IProps) {
+export default function AmountInput({ disabled, onValueChange, placeholder, formatOptionsUnit }: IProps) {
   const [amount, setAmount] = useState("");
   const formatOptions = useAtomValue(formatOptionsAtom);
 
@@ -31,7 +32,7 @@ export default function AmountInput({ disabled, onValueChange, placeholder }: IP
       fill={true}
       min={0}
       minorStepSize={0.001}
-      rightElement={<Tag minimal={true}>{formatOptions && formatOptions.unit}</Tag>}
+      rightElement={<Tag minimal={true}>{formatOptionsUnit || formatOptions && formatOptions.unit}</Tag>}
     />
   );
 }

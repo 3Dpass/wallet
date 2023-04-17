@@ -25,7 +25,7 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
 
   useEffect(() => {
     setCanSubmit(api !== undefined);
-  }, [api, {}]);
+  }, [api]);
 
   async function handleSubmitClick() {
     if (!api) {
