@@ -28,7 +28,7 @@ export const convertPool = (poolsSource: [StorageKey<AnyTuple>, Codec][]): IPool
   }
 };
 
-export const filterPool = (poolBox: IPoolBox, accountId: string): IPoolBox => {
+export const poolsWithMember = (poolBox: IPoolBox, accountId: string): IPoolBox => {
   let poolsNew: IPool[] = [];
   let poolIdsNew: string[] = [];
   poolBox.pools.forEach(function (p: IPool) {
