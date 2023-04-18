@@ -151,6 +151,8 @@ export default function Account({ pair }: IProps) {
     </>
   );
 
+  const accountLocked = pair.isLocked && !pair.meta.isInjected;
+
   return (
     <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
       {dialogElements}
@@ -164,7 +166,7 @@ export default function Account({ pair }: IProps) {
               <TitledValue title="Transferable" value={<FormattedAmount value={balances.availableBalance.toBigInt()} />} />
               <TitledValue title="Locked" value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />} />
             </div>
-            {pair.isLocked && !pair.meta.isInjected && (
+            {accountLocked && (
               <div className="my-2 text-center">
                 Account is <Icon icon="lock" /> password protected, you need to{" "}
                 <a href="#" onClick={handleUnlockAccount} className="text-white underline underline-offset-4">
@@ -174,16 +176,16 @@ export default function Account({ pair }: IProps) {
               </div>
             )}
             <div className="grid grid-cols-3 gap-1">
-              <Button icon="send-to" text="Send..." onClick={() => dialogToggle("send")} disabled={pair.isLocked && !pair.meta.isInjected} />
+              <Button icon="send-to" text="Send..." onClick={() => dialogToggle("send")} disabled={accountLocked} />
               <Button icon="duplicate" text="Copy" onClick={handleCopyAddress} />
-              <Button icon="endorsed" text="Sign & Verify" onClick={handleSignVerify} disabled={pair.isLocked && !pair.meta.isInjected} />
+              <Button icon="endorsed" text="Sign & Verify" onClick={handleSignVerify} disabled={accountLocked} />
               <Button
                 icon="unlock"
                 text="Unlock"
                 onClick={handleUnlockFundsClick}
-                disabled={balances.lockedBalance.toBigInt() <= 0 || (pair.isLocked && !pair.meta.isInjected)}
+                disabled={balances.lockedBalance.toBigInt() <= 0 || (accountLocked)}
               />
-              <Button icon="lock" text="Lock..." onClick={handleLockFundsClick} disabled={pair.isLocked && !pair.meta.isInjected} />
+              <Button icon="lock" text="Lock..." onClick={handleLockFundsClick} disabled={accountLocked} />
               {!pair.meta.isInjected && (
                 <>
                   <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
@@ -196,11 +198,11 @@ export default function Account({ pair }: IProps) {
                   <Text className="font-bold">Advanced</Text>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
-                  <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
-                  <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={pair.isLocked && !pair.meta.isInjected} />
-                  <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")} disabled={pair.isLocked && !pair.meta.isInjected} />
-                  <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
-                  <Button text="Leave a pool" onClick={() => dialogToggle("leave_pool")} disabled={pair.isLocked && !pair.meta.isInjected} />
+                  <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={accountLocked} />
+                  <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked} />
+                  <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")} disabled={accountLocked} />
+                  <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />
+                  <Button text="Leave a pool" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />
                 </div>
               </>
             )}
