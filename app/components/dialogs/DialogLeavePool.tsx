@@ -123,14 +123,21 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Leave a mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <Select2<string>
+        <Select2
           items={data.poolIds}
           itemPredicate={filterPool}
           itemRenderer={renderPoolId}
           noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
           onItemSelect={setPool}
+          popoverProps={{ matchTargetWidth: true }}
+          fill={true}
         >
-          <Button text={data.poolToLeave} rightIcon="double-caret-vertical" placeholder="Select a pool" className="bp4-context-menu" />
+          <Button
+            text={data.poolToLeave}
+            rightIcon="double-caret-vertical"
+            placeholder="Select a pool"
+            className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
+          />
         </Select2>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
