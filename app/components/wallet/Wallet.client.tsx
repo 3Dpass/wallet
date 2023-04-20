@@ -57,7 +57,7 @@ export default function Wallet() {
   }
 
   if (isLoading || !api) {
-    return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed"></div>;
+    return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed" />;
   }
 
   return (

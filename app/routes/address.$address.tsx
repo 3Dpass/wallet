@@ -39,7 +39,7 @@ export default function Address() {
             <th>
               <div className="text-right">Value</div>
             </th>
-            <th></th>
+            <th />
           </tr>
         </thead>
         <tbody>
