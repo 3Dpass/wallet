@@ -11,6 +11,8 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { isValidPolkadotAddress } from "./utils/address";
 import { NETWORK_MAINNET, ss58formats } from "./api.config";
 import useApi from "./hooks/useApi";
+import { apiAdvancedModeAtom, poolIdsAtom } from "./atoms";
+import { convertPool } from "./utils/pool";
 
 export function meta() {
   return [{ charset: "utf-8" }, { title: "3DPass Wallet" }, { viewport: "width=device-width,initial-scale=1" }];
@@ -35,6 +37,8 @@ export default function App() {
   const [searchValue, setSearchValue] = useState("");
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
   const setFormatOptions = useSetAtom(formatOptionsAtom);
+  const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
+  const setPoolIds = useSetAtom(poolIdsAtom);
 
   useEffect(() => {
     setToaster(toasterRef.current);
@@ -50,6 +54,17 @@ export default function App() {
       unit: api.registry.chainTokens[0],
     });
   }, [api, setFormatOptions]);
+
+  useEffect(() => {
+    if (apiAdvancedMode) {
+      api?.query.miningPool.pools.entries().then(
+        (pools) => {
+          const poolsIds = convertPool(Array.from(pools));
+          setPoolIds(poolsIds.poolIds);
+        }
+      )
+    }
+  }, [api, apiAdvancedMode, setPoolIds]);
 
   const client = new ApolloClient({
     uri: apiExplorerEndpoint,
