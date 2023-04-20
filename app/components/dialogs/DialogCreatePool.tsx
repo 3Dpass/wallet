@@ -48,14 +48,15 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
       const tx = api.tx.miningPool.createPool();
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSendWithSubscribtion(tx, pair, options, ({ events = [], status, txHash }) => {
-        if (status.isFinalized) {
-          events.forEach(({ phase, event: { data, method, section } }) => {
-            if (method == 'ExtrinsicSuccess' && poolIds.includes(pair.address)) {
-              setPoolIds([pair.address, ...poolIds]);
-            }
-          });
-          unsub();
+        if (!status.isFinalized) {
+          return;
         }
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          if (method == 'ExtrinsicSuccess' && poolIds.includes(pair.address)) {
+            setPoolIds([pair.address, ...poolIds]);
+          }
+        });
+        unsub();
       });
       toaster.show({
         icon: "endorsed",
