@@ -1,5 +1,4 @@
 import { Button, Classes, Dialog, Intent, NumericInput } from "@blueprintjs/core";
-import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 

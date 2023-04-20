@@ -1,9 +1,11 @@
 import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
-import { signAndSend } from "../../utils/sign";
+import { poolIdsAtom } from "../../atoms";
+import { signAndSendWithSubscribtion } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
@@ -18,6 +20,7 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [poolIds, setPoolIds] = useAtom(poolIdsAtom);
 
   function handleOnOpening() {
     setIsLoading(false);
@@ -44,7 +47,16 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
     try {
       const tx = api.tx.miningPool.createPool();
       const options: Partial<SignerOptions> = {};
-      await signAndSend(tx, pair, options);
+      const unsub = await signAndSendWithSubscribtion(tx, pair, options, ({ events = [], status, txHash }) => {
+        if (status.isFinalized) {
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            if (method == 'ExtrinsicSuccess' && poolIds.includes(pair.address)) {
+              setPoolIds([pair.address, ...poolIds]);
+            }
+          });
+          unsub();
+        }
+      });
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,

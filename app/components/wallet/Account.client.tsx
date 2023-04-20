@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Text, Elevation, Icon, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
-import { apiAdvancedModeAtom } from "../../atoms";
+import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
@@ -32,6 +32,8 @@ export default function Account({ pair }: IProps) {
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
+  const poolIds = useAtomValue(poolIdsAtom);
+  const poolAlreadyExist = poolIds.includes(pair.address)
 
   const dialogsInitial = {
     send: false,
@@ -198,9 +200,10 @@ export default function Account({ pair }: IProps) {
                   <Text className="font-bold">Advanced</Text>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
-                  <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={accountLocked} />
-                  <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked} />
-                  <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")} disabled={accountLocked} />
+                  <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={accountLocked || poolAlreadyExist} />
+                  <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked || !poolAlreadyExist} />
+                  <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")}
+                    disabled={accountLocked || !poolAlreadyExist} />
                   <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />
                   <Button text="Leave a pool" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />
                 </div>
