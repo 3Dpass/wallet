@@ -50,8 +50,8 @@ export default function Address() {
               }
               const fromAddress = encodeAddress(transfer.fromMultiAddressAccountId, ss58format);
               const toAddress = encodeAddress(transfer.toMultiAddressAccountId, ss58format);
-              const otherAddress = fromAddress != address ? fromAddress : toAddress;
-              const outgoing = fromAddress == address;
+              const otherAddress = fromAddress !== address ? fromAddress : toAddress;
+              const outgoing = fromAddress === address;
               return (
                 <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
                   <td>

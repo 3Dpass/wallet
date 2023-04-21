@@ -3,5 +3,5 @@ import { useSS58Format } from "./useSS58Format";
 
 export default function useIsMainnet() {
   const ss58 = useSS58Format();
-  return ss58 == ss58formats[NETWORK_MAINNET];
+  return ss58 === ss58formats[NETWORK_MAINNET];
 }
