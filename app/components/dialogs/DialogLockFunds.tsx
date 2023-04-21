@@ -31,10 +31,10 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
   };
   const [data, setData] = useState(dataInitial);
 
-  const handleOnOpening = useCallback(async () => {
+  const handleOnOpening = useCallback(() => {
     setIsLoading(false);
     setData(dataInitial);
-  }, [setData, setIsLoading]);
+  }, [dataInitial, setData, setIsLoading]);
 
   useEffect(() => {
     if (!isOpen || !api) {
