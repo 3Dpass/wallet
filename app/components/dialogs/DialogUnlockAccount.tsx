@@ -1,5 +1,5 @@
 import { Button, Classes, Dialog, Icon, InputGroup, Intent } from "@blueprintjs/core";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import useToaster from "../../hooks/useToaster";
 
@@ -17,7 +17,7 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
     setPassphrase("");
   }
 
-  async function handleSendClick() {
+  const handleSendClick = useCallback(async () => {
     try {
       await pair.unlock(passphrase);
       toaster.show({
@@ -33,7 +33,7 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
         message: e.message,
       });
     }
-  }
+  }, [pair, passphrase, onClose, toaster]);
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Unlock account">
