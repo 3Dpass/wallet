@@ -1,6 +1,6 @@
 import { Button, Checkbox, Classes, Dialog, Intent, NumericInput, Tag } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AmountInput from "../common/AmountInput";
 import { signAndSend } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
@@ -31,10 +31,10 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
   };
   const [data, setData] = useState(dataInitial);
 
-  async function handleOnOpening() {
+  const handleOnOpening = useCallback(async () => {
     setIsLoading(false);
     setData(dataInitial);
-  }
+  }, [setData, setIsLoading]);
 
   useEffect(() => {
     if (!isOpen || !api) {
@@ -61,19 +61,19 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
     setCanSubmit(data.amount_number > 0 && data.block_number >= data.current_block + autoExtendPeriod);
   }, [isOpen, api, data]);
 
-  function handleAmountChange(valueAsNumber: number, valueAsString: string) {
+  const handleAmountChange = useCallback((valueAsNumber: number, valueAsString: string) => {
     setData((prev) => ({ ...prev, amount: valueAsString, amount_number: valueAsNumber }));
-  }
+  }, []);
 
-  function handleBlockChange(valueAsNumber: number, valueAsString: string) {
+  const handleBlockChange = useCallback((valueAsNumber: number, valueAsString: string) => {
     setData((prev) => ({ ...prev, block: valueAsString, block_number: valueAsNumber }));
-  }
+  }, []);
 
-  function handleAutoExtendChange() {
+  const handleAutoExtendChange = useCallback(() => {
     setData((prev) => ({ ...prev, auto_extend: !prev.auto_extend }));
-  }
+  }, []);
 
-  async function handleSubmitClick() {
+  const handleSubmitClick = useCallback(async () => {
     if (!api) {
       return;
     }
@@ -97,7 +97,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [api, data, onAfterSubmit, pair, toaster]);
 
   return (
     <Dialog isOpen={isOpen} usePortal={true} onClose={onClose} onOpening={handleOnOpening} className="w-[90%] sm:w-[640px]">

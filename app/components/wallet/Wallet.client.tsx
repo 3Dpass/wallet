@@ -23,41 +23,49 @@ export default function Wallet() {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
 
-  function handleSeedPhraseImportClick(seed_phrase: string, password: string) {
-    try {
-      const currentPairs = keyring.getPairs();
-      const result = keyring.addUri(seed_phrase, password);
-
-      if (currentPairs.some((keyringAddress) => keyringAddress.address === result.pair.address)) {
-        throw new Error(`Wallet already imported`);
+  const handleSeedPhraseImportClick = useCallback(
+    (seed_phrase: string, password: string) => {
+      try {
+        const currentPairs = keyring.getPairs();
+        const result = keyring.addUri(seed_phrase, password);
+        if (currentPairs.some((keyringAddress) => keyringAddress.address === result.pair.address)) {
+          toaster.show({
+            icon: "warning-sign",
+            intent: Intent.WARNING,
+            message: "Wallet already imported",
+          });
+        }
+        dialogToggle("seed_phrase");
+      } catch (e: any) {
+        toaster.show({
+          icon: "ban-circle",
+          intent: Intent.DANGER,
+          message: e.message,
+        });
       }
+    },
+    [dialogToggle, toaster]
+  );
 
-      dialogToggle("seed_phrase");
-    } catch (e: any) {
-      toaster.show({
-        icon: "ban-circle",
-        intent: Intent.DANGER,
-        message: e.message,
-      });
-    }
-  }
-
-  function handleJSONWalletImportClick(json: string) {
-    try {
-      const pair = keyring.createFromJson(JSON.parse(json));
-      keyring.addPair(pair, "");
-      dialogToggle("json");
-    } catch (e: any) {
-      toaster.show({
-        icon: "ban-circle",
-        intent: Intent.DANGER,
-        message: e.message,
-      });
-    }
-  }
+  const handleJSONWalletImportClick = useCallback(
+    (json: string) => {
+      try {
+        const pair = keyring.createFromJson(JSON.parse(json));
+        keyring.addPair(pair, "");
+        dialogToggle("json");
+      } catch (e: any) {
+        toaster.show({
+          icon: "ban-circle",
+          intent: Intent.DANGER,
+          message: e.message,
+        });
+      }
+    },
+    [dialogToggle, toaster]
+  );
 
   if (isLoading || !api) {
-    return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed"></div>;
+    return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed" />;
   }
 
   return (

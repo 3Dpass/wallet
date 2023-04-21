@@ -32,11 +32,10 @@ async function loadNetworkState() {
   let frozen = BigInt(0);
   let circulating = BigInt(0);
   const accounts = await api.query.system.account.entries<AccountInfo>();
-  accounts.map(([_, account]) => {
-    const data = account.data as AccountData;
-    frozen += data.miscFrozen.toBigInt();
-    circulating += data.free.toBigInt();
-    return null;
+  accounts.forEach(([, account]) => {
+    const { miscFrozen, free } = account.data as AccountData;
+    frozen += miscFrozen.toBigInt();
+    circulating += free.toBigInt();
   });
 
   return {
