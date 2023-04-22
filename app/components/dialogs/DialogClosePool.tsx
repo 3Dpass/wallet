@@ -15,7 +15,7 @@ type IProps = {
   onClose: () => void;
 };
 
-export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
+export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -45,15 +45,16 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
-      const tx = api.tx.miningPool.createPool();
+      const tx = api.tx.miningPool.closePool();
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSendWithSubscribtion(tx, pair, options, ({ events = [], status, txHash }) => {
         if (!status.isFinalized) {
           return;
         }
         events.forEach(({ phase, event: { data, method, section } }) => {
-          if (method == 'ExtrinsicSuccess') {
-            setPoolIds([pair.address, ...poolIds]);
+          if (method == 'ExtrinsicSuccess' && poolIds.includes(pair.address)) {
+            poolIds
+            setPoolIds(poolIds.filter(function(item) { return item !== pair.address }));
           }
         });
         unsub();
@@ -61,7 +62,7 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Mining Pool has been created",
+        message: "Mining Pool will be closed",
       });
     } catch (e: any) {
       toaster.show({
@@ -76,7 +77,7 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
   }
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Create a new mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Close the mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button onClick={onClose} text="Cancel" disabled={isLoading} />
@@ -84,9 +85,9 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
-            icon="add"
+            icon="remove"
             loading={isLoading}
-            text="Create Pool"
+            text="Close Pool"
           />
         </div>
       </div>
