@@ -12,6 +12,7 @@ import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import DialogCreatePool from "../dialogs/DialogCreatePool";
+import DialogClosePool from "../dialogs/DialogClosePool";
 import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
 import DialogJoinPool from "../dialogs/DialogJoinPool";
@@ -46,6 +47,7 @@ export default function Account({ pair }: IProps) {
     set_pool_difficulty: false,
     join_pool: false,
     leave_pool: false,
+    close_pool: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
@@ -146,6 +148,7 @@ export default function Account({ pair }: IProps) {
       />
       <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
       <DialogCreatePool isOpen={dialogs.create_pool} onClose={() => dialogToggle("create_pool")} pair={pair} />
+      <DialogClosePool isOpen={dialogs.close_pool} onClose={() => dialogToggle("close_pool")} pair={pair} />
       <DialogSetPoolInterest isOpen={dialogs.set_pool_interest} onClose={() => dialogToggle("set_pool_interest")} pair={pair} />
       <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => dialogToggle("set_pool_difficulty")} pair={pair} />
       <DialogJoinPool isOpen={dialogs.join_pool} onClose={() => dialogToggle("join_pool")} pair={pair} />
@@ -200,7 +203,12 @@ export default function Account({ pair }: IProps) {
                   <Text className="font-bold">Advanced</Text>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
-                  <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={accountLocked || poolAlreadyExist} />
+                  {!poolAlreadyExist && (
+                    <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={accountLocked} />
+                  )}
+                  {poolAlreadyExist && (
+                    <Button text="Close the pool" onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />
+                  )}
                   <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked || !poolAlreadyExist} />
                   <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")}
                     disabled={accountLocked || !poolAlreadyExist} />
