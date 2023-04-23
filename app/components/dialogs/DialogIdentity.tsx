@@ -5,6 +5,8 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
+import { IPalletIdentityRegistrarInfo } from "../common/UserCard";
+import UserCard from "../common/UserCard";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
@@ -13,26 +15,6 @@ type IProps = {
   isOpen: boolean;
   onClose: () => void;
 };
-
-type IRegistrarInfoItem = {
-    Raw: string;
-}
-
-type IRegistrarInfo = {
-    display: IRegistrarInfoItem;
-    email: IRegistrarInfoItem;
-    web: IRegistrarInfoItem;
-    twitter: IRegistrarInfoItem;
-    // image: Any;
-}
-
-type IPalletIdentityRegistrarInfo = {
-    account: string;
-    fee: number;
-    fields: number[];
-    info: IRegistrarInfo;
-    judgements: string[][];
-}
 
 type IIdentityData = {
     registrarList: IPalletIdentityRegistrarInfo[];
@@ -59,8 +41,8 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     if (!registrars || !Array.isArray(registrars)) { return; }
     const registrarsList: IPalletIdentityRegistrarInfo[] = [];
     let isRegistrar: boolean = false;
-    registrars.forEach((r) => {
-        registrarsList.push(r as IPalletIdentityRegistrarInfo);
+    registrars.forEach((r, i) => {
+        registrarsList.push({...(r as IPalletIdentityRegistrarInfo), regIndex: (i + 1)});
         isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
     setData((prev) => ({ ...prev, registrarList: registrarsList, isRegistrar: isRegistrar}));
@@ -74,9 +56,9 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
 
   useEffect(() => {
     setCanSubmit(api !== undefined);
-  }, [api, {}]);
+  }, [api]);
 
-  async function handleSubmitClick() {
+  async function handleSubmitRequestForJudgement() {
     if (!api) {
       return;
     }
@@ -91,13 +73,17 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
-    //   const tx = api.tx.miningPool.addMemberSelf(data.poolToJoin);
-    //   const options: Partial<SignerOptions> = {};
-    //   await signAndSend(tx, pair, options);
+      const re = /\,/gi;
+      const tx = api.tx.identity.requestJudgement(
+        data.selectedRegistrar?.regIndex,
+        data.selectedRegistrar?.fee.replace(re, '')
+      );
+      const options: Partial<SignerOptions> = {};
+      await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "You have joined the mining pool",
+        message: "You requested for judgement",
       });
     } catch (e: any) {
       toaster.show({
@@ -117,7 +103,6 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     }
     const registrarInfo = (await api.query.identity.identityOf(registrarAccount.account)).toHuman();
     registrarAccount = {...registrarAccount, ...(registrarInfo as IPalletIdentityRegistrarInfo)};
-    console.log('registrarAccount: ', registrarAccount);
     setData((prev) => ({ ...prev, selectedRegistrar: registrarAccount }));
   }
 
@@ -152,36 +137,44 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        {!data.isRegistrar && (
-            <Select2<IPalletIdentityRegistrarInfo>
-            items={data.registrarList}
-            itemPredicate={filterRegistrar}
-            itemRenderer={renderRegistrar}
-            noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
-            onItemSelect={setRegistrar}
-            popoverProps={{ matchTargetWidth: true }}
-            fill={true}
-            >
-            <Button
-                text={data.selectedRegistrar?.account}
-                rightIcon="double-caret-vertical"
-                placeholder="Select a registrar"
-                className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
-            />
-            </Select2>
+        {!data.isRegistrar && !Boolean(pair.meta.isInjected) && (
+            <>
+                <Select2
+                items={data.registrarList}
+                itemPredicate={filterRegistrar}
+                itemRenderer={renderRegistrar}
+                noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
+                onItemSelect={setRegistrar}
+                popoverProps={{ matchTargetWidth: true }}
+                fill={true}
+                >
+                <Button
+                    text={data.selectedRegistrar?.account}
+                    rightIcon="double-caret-vertical"
+                    placeholder="Select a registrar"
+                    className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
+                />
+                </Select2>
+                {data.selectedRegistrar && (
+                    <>
+                        <Button
+                            intent={Intent.PRIMARY}
+                            disabled={isLoading || !canSubmit}
+                            onClick={handleSubmitRequestForJudgement}
+                            loading={isLoading}
+                            text="Request for judgement"
+                        />
+                        <UserCard registrarInfo={data.selectedRegistrar} />
+                    </>
+                )}
+            </>
+        )}
+        {!data.isRegistrar && Boolean(pair.meta.isInjected) && (
+            <div>You already have identity</div>
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
-          <Button
-            intent={Intent.PRIMARY}
-            disabled={isLoading || !canSubmit}
-            onClick={handleSubmitClick}
-            icon="add"
-            loading={isLoading}
-            text="Select the registrar"
-          />
         </div>
       </div>
     </Dialog>
