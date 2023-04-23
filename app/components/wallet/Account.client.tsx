@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Elevation, Icon, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
+import { Alert, Button, Card, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
@@ -17,6 +17,7 @@ import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
 import DialogJoinPool from "../dialogs/DialogJoinPool";
 import DialogLeavePool from "../dialogs/DialogLeavePool";
+import DialogIdentity from "../dialogs/DialogIdentity";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 import useIsMainnet from "../../hooks/useIsMainnet";
@@ -48,6 +49,7 @@ export default function Account({ pair }: IProps) {
     join_pool: false,
     leave_pool: false,
     close_pool: false,
+    identity: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
@@ -153,6 +155,7 @@ export default function Account({ pair }: IProps) {
       <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => dialogToggle("set_pool_difficulty")} pair={pair} />
       <DialogJoinPool isOpen={dialogs.join_pool} onClose={() => dialogToggle("join_pool")} pair={pair} />
       <DialogLeavePool isOpen={dialogs.leave_pool} onClose={() => dialogToggle("leave_pool")} pair={pair} />
+      <DialogIdentity isOpen={dialogs.identity} onClose={() => dialogToggle("identity")} pair={pair} />
     </>
   );
 
@@ -162,6 +165,13 @@ export default function Account({ pair }: IProps) {
     <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
       {dialogElements}
       <AddressItem address={pair.address} />
+      <Icon
+        className="bp4-icon bp4-intent-success"
+        style={{'position': 'absolute', 'right': '0.3rem', 'top': '2.5rem', 'cursor': 'pointer'}}
+        icon="endorsed"
+        size={IconSize.LARGE}
+        onClick={() => dialogToggle("identity")}
+      />
       <div className="grid gap-1">
         {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
         {balances && (
