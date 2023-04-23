@@ -76,7 +76,7 @@ export default function Account({ pair }: IProps) {
   const handleAddressDelete = useCallback(() => {
     keyring.forgetAccount(pair.address);
     dialogToggle("delete");
-  }, [dialogToggle]);
+  }, [dialogToggle, pair]);
 
   const handleCopyAddress = useCallback(async () => {
     await navigator.clipboard.writeText(pair.address);

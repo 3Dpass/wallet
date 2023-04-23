@@ -43,7 +43,7 @@ export default function useAccounts(): { accounts: KeyringPair[]; isLoading: boo
     });
 
     return () => {
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, [isInitialized, ss58Format, isMainnet]);
 
