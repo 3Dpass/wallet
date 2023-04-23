@@ -1,17 +1,16 @@
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
-// @ts-ignore
+// @ts-expect-error
 import styles from "./styles/app.css";
 import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
 import type { FormEvent, LegacyRef } from "react";
-import { useEffect, useRef, useState } from "react";
-import { apiExplorerEndpointAtom, formatOptionsAtom, toasterAtom } from "./atoms";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { apiAdvancedModeAtom, apiExplorerEndpointAtom, formatOptionsAtom, poolIdsAtom, toasterAtom } from "./atoms";
 import { useAtomValue, useSetAtom } from "jotai";
 import DialogSettings from "./components/dialogs/DialogSettings";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { isValidPolkadotAddress } from "./utils/address";
 import { NETWORK_MAINNET, ss58formats } from "./api.config";
 import useApi from "./hooks/useApi";
-import { apiAdvancedModeAtom, poolIdsAtom } from "./atoms";
 import { convertPool } from "./utils/pool";
 
 export function meta() {
@@ -57,12 +56,10 @@ export default function App() {
 
   useEffect(() => {
     if (apiAdvancedMode) {
-      api?.query.miningPool.pools.entries().then(
-        (pools) => {
-          const poolsIds = convertPool(Array.from(pools));
-          setPoolIds(poolsIds.poolIds);
-        }
-      )
+      api?.query.miningPool.pools.entries().then((pools) => {
+        const poolsIds = convertPool(Array.from(pools));
+        setPoolIds(poolsIds.poolIds);
+      });
     }
   }, [api, apiAdvancedMode, setPoolIds]);
 
@@ -71,17 +68,20 @@ export default function App() {
     cache: new InMemoryCache(),
   });
 
-  function handleSearchSubmit(e: FormEvent) {
-    e.preventDefault();
-    // if searchValue is integer redirect to block page
-    if (Number.isInteger(Number(searchValue))) {
-      window.location.href = `/block/${searchValue}`;
-    }
-    // if searchValue is a valid address redirect to address page
-    else if (isValidPolkadotAddress(searchValue)) {
-      window.location.href = `/address/${searchValue}`;
-    }
-  }
+  const handleSearchSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      // if searchValue is integer redirect to block page
+      if (Number.isInteger(Number(searchValue))) {
+        window.location.href = `/block/${searchValue}`;
+      }
+      // if searchValue is a valid address redirect to address page
+      else if (isValidPolkadotAddress(searchValue)) {
+        window.location.href = `/address/${searchValue}`;
+      }
+    },
+    [searchValue]
+  );
 
   return (
     <html lang="en">

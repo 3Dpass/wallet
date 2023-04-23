@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Text, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Alert, Button, Card, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
@@ -33,9 +33,9 @@ export default function Account({ pair }: IProps) {
   const toaster = useToaster();
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
-  const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
+  const apiAdvancedMode: boolean = useAtomValue(apiAdvancedModeAtom);
   const poolIds = useAtomValue(poolIdsAtom);
-  const poolAlreadyExist = poolIds.includes(pair.address)
+  const poolAlreadyExist = poolIds.includes(pair.address);
 
   const dialogsInitial = {
     send: false,
@@ -71,25 +71,25 @@ export default function Account({ pair }: IProps) {
     });
   }, [api, pair]);
 
-  function handleUnlockAccount() {
+  const handleUnlockAccount = useCallback(() => {
     dialogToggle("unlock");
-  }
+  }, [dialogToggle]);
 
-  function handleAddressDelete() {
+  const handleAddressDelete = useCallback(() => {
     keyring.forgetAccount(pair.address);
     dialogToggle("delete");
-  }
+  }, [dialogToggle, pair]);
 
-  async function handleCopyAddress() {
+  const handleCopyAddress = useCallback(async () => {
     await navigator.clipboard.writeText(pair.address);
     toaster.show({
       icon: "tick",
       intent: Intent.SUCCESS,
       message: "Address copied to clipboard",
     });
-  }
+  }, [pair, toaster]);
 
-  async function handleUnlockFundsClick() {
+  const handleUnlockFundsClick = useCallback(async () => {
     if (!api) {
       return;
     }
@@ -113,15 +113,15 @@ export default function Account({ pair }: IProps) {
         message: e.message,
       });
     }
-  }
+  }, [api, isMainnet, pair, toaster]);
 
-  async function handleLockFundsClick() {
+  const handleLockFundsClick = useCallback(() => {
     dialogToggle("lock_funds");
-  }
+  }, [dialogToggle]);
 
-  function handleSignVerify() {
+  const handleSignVerify = useCallback(() => {
     dialogToggle("sign_verify");
-  }
+  }, [dialogToggle]);
 
   const dialogElements = (
     <>
@@ -159,7 +159,7 @@ export default function Account({ pair }: IProps) {
     </>
   );
 
-  const accountLocked = pair.isLocked && !pair.meta.isInjected;
+  const accountLocked: boolean = pair.isLocked && !pair.meta.isInjected;
 
   return (
     <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
@@ -184,9 +184,9 @@ export default function Account({ pair }: IProps) {
             {accountLocked && (
               <div className="my-2 text-center">
                 Account is <Icon icon="lock" /> password protected, you need to{" "}
-                <a href="#" onClick={handleUnlockAccount} className="text-white underline underline-offset-4">
+                <span onClick={handleUnlockAccount} className="text-white underline underline-offset-4 cursor-pointer">
                   unlock it
-                </a>{" "}
+                </span>{" "}
                 before use
               </div>
             )}
@@ -194,12 +194,7 @@ export default function Account({ pair }: IProps) {
               <Button icon="send-to" text="Send..." onClick={() => dialogToggle("send")} disabled={accountLocked} />
               <Button icon="duplicate" text="Copy" onClick={handleCopyAddress} />
               <Button icon="endorsed" text="Sign & Verify" onClick={handleSignVerify} disabled={accountLocked} />
-              <Button
-                icon="unlock"
-                text="Unlock"
-                onClick={handleUnlockFundsClick}
-                disabled={balances.lockedBalance.toBigInt() <= 0 || (accountLocked)}
-              />
+              <Button icon="unlock" text="Unlock" onClick={handleUnlockFundsClick} disabled={balances.lockedBalance.toBigInt() <= 0 || accountLocked} />
               <Button icon="lock" text="Lock..." onClick={handleLockFundsClick} disabled={accountLocked} />
               {!pair.meta.isInjected && (
                 <>
@@ -209,19 +204,17 @@ export default function Account({ pair }: IProps) {
             </div>
             {apiAdvancedMode && (
               <>
-                <div className="text-right">
-                  <Text className="font-bold">Advanced</Text>
-                </div>
+                <Text className="font-bold pt-4 pb-2">Pool actions</Text>
                 <div className="grid grid-cols-3 gap-1">
-                  {!poolAlreadyExist && (
-                    <Button text="Create a pool" onClick={() => dialogToggle("create_pool")} disabled={accountLocked} />
-                  )}
-                  {poolAlreadyExist && (
-                    <Button text="Close the pool" onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />
-                  )}
-                  <Button text="Set up pool fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked || !poolAlreadyExist} />
-                  <Button className="text-center" text="Set up pool difficulty" onClick={() => dialogToggle("set_pool_difficulty")}
-                    disabled={accountLocked || !poolAlreadyExist} />
+                  {!poolAlreadyExist && <Button text="Create" onClick={() => dialogToggle("create_pool")} disabled={accountLocked} />}
+                  {poolAlreadyExist && <Button text="Close" onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />}
+                  <Button text="Set up fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked || !poolAlreadyExist} />
+                  <Button
+                    className="text-center"
+                    text="Set up difficulty"
+                    onClick={() => dialogToggle("set_pool_difficulty")}
+                    disabled={accountLocked || !poolAlreadyExist}
+                  />
                   <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />
                   <Button text="Leave a pool" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />
                 </div>
@@ -231,10 +224,10 @@ export default function Account({ pair }: IProps) {
         )}
       </div>
       {Boolean(pair.meta.isInjected) && (
-        <div className="absolute top-0 right-0 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
+        <div className="absolute top-0 right-0 flex gap-1 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
           {Boolean(pair.meta.name) && (
             <span>
-              <span className="font-bold text-white">{pair.meta.name as string}</span> —{" "}
+              <span className="font-bold text-white">{pair.meta.name as string}</span>
             </span>
           )}
           extension
