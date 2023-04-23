@@ -32,7 +32,7 @@ export default function Account({ pair }: IProps) {
   const toaster = useToaster();
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
-  const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
+  const apiAdvancedMode: boolean = useAtomValue(apiAdvancedModeAtom);
   const poolIds = useAtomValue(poolIdsAtom);
   const poolAlreadyExist = poolIds.includes(pair.address);
 
@@ -69,25 +69,25 @@ export default function Account({ pair }: IProps) {
     });
   }, [api, pair]);
 
-  function handleUnlockAccount() {
+  const handleUnlockAccount = useCallback(() => {
     dialogToggle("unlock");
-  }
+  }, [dialogToggle]);
 
-  function handleAddressDelete() {
+  const handleAddressDelete = useCallback(() => {
     keyring.forgetAccount(pair.address);
     dialogToggle("delete");
-  }
+  }, [dialogToggle]);
 
-  async function handleCopyAddress() {
+  const handleCopyAddress = useCallback(async () => {
     await navigator.clipboard.writeText(pair.address);
     toaster.show({
       icon: "tick",
       intent: Intent.SUCCESS,
       message: "Address copied to clipboard",
     });
-  }
+  }, [pair, toaster]);
 
-  async function handleUnlockFundsClick() {
+  const handleUnlockFundsClick = useCallback(async () => {
     if (!api) {
       return;
     }
@@ -111,15 +111,15 @@ export default function Account({ pair }: IProps) {
         message: e.message,
       });
     }
-  }
+  }, [api, isMainnet, pair, toaster]);
 
-  async function handleLockFundsClick() {
+  const handleLockFundsClick = useCallback(() => {
     dialogToggle("lock_funds");
-  }
+  }, [dialogToggle]);
 
-  function handleSignVerify() {
+  const handleSignVerify = useCallback(() => {
     dialogToggle("sign_verify");
-  }
+  }, [dialogToggle]);
 
   const dialogElements = (
     <>
@@ -156,7 +156,7 @@ export default function Account({ pair }: IProps) {
     </>
   );
 
-  const accountLocked = pair.isLocked && !pair.meta.isInjected;
+  const accountLocked: boolean = pair.isLocked && !pair.meta.isInjected;
 
   return (
     <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
@@ -174,9 +174,9 @@ export default function Account({ pair }: IProps) {
             {accountLocked && (
               <div className="my-2 text-center">
                 Account is <Icon icon="lock" /> password protected, you need to{" "}
-                <a href="#" onClick={handleUnlockAccount} className="text-white underline underline-offset-4">
+                <span onClick={handleUnlockAccount} className="text-white underline underline-offset-4 cursor-pointer">
                   unlock it
-                </a>{" "}
+                </span>{" "}
                 before use
               </div>
             )}
@@ -214,10 +214,10 @@ export default function Account({ pair }: IProps) {
         )}
       </div>
       {Boolean(pair.meta.isInjected) && (
-        <div className="absolute top-0 right-0 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
+        <div className="absolute top-0 right-0 flex gap-1 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
           {Boolean(pair.meta.name) && (
             <span>
-              <span className="font-bold text-white">{pair.meta.name as string}</span> —{" "}
+              <span className="font-bold text-white">{pair.meta.name as string}</span>
             </span>
           )}
           extension
