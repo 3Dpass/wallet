@@ -10,6 +10,9 @@ dependencies:
   '@blueprintjs/popover2':
     specifier: 1.13.12
     version: 1.13.12(@types/react@18.0.33)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+  '@blueprintjs/select':
+    specifier: 4.9.1
+    version: 4.9.1(@types/react@18.0.33)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
   '@polkadot/api':
     specifier: 10.2.2
     version: 10.2.2
@@ -1508,6 +1511,25 @@ packages:
       react-dom: 18.3.0-next-9c54b29b4-20230322(react@18.3.0-next-9c54b29b4-20230322)
       react-popper: 2.3.0(@popperjs/core@2.11.7)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
       tslib: 2.5.0
+    dev: false
+
+  /@blueprintjs/select@4.9.1(@types/react@18.0.33)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
+    resolution: {integrity: sha512-Kn/aB9vz+E6smMQS/GMkIOk21x1GZ8N9Yl+PLD1jesDyevBG5P9MGoMIsNyt6rSeY1AS1wojP6QVnfnlCKBIcA==}
+    peerDependencies:
+      '@types/react': ^16.14.32 || 17 || 18
+      react: ^16.8 || 17 || 18
+      react-dom: ^16.8 || 17 || 18
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@blueprintjs/core': 4.17.8(@types/react@18.0.33)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+      '@blueprintjs/popover2': 1.13.12(@types/react@18.0.33)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+      '@types/react': 18.0.33
+      classnames: 2.3.2
+      react: 18.3.0-next-9c54b29b4-20230322
+      react-dom: 18.3.0-next-9c54b29b4-20230322(react@18.3.0-next-9c54b29b4-20230322)
+      tslib: 2.3.1
     dev: false
 
   /@chevrotain/cst-dts-gen@10.1.2:
@@ -9182,6 +9204,10 @@ packages:
 
   /tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
+    dev: false
+
+  /tslib@2.3.1:
+    resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
     dev: false
 
   /tslib@2.5.0:
