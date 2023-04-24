@@ -166,8 +166,7 @@ export default function Account({ pair }: IProps) {
       {dialogElements}
       <AddressItem address={pair.address} />
       <Icon
-        className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`}
-        style={{'position': 'absolute', 'right': '0.3rem', 'top': '2.5rem', 'cursor': 'pointer'}}
+        className={`${Classes.ICON} ${Classes.INTENT_SUCCESS} absolute cursor-pointer right-1 top-9`}
         icon="endorsed"
         size={IconSize.LARGE}
         onClick={() => dialogToggle("identity")}

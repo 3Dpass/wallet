@@ -25,16 +25,27 @@ type IProps = {
 }
 
 export default function UserCard({ registrarInfo }: IProps) {
+    console.log(registrarInfo.info.display.Raw);
   return (
-    <Card interactive={true} elevation={Elevation.TWO}>
-        <div style={{"display": "block"}}>
-            <Icon icon="person" iconSize={IconSize.LARGE * 3} title="hgsfdhfiudsuifhsfdhifjoijao fdsjfoidsjfo sdfsdjf sdof"></Icon>
-            <span style={{"marginLeft": "3rem", "fontSize": "150%", "verticalAlign": "top"}}>{registrarInfo.info.display.Raw as string}</span>
+    <Card>
+        <div className="block mb-2">
+            <div className="flex items-center gap-x-6">
+            {registrarInfo.info.image.Raw && (
+                <img className="h-16 w-16 rounded-full" src={registrarInfo.info.image.Raw as string} alt=""/>
+            )}
+            {!registrarInfo.info.image.Raw && (
+                <Icon icon="person" iconSize={IconSize.LARGE * 3} title="no foto"></Icon>
+            )}
+            <div>
+                <h3 className="text-base font-semibold leading-7 tracking-tight text-white-900">{registrarInfo.info.display.Raw as string}</h3>
+                <p className="text-sm font-semibold leading-6 text-indigo-600">{registrarInfo.account}</p>
+            </div>
+            </div>
         </div>
 
         {registrarInfo.judgements && (
-            <div style={{"margin": "0.5rem 0rem"}}>
-                <Tag round large className={Classes.BREADCRUMB_CURRENT} style={{"backgroundColor": "green"}}>
+            <div className="mb-2">
+                <Tag round large className={`${Classes.BREADCRUMB_CURRENT} bg-lime-500`}>
                     {registrarInfo.judgements[0][0] as string} {registrarInfo.judgements[0][1] as string}
                 </Tag>
             </div>
