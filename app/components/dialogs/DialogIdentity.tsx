@@ -19,7 +19,7 @@ type IProps = {
 type IIdentityData = {
     registrarList: IPalletIdentityRegistrarInfo[];
     isRegistrar: boolean;
-    selectedRegistrar: IPalletIdentityRegistrarInfo | null
+    registrarData: IPalletIdentityRegistrarInfo | null
 }
 
 export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
@@ -31,7 +31,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   const dataInitial: IIdentityData = {
     registrarList: [],
     isRegistrar: false,
-    selectedRegistrar: null,
+    registrarData: null,
   };
   const [data, setData] = useState(dataInitial);
 
@@ -46,6 +46,15 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
         isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
     setData((prev) => ({ ...prev, registrarList: registrarsList, isRegistrar: isRegistrar}));
+    // if (isRegistrar) {
+    if (true) {
+        const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
+        setData((prev) => ({ ...prev, registrarData: (registrarInfo as IPalletIdentityRegistrarInfo)}));
+        const requestedIdentity = (await api.query.identity.subsOf('d1CJYEbtNDtKWR3gdEABQRynTbcVi1u9AFTF9J6yCSazgYW1h')).toHuman();
+        console.log('requestedIdentity', requestedIdentity);
+
+
+    }
   }
 
   function handleOnOpening() {
@@ -75,9 +84,43 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     try {
       const re = /\,/gi;
       const tx = api.tx.identity.requestJudgement(
-        data.selectedRegistrar?.regIndex,
-        data.selectedRegistrar?.fee.replace(re, '')
+        data.registrarData?.regIndex,
+        data.registrarData?.fee.replace(re, '')
       );
+      const options: Partial<SignerOptions> = {};
+      await signAndSend(tx, pair, options);
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: "You requested for judgement",
+      });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
+    } finally {
+      setIsLoading(false);
+      onClose();
+    }
+  }
+
+  async function handleSubmitAddJudgement(target: string) {
+    if (!api) {
+      return;
+    }
+    if (pair.isLocked && !pair.meta.isInjected) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "Account is locked",
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const tx = api.tx.identity.provideJudgement(data.registrarData?.regIndex, target, null);
       const options: Partial<SignerOptions> = {};
       await signAndSend(tx, pair, options);
       toaster.show({
@@ -103,7 +146,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     }
     const registrarInfo = (await api.query.identity.identityOf(registrarAccount.account)).toHuman();
     registrarAccount = {...registrarAccount, ...(registrarInfo as IPalletIdentityRegistrarInfo)};
-    setData((prev) => ({ ...prev, selectedRegistrar: registrarAccount }));
+    setData((prev) => ({ ...prev, registrarData: registrarAccount }));
   }
 
   const filterRegistrar: ItemPredicate<IPalletIdentityRegistrarInfo> = (query, registrar, _index, exactMatch) => {
@@ -149,13 +192,13 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                 fill={true}
                 >
                 <Button
-                    text={data.selectedRegistrar?.account}
+                    text={data.registrarData?.account}
                     rightIcon="double-caret-vertical"
                     placeholder="Select a registrar"
                     className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
                 />
                 </Select2>
-                {data.selectedRegistrar && (
+                {data.registrarData && (
                     <>
                         <Button
                             intent={Intent.PRIMARY}
@@ -164,13 +207,25 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                             loading={isLoading}
                             text="Request for judgement"
                         />
-                        <UserCard registrarInfo={data.selectedRegistrar} />
+                        <UserCard registrarInfo={data.registrarData} />
                     </>
                 )}
             </>
         )}
         {!data.isRegistrar && Boolean(pair.meta.isInjected) && (
             <div>You already have identity</div>
+        )}
+        {data.isRegistrar && data.registrarData && (
+            <>
+                <Button
+                    intent={Intent.PRIMARY}
+                    disabled={isLoading || !canSubmit}
+                    onClick={() => { handleSubmitAddJudgement('')}}
+                    loading={isLoading}
+                    text="Add judgement"
+                />
+                <UserCard registrarInfo={data.registrarData} />
+            </>        
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>

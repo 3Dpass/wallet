@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
+import { Alert, Button, Card, Classes, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
@@ -166,7 +166,7 @@ export default function Account({ pair }: IProps) {
       {dialogElements}
       <AddressItem address={pair.address} />
       <Icon
-        className="bp4-icon bp4-intent-success"
+        className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`}
         style={{'position': 'absolute', 'right': '0.3rem', 'top': '2.5rem', 'cursor': 'pointer'}}
         icon="endorsed"
         size={IconSize.LARGE}
