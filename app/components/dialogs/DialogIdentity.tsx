@@ -1,6 +1,7 @@
-import { Button, Classes, Dialog, Intent, MenuItem } from "@blueprintjs/core";
+import { Button, Classes, Dialog, InputGroup, Intent, MenuItem } from "@blueprintjs/core";
 import { ItemPredicate, ItemRenderer, Select2 } from "@blueprintjs/select";
 import { MouseEventHandler, useEffect, useState } from "react";
+// import { decodeAddress } from "@polkadot/util-crypto/address/decode";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
@@ -9,6 +10,7 @@ import { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import UserCard from "../common/UserCard";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
+// import { useSS58Format } from "../../hooks/useSS58Format";
 
 type IProps = {
   pair: KeyringPair;
@@ -16,10 +18,21 @@ type IProps = {
   onClose: () => void;
 };
 
+type ICandidateInfo = {
+  display: string | null;
+  legal: string | null;
+  web: string | null;
+  riot: string | null;
+  email: string | null;
+  discord: string | null;
+  twitter: string | null;
+}
+
 type IIdentityData = {
     registrarList: IPalletIdentityRegistrarInfo[];
     isRegistrar: boolean;
-    registrarData: IPalletIdentityRegistrarInfo | null
+    registrarData: IPalletIdentityRegistrarInfo | null;
+    candidateInfo: ICandidateInfo;
 }
 
 export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
@@ -27,11 +40,13 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  // const ss58format = useSS58Format();
 
   const dataInitial: IIdentityData = {
     registrarList: [],
     isRegistrar: false,
     registrarData: null,
+    candidateInfo: {} as ICandidateInfo,
   };
   const [data, setData] = useState(dataInitial);
 
@@ -46,14 +61,13 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
         isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
     setData((prev) => ({ ...prev, registrarList: registrarsList, isRegistrar: isRegistrar}));
-    // if (isRegistrar) {
-    if (true) {
+    if (isRegistrar) {
         const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
         setData((prev) => ({ ...prev, registrarData: (registrarInfo as IPalletIdentityRegistrarInfo)}));
-        const requestedIdentity = (await api.query.identity.subsOf('d1CJYEbtNDtKWR3gdEABQRynTbcVi1u9AFTF9J6yCSazgYW1h')).toHuman();
-        console.log('requestedIdentity', requestedIdentity);
-
-
+        console.log('registrarData: ', data.registrarData);
+        // console.log(decodeAddress('0xca84e52a21186bb6747c1cbb294ec1ec713f575bae313676cad4c138af7c5731', true, ss58format));
+    } else {
+      setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo}));
     }
   }
 
@@ -82,13 +96,14 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
+      const tx0 = api.tx.identity.setIdentity(data.candidateInfo);
+      await signAndSend(tx0, pair, {});
       const re = /\,/gi;
       const tx = api.tx.identity.requestJudgement(
         data.registrarData?.regIndex,
         data.registrarData?.fee.replace(re, '')
       );
-      const options: Partial<SignerOptions> = {};
-      await signAndSend(tx, pair, options);
+      await signAndSend(tx, pair, {});
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
@@ -172,7 +187,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
             onClick={handleClick as MouseEventHandler}
             onFocus={handleFocus}
             roleStructure="listoption"
-            text=""
+            text={registrar.fee}
         />
     );
   };
@@ -200,6 +215,83 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                 </Select2>
                 {data.registrarData && (
                     <>
+                        <InputGroup
+                          disabled={isLoading}
+                          large={true}
+                          className="font-mono"
+                          spellCheck={false}
+                          placeholder="Enter display name"
+                          onChange={(e) => {let ci = data.candidateInfo; ci.display = e.target.value; setData(
+                            (prev) => ({ ...prev, candidateInfo: ci })
+                          )}}
+                          value={data.candidateInfo.display || ''}
+                        />
+                        <InputGroup
+                          disabled={isLoading}
+                          large={true}
+                          className="font-mono"
+                          spellCheck={false}
+                          placeholder="Enter legal name"
+                          onChange={(e) => {let ci = data.candidateInfo; ci.legal = e.target.value; setData(
+                            (prev) => ({ ...prev, candidateInfo: ci })
+                          )}}
+                          value={data.candidateInfo.legal || ''}
+                        />
+                        <InputGroup
+                          disabled={isLoading}
+                          large={true}
+                          className="font-mono"
+                          spellCheck={false}
+                          placeholder="Enter email"
+                          onChange={(e) => {let ci = data.candidateInfo; ci.email = e.target.value; setData(
+                            (prev) => ({ ...prev, candidateInfo: ci })
+                          )}}
+                          value={data.candidateInfo.email || ''}
+                        />
+                        <InputGroup
+                          disabled={isLoading}
+                          large={true}
+                          className="font-mono"
+                          spellCheck={false}
+                          placeholder="Enter web address"
+                          onChange={(e) => {let ci = data.candidateInfo; ci.web = e.target.value; setData(
+                            (prev) => ({ ...prev, candidateInfo: ci })
+                          )}}
+                          value={data.candidateInfo.web || ''}
+                        />
+                        <InputGroup
+                          disabled={isLoading}
+                          large={true}
+                          className="font-mono"
+                          spellCheck={false}
+                          placeholder="Enter twitter"
+                          onChange={(e) => {let ci = data.candidateInfo; ci.twitter = e.target.value; setData(
+                            (prev) => ({ ...prev, candidateInfo: ci })
+                          )}}
+                          value={data.candidateInfo.twitter || ''}
+                        />
+                        <InputGroup
+                          disabled={isLoading}
+                          large={true}
+                          className="font-mono"
+                          spellCheck={false}
+                          placeholder="Enter discord"
+                          onChange={(e) => {let ci = data.candidateInfo; ci.discord = e.target.value; setData(
+                            (prev) => ({ ...prev, candidateInfo: ci })
+                          )}}
+                          value={data.candidateInfo.discord || ''}
+                        />
+                        <InputGroup
+                          disabled={isLoading}
+                          large={true}
+                          className="font-mono"
+                          spellCheck={false}
+                          placeholder="Enter riot name"
+                          onChange={(e) => {let ci = data.candidateInfo; ci.riot = e.target.value; setData(
+                            (prev) => ({ ...prev, candidateInfo: ci })
+                          )}}
+                          value={data.candidateInfo.riot || ''}
+                        />
                         <Button
                             intent={Intent.PRIMARY}
                             disabled={isLoading || !canSubmit}
