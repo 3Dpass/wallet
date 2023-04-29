@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
-import { poolIdsAtom } from "../../atoms";
-import { signAndSend, signAndSendWithSubscribtion } from "../../utils/sign";
+import { poolIdsAtom, poolModes } from "../../atoms";
+import { signAndSendWithSubscribtion } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
@@ -21,7 +21,8 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [poolIds, setPoolIds] = useAtom(poolIdsAtom);
-  const [poolMode, setPoolMode] = useState(false);
+  const [poolWithKYC, setPoolWithKYC] = useState(false);
+  const [poolMode, setPoolMode] = useAtom(poolModes);
 
   function handleOnOpening() {
     setIsLoading(false);
@@ -30,22 +31,6 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
   useEffect(() => {
     setCanSubmit(api !== undefined);
   }, [api]);
-
-  async function sendSetPoolMode(poolMode: boolean) {
-    if (!api) { return; }
-    const tx = api.tx.miningPool.setPoolMode(poolMode);
-    // await signAndSend(tx, pair, {});
-    const unsub = await signAndSendWithSubscribtion(tx, pair, {}, ({ events = [], status, txHash }) => {
-      console.log('status: ', status);
-      if (!status.isFinalized) {
-        return;
-      }
-      events.forEach(({ phase, event: { data, method, section } }) => {
-        console.log('setPoolMode: ', method);
-      });
-      unsub();
-    });
-  }
 
   async function handleSubmitClick() {
     if (!api) {
@@ -71,7 +56,6 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
         events.forEach(({ phase, event: { data, method, section } }) => {
           if (method == 'ExtrinsicSuccess') {
             setPoolIds([pair.address, ...poolIds]);
-            sendSetPoolMode(poolMode);
           }
         });
         unsub();
@@ -96,9 +80,13 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Create a new mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-      <Checkbox checked={poolMode} large={false}
+      <Checkbox checked={poolWithKYC} large={false}
             className="bp4-control absolute"
-            onChange={(e: any) => setPoolMode(e.target.checked)}>
+            onChange={(e: any) => {
+              setPoolWithKYC(e.target.checked);
+              poolMode.set(pair.address, e.target.checked);
+              setPoolMode(poolMode);
+            }}>
             KYC mode
           </Checkbox>
       </div>
