@@ -15,7 +15,6 @@ export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v4", default
 export const formatOptionsAtom = atom<IFormatOptions | false>(false);
 export const apiAdvancedModeAtom = atomWithStorage<boolean>("apiAdvancedMode_v1", false);
 export const poolIdsAtom = atomWithStorage<string[]>("poolIds_v1", []);
-export const poolModes = atomWithStorage<Map<string, boolean>>("poolModes_v1", new Map());
 
 // Explorer GraphQL API
 export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpoint_v1", "https://explorer-api.3dpass.org/graphql/");
