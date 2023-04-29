@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Classes, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
-import { useAtomValue } from "jotai";
-import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
+import { useAtom, useAtomValue } from "jotai";
+import { apiAdvancedModeAtom, poolIdsAtom, poolModes } from "../../atoms";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
@@ -19,7 +19,7 @@ import DialogJoinPool from "../dialogs/DialogJoinPool";
 import DialogLeavePool from "../dialogs/DialogLeavePool";
 import DialogIdentity from "../dialogs/DialogIdentity";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
-import { signAndSend } from "../../utils/sign";
+import { signAndSend, signAndSendWithSubscribtion } from "../../utils/sign";
 import useIsMainnet from "../../hooks/useIsMainnet";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
@@ -36,6 +36,7 @@ export default function Account({ pair }: IProps) {
   const apiAdvancedMode: boolean = useAtomValue(apiAdvancedModeAtom);
   const poolIds = useAtomValue(poolIdsAtom);
   const poolAlreadyExist = poolIds.includes(pair.address);
+  const [poolMode, setPoolMode] = useAtom(poolModes);
 
   const dialogsInitial = {
     send: false,
@@ -56,6 +57,26 @@ export default function Account({ pair }: IProps) {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
 
+  async function sendSetPoolMode(newMode: boolean | undefined) {
+    if (!api) { return; }
+    if (newMode === undefined) { return; }
+    const tx = api.tx.miningPool.setPoolMode(newMode);
+    const unsub = await signAndSendWithSubscribtion(tx, pair, {}, ({ events = [], status, txHash }) => {
+      console.log(status);
+      if (!status.isFinalized) {
+        return;
+      }
+      events.forEach(({ phase, event: { data, method, section } }) => {
+        if (method == 'ExtrinsicSuccess') {
+          console.log('hit!');
+          poolMode.delete(pair.address);
+          setPoolMode(poolMode);
+        }
+      });
+      unsub();
+    });
+  }
+
   useEffect(() => {
     if (!api) {
       return;
@@ -69,6 +90,9 @@ export default function Account({ pair }: IProps) {
       }
       setBalances(balances);
     });
+    if (poolAlreadyExist && poolMode.get(pair.address) !== undefined) {
+      sendSetPoolMode(poolMode.get(pair.address));
+    }
   }, [api, pair]);
 
   const handleUnlockAccount = useCallback(() => {
