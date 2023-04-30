@@ -1,6 +1,6 @@
 import { Alert, Button, Card, Classes, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
@@ -11,15 +11,16 @@ import { AddressItem } from "../common/AddressItem";
 import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
-import DialogCreatePool from "../dialogs/DialogCreatePool";
 import DialogClosePool from "../dialogs/DialogClosePool";
 import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
 import DialogJoinPool from "../dialogs/DialogJoinPool";
 import DialogLeavePool from "../dialogs/DialogLeavePool";
 import DialogIdentity from "../dialogs/DialogIdentity";
+import DialogRemoveMiner from "../dialogs/DialogRemoveMiner";
+import DialogAddMiner from "../dialogs/DialogAddMiner";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
-import { signAndSend } from "../../utils/sign";
+import { signAndSend, signAndSendWithSubscribtion } from "../../utils/sign";
 import useIsMainnet from "../../hooks/useIsMainnet";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
@@ -34,7 +35,7 @@ export default function Account({ pair }: IProps) {
   const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const apiAdvancedMode: boolean = useAtomValue(apiAdvancedModeAtom);
-  const poolIds = useAtomValue(poolIdsAtom);
+  const [poolIds, setPoolIds] = useAtom(poolIdsAtom);
   const poolAlreadyExist = poolIds.includes(pair.address);
 
   const dialogsInitial = {
@@ -50,11 +51,34 @@ export default function Account({ pair }: IProps) {
     leave_pool: false,
     close_pool: false,
     identity: false,
+    add_miner: false,
+    remove_miner: false,
   };
   const [dialogs, setDialogs] = useState(dialogsInitial);
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
+
+  async function sendSetPoolMode(newMode: boolean): Promise<void> {
+    if (!api) {
+      return;
+    }
+    try {
+      const tx = api.tx.miningPool.setPoolMode(newMode);
+      await signAndSend(tx, pair, {});
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: "Mining Pool KYC has been changed",
+      });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
+    }
+  }
 
   useEffect(() => {
     if (!api) {
@@ -115,6 +139,46 @@ export default function Account({ pair }: IProps) {
     }
   }, [api, isMainnet, pair, toaster]);
 
+  async function handleCreatePoolClick() {
+    if (!api) {
+      return;
+    }
+    const isLocked = pair.isLocked && !pair.meta.isInjected;
+    if (isLocked) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "Account is locked",
+      });
+      return;
+    }
+    try {
+      const tx = api.tx.miningPool.createPool();
+      const unsub = await signAndSendWithSubscribtion(tx, pair, {}, ({ events = [], status, txHash }) => {
+        if (!status.isFinalized) {
+          return;
+        }
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          if (method == "ExtrinsicSuccess") {
+            setPoolIds([pair.address, ...poolIds]);
+          }
+        });
+        unsub();
+      });
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: "Mining Pool has been created",
+      });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
+    }
+  }
+
   const handleLockFundsClick = useCallback(() => {
     dialogToggle("lock_funds");
   }, [dialogToggle]);
@@ -149,13 +213,14 @@ export default function Account({ pair }: IProps) {
         onClose={() => dialogToggle("lock_funds")}
       />
       <DialogSignAndVerify isOpen={dialogs.sign_verify} onClose={() => dialogToggle("sign_verify")} pair={pair} />
-      <DialogCreatePool isOpen={dialogs.create_pool} onClose={() => dialogToggle("create_pool")} pair={pair} />
       <DialogClosePool isOpen={dialogs.close_pool} onClose={() => dialogToggle("close_pool")} pair={pair} />
       <DialogSetPoolInterest isOpen={dialogs.set_pool_interest} onClose={() => dialogToggle("set_pool_interest")} pair={pair} />
       <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => dialogToggle("set_pool_difficulty")} pair={pair} />
       <DialogJoinPool isOpen={dialogs.join_pool} onClose={() => dialogToggle("join_pool")} pair={pair} />
       <DialogLeavePool isOpen={dialogs.leave_pool} onClose={() => dialogToggle("leave_pool")} pair={pair} />
       <DialogIdentity isOpen={dialogs.identity} onClose={() => dialogToggle("identity")} pair={pair} />
+      <DialogRemoveMiner isOpen={dialogs.remove_miner} onClose={() => dialogToggle("remove_miner")} pair={pair} />
+      <DialogAddMiner isOpen={dialogs.add_miner} onClose={() => dialogToggle("add_miner")} pair={pair} />
     </>
   );
 
@@ -205,7 +270,9 @@ export default function Account({ pair }: IProps) {
               <>
                 <Text className="font-bold pt-4 pb-2">Pool actions</Text>
                 <div className="grid grid-cols-3 gap-1">
-                  {!poolAlreadyExist && <Button text="Create" onClick={() => dialogToggle("create_pool")} disabled={accountLocked} />}
+                  {!poolAlreadyExist && <Button text="Create" onClick={handleCreatePoolClick} disabled={accountLocked} />}
+                  {poolAlreadyExist && <Button text="KYC" onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />}
+                  {poolAlreadyExist && <Button text="no KYC" onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />}
                   {poolAlreadyExist && <Button text="Close" onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />}
                   <Button text="Set up fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked || !poolAlreadyExist} />
                   <Button
@@ -216,6 +283,10 @@ export default function Account({ pair }: IProps) {
                   />
                   <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />
                   <Button text="Leave a pool" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />
+                  {poolAlreadyExist && <Button text="Add a miner to the pool" onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
+                  {poolAlreadyExist && (
+                    <Button text="Remove a miner from the pool" onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />
+                  )}
                 </div>
               </>
             )}

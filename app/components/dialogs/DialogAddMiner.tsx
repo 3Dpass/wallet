@@ -1,11 +1,10 @@
-import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
-import { useAtom } from "jotai";
+import { Button, Classes, Dialog, Icon, InputGroup, Intent } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
-
+import { isValidPolkadotAddress } from "../../utils/address";
+import { AddressIcon } from "../common/AddressIcon";
 import type { SignerOptions } from "@polkadot/api/types";
-import { poolIdsAtom } from "../../atoms";
-import { signAndSendWithSubscribtion } from "../../utils/sign";
+import { signAndSend } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
@@ -15,20 +14,20 @@ type IProps = {
   onClose: () => void;
 };
 
-export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
+export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [poolIds, setPoolIds] = useAtom(poolIdsAtom);
+  const [data, setData] = useState("");
 
   function handleOnOpening() {
     setIsLoading(false);
   }
 
   useEffect(() => {
-    setCanSubmit(api !== undefined);
-  }, [api]);
+    setCanSubmit(api !== undefined && isValidPolkadotAddress(data));
+  }, [api, data]);
 
   async function handleSubmitClick() {
     if (!api) {
@@ -45,23 +44,13 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
-      const tx = api.tx.miningPool.createPool();
+      const tx = api.tx.miningPool.addMember(data);
       const options: Partial<SignerOptions> = {};
-      const unsub = await signAndSendWithSubscribtion(tx, pair, options, ({ events = [], status, txHash }) => {
-        if (!status.isFinalized) {
-          return;
-        }
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          if (method == 'ExtrinsicSuccess') {
-            setPoolIds([pair.address, ...poolIds]);
-          }
-        });
-        unsub();
-      });
+      await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Mining Pool has been created",
+        message: "The member was added to the mining pool",
       });
     } catch (e: any) {
       toaster.show({
@@ -75,8 +64,22 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
     }
   }
 
+  const addressIcon = isValidPolkadotAddress(data) ? <AddressIcon address={data} className="m-2" /> : <Icon icon="asterisk" />;
+
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Create a new mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
+      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
+        <InputGroup
+          disabled={isLoading}
+          large={true}
+          className="font-mono"
+          spellCheck={false}
+          placeholder="Enter a miner address"
+          onChange={(e) => setData(e.target.value)}
+          value={data}
+          leftElement={addressIcon}
+        />
+      </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button onClick={onClose} text="Cancel" disabled={isLoading} />
@@ -84,9 +87,9 @@ export default function DialogCreatePool({ isOpen, onClose, pair }: IProps) {
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
-            icon="add"
+            icon="send-message"
             loading={isLoading}
-            text="Create Pool"
+            text="Add a miner"
           />
         </div>
       </div>
