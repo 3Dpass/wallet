@@ -100,29 +100,16 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
       const tx0 = api.tx.identity.setIdentity(dataState.candidateInfo);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSendWithSubscribtion(tx0, pair, options, ({ events = [], status, txHash }) => {
-        console.log('1', status.toHuman());
         if (!status.isFinalized) {
           return;
         }
         events.forEach(({ phase, event: { data, method, section } }) => {
-          console.log('1', method, data, section, phase);
           if (method == 'ExtrinsicSuccess') {
             const tx = api.tx.identity.requestJudgement(
               dataState.registrarData?.regIndex,
               dataState.registrarData?.fee.replace(re, '')
             );
-            signAndSendWithSubscribtion(tx, pair, options, ({ events = [], status, txHash }) => {
-              console.log('2', status.toHuman());
-              if (!status.isFinalized) {
-                return;
-              }
-              events.forEach(({ phase, event: { data, method, section } }) => {
-                console.log('2', method, data, section, phase);
-                if (method == 'ExtrinsicSuccess') {
-      
-                }
-              });
-            });
+            signAndSend(tx, pair, options);
           }
         });
         unsub();
@@ -220,6 +207,9 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         {!dataState.isRegistrar && !Boolean(pair.meta.isInjected) && (
             <>
+                {!dataState.registrarData && (
+                  <div>Please select a registrar:</div>
+                )}
                 <Select2
                 items={dataState.registrarList}
                 itemPredicate={filterRegistrar}
