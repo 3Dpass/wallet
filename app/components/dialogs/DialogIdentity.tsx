@@ -5,7 +5,7 @@ import { MouseEventHandler, useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
-import { signAndSend } from "../../utils/sign";
+import { signAndSend, signAndSendWithSubscribtion } from "../../utils/sign";
 import { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import UserCard from "../common/UserCard";
 import useApi from "../../hooks/useApi";
@@ -48,7 +48,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     registrarData: null,
     candidateInfo: {} as ICandidateInfo,
   };
-  const [data, setData] = useState(dataInitial);
+  const [dataState, setData] = useState(dataInitial);
 
   async function loadRegistrars() {
     if (!api) { return; }
@@ -64,7 +64,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     if (isRegistrar) {
         const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
         setData((prev) => ({ ...prev, registrarData: (registrarInfo as IPalletIdentityRegistrarInfo)}));
-        console.log('registrarData: ', data.registrarData);
+        console.log('registrarData: ', dataState.registrarData);
         // console.log(decodeAddress('0xca84e52a21186bb6747c1cbb294ec1ec713f575bae313676cad4c138af7c5731', true, ss58format));
     } else {
       setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo}));
@@ -96,14 +96,37 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
-      const tx0 = api.tx.identity.setIdentity(data.candidateInfo);
-      await signAndSend(tx0, pair, {});
       const re = /\,/gi;
-      const tx = api.tx.identity.requestJudgement(
-        data.registrarData?.regIndex,
-        data.registrarData?.fee.replace(re, '')
-      );
-      await signAndSend(tx, pair, {});
+      const tx0 = api.tx.identity.setIdentity(dataState.candidateInfo);
+      const options: Partial<SignerOptions> = {};
+      const unsub = await signAndSendWithSubscribtion(tx0, pair, options, ({ events = [], status, txHash }) => {
+        console.log('1', status.toHuman());
+        if (!status.isFinalized) {
+          return;
+        }
+        events.forEach(({ phase, event: { data, method, section } }) => {
+          console.log('1', method, data, section, phase);
+          if (method == 'ExtrinsicSuccess') {
+            const tx = api.tx.identity.requestJudgement(
+              dataState.registrarData?.regIndex,
+              dataState.registrarData?.fee.replace(re, '')
+            );
+            signAndSendWithSubscribtion(tx, pair, options, ({ events = [], status, txHash }) => {
+              console.log('2', status.toHuman());
+              if (!status.isFinalized) {
+                return;
+              }
+              events.forEach(({ phase, event: { data, method, section } }) => {
+                console.log('2', method, data, section, phase);
+                if (method == 'ExtrinsicSuccess') {
+      
+                }
+              });
+            });
+          }
+        });
+        unsub();
+      });
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
@@ -135,7 +158,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
-      const tx = api.tx.identity.provideJudgement(data.registrarData?.regIndex, target, null);
+      const tx = api.tx.identity.provideJudgement(dataState.registrarData?.regIndex, target, null);
       const options: Partial<SignerOptions> = {};
       await signAndSend(tx, pair, options);
       toaster.show({
@@ -195,10 +218,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        {!data.isRegistrar && !Boolean(pair.meta.isInjected) && (
+        {!dataState.isRegistrar && !Boolean(pair.meta.isInjected) && (
             <>
                 <Select2
-                items={data.registrarList}
+                items={dataState.registrarList}
                 itemPredicate={filterRegistrar}
                 itemRenderer={renderRegistrar}
                 noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
@@ -207,13 +230,13 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                 fill={true}
                 >
                 <Button
-                    text={data.registrarData?.account}
+                    text={dataState.registrarData?.account}
                     rightIcon="double-caret-vertical"
                     placeholder="Select a registrar"
                     className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
                 />
                 </Select2>
-                {data.registrarData && (
+                {dataState.registrarData && (
                     <>
                         <InputGroup
                           disabled={isLoading}
@@ -221,10 +244,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                           className="font-mono"
                           spellCheck={false}
                           placeholder="Enter display name"
-                          onChange={(e) => {let ci = data.candidateInfo; ci.display = e.target.value; setData(
+                          onChange={(e) => {let ci = dataState.candidateInfo; ci.display = e.target.value; setData(
                             (prev) => ({ ...prev, candidateInfo: ci })
                           )}}
-                          value={data.candidateInfo.display || ''}
+                          value={dataState.candidateInfo.display || ''}
                         />
                         <InputGroup
                           disabled={isLoading}
@@ -232,10 +255,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                           className="font-mono"
                           spellCheck={false}
                           placeholder="Enter legal name"
-                          onChange={(e) => {let ci = data.candidateInfo; ci.legal = e.target.value; setData(
+                          onChange={(e) => {let ci = dataState.candidateInfo; ci.legal = e.target.value; setData(
                             (prev) => ({ ...prev, candidateInfo: ci })
                           )}}
-                          value={data.candidateInfo.legal || ''}
+                          value={dataState.candidateInfo.legal || ''}
                         />
                         <InputGroup
                           disabled={isLoading}
@@ -243,10 +266,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                           className="font-mono"
                           spellCheck={false}
                           placeholder="Enter email"
-                          onChange={(e) => {let ci = data.candidateInfo; ci.email = e.target.value; setData(
+                          onChange={(e) => {let ci = dataState.candidateInfo; ci.email = e.target.value; setData(
                             (prev) => ({ ...prev, candidateInfo: ci })
                           )}}
-                          value={data.candidateInfo.email || ''}
+                          value={dataState.candidateInfo.email || ''}
                         />
                         <InputGroup
                           disabled={isLoading}
@@ -254,10 +277,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                           className="font-mono"
                           spellCheck={false}
                           placeholder="Enter web address"
-                          onChange={(e) => {let ci = data.candidateInfo; ci.web = e.target.value; setData(
+                          onChange={(e) => {let ci = dataState.candidateInfo; ci.web = e.target.value; setData(
                             (prev) => ({ ...prev, candidateInfo: ci })
                           )}}
-                          value={data.candidateInfo.web || ''}
+                          value={dataState.candidateInfo.web || ''}
                         />
                         <InputGroup
                           disabled={isLoading}
@@ -265,10 +288,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                           className="font-mono"
                           spellCheck={false}
                           placeholder="Enter twitter"
-                          onChange={(e) => {let ci = data.candidateInfo; ci.twitter = e.target.value; setData(
+                          onChange={(e) => {let ci = dataState.candidateInfo; ci.twitter = e.target.value; setData(
                             (prev) => ({ ...prev, candidateInfo: ci })
                           )}}
-                          value={data.candidateInfo.twitter || ''}
+                          value={dataState.candidateInfo.twitter || ''}
                         />
                         <InputGroup
                           disabled={isLoading}
@@ -276,10 +299,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                           className="font-mono"
                           spellCheck={false}
                           placeholder="Enter discord"
-                          onChange={(e) => {let ci = data.candidateInfo; ci.discord = e.target.value; setData(
+                          onChange={(e) => {let ci = dataState.candidateInfo; ci.discord = e.target.value; setData(
                             (prev) => ({ ...prev, candidateInfo: ci })
                           )}}
-                          value={data.candidateInfo.discord || ''}
+                          value={dataState.candidateInfo.discord || ''}
                         />
                         <InputGroup
                           disabled={isLoading}
@@ -287,10 +310,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                           className="font-mono"
                           spellCheck={false}
                           placeholder="Enter riot name"
-                          onChange={(e) => {let ci = data.candidateInfo; ci.riot = e.target.value; setData(
+                          onChange={(e) => {let ci = dataState.candidateInfo; ci.riot = e.target.value; setData(
                             (prev) => ({ ...prev, candidateInfo: ci })
                           )}}
-                          value={data.candidateInfo.riot || ''}
+                          value={dataState.candidateInfo.riot || ''}
                         />
                         <Button
                             intent={Intent.PRIMARY}
@@ -299,15 +322,15 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                             loading={isLoading}
                             text="Request for judgement"
                         />
-                        <UserCard registrarInfo={data.registrarData} />
+                        <UserCard registrarInfo={dataState.registrarData} />
                     </>
                 )}
             </>
         )}
-        {!data.isRegistrar && Boolean(pair.meta.isInjected) && (
+        {!dataState.isRegistrar && Boolean(pair.meta.isInjected) && (
             <div>You already have identity</div>
         )}
-        {data.isRegistrar && data.registrarData && (
+        {dataState.isRegistrar && dataState.registrarData && (
             <>
                 <Button
                     intent={Intent.PRIMARY}
@@ -316,7 +339,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                     loading={isLoading}
                     text="Add judgement"
                 />
-                <UserCard registrarInfo={data.registrarData} />
+                <UserCard registrarInfo={dataState.registrarData} />
             </>        
         )}
       </div>
