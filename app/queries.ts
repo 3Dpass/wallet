@@ -105,3 +105,76 @@ export const GET_BLOCK = gql`
     }
   }
 `;
+
+export type IEventPageData = {
+  pageSize: number;
+  pageNext: string;
+  pagePrev: string;
+};
+
+export type IEventObjectData = {
+  blockNumber: number;
+  eventIdxL: number;
+  extrinsicIdx: number;
+  event: string;
+  eventModule: string;
+  eventName: string;
+  phaseIdx: number;
+  phaseName: string;
+  attributes: string;
+  topics: string;
+  blockDatetime: string;
+  blockHash: string;
+  specName: string;
+  specVersion: number;
+  complete: number;
+};
+
+export type IEventData = {
+  pageInfo: IEventPageData;
+  objects: IEventObjectData[];
+};
+
+export type EventsData = {
+  getEvents: IEventData;
+};
+
+export type EventsVars = {
+  eventModule: string;
+  eventName: string;
+  blockDatetimeGte: string;
+  pageSize: number;
+};
+
+export const GET_EVENTS = gql`
+  query GetEvents($eventModule: String!, $eventName: String!, $blockDatetimeGte: String!, $pageSize: number = 2147483647) {
+    getEvents (filters: {
+      eventModule: $eventModule,
+      eventName: $eventName,
+      blockDatetimeGte: $blockDatetimeGte
+    }, pageSize: $pageSize) {
+      pageInfo {
+        pageSize
+        pageNext
+        pagePrev
+      }
+     objects {
+      blockNumber
+      eventIdx
+      extrinsicIdx
+      event
+      eventModule
+      eventName
+      phaseIdx
+      phaseName
+      attributes
+      topics
+      blockDatetime
+      blockHash
+      specName
+      specVersion
+      complete
+    }
+    }
+  }  
+`;
