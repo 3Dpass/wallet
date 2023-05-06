@@ -1,7 +1,7 @@
 import { Button, Classes, Dialog, InputGroup, Intent, MenuItem } from "@blueprintjs/core";
 import { ItemPredicate, ItemRenderer, Select2 } from "@blueprintjs/select";
 import { MouseEventHandler, useEffect, useState } from "react";
-// import { decodeAddress } from "@polkadot/util-crypto/address/decode";
+import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
@@ -10,7 +10,8 @@ import { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import UserCard from "../common/UserCard";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
-// import { useSS58Format } from "../../hooks/useSS58Format";
+import { useSS58Format } from "../../hooks/useSS58Format";
+import { getIdentityJudgementRequests } from "app/utils/events";
 
 type IProps = {
   pair: KeyringPair;
@@ -40,7 +41,8 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  // const ss58format = useSS58Format();
+  const ss58format = useSS58Format();
+  console.log(encodeAddress('0x6e50b0fed9840b7331d09ec0276097ada08d4215f56caa959ca925ef58dbd954', ss58format as number));
 
   const dataInitial: IIdentityData = {
     registrarList: [],
@@ -61,11 +63,18 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
         isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
     setData((prev) => ({ ...prev, registrarList: registrarsList, isRegistrar: isRegistrar}));
-    if (isRegistrar) {
+    // if (isRegistrar) {
+    if (true) {
         const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
         setData((prev) => ({ ...prev, registrarData: (registrarInfo as IPalletIdentityRegistrarInfo)}));
         console.log('registrarData: ', dataState.registrarData);
-        // console.log(decodeAddress('0xca84e52a21186bb6747c1cbb294ec1ec713f575bae313676cad4c138af7c5731', true, ss58format));
+
+        const events = getIdentityJudgementRequests(dataState.registrarData?.regIndex);
+        if (events != undefined) {
+
+        }
+
+        // console.log(decodeAddress('0x6e50b0fed9840b7331d09ec0276097ada08d4215f56caa959ca925ef58dbd954', true, ss58format));
     } else {
       setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo}));
     }
@@ -322,6 +331,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
         )}
         {dataState.isRegistrar && dataState.registrarData && (
             <>
+                <div>Please select address to provide judgement</div>
                 <Button
                     intent={Intent.PRIMARY}
                     disabled={isLoading || !canSubmit}
