@@ -6,7 +6,6 @@ import { formatOptionsAtom } from "../atoms";
 import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useSS58Format } from "../hooks/useSS58Format";
 import { loadWeb3Accounts } from "./Web3.client";
 
 interface Props {
@@ -23,9 +22,6 @@ interface Context {
 export const ApiCtx = React.createContext<Context>({ api: undefined, keyringLoaded: false, accounts: [] });
 
 export function ApiCtxRoot({ apiUrl, children }: Props): React.ReactElement<Props> | null {
-  const ss58Format = useSS58Format();
-  const isMainnet = ss58Format === ss58formats[NETWORK_MAINNET];
-
   const [api, setApi] = React.useState<ApiPromise>();
   const [accounts, setAccounts] = React.useState<KeyringPair[]>([]);
   const [keyringLoaded, setKeyringLoaded] = React.useState(false);
@@ -43,24 +39,20 @@ export function ApiCtxRoot({ apiUrl, children }: Props): React.ReactElement<Prop
   }, [apiUrl]);
 
   useEffect(() => {
-    if (!api) {
-      return;
-    }
-    setFormatOptions({
-      decimals: api.registry.chainDecimals[0],
-      chainSS58: api.registry.chainSS58 || ss58formats[NETWORK_MAINNET],
-      unit: api.registry.chainTokens[0],
-    });
-  }, [api, setFormatOptions]);
-
-  useEffect(() => {
     if (!api || keyringLoaded) {
       return;
     }
     setKeyringLoaded(true);
+    const ss58format = api.registry.chainSS58 || ss58formats[NETWORK_MAINNET];
+    setFormatOptions({
+      decimals: api.registry.chainDecimals[0],
+      chainSS58: ss58format,
+      unit: api.registry.chainTokens[0],
+    });
 
     async function loadAllAccounts(ss58Format: any) {
       await cryptoWaitReady();
+      const isMainnet = ss58Format === ss58formats[NETWORK_MAINNET];
       const genesisHash = genesisHashes[isMainnet ? NETWORK_MAINNET : NETWORK_TEST];
       const injected = await loadWeb3Accounts(genesisHash, ss58Format);
       keyring.loadAll({ ss58Format, type: "sr25519" }, injected);
@@ -68,7 +60,7 @@ export function ApiCtxRoot({ apiUrl, children }: Props): React.ReactElement<Prop
 
     let subscription: any;
 
-    loadAllAccounts(ss58Format).then(() => {
+    loadAllAccounts(ss58format).then(() => {
       subscription = keyring.accounts.subject.subscribe(() => {
         setAccounts(keyring.getPairs());
       });
@@ -77,7 +69,7 @@ export function ApiCtxRoot({ apiUrl, children }: Props): React.ReactElement<Prop
     return () => {
       subscription?.unsubscribe();
     };
-  }, [isMainnet, ss58Format, api, keyringLoaded]);
+  }, [api, keyringLoaded, setFormatOptions]);
 
   return <ApiCtx.Provider value={{ api, keyringLoaded, accounts }}>{children}</ApiCtx.Provider>;
 }
