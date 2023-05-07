@@ -20,7 +20,6 @@ import DialogRemoveMiner from "../dialogs/DialogRemoveMiner";
 import DialogAddMiner from "../dialogs/DialogAddMiner";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
-import useIsMainnet from "../../hooks/useIsMainnet";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
@@ -31,7 +30,6 @@ type IProps = {
 export default function Account({ pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
-  const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const apiAdvancedMode: boolean = useAtomValue(apiAdvancedModeAtom);
   const [poolIds, setPoolIds] = useAtom(poolIdsAtom);
@@ -126,11 +124,7 @@ export default function Account({ pair }: IProps) {
     }
     try {
       let tx;
-      if (isMainnet) {
-        tx = api.tx.rewards.unlock();
-      } else {
-        tx = api.tx.rewards.unlock(pair.address);
-      }
+      tx = api.tx.rewards.unlock();
       await signAndSend(tx, pair);
       toaster.show({
         icon: "tick",
@@ -140,7 +134,7 @@ export default function Account({ pair }: IProps) {
     } catch (e: any) {
       showError(e.message);
     }
-  }, [api, isMainnet, pair, showError, toaster]);
+  }, [api, pair, showError, toaster]);
 
   async function handleCreatePoolClick() {
     if (!api) {
