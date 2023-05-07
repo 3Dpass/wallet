@@ -25,14 +25,15 @@ type ICandidateInfo = {
   email: string | null;
   discord: string | null;
   twitter: string | null;
-}
+};
 
 type IIdentityData = {
-    registrarList: IPalletIdentityRegistrarInfo[];
-    isRegistrar: boolean;
-    registrarData: IPalletIdentityRegistrarInfo | null;
-    candidateInfo: ICandidateInfo;
-}
+  registrarList: IPalletIdentityRegistrarInfo[];
+  isRegistrar: boolean;
+  registrarData: IPalletIdentityRegistrarInfo | null;
+  candidateInfo: ICandidateInfo;
+  dateMonthAgo: Date;
+};
 
 export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   const api = useApi();
@@ -45,25 +46,33 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     isRegistrar: false,
     registrarData: null,
     candidateInfo: {} as ICandidateInfo,
+    dateMonthAgo: new Date(),
   };
   const [dataState, setData] = useState(dataInitial);
 
   async function loadRegistrars() {
-    if (!api) { return; }
+    if (!api) {
+      return;
+    }
     const registrars: Object[] = (await api.query.identity.registrars()).toHuman() as Object[];
-    if (!registrars || !Array.isArray(registrars)) { return; }
+    if (!registrars || !Array.isArray(registrars)) {
+      return;
+    }
     const registrarsList: IPalletIdentityRegistrarInfo[] = [];
     let isRegistrar: boolean = true;
     registrars.forEach((r, i) => {
-        registrarsList.push({...(r as IPalletIdentityRegistrarInfo), regIndex: (i + 1)});
-        isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
+      registrarsList.push({ ...(r as IPalletIdentityRegistrarInfo), regIndex: i + 1 });
+      isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
-    setData((prev) => ({ ...prev, isRegistrar: isRegistrar}));
+    setData((prev) => ({ ...prev, isRegistrar: isRegistrar }));
     if (isRegistrar) {
-        const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
-        setData((prev) => ({ ...prev, registrarData: (registrarInfo as IPalletIdentityRegistrarInfo)}));
+      const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
+      setData((prev) => ({ ...prev, registrarData: registrarInfo as IPalletIdentityRegistrarInfo }));
+      const dateMonthAgo = new Date();
+      dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
+      setData((prev) => ({ ...prev, dateMonthAgo: dateMonthAgo }));
     } else {
-      setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo, registrarList: registrarsList}));
+      setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo, registrarList: registrarsList }));
     }
   }
 
@@ -100,11 +109,8 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
           return;
         }
         events.forEach(({ phase, event: { data, method, section } }) => {
-          if (method == 'ExtrinsicSuccess') {
-            const tx = api.tx.identity.requestJudgement(
-              dataState.registrarData?.regIndex,
-              dataState.registrarData?.fee.replace(re, '')
-            );
+          if (method == "ExtrinsicSuccess") {
+            const tx = api.tx.identity.requestJudgement(dataState.registrarData?.regIndex, dataState.registrarData?.fee.replace(re, ""));
             signAndSend(tx, pair, options);
           }
         });
@@ -129,10 +135,10 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
 
   async function setRegistrar(registrarAccount: IPalletIdentityRegistrarInfo) {
     if (!api) {
-        return;
+      return;
     }
     const registrarInfo = (await api.query.identity.identityOf(registrarAccount.account)).toHuman();
-    registrarAccount = {...registrarAccount, ...(registrarInfo as IPalletIdentityRegistrarInfo)};
+    registrarAccount = { ...registrarAccount, ...(registrarInfo as IPalletIdentityRegistrarInfo) };
     setData((prev) => ({ ...prev, registrarData: registrarAccount }));
   }
 
@@ -140,27 +146,27 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     const normalizedId = registrar.account.toLowerCase();
     const normalizedQuery = query.toLowerCase();
     if (exactMatch) {
-        return normalizedId === normalizedQuery;
+      return normalizedId === normalizedQuery;
     } else {
-        return normalizedId.indexOf(normalizedQuery) >= 0;
+      return normalizedId.indexOf(normalizedQuery) >= 0;
     }
   };
 
   const renderRegistrar: ItemRenderer<IPalletIdentityRegistrarInfo> = (registrar, { handleClick, handleFocus, modifiers, query }) => {
     if (!modifiers.matchesPredicate) {
-        return null;
+      return null;
     }
     return (
-        <MenuItem
-            active={modifiers.active}
-            disabled={modifiers.disabled}
-            key={registrar.account}
-            label={registrar.account}
-            onClick={handleClick as MouseEventHandler}
-            onFocus={handleFocus}
-            roleStructure="listoption"
-            text={registrar.fee}
-        />
+      <MenuItem
+        active={modifiers.active}
+        disabled={modifiers.disabled}
+        key={registrar.account}
+        label={registrar.account}
+        onClick={handleClick as MouseEventHandler}
+        onFocus={handleFocus}
+        roleStructure="listoption"
+        text={registrar.fee}
+      />
     );
   };
 
@@ -168,127 +174,138 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         {!dataState.isRegistrar && !Boolean(pair.meta.isInjected) && (
-            <>
-                {!dataState.registrarData && (
-                  <div>Please select a registrar:</div>
-                )}
-                <Select2
-                items={dataState.registrarList}
-                itemPredicate={filterRegistrar}
-                itemRenderer={renderRegistrar}
-                noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
-                onItemSelect={setRegistrar}
-                popoverProps={{ matchTargetWidth: true }}
-                fill={true}
-                >
-                <Button
-                    text={dataState.registrarData?.account}
-                    rightIcon="double-caret-vertical"
-                    placeholder="Select a registrar"
-                    className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
+          <>
+            {!dataState.registrarData && <div>Please select a registrar:</div>}
+            <Select2
+              items={dataState.registrarList}
+              itemPredicate={filterRegistrar}
+              itemRenderer={renderRegistrar}
+              noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
+              onItemSelect={setRegistrar}
+              popoverProps={{ matchTargetWidth: true }}
+              fill={true}
+            >
+              <Button
+                text={dataState.registrarData?.account}
+                rightIcon="double-caret-vertical"
+                placeholder="Select a registrar"
+                className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
+              />
+            </Select2>
+            {dataState.registrarData && (
+              <>
+                <InputGroup
+                  disabled={isLoading}
+                  large={true}
+                  className="font-mono"
+                  spellCheck={false}
+                  placeholder="Enter display name"
+                  onChange={(e) => {
+                    let ci = dataState.candidateInfo;
+                    ci.display = e.target.value;
+                    setData((prev) => ({ ...prev, candidateInfo: ci }));
+                  }}
+                  value={dataState.candidateInfo.display || ""}
                 />
-                </Select2>
-                {dataState.registrarData && (
-                    <>
-                        <InputGroup
-                          disabled={isLoading}
-                          large={true}
-                          className="font-mono"
-                          spellCheck={false}
-                          placeholder="Enter display name"
-                          onChange={(e) => {let ci = dataState.candidateInfo; ci.display = e.target.value; setData(
-                            (prev) => ({ ...prev, candidateInfo: ci })
-                          )}}
-                          value={dataState.candidateInfo.display || ''}
-                        />
-                        <InputGroup
-                          disabled={isLoading}
-                          large={true}
-                          className="font-mono"
-                          spellCheck={false}
-                          placeholder="Enter legal name"
-                          onChange={(e) => {let ci = dataState.candidateInfo; ci.legal = e.target.value; setData(
-                            (prev) => ({ ...prev, candidateInfo: ci })
-                          )}}
-                          value={dataState.candidateInfo.legal || ''}
-                        />
-                        <InputGroup
-                          disabled={isLoading}
-                          large={true}
-                          className="font-mono"
-                          spellCheck={false}
-                          placeholder="Enter email"
-                          onChange={(e) => {let ci = dataState.candidateInfo; ci.email = e.target.value; setData(
-                            (prev) => ({ ...prev, candidateInfo: ci })
-                          )}}
-                          value={dataState.candidateInfo.email || ''}
-                        />
-                        <InputGroup
-                          disabled={isLoading}
-                          large={true}
-                          className="font-mono"
-                          spellCheck={false}
-                          placeholder="Enter web address"
-                          onChange={(e) => {let ci = dataState.candidateInfo; ci.web = e.target.value; setData(
-                            (prev) => ({ ...prev, candidateInfo: ci })
-                          )}}
-                          value={dataState.candidateInfo.web || ''}
-                        />
-                        <InputGroup
-                          disabled={isLoading}
-                          large={true}
-                          className="font-mono"
-                          spellCheck={false}
-                          placeholder="Enter twitter"
-                          onChange={(e) => {let ci = dataState.candidateInfo; ci.twitter = e.target.value; setData(
-                            (prev) => ({ ...prev, candidateInfo: ci })
-                          )}}
-                          value={dataState.candidateInfo.twitter || ''}
-                        />
-                        <InputGroup
-                          disabled={isLoading}
-                          large={true}
-                          className="font-mono"
-                          spellCheck={false}
-                          placeholder="Enter discord"
-                          onChange={(e) => {let ci = dataState.candidateInfo; ci.discord = e.target.value; setData(
-                            (prev) => ({ ...prev, candidateInfo: ci })
-                          )}}
-                          value={dataState.candidateInfo.discord || ''}
-                        />
-                        <InputGroup
-                          disabled={isLoading}
-                          large={true}
-                          className="font-mono"
-                          spellCheck={false}
-                          placeholder="Enter riot name"
-                          onChange={(e) => {let ci = dataState.candidateInfo; ci.riot = e.target.value; setData(
-                            (prev) => ({ ...prev, candidateInfo: ci })
-                          )}}
-                          value={dataState.candidateInfo.riot || ''}
-                        />
-                        <Button
-                            intent={Intent.PRIMARY}
-                            disabled={isLoading || !canSubmit}
-                            onClick={handleSubmitRequestForJudgement}
-                            loading={isLoading}
-                            text="Request for judgement"
-                        />
-                        <UserCard registrarInfo={dataState.registrarData} />
-                    </>
-                )}
-            </>
+                <InputGroup
+                  disabled={isLoading}
+                  large={true}
+                  className="font-mono"
+                  spellCheck={false}
+                  placeholder="Enter legal name"
+                  onChange={(e) => {
+                    let ci = dataState.candidateInfo;
+                    ci.legal = e.target.value;
+                    setData((prev) => ({ ...prev, candidateInfo: ci }));
+                  }}
+                  value={dataState.candidateInfo.legal || ""}
+                />
+                <InputGroup
+                  disabled={isLoading}
+                  large={true}
+                  className="font-mono"
+                  spellCheck={false}
+                  placeholder="Enter email"
+                  onChange={(e) => {
+                    let ci = dataState.candidateInfo;
+                    ci.email = e.target.value;
+                    setData((prev) => ({ ...prev, candidateInfo: ci }));
+                  }}
+                  value={dataState.candidateInfo.email || ""}
+                />
+                <InputGroup
+                  disabled={isLoading}
+                  large={true}
+                  className="font-mono"
+                  spellCheck={false}
+                  placeholder="Enter web address"
+                  onChange={(e) => {
+                    let ci = dataState.candidateInfo;
+                    ci.web = e.target.value;
+                    setData((prev) => ({ ...prev, candidateInfo: ci }));
+                  }}
+                  value={dataState.candidateInfo.web || ""}
+                />
+                <InputGroup
+                  disabled={isLoading}
+                  large={true}
+                  className="font-mono"
+                  spellCheck={false}
+                  placeholder="Enter twitter"
+                  onChange={(e) => {
+                    let ci = dataState.candidateInfo;
+                    ci.twitter = e.target.value;
+                    setData((prev) => ({ ...prev, candidateInfo: ci }));
+                  }}
+                  value={dataState.candidateInfo.twitter || ""}
+                />
+                <InputGroup
+                  disabled={isLoading}
+                  large={true}
+                  className="font-mono"
+                  spellCheck={false}
+                  placeholder="Enter discord"
+                  onChange={(e) => {
+                    let ci = dataState.candidateInfo;
+                    ci.discord = e.target.value;
+                    setData((prev) => ({ ...prev, candidateInfo: ci }));
+                  }}
+                  value={dataState.candidateInfo.discord || ""}
+                />
+                <InputGroup
+                  disabled={isLoading}
+                  large={true}
+                  className="font-mono"
+                  spellCheck={false}
+                  placeholder="Enter riot name"
+                  onChange={(e) => {
+                    let ci = dataState.candidateInfo;
+                    ci.riot = e.target.value;
+                    setData((prev) => ({ ...prev, candidateInfo: ci }));
+                  }}
+                  value={dataState.candidateInfo.riot || ""}
+                />
+                <Button
+                  intent={Intent.PRIMARY}
+                  disabled={isLoading || !canSubmit}
+                  onClick={handleSubmitRequestForJudgement}
+                  loading={isLoading}
+                  text="Request for judgement"
+                />
+                <UserCard registrarInfo={dataState.registrarData} />
+              </>
+            )}
+          </>
         )}
-        {!dataState.isRegistrar && Boolean(pair.meta.isInjected) && (
-            <div>You already have identity</div>
-        )}
-        {dataState.isRegistrar && (
-          <CandidateCards regIndex={dataState.registrarData?.regIndex} pair={pair}/>
+        {!dataState.isRegistrar && Boolean(pair.meta.isInjected) && <div>You already have identity</div>}
+        {/* {dataState.isRegistrar && (
+          <CandidateCards regIndex={dataState.registrarData?.regIndex || 1} pair={pair} dateMonthAgo={dataState.dateMonthAgo}/> */}
+        {dataState.isRegistrar && dataState.registrarData?.regIndex && (
+          <CandidateCards regIndex={dataState.registrarData?.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-        </div>
+        <div className={Classes.DIALOG_FOOTER_ACTIONS}></div>
       </div>
     </Dialog>
   );

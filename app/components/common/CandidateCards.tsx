@@ -15,83 +15,80 @@ import { Spinner } from "@blueprintjs/core";
 import Error from "../../components/common/Error";
 
 type IProps = {
-    regIndex: number;
-    pair: KeyringPair;
-    onClose: () => void;
-}
+  regIndex: number;
+  pair: KeyringPair;
+  dateMonthAgo: Date;
+};
 
 type IData = {
-    candidateList: IPalletIdentityRegistrarInfo[];
-}
+  candidateList: IPalletIdentityRegistrarInfo[] | null;
+};
 
-export default function CandidateCards({ regIndex, pair, onClose }: IProps) {
-    const ss58format = useSS58Format();
-    const api = useApi();
-    const toaster = useToaster();
-    const [isLoading, setIsLoading] = useState(false);
-    const dataInitial: IData = {
-        candidateList: [],
-      };
-    const [dataState, setData] = useState(dataInitial);
-    const dateMonthAgo = new Date();
-    dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
-    const queryEvents = useQuery<EventsData, EventsVars>(GET_EVENTS, {
-        variables: { eventModule: 'Identity', eventName: 'JudgementRequested', blockDatetimeGte: dateMonthAgo.toISOString(), pageSize: 10000 },
+export default function CandidateCards({ regIndex, pair, dateMonthAgo }: IProps) {
+  const ss58format = useSS58Format();
+  const api = useApi();
+  const toaster = useToaster();
+  const [addressLoading, setAddressLoading] = useState("");
+  const dataInitial: IData = {
+    candidateList: null,
+  };
+  const [dataState, setData] = useState(dataInitial);
+  const queryEvents = useQuery<EventsData, EventsVars>(GET_EVENTS, {
+    variables: { eventModule: "Identity", eventName: "JudgementRequested", blockDatetimeGte: dateMonthAgo.toISOString(), pageSize: 10000 },
+  });
+  if (queryEvents.data && !dataState.candidateList && api) {
+    getIdentityJudgementRequests(api, ss58format, regIndex, queryEvents).then((newCandidateList) => {
+      setData((prev) => ({ ...prev, candidateList: newCandidateList }));
     });
-    if (queryEvents.data && api) {
-        getIdentityJudgementRequests(api, ss58format, regIndex, queryEvents).then((newCandidateList) => {
-            setData((prev) => ({ ...prev, candidateList: newCandidateList}));
-        });
-    }
-    
-    async function handleSubmitAddJudgement(candidateAddress: string) {
-        if (!api) {
-          return;
-        }
-        if (pair.isLocked && !pair.meta.isInjected) {
-          toaster.show({
-            icon: "error",
-            intent: Intent.DANGER,
-            message: "Account is locked",
-          });
-          return;
-        }
-        setIsLoading(true);
-        try {
-          const tx = api.tx.identity.provideJudgement(regIndex, candidateAddress, null);
-          await signAndSend(tx, pair, {});
-          toaster.show({
-            icon: "endorsed",
-            intent: Intent.SUCCESS,
-            message: "You requested for judgement",
-          });
-        } catch (e: any) {
-          toaster.show({
-            icon: "error",
-            intent: Intent.DANGER,
-            message: e.message,
-          });
-        } finally {
-          setIsLoading(false);
-          onClose();
-        }
-      }
-    
-      if (queryEvents.loading) return <Spinner />;
-      if (queryEvents.error) return <Error>Error loading block data, try to reload.</Error>;
+  }
 
-      if (queryEvents.data) {
+  async function handleSubmitAddJudgement(candidateAddress: string) {
+    if (!api) {
+      return;
+    }
+    setAddressLoading(candidateAddress);
+    try {
+      const tx = api.tx.identity.provideJudgement(regIndex, candidateAddress, null);
+      await signAndSend(tx, pair, {});
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: "You requested for judgement",
+      });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
+    } finally {
+      setAddressLoading("");
+    }
+  }
+
+  if (queryEvents.loading || !dataState.candidateList) return <Spinner />;
+  if (queryEvents.error) return <Error>Error loading block data, try to reload.</Error>;
+
+  return (
+    <div>
+      {dataState.candidateList &&
         dataState.candidateList.map((candidateInfo) => {
-            return <>
-                <UserCard registrarInfo={candidateInfo} />
-                <Button
-                    intent={Intent.PRIMARY}
-                    disabled={false}
-                    onClick={() => { handleSubmitAddJudgement(candidateInfo.account) }}
-                    loading={isLoading}
-                    text="Add judgement"
-                />
-              </>;
-          })
-      }
+          return (
+            <div key={candidateInfo.account} className="relative">
+              <UserCard registrarInfo={candidateInfo} />
+              <Button
+                intent={Intent.PRIMARY}
+                disabled={false}
+                onClick={() => {
+                  handleSubmitAddJudgement(candidateInfo.account);
+                }}
+                loading={addressLoading == candidateInfo.account}
+                text="Add judgement"
+                className="absolute top-2 right-2"
+              />
+            </div>
+          );
+        })}
+    </div>
+  );
 }
