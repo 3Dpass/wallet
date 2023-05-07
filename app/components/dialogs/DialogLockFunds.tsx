@@ -3,8 +3,8 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { useCallback, useEffect, useState } from "react";
 import AmountInput from "../common/AmountInput";
 import { signAndSend } from "../../utils/sign";
-import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
+import useApi from "../Api";
 
 type IProps = {
   pair: KeyringPair;

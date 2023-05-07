@@ -4,9 +4,9 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
-import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 import AmountInput from "../common/AmountInput";
+import useApi from "../Api";
 
 type IProps = {
   pair: KeyringPair;

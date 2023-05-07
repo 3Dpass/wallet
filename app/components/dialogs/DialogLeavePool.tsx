@@ -6,8 +6,8 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import { convertPool, poolsWithMember, IPool } from "../../utils/pool";
-import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
+import useApi from "../Api";
 
 type IProps = {
   pair: KeyringPair;
@@ -19,7 +19,7 @@ type IPoolData = {
   pools: IPool[];
   poolIds: string[];
   poolToLeave: string;
-}
+};
 
 export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
   const api = useApi();
@@ -96,27 +96,27 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
     const normalizedId = poolId.toLowerCase();
     const normalizedQuery = query.toLowerCase();
     if (exactMatch) {
-        return normalizedId === normalizedQuery;
+      return normalizedId === normalizedQuery;
     } else {
-        return normalizedId.indexOf(normalizedQuery) >= 0;
+      return normalizedId.indexOf(normalizedQuery) >= 0;
     }
   };
 
   const renderPoolId: ItemRenderer<string> = (poolId, { handleClick, handleFocus, modifiers, query }) => {
     if (!modifiers.matchesPredicate) {
-        return null;
+      return null;
     }
     return (
-        <MenuItem
-            active={modifiers.active}
-            disabled={modifiers.disabled}
-            key={poolId}
-            label={poolId}
-            onClick={handleClick as MouseEventHandler}
-            onFocus={handleFocus}
-            roleStructure="listoption"
-            text=""
-        />
+      <MenuItem
+        active={modifiers.active}
+        disabled={modifiers.disabled}
+        key={poolId}
+        label={poolId}
+        onClick={handleClick as MouseEventHandler}
+        onFocus={handleFocus}
+        roleStructure="listoption"
+        text=""
+      />
     );
   };
 

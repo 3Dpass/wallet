@@ -5,8 +5,8 @@ import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
 import useAccounts from "../../hooks/useAccounts";
-import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
+import useApi from "../Api";
 
 export default function Wallet() {
   const api = useApi();
