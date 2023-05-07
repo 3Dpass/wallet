@@ -5,7 +5,7 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { poolIdsAtom } from "../../atoms";
-import { signAndSendWithSubscription } from "../../utils/sign";
+import { signAndSend } from "../../utils/sign";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
 
@@ -47,7 +47,7 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
     try {
       const tx = api.tx.miningPool.closePool();
       const options: Partial<SignerOptions> = {};
-      const unsub = await signAndSendWithSubscription(tx, pair, options, ({ events = [], status, txHash }) => {
+      const unsub = await signAndSend(tx, pair, options, ({ events = [], status, txHash }) => {
         if (!status.isFinalized) {
           return;
         }
