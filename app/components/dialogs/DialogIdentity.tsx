@@ -1,17 +1,15 @@
 import { Button, Classes, Dialog, InputGroup, Intent, MenuItem } from "@blueprintjs/core";
 import { ItemPredicate, ItemRenderer, Select2 } from "@blueprintjs/select";
 import { MouseEventHandler, useEffect, useState } from "react";
-import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend, signAndSendWithSubscribtion } from "../../utils/sign";
 import { IPalletIdentityRegistrarInfo } from "../common/UserCard";
+import CandidateCards from "../common/CandidateCards";
 import UserCard from "../common/UserCard";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
-import { useSS58Format } from "../../hooks/useSS58Format";
-import { getIdentityJudgementRequests } from "app/utils/events";
 
 type IProps = {
   pair: KeyringPair;
@@ -41,8 +39,6 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const ss58format = useSS58Format();
-  console.log(encodeAddress('0x6e50b0fed9840b7331d09ec0276097ada08d4215f56caa959ca925ef58dbd954', ss58format as number));
 
   const dataInitial: IIdentityData = {
     registrarList: [],
@@ -57,33 +53,24 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     const registrars: Object[] = (await api.query.identity.registrars()).toHuman() as Object[];
     if (!registrars || !Array.isArray(registrars)) { return; }
     const registrarsList: IPalletIdentityRegistrarInfo[] = [];
-    let isRegistrar: boolean = false;
+    let isRegistrar: boolean = true;
     registrars.forEach((r, i) => {
         registrarsList.push({...(r as IPalletIdentityRegistrarInfo), regIndex: (i + 1)});
         isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
-    setData((prev) => ({ ...prev, registrarList: registrarsList, isRegistrar: isRegistrar}));
-    // if (isRegistrar) {
-    if (true) {
+    setData((prev) => ({ ...prev, isRegistrar: isRegistrar}));
+    if (isRegistrar) {
         const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
         setData((prev) => ({ ...prev, registrarData: (registrarInfo as IPalletIdentityRegistrarInfo)}));
-        console.log('registrarData: ', dataState.registrarData);
-
-        const events = getIdentityJudgementRequests(dataState.registrarData?.regIndex);
-        if (events != undefined) {
-
-        }
-
-        // console.log(decodeAddress('0x6e50b0fed9840b7331d09ec0276097ada08d4215f56caa959ca925ef58dbd954', true, ss58format));
     } else {
-      setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo}));
+      setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo, registrarList: registrarsList}));
     }
   }
 
-  function handleOnOpening() {
+  async function handleOnOpening() {
     setIsLoading(false);
     setData(dataInitial);
-    void loadRegistrars();
+    await loadRegistrars();
   }
 
   useEffect(() => {
@@ -123,40 +110,6 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
         });
         unsub();
       });
-      toaster.show({
-        icon: "endorsed",
-        intent: Intent.SUCCESS,
-        message: "You requested for judgement",
-      });
-    } catch (e: any) {
-      toaster.show({
-        icon: "error",
-        intent: Intent.DANGER,
-        message: e.message,
-      });
-    } finally {
-      setIsLoading(false);
-      onClose();
-    }
-  }
-
-  async function handleSubmitAddJudgement(target: string) {
-    if (!api) {
-      return;
-    }
-    if (pair.isLocked && !pair.meta.isInjected) {
-      toaster.show({
-        icon: "error",
-        intent: Intent.DANGER,
-        message: "Account is locked",
-      });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const tx = api.tx.identity.provideJudgement(dataState.registrarData?.regIndex, target, null);
-      const options: Partial<SignerOptions> = {};
-      await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
@@ -329,18 +282,8 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
         {!dataState.isRegistrar && Boolean(pair.meta.isInjected) && (
             <div>You already have identity</div>
         )}
-        {dataState.isRegistrar && dataState.registrarData && (
-            <>
-                <div>Please select address to provide judgement</div>
-                <Button
-                    intent={Intent.PRIMARY}
-                    disabled={isLoading || !canSubmit}
-                    onClick={() => { handleSubmitAddJudgement('')}}
-                    loading={isLoading}
-                    text="Add judgement"
-                />
-                <UserCard registrarInfo={dataState.registrarData} />
-            </>        
+        {dataState.isRegistrar && (
+          <CandidateCards regIndex={dataState.registrarData?.regIndex} pair={pair}/>
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
