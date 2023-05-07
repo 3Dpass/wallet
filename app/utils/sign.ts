@@ -17,8 +17,11 @@ export async function signAndSend(tx: SubmittableExtrinsic, pair: KeyringPair, o
   return tx.signAndSend(options.signer ? pair.address : pair, options);
 }
 
-export async function signAndSendWithSubscribtion(
-  tx: SubmittableExtrinsic, pair: KeyringPair, options: Options, statusCb: Callback<ISubmittableResult>
+export async function signAndSendWithSubscription(
+  tx: SubmittableExtrinsic,
+  pair: KeyringPair,
+  options: Options,
+  statusCb: Callback<ISubmittableResult>
 ) {
   options = options || {};
   if (pair.meta.isInjected) {

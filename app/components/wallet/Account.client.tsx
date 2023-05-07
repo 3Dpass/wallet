@@ -19,7 +19,7 @@ import DialogLeavePool from "../dialogs/DialogLeavePool";
 import DialogRemoveMiner from "../dialogs/DialogRemoveMiner";
 import DialogAddMiner from "../dialogs/DialogAddMiner";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
-import { signAndSend, signAndSendWithSubscribtion } from "../../utils/sign";
+import { signAndSend, signAndSendWithSubscription } from "../../utils/sign";
 import useIsMainnet from "../../hooks/useIsMainnet";
 import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
@@ -151,7 +151,7 @@ export default function Account({ pair }: IProps) {
     setIsCreatePoolLoading(true);
     try {
       const tx = api.tx.miningPool.createPool();
-      const unsub = await signAndSendWithSubscribtion(tx, pair, {}, ({ status, events, dispatchError }) => {
+      const unsub = await signAndSendWithSubscription(tx, pair, {}, ({ status, events, dispatchError }) => {
         if (!status.isInBlock && !status.isFinalized) {
           return;
         }
