@@ -4,15 +4,15 @@ import UserCard from "./UserCard";
 import { getIdentityJudgementRequests } from "app/utils/events";
 import { useSS58Format } from "../../hooks/useSS58Format";
 import useToaster from "../../hooks/useToaster";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { signAndSend } from "../../utils/sign";
 import { IPalletIdentityRegistrarInfo } from "../../components/common/UserCard";
 import { useQuery } from "@apollo/client";
 import { GET_EVENTS } from "../../queries";
 import type { EventsData, EventsVars } from "../../queries";
-import { Card, Spinner } from "@blueprintjs/core";
-
+import { Spinner } from "@blueprintjs/core";
+import Error from "../../components/common/Error";
 
 type IProps = {
     regIndex: number;
@@ -38,15 +38,11 @@ export default function CandidateCards({ regIndex, pair, onClose }: IProps) {
     const queryEvents = useQuery<EventsData, EventsVars>(GET_EVENTS, {
         variables: { eventModule: 'Identity', eventName: 'JudgementRequested', blockDatetimeGte: dateMonthAgo.toISOString(), pageSize: 10000 },
     });
-
-    useEffect(() => {
-        if (!api) { return; }
-        setIsLoading(false);
-        console.log('queryEvents: ', queryEvents);
+    if (queryEvents.data && api) {
         getIdentityJudgementRequests(api, ss58format, regIndex, queryEvents).then((newCandidateList) => {
             setData((prev) => ({ ...prev, candidateList: newCandidateList}));
         });
-    }, [api, pair]);
+    }
     
     async function handleSubmitAddJudgement(candidateAddress: string) {
         if (!api) {
@@ -82,17 +78,20 @@ export default function CandidateCards({ regIndex, pair, onClose }: IProps) {
       }
     
       if (queryEvents.loading) return <Spinner />;
+      if (queryEvents.error) return <Error>Error loading block data, try to reload.</Error>;
 
-      dataState.candidateList.map((candidateInfo) => {
-        return <>
-            <UserCard registrarInfo={candidateInfo} />
-            <Button
-                intent={Intent.PRIMARY}
-                disabled={false}
-                onClick={() => { handleSubmitAddJudgement(candidateInfo.account) }}
-                loading={isLoading}
-                text="Add judgement"
-            />
-          </>;
-      })
+      if (queryEvents.data) {
+        dataState.candidateList.map((candidateInfo) => {
+            return <>
+                <UserCard registrarInfo={candidateInfo} />
+                <Button
+                    intent={Intent.PRIMARY}
+                    disabled={false}
+                    onClick={() => { handleSubmitAddJudgement(candidateInfo.account) }}
+                    loading={isLoading}
+                    text="Add judgement"
+                />
+              </>;
+          })
+      }
 }

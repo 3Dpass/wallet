@@ -13,6 +13,7 @@ export async function getIdentityJudgementRequests(
     queryEvents: QueryResult<EventsData, EventsVars>,
 ): Promise<IPalletIdentityRegistrarInfo[]> {
     const candidateInfoArray: IPalletIdentityRegistrarInfo[] = [];
+    console.log('hit2!');
     if (queryEvents.data !== undefined && registrarIndex !== undefined && api) {
         let candidateAddress: string;
         let candidateInfo: IPalletIdentityRegistrarInfo;
