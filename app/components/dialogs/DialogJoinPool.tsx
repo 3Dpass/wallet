@@ -108,14 +108,14 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     }
     return (
       <MenuItem
+        className="font-mono text-lg"
         active={modifiers.active}
         disabled={modifiers.disabled}
         key={poolId}
-        label={poolId}
+        text={poolId}
         onClick={handleClick as MouseEventHandler}
         onFocus={handleFocus}
         roleStructure="listoption"
-        text=""
       />
     );
   };
@@ -136,7 +136,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
             text={data.poolToJoin}
             rightIcon="double-caret-vertical"
             placeholder="Select a pool"
-            className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
+            className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono text-lg`}
           />
         </Select2>
       </div>
