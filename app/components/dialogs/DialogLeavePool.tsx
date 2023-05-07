@@ -7,7 +7,7 @@ import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import { convertPool, poolsWithMember, IPool } from "../../utils/pool";
 import useToaster from "../../hooks/useToaster";
-import useApi from "../Api";
+import { useApi } from "../Api";
 
 type IProps = {
   pair: KeyringPair;

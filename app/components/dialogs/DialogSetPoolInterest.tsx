@@ -6,7 +6,7 @@ import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import AmountInput from "../common/AmountInput";
-import useApi from "../Api";
+import { useApi } from "../Api";
 
 type IProps = {
   pair: KeyringPair;

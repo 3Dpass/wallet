@@ -21,7 +21,7 @@ import DialogAddMiner from "../dialogs/DialogAddMiner";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
-import useApi from "../Api";
+import { useApi } from "../Api";
 
 type IProps = {
   pair: KeyringPair;

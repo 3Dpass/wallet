@@ -10,8 +10,7 @@ import type { ApiPromise } from "@polkadot/api";
 import { FormattedAmount } from "./common/FormattedAmount";
 import type { Int } from "@polkadot/types/codec";
 import TimeAgo from "react-timeago";
-
-import useApi from "./Api";
+import { useApi } from "./Api";
 
 type INetworkState = {
   totalIssuance: bigint;

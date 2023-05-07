@@ -1,18 +1,35 @@
 import React, { useEffect } from "react";
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { NETWORK_MAINNET, RPC_CONFIG, RPC_TYPES, ss58formats } from "../api.config";
+import { genesisHashes, NETWORK_MAINNET, NETWORK_TEST, RPC_CONFIG, RPC_TYPES, ss58formats } from "../api.config";
 import { useSetAtom } from "jotai/index";
 import { formatOptionsAtom } from "../atoms";
+import { cryptoWaitReady } from "@polkadot/util-crypto";
+import keyring from "@polkadot/ui-keyring";
+import type { KeyringPair } from "@polkadot/keyring/types";
+import { useSS58Format } from "../hooks/useSS58Format";
+import useIsMainnet from "../hooks/useIsMainnet";
+import { loadWeb3Accounts } from "./Web3.client";
 
 interface Props {
   children: React.ReactNode;
   apiUrl: string;
 }
 
-export const ApiCtx = React.createContext<ApiPromise | undefined>(undefined as any);
+interface Context {
+  api: ApiPromise | undefined;
+  keyringLoaded: boolean;
+  accounts: KeyringPair[];
+}
+
+export const ApiCtx = React.createContext<Context>({ api: undefined, keyringLoaded: false, accounts: [] });
 
 export function ApiCtxRoot({ apiUrl, children }: Props): React.ReactElement<Props> | null {
+  const ss58Format = useSS58Format();
+  const isMainnet = useIsMainnet();
+
   const [api, setApi] = React.useState<ApiPromise>();
+  const [accounts, setAccounts] = React.useState<KeyringPair[]>([]);
+  const [keyringLoaded, setKeyringLoaded] = React.useState(false);
   const setFormatOptions = useSetAtom(formatOptionsAtom);
 
   useEffect(() => {
@@ -37,9 +54,39 @@ export function ApiCtxRoot({ apiUrl, children }: Props): React.ReactElement<Prop
     });
   }, [api, setFormatOptions]);
 
-  return <ApiCtx.Provider value={api}>{children}</ApiCtx.Provider>;
+  useEffect(() => {
+    if (!api || keyringLoaded) {
+      return;
+    }
+    setKeyringLoaded(true);
+
+    async function loadAllAccounts(ss58Format: any) {
+      await cryptoWaitReady();
+      const genesisHash = genesisHashes[isMainnet ? NETWORK_MAINNET : NETWORK_TEST];
+      const injected = await loadWeb3Accounts(genesisHash, ss58Format);
+      keyring.loadAll({ ss58Format, type: "sr25519" }, injected);
+    }
+
+    let subscription: any;
+
+    loadAllAccounts(ss58Format).then(() => {
+      subscription = keyring.accounts.subject.subscribe(() => {
+        setAccounts(keyring.getPairs());
+      });
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [isMainnet, ss58Format, api]);
+
+  return <ApiCtx.Provider value={{ api, keyringLoaded, accounts }}>{children}</ApiCtx.Provider>;
 }
 
-export default function useApi(): ApiPromise | undefined {
-  return React.useContext(ApiCtx);
+export function useApi(): ApiPromise | undefined {
+  return React.useContext(ApiCtx).api;
+}
+
+export function useAccounts(): KeyringPair[] {
+  return React.useContext(ApiCtx).accounts;
 }

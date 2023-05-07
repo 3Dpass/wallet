@@ -4,14 +4,14 @@ import { Button, Card, Elevation, Intent } from "@blueprintjs/core";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
 import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
-import useAccounts from "../../hooks/useAccounts";
 import useToaster from "../../hooks/useToaster";
-import useApi from "../Api";
+import { useAccounts, useApi } from "../Api";
 
 export default function Wallet() {
-  const api = useApi();
   const toaster = useToaster();
-  const { accounts, isLoading } = useAccounts();
+
+  const api = useApi();
+  const accounts = useAccounts();
 
   const dialogsInitial = {
     seed_phrase: false,
@@ -64,7 +64,7 @@ export default function Wallet() {
     [dialogToggle, toaster]
   );
 
-  if (isLoading || !api) {
+  if (!api) {
     return <div className="mb-4 w-100 h-[100px] border border-gray-500 border-dashed" />;
   }
 
