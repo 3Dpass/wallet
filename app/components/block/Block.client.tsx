@@ -31,13 +31,13 @@ export default function Block({ block }: IProps) {
             blockNumber <= bestNumberFinalized ? (
               <>
                 <Link to={`/block/${blockNumber}`} target="_blank" rel="noopener noreferrer">
-                  {blockNumber}
+                  {blockNumber.toLocaleString()}
                 </Link>{" "}
                 <div className="small-title">✓ Finalized</div>
               </>
             ) : (
               <>
-                {blockNumber}
+                {blockNumber.toLocaleString()}
                 <div className="small-title">Not finalized</div>
               </>
             )

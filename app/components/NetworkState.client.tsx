@@ -8,14 +8,13 @@ import { MAX_BLOCKS } from "../api.config";
 import TitledValue from "./common/TitledValue";
 import type { ApiPromise } from "@polkadot/api";
 import { FormattedAmount } from "./common/FormattedAmount";
-import type { Int } from "@polkadot/types/codec";
 import TimeAgo from "react-timeago";
 import { useApi } from "./Api";
 
 type INetworkState = {
   totalIssuance: bigint;
-  bestNumber: string;
-  bestNumberFinalized: string;
+  bestNumber: bigint;
+  bestNumberFinalized: bigint;
   timestamp: number;
   targetBlockTime: number;
 };
@@ -27,24 +26,21 @@ export default function NetworkState() {
   const [networkState, setNetworkState] = useState<INetworkState>();
   const setBestNumberFinalized = useSetAtom(bestNumberFinalizedAtom);
 
-  async function loadNetworkState(timestamp: Int) {
-    if (!api) {
-      return;
-    }
-
+  async function loadNetworkState(api: ApiPromise) {
     setIsLoading(true);
     // @ts-ignore
-    const [totalIssuance, bestNumber, bestNumberFinalized, targetBlockTime] = await Promise.all([
+    const [totalIssuance, timestamp, bestNumber, bestNumberFinalized, targetBlockTime] = await Promise.all([
       api.query.balances.totalIssuance(),
+      api.query.timestamp.now(),
       api.derive.chain.bestNumber(),
       api.derive.chain.bestNumberFinalized(),
       api.consts.difficulty.targetBlockTime,
     ]);
     setNetworkState({
       totalIssuance: BigInt(totalIssuance.toString()),
-      bestNumber: bestNumber.toHuman().toString(),
-      bestNumberFinalized: bestNumberFinalized.toHuman().toString(),
-      timestamp: timestamp.toJSON(),
+      bestNumber: bestNumber.toBigInt(),
+      bestNumberFinalized: bestNumberFinalized.toBigInt(),
+      timestamp: timestamp.toPrimitive() as number,
       targetBlockTime: parseInt(targetBlockTime.toString()) / 1000,
     });
 
@@ -65,10 +61,10 @@ export default function NetworkState() {
     let newHeadsUnsubscribe: () => void;
 
     async function subscribe(api: ApiPromise) {
-      [, newHeadsUnsubscribe] = await Promise.all([
-        api.query.timestamp.now(loadNetworkState),
+      [newHeadsUnsubscribe] = await Promise.all([
         api.rpc.chain.subscribeNewHeads((head) => {
           const hash = head.hash.toHex();
+          loadNetworkState(api);
           if (isBlockAlreadyLoaded(hash)) {
             return;
           }
@@ -102,8 +98,8 @@ export default function NetworkState() {
   return (
     <Card className="mb-4" elevation={Elevation.ZERO}>
       <div className={cardClassName}>
-        <TitledValue title="Best block" value={networkState.bestNumber} />
-        <TitledValue title="Finalized" value={networkState.bestNumberFinalized} />
+        <TitledValue title="Best block" value={networkState.bestNumber.toLocaleString()} />
+        <TitledValue title="Finalized" value={networkState.bestNumberFinalized.toLocaleString()} />
         <TitledValue title="Latest block" value={<TimeAgo date={networkState.timestamp} live={true} />} />
         <TitledValue title="Target" value={formatDuration(networkState.targetBlockTime)} />
         <TitledValue title="Total issuance" value={<FormattedAmount value={networkState.totalIssuance} />} />
