@@ -1,17 +1,31 @@
-import { useQuery } from "@apollo/client";
+import { ApiPromise } from "@polkadot/api";
+import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 
+import { IPalletIdentityRegistrarInfo } from "../components/common/UserCard";
+import { QueryResult } from "@apollo/client";
 import type { EventsData, EventsVars } from "../queries";
-import { GET_EVENTS } from "../queries";
 
 
-export const getIdentityJudgementRequests = (registrarIndex: number | undefined): string[] => {
-    const queryEvents = useQuery<EventsData, EventsVars>(GET_EVENTS, {
-        variables: { eventModule: 'Identity', eventName: 'JudgementRequested', blockDatetimeGte: '', pageSize: 10000 },
-    });
-    if (queryEvents.data !== undefined && registrarIndex !== undefined) {
-        queryEvents.data.getEvents.objects.forEach((item) => {
-            item.attributes
-        });
+export async function getIdentityJudgementRequests(
+    api: ApiPromise,
+    ss58format: number | false,
+    registrarIndex: number | undefined,
+    queryEvents: QueryResult<EventsData, EventsVars>,
+): Promise<IPalletIdentityRegistrarInfo[]> {
+    const candidateInfoArray: IPalletIdentityRegistrarInfo[] = [];
+    if (queryEvents.data !== undefined && registrarIndex !== undefined && api) {
+        let candidateAddress: string;
+        let candidateInfo: IPalletIdentityRegistrarInfo;
+        for (let i = 0; i++; i < queryEvents.data.getEvents.objects.length) {
+            let item = queryEvents.data.getEvents.objects[i];
+            console.log(item.attributes);
+
+            candidateAddress = encodeAddress('0x6e50b0fed9840b7331d09ec0276097ada08d4215f56caa959ca925ef58dbd954', ss58format as number);
+            candidateInfo = (await api.query.identity.identityOf(candidateAddress)).toHuman() as IPalletIdentityRegistrarInfo;
+            if (candidateInfo) {
+                candidateInfoArray.push(candidateInfo);
+            }
+        }
     }
-    return [];
+    return candidateInfoArray;
 }
