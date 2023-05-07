@@ -148,33 +148,33 @@ export type EventsVars = {
 
 export const GET_EVENTS = gql`
   query GetEvents($eventModule: String!, $eventName: String!, $blockDatetimeGte: DateTime, $pageSize: Int = 2147483647, $pageKey: String = null) {
-    getEvents (filters: {
-      eventModule: $eventModule,
-      eventName: $eventName,
-      blockDatetimeGte: $blockDatetimeGte
-    }, pageSize: $pageSize, pageKey: $pageKey) {
+    getEvents(
+      filters: { eventModule: $eventModule, eventName: $eventName, blockDatetimeGte: $blockDatetimeGte }
+      pageSize: $pageSize
+      pageKey: $pageKey
+    ) {
       pageInfo {
         pageSize
         pageNext
         pagePrev
       }
-     objects {
-      blockNumber
-      eventIdx
-      extrinsicIdx
-      event
-      eventModule
-      eventName
-      phaseIdx
-      phaseName
-      attributes
-      topics
-      blockDatetime
-      blockHash
-      specName
-      specVersion
-      complete
+      objects {
+        blockNumber
+        eventIdx
+        extrinsicIdx
+        event
+        eventModule
+        eventName
+        phaseIdx
+        phaseName
+        attributes
+        topics
+        blockDatetime
+        blockHash
+        specName
+        specVersion
+        complete
+      }
     }
-    }
-  }  
+  }
 `;
