@@ -268,8 +268,12 @@ export default function Account({ pair }: IProps) {
                 <Text className="font-bold pt-4 pb-2">Pool actions</Text>
                 <div className="grid grid-cols-3 gap-1">
                   {!poolAlreadyExist && <Button text="Create" loading={isCreatePoolLoading} onClick={handleCreatePoolClick} disabled={accountLocked} />}
-                  {poolAlreadyExist && <Button text="KYC" onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />}
-                  {poolAlreadyExist && <Button text="no KYC" onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />}
+                  {poolAlreadyExist && (
+                    <div className="grid grid-cols-2 gap-1">
+                      <Button text="KYC" onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />
+                      <Button text="no KYC" onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />
+                    </div>
+                  )}
                   {poolAlreadyExist && <Button text="Close" onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />}
                   <Button text="Set up fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked || !poolAlreadyExist} />
                   <Button
@@ -278,10 +282,10 @@ export default function Account({ pair }: IProps) {
                     onClick={() => dialogToggle("set_pool_difficulty")}
                     disabled={accountLocked || !poolAlreadyExist}
                   />
-                  <Button text="Join" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />
-                  <Button text="Leave" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />
                   {poolAlreadyExist && <Button text="Add miner" onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
                   {poolAlreadyExist && <Button text="Remove miner" onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />}
+                  {!poolAlreadyExist && <Button text="Join" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />}
+                  {!poolAlreadyExist && <Button text="Leave" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />}
                 </div>
               </>
             )}
