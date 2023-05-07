@@ -272,12 +272,10 @@ export default function Account({ pair }: IProps) {
                     onClick={() => dialogToggle("set_pool_difficulty")}
                     disabled={accountLocked || !poolAlreadyExist}
                   />
-                  <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />
-                  <Button text="Leave a pool" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />
-                  {poolAlreadyExist && <Button text="Add a miner to the pool" onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
-                  {poolAlreadyExist && (
-                    <Button text="Remove a miner from the pool" onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />
-                  )}
+                  <Button text="Join" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />
+                  <Button text="Leave" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />
+                  {poolAlreadyExist && <Button text="Add miner" onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
+                  {poolAlreadyExist && <Button text="Remove miner" onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />}
                 </div>
               </>
             )}
