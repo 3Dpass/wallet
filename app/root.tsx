@@ -4,13 +4,12 @@ import styles from "./styles/app.css";
 import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
 import type { FormEvent, LegacyRef } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { apiAdvancedModeAtom, apiEndpointAtom, apiExplorerEndpointAtom, poolIdsAtom, toasterAtom } from "./atoms";
+import { apiEndpointAtom, apiExplorerEndpointAtom, toasterAtom } from "./atoms";
 import { useAtomValue, useSetAtom } from "jotai";
 import DialogSettings from "./components/dialogs/DialogSettings";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { isValidPolkadotAddress } from "./utils/address";
-import { convertPool } from "./utils/pool";
-import { ApiCtxRoot, useApi } from "./components/Api";
+import { ApiCtxRoot } from "./components/Api";
 import { ClientOnly } from "remix-utils";
 
 export function meta() {
@@ -29,28 +28,16 @@ export function links() {
 }
 
 export default function App() {
-  const api = useApi();
   const apiUrl = useAtomValue(apiEndpointAtom);
   const toasterRef = useRef<Toaster>();
   const setToaster = useSetAtom(toasterAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
-  const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
-  const setPoolIds = useSetAtom(poolIdsAtom);
 
   useEffect(() => {
     setToaster(toasterRef.current);
   }, [setToaster, toasterRef]);
-
-  useEffect(() => {
-    if (apiAdvancedMode) {
-      api?.query.miningPool.pools.entries().then((pools) => {
-        const poolsIds = convertPool(Array.from(pools));
-        setPoolIds(poolsIds.poolIds);
-      });
-    }
-  }, [api, apiAdvancedMode, setPoolIds]);
 
   const client = new ApolloClient({
     uri: apiExplorerEndpoint,

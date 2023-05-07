@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import keyring from "@polkadot/ui-keyring";
 import { Button, Card, Elevation, Intent } from "@blueprintjs/core";
 import DialogImportAddress from "../dialogs/DialogImportAddress";
@@ -6,12 +6,17 @@ import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
 import useToaster from "../../hooks/useToaster";
 import { useAccounts, useApi } from "../Api";
+import { useAtomValue, useSetAtom } from "jotai/index";
+import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
+import { convertPool } from "../../utils/pool";
 
 export default function Wallet() {
   const toaster = useToaster();
 
   const api = useApi();
   const accounts = useAccounts();
+  const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
+  const setPoolIds = useSetAtom(poolIdsAtom);
 
   const dialogsInitial = {
     seed_phrase: false,
@@ -22,6 +27,15 @@ export default function Wallet() {
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
+
+  useEffect(() => {
+    if (apiAdvancedMode) {
+      api?.query.miningPool.pools.entries().then((pools) => {
+        const poolsIds = convertPool(Array.from(pools));
+        setPoolIds(poolsIds.poolIds);
+      });
+    }
+  }, [api, apiAdvancedMode, setPoolIds]);
 
   const handleSeedPhraseImportClick = useCallback(
     (seed_phrase: string, password: string) => {
