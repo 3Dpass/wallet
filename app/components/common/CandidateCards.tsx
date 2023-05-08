@@ -1,18 +1,19 @@
-import { Button, Intent } from "@blueprintjs/core";
-import useApi from "../../hooks/useApi";
+import { Button, Intent, Spinner } from "@blueprintjs/core";
+import { useApi } from "../Api";
+import type { IPalletIdentityRegistrarInfo } from "./UserCard";
 import UserCard from "./UserCard";
 import { getIdentityJudgementRequests } from "app/utils/events";
-import { useSS58Format } from "../../hooks/useSS58Format";
 import useToaster from "../../hooks/useToaster";
 import { useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { signAndSend } from "../../utils/sign";
-import { IPalletIdentityRegistrarInfo } from "../../components/common/UserCard";
 import { useQuery } from "@apollo/client";
-import { GET_EVENTS } from "../../queries";
 import type { EventsData, EventsVars } from "../../queries";
-import { Spinner } from "@blueprintjs/core";
+import { GET_EVENTS } from "../../queries";
 import Error from "../../components/common/Error";
+import type { IFormatOptions } from "../../atoms";
+import { formatOptionsAtom } from "../../atoms";
+import { useAtomValue } from "jotai";
 
 type IProps = {
   regIndex: number;
@@ -25,10 +26,10 @@ type IData = {
 };
 
 export default function CandidateCards({ regIndex, pair, dateMonthAgo }: IProps) {
-  const ss58format = useSS58Format();
   const api = useApi();
   const toaster = useToaster();
   const [addressLoading, setAddressLoading] = useState("");
+  const formatOptions: false | IFormatOptions = useAtomValue(formatOptionsAtom);
   const dataInitial: IData = {
     candidateList: null,
   };
@@ -36,8 +37,8 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo }: IProps)
   const queryEvents = useQuery<EventsData, EventsVars>(GET_EVENTS, {
     variables: { eventModule: "Identity", eventName: "JudgementRequested", blockDatetimeGte: dateMonthAgo.toISOString(), pageSize: 10000 },
   });
-  if (queryEvents.data && !dataState.candidateList && api) {
-    getIdentityJudgementRequests(api, ss58format, regIndex, queryEvents).then((newCandidateList) => {
+  if (queryEvents.data && !dataState.candidateList && api && formatOptions) {
+    getIdentityJudgementRequests(api, formatOptions.chainSS58, regIndex, queryEvents).then((newCandidateList) => {
       setData((prev) => ({ ...prev, candidateList: newCandidateList }));
     });
   }
@@ -80,7 +81,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo }: IProps)
                 intent={Intent.PRIMARY}
                 disabled={false}
                 onClick={() => {
-                  handleSubmitAddJudgement(candidateInfo.account);
+                  void handleSubmitAddJudgement(candidateInfo.account);
                 }}
                 loading={addressLoading == candidateInfo.account}
                 text="Add judgement"

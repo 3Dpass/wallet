@@ -1,14 +1,16 @@
 import { Button, Classes, Dialog, InputGroup, Intent, MenuItem } from "@blueprintjs/core";
-import { ItemPredicate, ItemRenderer, Select2 } from "@blueprintjs/select";
-import { MouseEventHandler, useEffect, useState } from "react";
+import type { ItemPredicate, ItemRenderer } from "@blueprintjs/select";
+import { Select2 } from "@blueprintjs/select";
+import type { MouseEventHandler } from "react";
+import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
-import { signAndSend, signAndSendWithSubscribtion } from "../../utils/sign";
-import { IPalletIdentityRegistrarInfo } from "../common/UserCard";
-import CandidateCards from "../common/CandidateCards";
+import { signAndSend } from "../../utils/sign";
+import type { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import UserCard from "../common/UserCard";
-import useApi from "../../hooks/useApi";
+import CandidateCards from "../common/CandidateCards";
+import { useApi } from "../Api";
 import useToaster from "../../hooks/useToaster";
 
 type IProps = {
@@ -101,14 +103,14 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     }
     setIsLoading(true);
     try {
-      const re = /\,/gi;
+      const re = /,/gi;
       const tx0 = api.tx.identity.setIdentity(dataState.candidateInfo);
       const options: Partial<SignerOptions> = {};
-      const unsub = await signAndSendWithSubscribtion(tx0, pair, options, ({ events = [], status, txHash }) => {
+      const unsub = await signAndSend(tx0, pair, options, ({ events = [], status }) => {
         if (!status.isFinalized) {
           return;
         }
-        events.forEach(({ phase, event: { data, method, section } }) => {
+        events.forEach(({ event: { method } }) => {
           if (method == "ExtrinsicSuccess") {
             const tx = api.tx.identity.requestJudgement(dataState.registrarData?.regIndex, dataState.registrarData?.fee.replace(re, ""));
             signAndSend(tx, pair, options);
@@ -152,7 +154,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     }
   };
 
-  const renderRegistrar: ItemRenderer<IPalletIdentityRegistrarInfo> = (registrar, { handleClick, handleFocus, modifiers, query }) => {
+  const renderRegistrar: ItemRenderer<IPalletIdentityRegistrarInfo> = (registrar, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {
       return null;
     }
@@ -173,7 +175,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        {!dataState.isRegistrar && !Boolean(pair.meta.isInjected) && (
+        {!dataState.isRegistrar && !pair.meta.isInjected && (
           <>
             {!dataState.registrarData && <div>Please select a registrar:</div>}
             <Select2
