@@ -11,18 +11,19 @@ import { useQuery } from "@apollo/client";
 import Error from "../components/common/Error";
 import { AddressItem } from "../components/common/AddressItem";
 import { ExplorerUrl } from "../components/common/ExplorerForward";
-import { useSS58Format } from "../hooks/useSS58Format";
 import TitledValue from "../components/common/TitledValue";
+import { useAtomValue } from "jotai/index";
+import { formatOptionsAtom } from "../atoms";
 
 export default function Address() {
   const { address } = useParams();
   const accountIdHex = u8aToHex(decodeAddress(address));
-  const ss58format = useSS58Format();
+  const formatOptions = useAtomValue(formatOptionsAtom);
 
   const { loading, error, data } = useQuery<TransfersData, TransfersVars>(GET_TRANSFERS, {
     variables: { accountId: accountIdHex },
   });
-  if (loading) return <Spinner />;
+  if (loading || !formatOptions) return <Spinner />;
   if (error) return <Error>Error fetching transactions data, try to reload.</Error>;
 
   return (
@@ -45,11 +46,8 @@ export default function Address() {
         <tbody>
           {data &&
             data.getTransfers.objects.map((transfer) => {
-              if (!ss58format) {
-                return null;
-              }
-              const fromAddress = encodeAddress(transfer.fromMultiAddressAccountId, ss58format);
-              const toAddress = encodeAddress(transfer.toMultiAddressAccountId, ss58format);
+              const fromAddress = encodeAddress(transfer.fromMultiAddressAccountId, formatOptions.chainSS58);
+              const toAddress = encodeAddress(transfer.toMultiAddressAccountId, formatOptions.chainSS58);
               const otherAddress = fromAddress !== address ? fromAddress : toAddress;
               const outgoing = fromAddress === address;
               return (

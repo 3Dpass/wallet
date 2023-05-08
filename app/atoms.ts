@@ -9,7 +9,7 @@ export interface IFormatOptions {
   unit: string;
 }
 
-// RPC API
+// RPC API (use `_v{X}` suffix to have possibility to change default atom value in future)
 export const defaultEndpoint = "wss://rpc2.3dpass.org";
 export const apiEndpointAtom = atomWithStorage<string>("apiEndpoint_v4", defaultEndpoint);
 export const formatOptionsAtom = atom<IFormatOptions | false>(false);

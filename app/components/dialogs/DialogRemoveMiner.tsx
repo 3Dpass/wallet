@@ -5,8 +5,8 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
-import useApi from "../../hooks/useApi";
 import useToaster from "../../hooks/useToaster";
+import { useApi } from "../Api";
 
 type IProps = {
   pair: KeyringPair;
@@ -93,14 +93,14 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
     }
     return (
       <MenuItem
+        className="font-mono text-lg"
         active={modifiers.active}
         disabled={modifiers.disabled}
         key={poolId}
-        label={poolId}
+        text={poolId}
         onClick={handleClick as MouseEventHandler}
         onFocus={handleFocus}
         roleStructure="listoption"
-        text=""
       />
     );
   };
@@ -117,7 +117,12 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
           popoverProps={{ matchTargetWidth: true }}
           fill={true}
         >
-          <Button text={data} rightIcon="double-caret-vertical" placeholder="Select a miner" className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`} />
+          <Button
+            text={data}
+            rightIcon="double-caret-vertical"
+            placeholder="Select a miner"
+            className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono text-lg`}
+          />
         </Select2>
       </div>
       <div className={Classes.DIALOG_FOOTER}>

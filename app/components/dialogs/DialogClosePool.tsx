@@ -5,9 +5,9 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { poolIdsAtom } from "../../atoms";
-import { signAndSendWithSubscribtion } from "../../utils/sign";
-import useApi from "../../hooks/useApi";
+import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
+import { useApi } from "../Api";
 
 type IProps = {
   pair: KeyringPair;
@@ -47,14 +47,18 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
     try {
       const tx = api.tx.miningPool.closePool();
       const options: Partial<SignerOptions> = {};
-      const unsub = await signAndSendWithSubscribtion(tx, pair, options, ({ events = [], status, txHash }) => {
+      const unsub = await signAndSend(tx, pair, options, ({ events = [], status, txHash }) => {
         if (!status.isFinalized) {
           return;
         }
         events.forEach(({ phase, event: { data, method, section } }) => {
-          if (method == 'ExtrinsicSuccess' && poolIds.includes(pair.address)) {
-            poolIds
-            setPoolIds(poolIds.filter(function(item) { return item !== pair.address }));
+          if (method == "ExtrinsicSuccess" && poolIds.includes(pair.address)) {
+            poolIds;
+            setPoolIds(
+              poolIds.filter(function (item) {
+                return item !== pair.address;
+              })
+            );
           }
         });
         unsub();
@@ -77,7 +81,14 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
   }
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Close the mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog
+      isOpen={isOpen}
+      usePortal={true}
+      onOpening={handleOnOpening}
+      title="Close the mining pool"
+      onClose={onClose}
+      className="w-[90%] sm:w-[640px]"
+    >
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button onClick={onClose} text="Cancel" disabled={isLoading} />

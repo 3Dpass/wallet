@@ -20,10 +20,9 @@ import DialogIdentity from "../dialogs/DialogIdentity";
 import DialogRemoveMiner from "../dialogs/DialogRemoveMiner";
 import DialogAddMiner from "../dialogs/DialogAddMiner";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
-import { signAndSend, signAndSendWithSubscribtion } from "../../utils/sign";
-import useIsMainnet from "../../hooks/useIsMainnet";
-import useApi from "../../hooks/useApi";
+import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
+import { useApi } from "../Api";
 
 type IProps = {
   pair: KeyringPair;
@@ -32,11 +31,12 @@ type IProps = {
 export default function Account({ pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
-  const isMainnet = useIsMainnet();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
   const apiAdvancedMode: boolean = useAtomValue(apiAdvancedModeAtom);
   const [poolIds, setPoolIds] = useAtom(poolIdsAtom);
   const poolAlreadyExist = poolIds.includes(pair.address);
+
+  const [isCreatePoolLoading, setIsCreatePoolLoading] = useState(false);
 
   const dialogsInitial = {
     send: false,
@@ -59,6 +59,17 @@ export default function Account({ pair }: IProps) {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
 
+  const showError = useCallback(
+    (message: string) => {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message,
+      });
+    },
+    [toaster]
+  );
+
   async function sendSetPoolMode(newMode: boolean): Promise<void> {
     if (!api) {
       return;
@@ -72,11 +83,7 @@ export default function Account({ pair }: IProps) {
         message: "Mining Pool KYC has been changed",
       });
     } catch (e: any) {
-      toaster.show({
-        icon: "error",
-        intent: Intent.DANGER,
-        message: e.message,
-      });
+      showError(e.message);
     }
   }
 
@@ -119,11 +126,7 @@ export default function Account({ pair }: IProps) {
     }
     try {
       let tx;
-      if (isMainnet) {
-        tx = api.tx.rewards.unlock();
-      } else {
-        tx = api.tx.rewards.unlock(pair.address);
-      }
+      tx = api.tx.rewards.unlock();
       await signAndSend(tx, pair);
       toaster.show({
         icon: "tick",
@@ -131,13 +134,9 @@ export default function Account({ pair }: IProps) {
         message: "Unlock request sent",
       });
     } catch (e: any) {
-      toaster.show({
-        icon: "error",
-        intent: Intent.DANGER,
-        message: e.message,
-      });
+      showError(e.message);
     }
-  }, [api, isMainnet, pair, toaster]);
+  }, [api, pair, showError, toaster]);
 
   async function handleCreatePoolClick() {
     if (!api) {
@@ -145,37 +144,44 @@ export default function Account({ pair }: IProps) {
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
     if (isLocked) {
-      toaster.show({
-        icon: "error",
-        intent: Intent.DANGER,
-        message: "Account is locked",
-      });
+      showError("Account is locked");
       return;
     }
+    setIsCreatePoolLoading(true);
     try {
       const tx = api.tx.miningPool.createPool();
-      const unsub = await signAndSendWithSubscribtion(tx, pair, {}, ({ events = [], status, txHash }) => {
-        if (!status.isFinalized) {
+      const unsub = await signAndSend(tx, pair, {}, ({ status, dispatchError }) => {
+        if (!status.isInBlock && !status.isFinalized) {
           return;
         }
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          if (method == "ExtrinsicSuccess") {
-            setPoolIds([pair.address, ...poolIds]);
-          }
-        });
+        setIsCreatePoolLoading(false);
         unsub();
+        if (dispatchError) {
+          if (dispatchError.isModule) {
+            const decoded = api.registry.findMetaError(dispatchError.asModule);
+            const { docs, name, section } = decoded;
+            showError(`${section}.${name}: ${docs.join(" ")}`);
+          } else {
+            showError(dispatchError.toString());
+          }
+          setIsCreatePoolLoading(false);
+          return;
+        }
+        toaster.show({
+          icon: "endorsed",
+          intent: Intent.SUCCESS,
+          message: "Mining Pool has been created",
+        });
+        setPoolIds([pair.address, ...poolIds]);
       });
       toaster.show({
-        icon: "endorsed",
-        intent: Intent.SUCCESS,
-        message: "Mining Pool has been created",
+        icon: "time",
+        intent: Intent.PRIMARY,
+        message: "Creating Mining Pool...",
       });
     } catch (e: any) {
-      toaster.show({
-        icon: "error",
-        intent: Intent.DANGER,
-        message: e.message,
-      });
+      setIsCreatePoolLoading(false);
+      showError(e.message);
     }
   }
 
@@ -270,9 +276,13 @@ export default function Account({ pair }: IProps) {
               <>
                 <Text className="font-bold pt-4 pb-2">Pool actions</Text>
                 <div className="grid grid-cols-3 gap-1">
-                  {!poolAlreadyExist && <Button text="Create" onClick={handleCreatePoolClick} disabled={accountLocked} />}
-                  {poolAlreadyExist && <Button text="KYC" onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />}
-                  {poolAlreadyExist && <Button text="no KYC" onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />}
+                  {!poolAlreadyExist && <Button text="Create" loading={isCreatePoolLoading} onClick={handleCreatePoolClick} disabled={accountLocked} />}
+                  {poolAlreadyExist && (
+                    <div className="grid grid-cols-2 gap-1">
+                      <Button text="KYC" onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />
+                      <Button text="no KYC" onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />
+                    </div>
+                  )}
                   {poolAlreadyExist && <Button text="Close" onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />}
                   <Button text="Set up fee" onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked || !poolAlreadyExist} />
                   <Button
@@ -281,12 +291,10 @@ export default function Account({ pair }: IProps) {
                     onClick={() => dialogToggle("set_pool_difficulty")}
                     disabled={accountLocked || !poolAlreadyExist}
                   />
-                  <Button text="Join a pool" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />
-                  <Button text="Leave a pool" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />
-                  {poolAlreadyExist && <Button text="Add a miner to the pool" onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
-                  {poolAlreadyExist && (
-                    <Button text="Remove a miner from the pool" onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />
-                  )}
+                  {poolAlreadyExist && <Button text="Add miner" onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
+                  {poolAlreadyExist && <Button text="Remove miner" onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />}
+                  {!poolAlreadyExist && <Button text="Join" onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />}
+                  {!poolAlreadyExist && <Button text="Leave" onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />}
                 </div>
               </>
             )}
