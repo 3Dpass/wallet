@@ -53,7 +53,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo }: IProps)
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "You requested for judgement",
+        message: "Your judgement was sent",
       });
     } catch (e: any) {
       toaster.show({

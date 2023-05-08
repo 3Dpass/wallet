@@ -25,7 +25,6 @@ export async function getIdentityJudgementRequests(
       addressAndRegIndex = JSON.parse(item.attributes);
       if (addressAndRegIndex.length > 1 && addressAndRegIndex[1] == registrarIndex) {
         candidateAddress = encodeAddress(addressAndRegIndex[0], ss58format as number);
-        // candidateAddress = encodeAddress('0x6e50b0fed9840b7331d09ec0276097ada08d4215f56caa959ca925ef58dbd954', ss58format as number);
         candidateInfo = (await api.query.identity.identityOf(candidateAddress)).toHuman() as IPalletIdentityRegistrarInfo;
         if (
           candidateInfo &&

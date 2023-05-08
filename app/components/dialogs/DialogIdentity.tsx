@@ -59,7 +59,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
       return;
     }
     const registrarsList: IPalletIdentityRegistrarInfo[] = [];
-    let isRegistrar: boolean = true;
+    let isRegistrar: boolean = false;
     registrars.forEach((r, i) => {
       registrarsList.push({ ...(r as IPalletIdentityRegistrarInfo), regIndex: i + 1 });
       isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
@@ -298,8 +298,6 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
           </>
         )}
         {!dataState.isRegistrar && Boolean(pair.meta.isInjected) && <div>You already have identity</div>}
-        {/* {dataState.isRegistrar && (
-          <CandidateCards regIndex={dataState.registrarData?.regIndex || 1} pair={pair} dateMonthAgo={dataState.dateMonthAgo}/> */}
         {dataState.isRegistrar && dataState.registrarData?.regIndex && (
           <CandidateCards regIndex={dataState.registrarData?.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
         )}
