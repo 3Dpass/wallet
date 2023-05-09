@@ -106,10 +106,10 @@ export default function Account({ pair }: IProps) {
       if (identityInfo) {
         const identity = identityInfo.toHuman() as IPalletIdentityRegistrarInfo;
         if (identity) {
-          setHasIdentity(identity.judgements[0][1].toString() == 'Reasonable');
+          setHasIdentity(identity.judgements[0][1].toString() == "Reasonable");
         }
       }
-    })
+    });
   }, [api, pair]);
 
   const handleUnlockAccount = useCallback(() => {
@@ -246,13 +246,15 @@ export default function Account({ pair }: IProps) {
     <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
       {dialogElements}
       <AddressItem address={pair.address} />
-      <Icon
-        className={`${Classes.ICON} ${Classes.INTENT_SUCCESS} absolute cursor-pointer right-1 top-9`}
-        color={hasIdentity ? "green" : "gray"}
-        icon="endorsed"
-        size={IconSize.LARGE}
-        onClick={() => dialogToggle("identity")}
-      />
+      {!accountLocked && (
+        <Icon
+          className={`${Classes.ICON} ${Classes.INTENT_SUCCESS} absolute cursor-pointer right-1 top-9`}
+          color={hasIdentity ? "green" : "gray"}
+          icon="endorsed"
+          size={IconSize.LARGE}
+          onClick={() => dialogToggle("identity")}
+        />
+      )}
       <div className="grid gap-1">
         {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
         {balances && (

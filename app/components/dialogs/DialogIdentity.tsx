@@ -2,7 +2,7 @@ import { Button, Classes, Dialog, InputGroup, Intent, MenuItem } from "@blueprin
 import type { ItemPredicate, ItemRenderer } from "@blueprintjs/select";
 import { Select2 } from "@blueprintjs/select";
 import type { MouseEventHandler } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
@@ -86,14 +86,6 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
 
   async function handleSubmitRequestForJudgement() {
     if (!api) {
-      return;
-    }
-    if (pair.isLocked) {
-      toaster.show({
-        icon: "error",
-        intent: Intent.DANGER,
-        message: "Account is locked",
-      });
       return;
     }
     setIsLoading(true);
