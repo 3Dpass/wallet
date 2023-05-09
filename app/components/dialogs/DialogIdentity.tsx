@@ -12,6 +12,7 @@ import UserCard from "../common/UserCard";
 import CandidateCards from "../common/CandidateCards";
 import { useApi } from "../Api";
 import useToaster from "../../hooks/useToaster";
+import { FormattedAmount } from "../common/FormattedAmount";
 
 type IProps = {
   pair: KeyringPair;
@@ -42,6 +43,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
   const api = useApi();
   const toaster = useToaster();
   const [isLoading, setIsLoading] = useState(false);
+  const re = /,/gi;
 
   const dataInitial: IIdentityData = {
     registrarList: [],
@@ -90,7 +92,6 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     }
     setIsLoading(true);
     try {
-      const re = /,/gi;
       const tx0 = api.tx.identity.setIdentity(dataState.candidateInfo);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSend(tx0, pair, options, ({ events = [], status }) => {
@@ -154,7 +155,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         onClick={handleClick as MouseEventHandler}
         onFocus={handleFocus}
         roleStructure="listoption"
-        text={registrar.fee}
+        text={<FormattedAmount value={parseInt(registrar.fee.replace(re, ""))} />}
       />
     );
   };
