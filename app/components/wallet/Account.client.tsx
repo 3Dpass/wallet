@@ -279,12 +279,7 @@ export default function Account({ pair }: IProps) {
                 <div className="flex items-center justify-center gap-1 cursor-pointer group" onClick={() => dialogToggle("identity")}>
                   <span className="group-hover:underline underline-offset-2">Identity:</span>
                   {hasIdentity ? (
-                    <Icon
-                      className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`}
-                      icon="endorsed"
-                      size={IconSize.LARGE}
-                      color={hasIdentity ? "currentcolor" : "#555"}
-                    />
+                    <Icon className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`} icon="endorsed" size={IconSize.LARGE} />
                   ) : (
                     <span className="font-bold underline underline-offset-2">claim &rarr;</span>
                   )}
