@@ -234,7 +234,7 @@ export default function Account({ pair }: IProps) {
       <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => dialogToggle("set_pool_difficulty")} pair={pair} />
       <DialogJoinPool isOpen={dialogs.join_pool} onClose={() => dialogToggle("join_pool")} pair={pair} />
       <DialogLeavePool isOpen={dialogs.leave_pool} onClose={() => dialogToggle("leave_pool")} pair={pair} />
-      <DialogIdentity isOpen={dialogs.identity} onClose={() => dialogToggle("identity")} pair={pair} />
+      <DialogIdentity isOpen={dialogs.identity} onClose={() => dialogToggle("identity")} pair={pair} hasIdentity={hasIdentity} />
       <DialogRemoveMiner isOpen={dialogs.remove_miner} onClose={() => dialogToggle("remove_miner")} pair={pair} />
       <DialogAddMiner isOpen={dialogs.add_miner} onClose={() => dialogToggle("add_miner")} pair={pair} />
     </>

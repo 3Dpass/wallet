@@ -29,8 +29,11 @@ export default function UserCard({ registrarInfo }: IProps) {
     <Card>
       <div className="block mb-2">
         <div className="flex items-center gap-x-6">
-          {registrarInfo.info?.image?.Raw && <img className="h-16 w-16 rounded-full" src={registrarInfo.info.image.Raw as string} alt="" />}
-          {!registrarInfo.info?.image?.Raw && <Icon icon="person" iconSize={IconSize.LARGE * 3} title="no foto"></Icon>}
+          {
+            registrarInfo.info?.image?.Raw ?
+            <img className="h-16 w-16 rounded-full" src={registrarInfo.info.image.Raw as string} alt="" /> :
+            <Icon icon="person" iconSize={IconSize.LARGE * 3} title="no foto"></Icon>
+          }
           <div>
             <h3 className="text-base font-semibold leading-7 tracking-tight text-white-900">{registrarInfo.info?.display?.Raw as string}</h3>
             <p className="text-sm font-semibold leading-6 text-indigo-600">{registrarInfo.account}</p>

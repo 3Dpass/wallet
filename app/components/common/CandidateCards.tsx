@@ -18,6 +18,7 @@ import { useAtomValue } from "jotai";
 type IProps = {
   regIndex: number;
   pair: KeyringPair;
+  // dateMonthAgo is needed to use it in the GQL request to get events only for 30 days ago
   dateMonthAgo: Date;
 };
 
@@ -79,7 +80,6 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo }: IProps)
               <UserCard registrarInfo={candidateInfo} />
               <Button
                 intent={Intent.PRIMARY}
-                disabled={false}
                 onClick={() => {
                   void handleSubmitAddJudgement(candidateInfo.account);
                 }}

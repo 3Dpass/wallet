@@ -17,6 +17,7 @@ type IProps = {
   pair: KeyringPair;
   isOpen: boolean;
   onClose: () => void;
+  hasIdentity: boolean;
 };
 
 type ICandidateInfo = {
@@ -34,13 +35,12 @@ type IIdentityData = {
   isRegistrar: boolean;
   registrarData: IPalletIdentityRegistrarInfo | null;
   candidateInfo: ICandidateInfo;
-  dateMonthAgo: Date;
+  dateMonthAgo: Date | null;
 };
 
-export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
+export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: IProps) {
   const api = useApi();
   const toaster = useToaster();
-  const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const dataInitial: IIdentityData = {
@@ -48,7 +48,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     isRegistrar: false,
     registrarData: null,
     candidateInfo: {} as ICandidateInfo,
-    dateMonthAgo: new Date(),
+    dateMonthAgo: null,
   };
   const [dataState, setData] = useState(dataInitial);
 
@@ -84,16 +84,11 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
     await loadRegistrars();
   }
 
-  useEffect(() => {
-    setCanSubmit(api !== undefined);
-  }, [api]);
-
   async function handleSubmitRequestForJudgement() {
     if (!api) {
       return;
     }
-    const isLocked = pair.isLocked && !pair.meta.isInjected;
-    if (isLocked) {
+    if (pair.isLocked) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
@@ -175,7 +170,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        {!dataState.isRegistrar && !pair.meta.isInjected && (
+        {!dataState.isRegistrar && !hasIdentity && (
           <>
             {!dataState.registrarData && <div>Please select a registrar:</div>}
             <Select2
@@ -289,7 +284,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
                 />
                 <Button
                   intent={Intent.PRIMARY}
-                  disabled={isLoading || !canSubmit}
+                  disabled={isLoading || !api}
                   onClick={handleSubmitRequestForJudgement}
                   loading={isLoading}
                   text="Request for judgement"
@@ -299,8 +294,8 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
             )}
           </>
         )}
-        {!dataState.isRegistrar && Boolean(pair.meta.isInjected) && <div>You already have identity</div>}
-        {dataState.isRegistrar && dataState.registrarData?.regIndex && (
+        {!dataState.isRegistrar && hasIdentity && <div>You already have identity</div>}
+        {dataState.isRegistrar && dataState.registrarData?.regIndex && dataState.dateMonthAgo != null && (
           <CandidateCards regIndex={dataState.registrarData?.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
         )}
       </div>
