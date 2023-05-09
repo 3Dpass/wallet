@@ -2,6 +2,7 @@ import { Alert, Button, Card, Classes, Elevation, Icon, IconSize, Intent, Spinne
 import { useCallback, useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
+import type { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
@@ -37,6 +38,7 @@ export default function Account({ pair }: IProps) {
   const poolAlreadyExist = poolIds.includes(pair.address);
 
   const [isCreatePoolLoading, setIsCreatePoolLoading] = useState(false);
+  const [hasIdentity, setHasIdentity] = useState(false);
 
   const dialogsInitial = {
     send: false,
@@ -100,6 +102,14 @@ export default function Account({ pair }: IProps) {
       }
       setBalances(balances);
     });
+    api.query.identity.identityOf(pair.address).then((identityInfo) => {
+      if (identityInfo) {
+        const identity = identityInfo.toHuman() as IPalletIdentityRegistrarInfo;
+        if (identity) {
+          setHasIdentity(identity.judgements[0][1].toString() == 'Reasonable');
+        }
+      }
+    })
   }, [api, pair]);
 
   const handleUnlockAccount = useCallback(() => {
@@ -238,6 +248,7 @@ export default function Account({ pair }: IProps) {
       <AddressItem address={pair.address} />
       <Icon
         className={`${Classes.ICON} ${Classes.INTENT_SUCCESS} absolute cursor-pointer right-1 top-9`}
+        color={hasIdentity ? "green" : "gray"}
         icon="endorsed"
         size={IconSize.LARGE}
         onClick={() => dialogToggle("identity")}

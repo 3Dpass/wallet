@@ -1,8 +1,8 @@
-import { ApiPromise } from "@polkadot/api";
+import type { ApiPromise } from "@polkadot/api";
 import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 
-import { IPalletIdentityRegistrarInfo } from "../components/common/UserCard";
-import { QueryResult } from "@apollo/client";
+import type { IPalletIdentityRegistrarInfo } from "../components/common/UserCard";
+import type { QueryResult } from "@apollo/client";
 import type { EventsData, EventsVars } from "../queries";
 
 type IJudgementInfo = {
