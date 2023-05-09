@@ -246,15 +246,6 @@ export default function Account({ pair }: IProps) {
     <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
       {dialogElements}
       <AddressItem address={pair.address} />
-      {!accountLocked && (
-        <Icon
-          className={`${Classes.ICON} ${Classes.INTENT_SUCCESS} absolute cursor-pointer right-1 top-9`}
-          color={hasIdentity ? "green" : "gray"}
-          icon="endorsed"
-          size={IconSize.LARGE}
-          onClick={() => dialogToggle("identity")}
-        />
-      )}
       <div className="grid gap-1">
         {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
         {balances && (
@@ -283,6 +274,21 @@ export default function Account({ pair }: IProps) {
                 <>
                   <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
                 </>
+              )}
+              {!accountLocked && (
+                <div className="flex items-center justify-center gap-1 cursor-pointer group" onClick={() => dialogToggle("identity")}>
+                  <span className="group-hover:underline underline-offset-2">Identity:</span>
+                  {hasIdentity ? (
+                    <Icon
+                      className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`}
+                      icon="endorsed"
+                      size={IconSize.LARGE}
+                      color={hasIdentity ? "currentcolor" : "#555"}
+                    />
+                  ) : (
+                    <span className="font-bold underline underline-offset-2">claim &rarr;</span>
+                  )}
+                </div>
               )}
             </div>
             {apiAdvancedMode && (
