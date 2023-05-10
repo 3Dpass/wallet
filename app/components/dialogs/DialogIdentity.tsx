@@ -13,6 +13,7 @@ import CandidateCards from "../common/CandidateCards";
 import { useApi } from "../Api";
 import useToaster from "../../hooks/useToaster";
 import { FormattedAmount } from "../common/FormattedAmount";
+import { Codec } from "@polkadot/types/types";
 
 type IProps = {
   pair: KeyringPair;
@@ -62,12 +63,22 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     if (!registrars || !Array.isArray(registrars)) {
       return;
     }
-    const registrarsList: IPalletIdentityRegistrarInfo[] = [];
+    const registrarList: IPalletIdentityRegistrarInfo[] = [];
     let isRegistrar: boolean = false;
     registrars.forEach((r, i) => {
-      registrarsList.push({ ...(r as IPalletIdentityRegistrarInfo), regIndex: i + 1 });
+      registrarList.push({ ...(r as IPalletIdentityRegistrarInfo), regIndex: i + 1 });
       isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
+
+    const getIdentityPromiseList: Promise<Codec>[] = [];
+    registrars.forEach((r, i) => {
+      getIdentityPromiseList.push(api.query.identity.identityOf((r as IPalletIdentityRegistrarInfo).account));
+    });
+    const results = await Promise.all(getIdentityPromiseList);
+    results.forEach((r, i) => {
+      registrarList[i] = {...registrarList[i], ...(r.toHuman() as IPalletIdentityRegistrarInfo)};
+    });
+
     setData((prev) => ({ ...prev, isRegistrar: isRegistrar }));
     if (isRegistrar) {
       const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
@@ -76,7 +87,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
       dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
       setData((prev) => ({ ...prev, dateMonthAgo: dateMonthAgo }));
     } else {
-      setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo, registrarList: registrarsList }));
+      setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo, registrarList: registrarList }));
     }
   }
 
@@ -151,7 +162,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         active={modifiers.active}
         disabled={modifiers.disabled}
         key={registrar.account}
-        label={registrar.account}
+        label={registrar.info.display.Raw}
         onClick={handleClick as MouseEventHandler}
         onFocus={handleFocus}
         roleStructure="listoption"
