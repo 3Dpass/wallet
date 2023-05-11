@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
+import type { PalletIdentityIdentityInfo } from '@polkadot/types/lookup';
 import { signAndSend } from "../../utils/sign";
 import type { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import UserCard from "../common/UserCard";
@@ -13,7 +14,7 @@ import CandidateCards from "../common/CandidateCards";
 import { useApi } from "../Api";
 import useToaster from "../../hooks/useToaster";
 import { FormattedAmount } from "../common/FormattedAmount";
-import { Codec } from "@polkadot/types/types";
+import type { Codec } from "@polkadot/types/types";
 
 type IProps = {
   pair: KeyringPair;
@@ -29,6 +30,8 @@ type ICandidateInfo = {
   riot: string | null;
   email: string | null;
   discord: string | null;
+  pgpFingerprint: string | null;
+  image: string | null;
   twitter: string | null;
 };
 
@@ -103,7 +106,11 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     }
     setIsLoading(true);
     try {
-      const tx0 = api.tx.identity.setIdentity(dataState.candidateInfo);
+      const candidateData = {} as PalletIdentityIdentityInfo;
+      for (const [key, value] of Object.entries(dataState.candidateInfo)) {
+        candidateData[key] = {Raw: value};
+      }      
+      const tx0 = api.tx.identity.setIdentity(candidateData);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSend(tx0, pair, options, ({ events = [], status }) => {
         if (!status.isFinalized) {
