@@ -108,7 +108,11 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     try {
       const candidateData = {} as PalletIdentityIdentityInfo;
       for (const [key, value] of Object.entries(dataState.candidateInfo)) {
-        candidateData[key] = {Raw: value};
+        if (key == 'discord') {
+          candidateData.additional = [[{Raw: 'Discord'}, {Raw: value}]];
+        } else {
+          candidateData[key] = {Raw: value};
+        }
       }      
       const tx0 = api.tx.identity.setIdentity(candidateData);
       const options: Partial<SignerOptions> = {};
