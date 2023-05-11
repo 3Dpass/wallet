@@ -6,7 +6,7 @@ import { useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
-import type { PalletIdentityIdentityInfo } from '@polkadot/types/lookup';
+import type { PalletIdentityIdentityInfo } from "@polkadot/types/lookup";
 import { signAndSend } from "../../utils/sign";
 import type { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import UserCard from "../common/UserCard";
@@ -79,7 +79,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     });
     const results = await Promise.all(getIdentityPromiseList);
     results.forEach((r, i) => {
-      registrarList[i] = {...registrarList[i], ...(r.toHuman() as IPalletIdentityRegistrarInfo)};
+      registrarList[i] = { ...registrarList[i], ...(r.toHuman() as IPalletIdentityRegistrarInfo) };
     });
 
     setData((prev) => ({ ...prev, isRegistrar: isRegistrar }));
@@ -108,8 +108,8 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     try {
       const candidateData = {} as PalletIdentityIdentityInfo;
       for (const [key, value] of Object.entries(dataState.candidateInfo)) {
-        candidateData[key] = {Raw: value};
-      }      
+        candidateData[key] = { Raw: value };
+      }
       const tx0 = api.tx.identity.setIdentity(candidateData);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSend(tx0, pair, options, ({ events = [], status }) => {
@@ -166,14 +166,15 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     }
     return (
       <MenuItem
+        className="font-mono text-lg"
         active={modifiers.active}
         disabled={modifiers.disabled}
         key={registrar.account}
-        label={registrar.info.display.Raw}
+        text={registrar.info.display.Raw}
+        label={<FormattedAmount value={parseInt(registrar.fee.replace(re, ""))} />}
         onClick={handleClick as MouseEventHandler}
         onFocus={handleFocus}
         roleStructure="listoption"
-        text={<FormattedAmount value={parseInt(registrar.fee.replace(re, ""))} />}
       />
     );
   };
