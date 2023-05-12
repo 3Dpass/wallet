@@ -108,12 +108,12 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     try {
       const candidateData = {} as PalletIdentityIdentityInfo;
       for (const [key, value] of Object.entries(dataState.candidateInfo)) {
-        if (key == 'discord') {
-          candidateData.additional = [[{Raw: 'Discord'}, {Raw: value}]];
+        if (key == "discord") {
+          candidateData.additional = [[{ Raw: "Discord" }, { Raw: value }]];
         } else {
-          candidateData[key] = {Raw: value};
+          candidateData[key] = { Raw: value };
         }
-      }      
+      }
       const tx0 = api.tx.identity.setIdentity(candidateData);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSend(tx0, pair, options, ({ events = [], status }) => {
@@ -123,15 +123,25 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         events.forEach(({ event: { method } }) => {
           if (method == "ExtrinsicSuccess") {
             const tx = api.tx.identity.requestJudgement(dataState.registrarData?.regIndex, dataState.registrarData?.fee.replace(re, ""));
-            signAndSend(tx, pair, options);
+            signAndSend(tx, pair, options, ({ events = [], status }) => {
+              if (!status.isReady) {
+                return;
+              }
+              toaster.show({
+                icon: "endorsed",
+                intent: Intent.SUCCESS,
+                message: "You requested for judgement",
+              });
+            });
           }
         });
         unsub();
       });
       toaster.show({
-        icon: "endorsed",
-        intent: Intent.SUCCESS,
-        message: "You requested for judgement",
+        icon: "warning-sign",
+        intent: Intent.WARNING,
+        message: "Your request is in progress, please stay on for a while",
+        timeout: 20000,
       });
     } catch (e: any) {
       toaster.show({
