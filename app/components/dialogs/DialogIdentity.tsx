@@ -46,7 +46,7 @@ type IIdentityData = {
 export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: IProps) {
   const api = useApi();
   const toaster = useToaster();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isIdentityLoading, setIsIdentityLoading] = useState(false);
   const re = /,/gi;
 
   const dataInitial: IIdentityData = {
@@ -95,7 +95,6 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
   }
 
   async function handleOnOpening() {
-    setIsLoading(false);
     setData(dataInitial);
     await loadRegistrars();
   }
@@ -104,7 +103,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     if (!api) {
       return;
     }
-    setIsLoading(true);
+    setIsIdentityLoading(true);
     try {
       const candidateData = {} as PalletIdentityIdentityInfo;
       for (const [key, value] of Object.entries(dataState.candidateInfo)) {
@@ -132,6 +131,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                 intent: Intent.SUCCESS,
                 message: "You requested for judgement",
               });
+              setIsIdentityLoading(false);
             });
           }
         });
@@ -149,8 +149,8 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         intent: Intent.DANGER,
         message: e.message,
       });
+      setIsIdentityLoading(false);
     } finally {
-      setIsLoading(false);
       onClose();
     }
   }
@@ -218,7 +218,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
             {dataState.registrarData && (
               <>
                 <InputGroup
-                  disabled={isLoading}
+                  disabled={isIdentityLoading}
                   large={true}
                   className="font-mono"
                   spellCheck={false}
@@ -231,7 +231,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                   value={dataState.candidateInfo.display || ""}
                 />
                 <InputGroup
-                  disabled={isLoading}
+                  disabled={isIdentityLoading}
                   large={true}
                   className="font-mono"
                   spellCheck={false}
@@ -244,7 +244,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                   value={dataState.candidateInfo.legal || ""}
                 />
                 <InputGroup
-                  disabled={isLoading}
+                  disabled={isIdentityLoading}
                   large={true}
                   className="font-mono"
                   spellCheck={false}
@@ -257,7 +257,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                   value={dataState.candidateInfo.email || ""}
                 />
                 <InputGroup
-                  disabled={isLoading}
+                  disabled={isIdentityLoading}
                   large={true}
                   className="font-mono"
                   spellCheck={false}
@@ -270,7 +270,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                   value={dataState.candidateInfo.web || ""}
                 />
                 <InputGroup
-                  disabled={isLoading}
+                  disabled={isIdentityLoading}
                   large={true}
                   className="font-mono"
                   spellCheck={false}
@@ -283,7 +283,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                   value={dataState.candidateInfo.twitter || ""}
                 />
                 <InputGroup
-                  disabled={isLoading}
+                  disabled={isIdentityLoading}
                   large={true}
                   className="font-mono"
                   spellCheck={false}
@@ -296,7 +296,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                   value={dataState.candidateInfo.discord || ""}
                 />
                 <InputGroup
-                  disabled={isLoading}
+                  disabled={isIdentityLoading}
                   large={true}
                   className="font-mono"
                   spellCheck={false}
@@ -310,9 +310,9 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                 />
                 <Button
                   intent={Intent.PRIMARY}
-                  disabled={isLoading || !api}
+                  disabled={isIdentityLoading || !api}
                   onClick={handleSubmitRequestForJudgement}
-                  loading={isLoading}
+                  loading={isIdentityLoading}
                   text="Request for judgement"
                 />
                 <UserCard registrarInfo={dataState.registrarData} />
