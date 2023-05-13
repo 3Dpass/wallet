@@ -132,6 +132,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
                 message: "You requested for judgement",
               });
               setIsIdentityLoading(false);
+              onClose();
             });
           }
         });
@@ -150,7 +151,6 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         message: e.message,
       });
       setIsIdentityLoading(false);
-    } finally {
       onClose();
     }
   }
@@ -207,6 +207,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
               onItemSelect={setRegistrar}
               popoverProps={{ matchTargetWidth: true }}
               fill={true}
+              disabled={isIdentityLoading}
             >
               <Button
                 text={dataState.registrarData?.account}
