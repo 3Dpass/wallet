@@ -105,7 +105,7 @@ export default function Account({ pair }: IProps) {
     api.query.identity.identityOf(pair.address).then((identityInfo) => {
       if (identityInfo) {
         const identity = identityInfo.toHuman() as IPalletIdentityRegistrarInfo;
-        if (identity) {
+        if (identity && identity.judgements && identity.judgements[0] && identity.judgements[0][1]) {
           setHasIdentity(identity.judgements[0][1].toString() == "Reasonable");
         }
       }
