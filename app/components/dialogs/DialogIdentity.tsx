@@ -122,7 +122,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         events.forEach(({ event: { method } }) => {
           if (method == "ExtrinsicSuccess") {
             const tx = api.tx.identity.requestJudgement(dataState.registrarData?.regIndex, dataState.registrarData?.fee.replace(re, ""));
-            signAndSend(tx, pair, options, ({ events = [], status }) => {
+            signAndSend(tx, pair, options, ({ status }) => {
               if (!status.isInBlock) {
                 return;
               }
