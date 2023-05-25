@@ -1,4 +1,4 @@
-const BASE_URL = "https://explorer.3dpass.org";
+const BASE_URL = "https://3dpscan.io";
 
 export const ExplorerUrl = {
   extrinsic: (blockNumber: number, extrinsicIdx: number) => `${BASE_URL}/extrinsic/${blockNumber}-${extrinsicIdx}`,
