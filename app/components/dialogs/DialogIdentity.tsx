@@ -196,7 +196,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        {!dataState.isRegistrar && !hasIdentity && (
+        {!dataState.isRegistrar && (
           <>
             {!dataState.registrarData && <div>Please select a registrar:</div>}
             <Select2
@@ -321,7 +321,6 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
             )}
           </>
         )}
-        {!dataState.isRegistrar && hasIdentity && <div>You already have identity</div>}
         {dataState.isRegistrar && dataState.registrarData?.regIndex && dataState.dateMonthAgo != null && (
           <CandidateCards regIndex={dataState.registrarData?.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
         )}
