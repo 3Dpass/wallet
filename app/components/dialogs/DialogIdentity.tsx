@@ -116,14 +116,14 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
       const tx0 = api.tx.identity.setIdentity(candidateData);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSend(tx0, pair, options, ({ events = [], status }) => {
-        if (!status.isFinalized) {
+        if (!status.isInBlock) {
           return;
         }
         events.forEach(({ event: { method } }) => {
           if (method == "ExtrinsicSuccess") {
             const tx = api.tx.identity.requestJudgement(dataState.registrarData?.regIndex, dataState.registrarData?.fee.replace(re, ""));
             signAndSend(tx, pair, options, ({ events = [], status }) => {
-              if (!status.isReady) {
+              if (!status.isInBlock) {
                 return;
               }
               toaster.show({
