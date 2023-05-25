@@ -1,7 +1,8 @@
-import { Alert, Button, Card, Elevation, Icon, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
+import { Alert, Button, Card, Classes, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
+import type { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
@@ -16,6 +17,7 @@ import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
 import DialogJoinPool from "../dialogs/DialogJoinPool";
 import DialogLeavePool from "../dialogs/DialogLeavePool";
+import DialogIdentity from "../dialogs/DialogIdentity";
 import DialogRemoveMiner from "../dialogs/DialogRemoveMiner";
 import DialogAddMiner from "../dialogs/DialogAddMiner";
 import type { DeriveBalancesAll } from "@polkadot/api-derive/types";
@@ -36,6 +38,7 @@ export default function Account({ pair }: IProps) {
   const poolAlreadyExist = poolIds.includes(pair.address);
 
   const [isCreatePoolLoading, setIsCreatePoolLoading] = useState(false);
+  const [hasIdentity, setHasIdentity] = useState(false);
 
   const dialogsInitial = {
     send: false,
@@ -49,6 +52,7 @@ export default function Account({ pair }: IProps) {
     join_pool: false,
     leave_pool: false,
     close_pool: false,
+    identity: false,
     add_miner: false,
     remove_miner: false,
   };
@@ -97,6 +101,14 @@ export default function Account({ pair }: IProps) {
         // pair is password protected
       }
       setBalances(balances);
+    });
+    api.query.identity.identityOf(pair.address).then((identityInfo) => {
+      if (identityInfo) {
+        const identity = identityInfo.toHuman() as IPalletIdentityRegistrarInfo;
+        if (identity && identity.judgements && identity.judgements[0] && identity.judgements[0][1]) {
+          setHasIdentity(identity.judgements[0][1].toString() == "Reasonable");
+        }
+      }
     });
   }, [api, pair]);
 
@@ -222,6 +234,7 @@ export default function Account({ pair }: IProps) {
       <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => dialogToggle("set_pool_difficulty")} pair={pair} />
       <DialogJoinPool isOpen={dialogs.join_pool} onClose={() => dialogToggle("join_pool")} pair={pair} />
       <DialogLeavePool isOpen={dialogs.leave_pool} onClose={() => dialogToggle("leave_pool")} pair={pair} />
+      <DialogIdentity isOpen={dialogs.identity} onClose={() => dialogToggle("identity")} pair={pair} hasIdentity={hasIdentity} />
       <DialogRemoveMiner isOpen={dialogs.remove_miner} onClose={() => dialogToggle("remove_miner")} pair={pair} />
       <DialogAddMiner isOpen={dialogs.add_miner} onClose={() => dialogToggle("add_miner")} pair={pair} />
     </>
@@ -261,6 +274,16 @@ export default function Account({ pair }: IProps) {
                 <>
                   <Button icon="delete" text="Remove" onClick={() => dialogToggle("delete")} />
                 </>
+              )}
+              {!accountLocked && (
+                <div className="flex items-center justify-center gap-1 cursor-pointer group" onClick={() => dialogToggle("identity")}>
+                  <span className="group-hover:underline underline-offset-2">Identity:</span>
+                  {hasIdentity ? (
+                    <Icon className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`} icon="endorsed" size={IconSize.LARGE} />
+                  ) : (
+                    <span className="font-bold underline underline-offset-2">claim &rarr;</span>
+                  )}
+                </div>
               )}
             </div>
             {apiAdvancedMode && (
