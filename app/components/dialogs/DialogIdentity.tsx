@@ -116,7 +116,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
       const tx0 = api.tx.identity.setIdentity(candidateData);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSend(tx0, pair, options, ({ events = [], status }) => {
-        if (!status.isFinalized) {
+        if (!status.isInBlock) {
           return;
         }
         events.forEach(({ event: { method } }) => {
@@ -142,7 +142,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
         icon: "warning-sign",
         intent: Intent.WARNING,
         message:
-          "We are currently working on your request. Please bear with us as it is being processed through the network, which may take approximately 3-5 minutes.",
+          "We are currently working on your request. Please bear with us as it is being processed through the network, which may take approximately 1-3 minutes.",
         timeout: 20000,
       });
     } catch (e: any) {
