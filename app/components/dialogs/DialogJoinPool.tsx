@@ -4,8 +4,6 @@ import { Select2 } from "@blueprintjs/select";
 import type { MouseEventHandler } from "react";
 import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
-
-import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import type { IPool } from "../../utils/pool";
 import { convertPool } from "../../utils/pool";
@@ -68,12 +66,16 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     setIsLoading(true);
     try {
       const tx = api.tx.miningPool.addMemberSelf(data.poolToJoin);
-      const options: Partial<SignerOptions> = {};
-      await signAndSend(tx, pair, options);
-      toaster.show({
-        icon: "endorsed",
-        intent: Intent.SUCCESS,
-        message: "You have joined the mining pool",
+      await signAndSend(tx, pair, {}, (status) => {
+        if (status.isInBlock) {
+          toaster.show({
+            icon: "endorsed",
+            intent: Intent.SUCCESS,
+            message: "You have joined the mining pool",
+          });
+          setIsLoading(false);
+          onClose();
+        }
       });
     } catch (e: any) {
       toaster.show({
@@ -81,9 +83,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
         intent: Intent.DANGER,
         message: e.message,
       });
-    } finally {
       setIsLoading(false);
-      onClose();
     }
   }
 
