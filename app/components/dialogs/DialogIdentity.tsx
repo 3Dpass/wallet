@@ -116,7 +116,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
       const tx0 = api.tx.identity.setIdentity(candidateData);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSend(tx0, pair, options, ({ events = [], status }) => {
-        if (!status.isInBlock) {
+        if (!status.isFinalized) {
           return;
         }
         events.forEach(({ event: { method } }) => {
