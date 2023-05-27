@@ -1,13 +1,17 @@
 import { Button, Classes, Dialog, Intent, MenuItem } from "@blueprintjs/core";
-import { ItemPredicate, ItemRenderer, Select2 } from "@blueprintjs/select";
-import { MouseEventHandler, useEffect, useState } from "react";
+import type { ItemPredicate, ItemRenderer } from "@blueprintjs/select";
+import { Select2 } from "@blueprintjs/select";
+import type { MouseEventHandler } from "react";
+import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 
 import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
-import { convertPool, IPool } from "../../utils/pool";
+import type { IPool } from "../../utils/pool";
+import { convertPool } from "../../utils/pool";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import type { ApiPromise } from "@polkadot/api";
 
 type IProps = {
   pair: KeyringPair;
@@ -17,7 +21,6 @@ type IProps = {
 
 type IPoolData = {
   pools: IPool[];
-  poolIds: string[];
   poolToJoin: string;
 };
 
@@ -29,29 +32,25 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
 
   const dataInitial: IPoolData = {
     pools: [],
-    poolIds: [],
     poolToJoin: "",
   };
   const [data, setData] = useState(dataInitial);
 
-  async function loadPools() {
-    if (!api) {
-      return;
-    }
+  async function loadPools(api: ApiPromise) {
     const pools = Array.from(await api.query.miningPool.pools.entries());
     const poolsConverted = convertPool(pools);
-    setData((prev) => ({ ...prev, pools: poolsConverted.pools, poolIds: poolsConverted.poolIds, poolToJoin: poolsConverted.poolIds[0] }));
+    setData((prev) => ({ ...prev, pools: poolsConverted.pools, poolToJoin: poolsConverted.pools[0].poolId }));
   }
 
   function handleOnOpening() {
     setIsLoading(false);
     setData(dataInitial);
-    void loadPools();
+    void loadPools(api!);
   }
 
   useEffect(() => {
     setCanSubmit(api !== undefined);
-  }, [api, {}]);
+  }, [api]);
 
   async function handleSubmitClick() {
     if (!api) {
@@ -88,31 +87,31 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     }
   }
 
-  function setPool(poolId: string) {
-    setData((prev) => ({ ...prev, poolToJoin: poolId }));
+  function setPool(pool: IPool) {
+    setData((prev) => ({ ...prev, poolToJoin: pool.poolId }));
   }
 
-  const filterPool: ItemPredicate<string> = (query, poolId, _index, exactMatch) => {
-    const normalizedId = poolId.toLowerCase();
+  const filterPool: ItemPredicate<IPool> = (query, pool, _index, exactMatch) => {
+    const normalizedId = pool.poolId.toLowerCase();
     const normalizedQuery = query.toLowerCase();
     if (exactMatch) {
       return normalizedId === normalizedQuery;
-    } else {
-      return normalizedId.indexOf(normalizedQuery) >= 0;
     }
+    return normalizedId.indexOf(normalizedQuery) >= 0;
   };
 
-  const renderPoolId: ItemRenderer<string> = (poolId, { handleClick, handleFocus, modifiers, query }) => {
+  const renderPool: ItemRenderer<IPool> = (pool: IPool, { handleClick, handleFocus, modifiers }) => {
     if (!modifiers.matchesPredicate) {
       return null;
     }
     return (
       <MenuItem
-        className="font-mono text-lg"
+        className="font-mono"
         active={modifiers.active}
         disabled={modifiers.disabled}
-        key={poolId}
-        text={poolId}
+        key={pool.poolId}
+        text={pool.poolId}
+        label={pool.poolMembers.length.toString()}
         onClick={handleClick as MouseEventHandler}
         onFocus={handleFocus}
         roleStructure="listoption"
@@ -124,9 +123,10 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Join a mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <Select2
-          items={data.poolIds}
+          items={data.pools}
           itemPredicate={filterPool}
-          itemRenderer={renderPoolId}
+          itemRenderer={renderPool}
+          menuProps={{ className: "max-h-[300px] overflow-auto" }}
           noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
           onItemSelect={setPool}
           popoverProps={{ matchTargetWidth: true }}
@@ -136,10 +136,11 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
             text={data.poolToJoin}
             rightIcon="double-caret-vertical"
             placeholder="Select a pool"
-            className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono text-lg`}
+            className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono`}
           />
         </Select2>
       </div>
+      {data.poolToJoin && <div className="font-mono px-4 text-gray-400">$ pass3d-pool run --pool-id {data.poolToJoin} ...</div>}
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button onClick={onClose} text="Cancel" disabled={isLoading} />
