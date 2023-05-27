@@ -43,7 +43,7 @@ type IIdentityData = {
   dateMonthAgo: Date | null;
 };
 
-export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: IProps) {
+export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [isIdentityLoading, setIsIdentityLoading] = useState(false);
@@ -74,7 +74,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     });
 
     const getIdentityPromiseList: Promise<Codec>[] = [];
-    registrars.forEach((r, i) => {
+    registrars.forEach((r) => {
       getIdentityPromiseList.push(api.query.identity.identityOf((r as IPalletIdentityRegistrarInfo).account));
     });
     const results = await Promise.all(getIdentityPromiseList);
@@ -129,7 +129,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
               toaster.show({
                 icon: "endorsed",
                 intent: Intent.SUCCESS,
-                message: "You requested for judgement",
+                message: "You have requested a judgement.",
               });
               setIsIdentityLoading(false);
               onClose();
@@ -141,7 +141,8 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
       toaster.show({
         icon: "warning-sign",
         intent: Intent.WARNING,
-        message: "Your request is in progress, please stay on for a while",
+        message:
+          "We are currently working on your request. Please bear with us as it is being processed through the network, which may take approximately 3-5 minutes.",
         timeout: 20000,
       });
     } catch (e: any) {
