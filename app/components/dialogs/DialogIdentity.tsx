@@ -184,7 +184,11 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         active={modifiers.active}
         disabled={modifiers.disabled}
         key={registrar.account}
-        text={registrar.info.display.Raw}
+        text={
+          <div>
+            #{registrar.regIndex}: {registrar.info.display.Raw}
+          </div>
+        }
         label={<FormattedAmount value={parseInt(registrar.fee.replace(re, ""))} />}
         onClick={handleClick as MouseEventHandler}
         onFocus={handleFocus}
