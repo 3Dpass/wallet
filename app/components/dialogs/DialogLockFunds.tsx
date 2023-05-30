@@ -82,21 +82,25 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
     setIsLoading(true);
     try {
       const value = BigInt(data.amount_number * 1_000_000_000_000);
-      const tx = api.tx.validatorSet.lock(value, data.block_number, data.auto_extend ?? autoExtendPeriod);
-      await signAndSend(tx, pair);
-      toaster.show({
-        icon: "endorsed",
-        intent: Intent.SUCCESS,
-        message: "Lock request is submitted",
+      const tx = api.tx.validatorSet.lock(value, data.block_number, data.auto_extend ? autoExtendPeriod : null);
+      await signAndSend(tx, pair, {}, ({ status }) => {
+        if (!status.isInBlock) {
+          return;
+        }
+        toaster.show({
+          icon: "endorsed",
+          intent: Intent.SUCCESS,
+          message: "Lock request is submitted",
+        });
+        setIsLoading(false);
+        onAfterSubmit();
       });
-      onAfterSubmit();
     } catch (e: any) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
         message: e.message,
       });
-    } finally {
       setIsLoading(false);
     }
   }, [api, data, onAfterSubmit, pair, toaster]);
