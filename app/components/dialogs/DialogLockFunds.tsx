@@ -1,6 +1,6 @@
 import { Button, Checkbox, Classes, Dialog, Intent, NumericInput, Tag } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AmountInput from "../common/AmountInput";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
@@ -21,14 +21,16 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const dataInitial = {
-    amount: "",
-    amount_number: 0,
-    block: "",
-    block_number: 0,
-    current_block: null,
-    auto_extend: false,
-  };
+  const dataInitial = useMemo(() => {
+    return {
+      amount: "",
+      amount_number: 0,
+      block: "",
+      block_number: 0,
+      current_block: null,
+      auto_extend: false,
+    };
+  }, []);
   const [data, setData] = useState(dataInitial);
 
   const handleOnOpening = useCallback(() => {
