@@ -70,20 +70,24 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
       if (tips > 0) {
         options.tip = tips.toString();
       }
-      await signAndSend(tx, pair, options);
-      toaster.show({
-        icon: "endorsed",
-        intent: Intent.SUCCESS,
-        message: "Send request submitted",
+      await signAndSend(tx, pair, options, ({ status }) => {
+        if (!status.isInBlock) {
+          return;
+        }
+        toaster.show({
+          icon: "endorsed",
+          intent: Intent.SUCCESS,
+          message: "Transaction sent",
+        });
+        setIsLoading(false);
+        onAfterSubmit();
       });
-      onAfterSubmit();
     } catch (e: any) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
         message: e.message,
       });
-    } finally {
       setIsLoading(false);
     }
   }
