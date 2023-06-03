@@ -28,7 +28,7 @@ type IProps = {
 
 interface IMap<T> {
   [index: string]: T;
-} 
+}
 
 export default function UserCard({ registrarInfo }: IProps) {
   return (
@@ -41,13 +41,11 @@ export default function UserCard({ registrarInfo }: IProps) {
             <Icon icon="person" size={IconSize.LARGE * 3} title="No image"></Icon>
           )}
           <div>
-            {registrarInfo.info?.display?.Raw ?
-              (
-                <div className="text-lg">{registrarInfo.info?.display?.Raw as string}</div>
-              ) : (
-                <div className="text-lg">NO DISPLAY NAME</div>
-              )
-            }
+            {registrarInfo.info?.display?.Raw ? (
+              <div className="text-lg">{registrarInfo.info?.display?.Raw as string}</div>
+            ) : (
+              <div className="text-lg">NO DISPLAY NAME</div>
+            )}
             <AddressItem address={registrarInfo.account} />
           </div>
         </div>
@@ -73,14 +71,17 @@ export default function UserCard({ registrarInfo }: IProps) {
         {registrarInfo.judgements && (
           <div className="mb-2">
             <Tag round large className={`${Classes.BREADCRUMB_CURRENT} bg-green-700 text-green-100`}>
-              {typeof registrarInfo.judgements[0][1] == "object" && Object.keys(registrarInfo.judgements[0][1]).map((key, index): any => {
-                if (key in registrarInfo.judgements[0][1]) {
-                  return (
-                    <span key={index}>{key}: {(registrarInfo.judgements[0][1] as IMap<String>)[key].toString()}</span>
-                  );
-                }
-                return <span key={index}></span>;
-              })}
+              {typeof registrarInfo.judgements[0][1] == "object" &&
+                Object.keys(registrarInfo.judgements[0][1]).map((key, index): any => {
+                  if (key in registrarInfo.judgements[0][1]) {
+                    return (
+                      <span key={index}>
+                        {key}: {(registrarInfo.judgements[0][1] as IMap<String>)[key].toString()}
+                      </span>
+                    );
+                  }
+                  return <span key={index}></span>;
+                })}
             </Tag>
           </div>
         )}
