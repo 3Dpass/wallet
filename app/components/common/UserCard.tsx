@@ -26,10 +26,6 @@ type IProps = {
   registrarInfo: IPalletIdentityRegistrarInfo;
 };
 
-interface IMap<T> {
-  [index: string]: T;
-}
-
 export default function UserCard({ registrarInfo }: IProps) {
   return (
     <Card>
@@ -76,7 +72,7 @@ export default function UserCard({ registrarInfo }: IProps) {
                   if (key in registrarInfo.judgements[0][1]) {
                     return (
                       <span key={index}>
-                        {key}: {(registrarInfo.judgements[0][1] as IMap<String>)[key].toString()}
+                        {key}: {(registrarInfo.judgements[0][1] as Record<string, string>)[key].toString()}
                       </span>
                     );
                   }
