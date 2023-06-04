@@ -72,24 +72,21 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
       registrarList.push({ ...(r as IPalletIdentityRegistrarInfo), regIndex: i + 1 });
       isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
-
-    const getIdentityPromiseList: Promise<Codec>[] = [];
-    registrars.forEach((r) => {
-      getIdentityPromiseList.push(api.query.identity.identityOf((r as IPalletIdentityRegistrarInfo).account));
-    });
-    const results = await Promise.all(getIdentityPromiseList);
-    results.forEach((r, i) => {
-      registrarList[i] = { ...registrarList[i], ...(r.toHuman() as IPalletIdentityRegistrarInfo) };
-    });
-
     setData((prev) => ({ ...prev, isRegistrar: isRegistrar }));
     if (isRegistrar) {
-      const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
-      setData((prev) => ({ ...prev, registrarData: registrarInfo as IPalletIdentityRegistrarInfo }));
       const dateMonthAgo = new Date();
       dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
-      setData((prev) => ({ ...prev, dateMonthAgo: dateMonthAgo }));
+      const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
+      setData((prev) => ({ ...prev, registrarData: registrarInfo as IPalletIdentityRegistrarInfo, dateMonthAgo: dateMonthAgo }));
     } else {
+      const getIdentityPromiseList: Promise<Codec>[] = [];
+      registrars.forEach((r) => {
+        getIdentityPromiseList.push(api.query.identity.identityOf((r as IPalletIdentityRegistrarInfo).account));
+      });
+      const results = await Promise.all(getIdentityPromiseList);
+      results.forEach((r, i) => {
+        registrarList[i] = { ...registrarList[i], ...(r.toHuman() as IPalletIdentityRegistrarInfo) };
+      });
       setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo, registrarList: registrarList }));
     }
   }
