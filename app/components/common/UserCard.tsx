@@ -67,17 +67,18 @@ export default function UserCard({ registrarInfo }: IProps) {
         {registrarInfo.judgements && (
           <div className="mb-2">
             <Tag round large className={`${Classes.BREADCRUMB_CURRENT} bg-green-700 text-green-100`}>
-              {typeof registrarInfo.judgements[0][1] == "object" &&
-                Object.keys(registrarInfo.judgements[0][1]).map((key, index): any => {
-                  if (key in registrarInfo.judgements[0][1]) {
-                    return (
-                      <span key={index}>
-                        {key}: {(registrarInfo.judgements[0][1] as Record<string, string>)[key].toString()}
-                      </span>
-                    );
-                  }
-                  return <span key={index}></span>;
-                })}
+              {typeof registrarInfo.judgements[0][1] == "object"
+                ? Object.keys(registrarInfo.judgements[0][1]).map((key, index): any => {
+                    if (key in registrarInfo.judgements[0][1]) {
+                      return (
+                        <span key={index}>
+                          {key}: {(registrarInfo.judgements[0][1] as Record<string, string>)[key].toString()}
+                        </span>
+                      );
+                    }
+                    return <span key={index}></span>;
+                  })
+                : registrarInfo.judgements && registrarInfo.judgements[0] && registrarInfo.judgements[0][1]}
             </Tag>
           </div>
         )}

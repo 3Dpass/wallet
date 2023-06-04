@@ -43,7 +43,7 @@ type IIdentityData = {
   dateMonthAgo: Date | null;
 };
 
-export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
+export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [isIdentityLoading, setIsIdentityLoading] = useState(false);
@@ -72,24 +72,21 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
       registrarList.push({ ...(r as IPalletIdentityRegistrarInfo), regIndex: i + 1 });
       isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
     });
-
-    const getIdentityPromiseList: Promise<Codec>[] = [];
-    registrars.forEach((r) => {
-      getIdentityPromiseList.push(api.query.identity.identityOf((r as IPalletIdentityRegistrarInfo).account));
-    });
-    const results = await Promise.all(getIdentityPromiseList);
-    results.forEach((r, i) => {
-      registrarList[i] = { ...registrarList[i], ...(r.toHuman() as IPalletIdentityRegistrarInfo) };
-    });
-
     setData((prev) => ({ ...prev, isRegistrar: isRegistrar }));
     if (isRegistrar) {
-      const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
-      setData((prev) => ({ ...prev, registrarData: registrarInfo as IPalletIdentityRegistrarInfo }));
       const dateMonthAgo = new Date();
       dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
-      setData((prev) => ({ ...prev, dateMonthAgo: dateMonthAgo }));
+      const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
+      setData((prev) => ({ ...prev, registrarData: registrarInfo as IPalletIdentityRegistrarInfo, dateMonthAgo: dateMonthAgo }));
     } else {
+      const getIdentityPromiseList: Promise<Codec>[] = [];
+      registrars.forEach((r) => {
+        getIdentityPromiseList.push(api.query.identity.identityOf((r as IPalletIdentityRegistrarInfo).account));
+      });
+      const results = await Promise.all(getIdentityPromiseList);
+      results.forEach((r, i) => {
+        registrarList[i] = { ...registrarList[i], ...(r.toHuman() as IPalletIdentityRegistrarInfo) };
+      });
       setData((prev) => ({ ...prev, candidateInfo: {} as ICandidateInfo, registrarList: registrarList }));
     }
   }
@@ -201,7 +198,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        {!dataState.isRegistrar && (
+        {!dataState.isRegistrar && !hasIdentity && (
           <>
             {!dataState.registrarData && <div>Please select a registrar:</div>}
             <Select2
@@ -326,8 +323,9 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
             )}
           </>
         )}
+        {!dataState.isRegistrar && hasIdentity && <div>You already have identity</div>}
         {dataState.isRegistrar && dataState.registrarData?.regIndex && dataState.dateMonthAgo != null && (
-          <CandidateCards regIndex={dataState.registrarData?.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
+          <CandidateCards regIndex={dataState.registrarData.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
