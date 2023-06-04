@@ -11,6 +11,7 @@ type IRegistrarInfo = {
   web: IRegistrarInfoItem;
   twitter: IRegistrarInfoItem;
   image: IRegistrarInfoItem;
+  additional: IRegistrarInfoItem[][];
 };
 
 export type IPalletIdentityRegistrarInfo = {
@@ -62,6 +63,17 @@ export default function UserCard({ registrarInfo }: IProps) {
               <td>Twitter</td>
               <td>{registrarInfo.info?.twitter.Raw as string}</td>
             </tr>
+            {registrarInfo.info.additional &&
+              registrarInfo.info.additional.map((addItem, i) => {
+                return (
+                  <tr key={i}>
+                    {addItem &&
+                      addItem.map((item, j) => {
+                        return <td key={item.Raw}>{item.Raw}</td>;
+                      })}
+                  </tr>
+                );
+              })}
           </tbody>
         </HTMLTable>
         {registrarInfo.judgements && (

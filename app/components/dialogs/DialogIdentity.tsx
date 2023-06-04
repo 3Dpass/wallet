@@ -39,6 +39,7 @@ type IIdentityData = {
   registrarList: IPalletIdentityRegistrarInfo[];
   isRegistrar: boolean;
   registrarData: IPalletIdentityRegistrarInfo | null;
+  identityData: IPalletIdentityRegistrarInfo | null;
   candidateInfo: ICandidateInfo;
   dateMonthAgo: Date | null;
 };
@@ -53,6 +54,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
     registrarList: [],
     isRegistrar: false,
     registrarData: null,
+    identityData: null,
     candidateInfo: {} as ICandidateInfo,
     dateMonthAgo: null,
   };
@@ -78,6 +80,10 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
       dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
       const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
       setData((prev) => ({ ...prev, registrarData: registrarInfo as IPalletIdentityRegistrarInfo, dateMonthAgo: dateMonthAgo }));
+    } else if (hasIdentity) {
+      const identityInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
+      (identityInfo as IPalletIdentityRegistrarInfo).account = pair.address;
+      setData((prev) => ({ ...prev, identityData: identityInfo as IPalletIdentityRegistrarInfo }));
     } else {
       const getIdentityPromiseList: Promise<Codec>[] = [];
       registrars.forEach((r) => {
@@ -323,7 +329,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
             )}
           </>
         )}
-        {!dataState.isRegistrar && hasIdentity && <div>You already have identity</div>}
+        {!dataState.isRegistrar && hasIdentity && dataState.identityData && <UserCard registrarInfo={dataState.identityData} />}
         {dataState.isRegistrar && dataState.registrarData?.regIndex && dataState.dateMonthAgo != null && (
           <CandidateCards regIndex={dataState.registrarData.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
         )}
