@@ -43,7 +43,7 @@ type IIdentityData = {
   dateMonthAgo: Date | null;
 };
 
-export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
+export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [isIdentityLoading, setIsIdentityLoading] = useState(false);
@@ -201,7 +201,7 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        {!dataState.isRegistrar && (
+        {!dataState.isRegistrar && !hasIdentity && (
           <>
             {!dataState.registrarData && <div>Please select a registrar:</div>}
             <Select2
@@ -326,8 +326,9 @@ export default function DialogIdentity({ isOpen, onClose, pair }: IProps) {
             )}
           </>
         )}
+        {!dataState.isRegistrar && hasIdentity && <div>You already have identity</div>}
         {dataState.isRegistrar && dataState.registrarData?.regIndex && dataState.dateMonthAgo != null && (
-          <CandidateCards regIndex={dataState.registrarData?.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
+          <CandidateCards regIndex={dataState.registrarData.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
