@@ -69,17 +69,20 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
       return;
     }
     const registrarList: IPalletIdentityRegistrarInfo[] = [];
-    let isRegistrar: boolean = false;
+    let regIndexCurrent: number | null = null;
     registrars.forEach((r, i) => {
-      registrarList.push({ ...(r as IPalletIdentityRegistrarInfo), regIndex: i + 1 });
-      isRegistrar = isRegistrar || (r as IPalletIdentityRegistrarInfo).account == pair.address;
+      registrarList.push({ ...(r as IPalletIdentityRegistrarInfo), regIndex: i });
+      if ((r as IPalletIdentityRegistrarInfo).account == pair.address) {
+        regIndexCurrent = i;
+      }
     });
-    setData((prev) => ({ ...prev, isRegistrar: isRegistrar }));
-    if (isRegistrar) {
+    setData((prev) => ({ ...prev, isRegistrar: regIndexCurrent != null }));
+    if (regIndexCurrent != null) {
       const dateMonthAgo = new Date();
       dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
-      const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
-      setData((prev) => ({ ...prev, registrarData: registrarInfo as IPalletIdentityRegistrarInfo, dateMonthAgo: dateMonthAgo }));
+      const registrarInfo = (await api.query.identity.identityOf(pair.address)).toHuman() as IPalletIdentityRegistrarInfo;
+      registrarInfo.regIndex = regIndexCurrent;
+      setData((prev) => ({ ...prev, registrarData: registrarInfo, dateMonthAgo: dateMonthAgo }));
     } else if (hasIdentity) {
       const identityInfo = (await api.query.identity.identityOf(pair.address)).toHuman();
       (identityInfo as IPalletIdentityRegistrarInfo).account = pair.address;
@@ -331,7 +334,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         )}
         {!dataState.isRegistrar && hasIdentity && dataState.identityData && <UserCard registrarInfo={dataState.identityData} />}
         {dataState.isRegistrar && dataState.registrarData?.regIndex && dataState.dateMonthAgo != null && (
-          <CandidateCards regIndex={dataState.registrarData.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} />
+          <CandidateCards regIndex={dataState.registrarData.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} onClose={onClose}/>
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>

@@ -20,13 +20,14 @@ type IProps = {
   pair: KeyringPair;
   // dateMonthAgo is needed to use it in the GQL request to get events only for 30 days ago
   dateMonthAgo: Date;
+  onClose: () => void;
 };
 
 type IData = {
   candidateList: IPalletIdentityRegistrarInfo[] | null;
 };
 
-export default function CandidateCards({ regIndex, pair, dateMonthAgo }: IProps) {
+export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [addressLoading, setAddressLoading] = useState("");
@@ -65,6 +66,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo }: IProps)
       });
     } finally {
       setAddressLoading("");
+      onClose();
     }
   }
 
