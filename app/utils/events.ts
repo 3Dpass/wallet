@@ -27,14 +27,22 @@ export async function getIdentityJudgementRequests(
     if (addressAndRegIndex.length > 1 && addressAndRegIndex[1] == registrarIndex) {
       candidateAddress = encodeAddress(addressAndRegIndex[0], ss58format as number);
       candidateInfo = (await api.query.identity.identityOf(candidateAddress)).toHuman() as IPalletIdentityRegistrarInfo;
-      if (
-        candidateInfo &&
-        candidateInfo.judgements[0] &&
-        candidateInfo.judgements[0].length > 1 &&
-        (candidateInfo.judgements[0][1] as IJudgementInfo)["FeePaid"]
-      ) {
-        candidateInfo.account = candidateAddress;
-        candidateInfoArray.push(candidateInfo);
+
+      let candidateHasIdentity = false;
+      if (candidateInfo && candidateInfo.judgements) {
+        for (let i = 0; i < candidateInfo.judgements.length; i++) {
+          if (candidateInfo.judgements[i][1].toString() == "Reasonable") {
+            candidateHasIdentity = true;
+          }
+        }
+      }
+      if (!candidateHasIdentity && candidateInfo && candidateInfo.judgements) {
+        for (let i = 0; i < candidateInfo.judgements.length; i++) {
+          if ((candidateInfo.judgements[i][1] as IJudgementInfo)["FeePaid"]) {
+            candidateInfo.account = candidateAddress;
+            candidateInfoArray.push(candidateInfo);
+          }
+        }
       }
     }
   }
