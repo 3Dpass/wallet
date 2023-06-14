@@ -51,7 +51,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
     }
     setAddressLoading(candidateAddress);
     try {
-      const tx = api.tx.identity.provideJudgement(regIndex, candidateAddress, null);
+      const tx = api.tx.identity.provideJudgement(regIndex, candidateAddress, "Reasonable");
       await signAndSend(tx, pair, {});
       toaster.show({
         icon: "endorsed",
