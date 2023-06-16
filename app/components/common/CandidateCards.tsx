@@ -73,7 +73,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
   if (queryEvents.loading || !dataState.candidateList) return <Spinner />;
   if (queryEvents.error) return <Error>Error loading block data, try to reload.</Error>;
 
-  if (!dataState.candidateList) return <div>No candidates</div>;
+  if (!dataState.candidateList || dataState.candidateList.length == 0) return <div>No judgements requests</div>;
 
   return (
     <div>
