@@ -39,6 +39,7 @@ export default function Account({ pair }: IProps) {
 
   const [isCreatePoolLoading, setIsCreatePoolLoading] = useState(false);
   const [hasIdentity, setHasIdentity] = useState(false);
+  const [isRegistrar, setIsRegistrar] = useState(false);
 
   const dialogsInitial = {
     send: false,
@@ -113,6 +114,18 @@ export default function Account({ pair }: IProps) {
             }
           }
         }
+      }
+    });
+
+    api.query.identity.registrars().then((registrarsData) => {
+      const registrars: Object[] = registrarsData.toHuman() as Object[];
+      if (registrars && Array.isArray(registrars)) {
+        registrars.forEach((r, i) => {
+          if ((r as IPalletIdentityRegistrarInfo).account == pair.address) {
+            setIsRegistrar(true);
+            return;
+          }
+        });
       }
     });
   }, [api, pair]);
@@ -239,7 +252,13 @@ export default function Account({ pair }: IProps) {
       <DialogSetPoolDifficulty isOpen={dialogs.set_pool_difficulty} onClose={() => dialogToggle("set_pool_difficulty")} pair={pair} />
       <DialogJoinPool isOpen={dialogs.join_pool} onClose={() => dialogToggle("join_pool")} pair={pair} />
       <DialogLeavePool isOpen={dialogs.leave_pool} onClose={() => dialogToggle("leave_pool")} pair={pair} />
-      <DialogIdentity isOpen={dialogs.identity} onClose={() => dialogToggle("identity")} pair={pair} hasIdentity={hasIdentity} />
+      <DialogIdentity
+        isOpen={dialogs.identity}
+        onClose={() => dialogToggle("identity")}
+        pair={pair}
+        hasIdentity={hasIdentity}
+        isRegistrar={isRegistrar}
+      />
       <DialogRemoveMiner isOpen={dialogs.remove_miner} onClose={() => dialogToggle("remove_miner")} pair={pair} />
       <DialogAddMiner isOpen={dialogs.add_miner} onClose={() => dialogToggle("add_miner")} pair={pair} />
     </>
@@ -282,11 +301,17 @@ export default function Account({ pair }: IProps) {
               )}
               {!accountLocked && (
                 <div className="flex items-center justify-center gap-1 cursor-pointer group" onClick={() => dialogToggle("identity")}>
-                  <span className="group-hover:underline underline-offset-2">Identity:</span>
-                  {hasIdentity ? (
-                    <Icon className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`} icon="endorsed" size={IconSize.LARGE} />
+                  {isRegistrar ? (
+                    <span className="font-bold underline underline-offset-2 text-center">Judgements requests&nbsp;&rarr;</span>
                   ) : (
-                    <span className="font-bold underline underline-offset-2">claim &rarr;</span>
+                    <>
+                      <span className="group-hover:underline underline-offset-2">Identity:</span>
+                      {hasIdentity ? (
+                        <Icon className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`} icon="endorsed" size={IconSize.LARGE} />
+                      ) : (
+                        <span className="font-bold underline underline-offset-2">claim &rarr;</span>
+                      )}
+                    </>
                   )}
                 </div>
               )}

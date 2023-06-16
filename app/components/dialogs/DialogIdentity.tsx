@@ -21,6 +21,7 @@ type IProps = {
   isOpen: boolean;
   onClose: () => void;
   hasIdentity: boolean;
+  isRegistrar: boolean;
 };
 
 type ICandidateInfo = {
@@ -37,14 +38,13 @@ type ICandidateInfo = {
 
 type IIdentityData = {
   registrarList: IPalletIdentityRegistrarInfo[];
-  isRegistrar: boolean;
   registrarData: IPalletIdentityRegistrarInfo | null;
   identityData: IPalletIdentityRegistrarInfo | null;
   candidateInfo: ICandidateInfo;
   dateMonthAgo: Date | null;
 };
 
-export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: IProps) {
+export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isRegistrar }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [isIdentityLoading, setIsIdentityLoading] = useState(false);
@@ -52,7 +52,6 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
 
   const dataInitial: IIdentityData = {
     registrarList: [],
-    isRegistrar: false,
     registrarData: null,
     identityData: null,
     candidateInfo: {} as ICandidateInfo,
@@ -76,7 +75,6 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
         regIndexCurrent = i;
       }
     });
-    setData((prev) => ({ ...prev, isRegistrar: regIndexCurrent != null }));
     if (regIndexCurrent != null) {
       const dateMonthAgo = new Date();
       dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
@@ -207,7 +205,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
   return (
     <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        {!dataState.isRegistrar && !hasIdentity && (
+        {!isRegistrar && !hasIdentity && (
           <>
             {!dataState.registrarData && <div>Please select a registrar:</div>}
             <Select2
@@ -332,9 +330,9 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity }: I
             )}
           </>
         )}
-        {!dataState.isRegistrar && hasIdentity && dataState.identityData && <UserCard registrarInfo={dataState.identityData} />}
-        {dataState.isRegistrar && dataState.registrarData?.regIndex && dataState.dateMonthAgo != null && (
-          <CandidateCards regIndex={dataState.registrarData.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} onClose={onClose}/>
+        {!isRegistrar && hasIdentity && dataState.identityData && <UserCard registrarInfo={dataState.identityData} />}
+        {isRegistrar && dataState.registrarData?.regIndex && dataState.dateMonthAgo != null && (
+          <CandidateCards regIndex={dataState.registrarData.regIndex} pair={pair} dateMonthAgo={dataState.dateMonthAgo} onClose={onClose} />
         )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
