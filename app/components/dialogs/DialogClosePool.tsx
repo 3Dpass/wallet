@@ -8,6 +8,7 @@ import { poolIdsAtom } from "../../atoms";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -16,6 +17,7 @@ type IProps = {
 };
 
 export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -39,7 +41,7 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "Account is locked",
+        message: t('messages.lbl_account_locked'),
       });
       return;
     }
@@ -66,7 +68,7 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Mining Pool will be closed",
+        message: t('messages.lbl_closing_mining_pool'),
       });
     } catch (e: any) {
       toaster.show({
@@ -85,20 +87,20 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
       isOpen={isOpen}
       usePortal={true}
       onOpening={handleOnOpening}
-      title="Close the mining pool"
+      title={t('dlg_close_pool.lbl_title')}
       onClose={onClose}
       className="w-[90%] sm:w-[640px]"
     >
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="remove"
             loading={isLoading}
-            text="Close Pool"
+            text={t('dlg_close_pool.lbl_btn_close_pool')}
           />
         </div>
       </div>

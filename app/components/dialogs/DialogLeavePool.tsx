@@ -8,6 +8,7 @@ import { signAndSend } from "../../utils/sign";
 import { convertPool, IPool, poolsWithMember } from "../../utils/pool";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -22,6 +23,7 @@ type IPoolData = {
 };
 
 export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -62,7 +64,7 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "Account is locked",
+        message: t('messages.lbl_account_locked'),
       });
       return;
     }
@@ -74,7 +76,7 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "You have left the mining pool",
+        message: t('messages.lbl_left_mining_pool'),
       });
     } catch (e: any) {
       toaster.show({
@@ -121,13 +123,13 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
   };
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Leave a mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title={t('dlg_leave_pool.lbl_title')} onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <Select2
           items={data.poolIds}
           itemPredicate={filterPool}
           itemRenderer={renderPoolId}
-          noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
+          noResults={<MenuItem disabled={true} text={t('dlg_leave_pool.lbl_no_results')} roleStructure="listoption" />}
           onItemSelect={setPool}
           popoverProps={{ matchTargetWidth: true }}
           fill={true}
@@ -135,21 +137,21 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
           <Button
             text={data.poolToLeave}
             rightIcon="double-caret-vertical"
-            placeholder="Select a pool"
+            placeholder={t('dlg_leave_pool.lbl_btn_select_pool')}
             className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono text-lg`}
           />
         </Select2>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="add"
             loading={isLoading}
-            text="Leave the pool"
+            text={t('dlg_leave_pool.lbl_btn_leave_pool')}
           />
         </div>
       </div>

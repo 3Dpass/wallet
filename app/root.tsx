@@ -12,6 +12,11 @@ import { isValidPolkadotAddress } from "./utils/address";
 import { ApiCtxRoot } from "./components/Api";
 import { ClientOnly } from "remix-utils";
 
+import i18n from "i18next";
+import { useTranslation, initReactI18next } from "react-i18next";
+import en from './translations/en.json';
+import es from './translations/es.json';
+
 export function meta() {
   return [{ charset: "utf-8" }, { title: "3DPass Wallet" }, { viewport: "width=device-width,initial-scale=1" }];
 }
@@ -27,7 +32,24 @@ export function links() {
   ];
 }
 
+i18n
+  .use(initReactI18next) // passes i18n down to react-i18next
+  .init({
+    // Add the imported language to resource object
+    resources: {
+      en,
+      es,
+    },
+    lng: "en", // if you're using a language detector, do not define the lng option
+    fallbackLng: "en",
+
+    interpolation: {
+      escapeValue: false // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
+    }
+  });
+
 export default function App() {
+  const { t } = useTranslation();
   const apiUrl = useAtomValue(apiEndpointAtom);
   const toasterRef = useRef<Toaster>();
   const setToaster = useSetAtom(toasterAtom);
@@ -77,7 +99,7 @@ export default function App() {
                       <NavbarHeading className="whitespace-nowrap flex">
                         <Link to="" className="text-white hover:no-underline flex items-center gap-2">
                           <img src="/logo.svg" alt="3Dpass Logo" className="h-7" />
-                          <span className="mb-[-3px]">wallet</span>
+                          <span className="mb-[-3px]">{t('root.lbl_app_name')}</span>
                         </Link>
                         <Button className="ml-2" icon="cog" minimal={true} onClick={() => setIsSettingsDialogOpen(true)} />
                         <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
@@ -88,7 +110,7 @@ export default function App() {
                         <InputGroup
                           leftIcon="search"
                           onChange={(e) => setSearchValue(e.target.value)}
-                          placeholder="Search for address or block number..."
+                          placeholder={t('root.lbl_search_box')}
                           value={searchValue}
                           size={40}
                           type="search"

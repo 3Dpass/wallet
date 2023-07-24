@@ -5,6 +5,7 @@ import AmountInput from "../common/AmountInput";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -16,6 +17,7 @@ type IProps = {
 const autoExtendPeriod = 45000;
 
 export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);

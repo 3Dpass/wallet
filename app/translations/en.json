@@ -1,0 +1,119 @@
+{
+    "translation": {
+        "commons": {
+            "lbl_btn_cancel": "Cancel",
+            "lbl_btn_delete": "Delete",
+            "lbl_cancelled": "Action cancelled"
+        },
+        "messages": {
+            "lbl_account_locked": "Account is locked",
+            "lbl_kyc_changed": "Mining Pool KYC has been changed",
+            "lbl_address_copied": "Address copied to clipboard",
+            "lbl_unlock_request_sent": "Unlock request sent",
+            "lbl_mining_pool_created": "Mining Pool has been created",
+            "lbl_creating_mining_pool": "Creating Mining Pool...",
+            "lbl_delete_confirmation_1": "Are you sure you want to delete address ",
+            "lbl_delete_confirmation_2": " from wallet?",
+            "lbl_wallet_already_imported": "Wallet already imported",
+            "lbl_wallet_seed_phrase_copied": "Seed phrase copied to clipboard",
+            "lbl_closing_mining_pool": "Mining Pool will be closed",
+            "lbl_judgement_requested": "You have requested a judgement.",
+            "lbl_working_on_request": "We are currently working on your request. Please bear with us as it is being processed through the network, which may take approximately 1-3 minutes.",
+            "lbl_joined_pool": "You have joined the mining pool",
+            "lbl_left_mining_pool": "You have left the mining pool"
+        },
+        "root": {
+            "lbl_app_name": "Wallet",
+            "lbl_search_box": "Search for address or block number...",
+            "lbl_total_balance": "Total balance",
+            "lbl_transferable": "Transferable",
+            "lbl_locked": "Locked",
+            "lbl_btn_send": "Send...",
+            "lbl_btn_copy": "Copy",
+            "lbl_btn_sign_verify": "Sign & Verify",
+            "lbl_btn_unlock": "Unlock",
+            "lbl_btn_lock": "Lock...",
+            "lbl_btn_remove": "Remove",
+            "lbl_identity": "Identity",
+            "lbl_identity_not_claimed": "claim",
+            "lbl_best_block": "Best block",
+            "lbl_finalized": "Finalized",
+            "lbl_latest_block": "Latest block",
+            "lbl_target": "Target",
+            "lbl_total_issuance": "Total issuance",
+            "lbl_block": "Block",
+            "lbl_block_not_finalized": "Not finalized",
+            "lbl_btn_kyc": "KYC",
+            "lbl_btn_no_kyc": "no KYC",
+            "lbl_btn_create": "Create",
+            "lbl_btn_fee": "Set up fee",
+            "lbl_btn_difficulty": "Set up difficulty",
+            "lbl_btn_join": "Join",
+            "lbl_btn_leave": "Leave",
+            "lbl_btn_close_pool": "Close",
+            "lbl_btn_add_miner": "Add miner",
+            "lbl_btn_remove_miner": "Remove miner",
+            "lbl_pool_actions": "Pool actions",
+            "lbl_judgements_requests": "Judgements requests"
+        },
+        "root_wallet": {
+            "lbl_btn_create_new_address": "Create new address...",
+            "lbl_btn_import_from_seed": "Import from seed phrase...",
+            "lbl_btn_import_from_json": "Import from JSON..."
+        },
+        "dlg_identity": {
+            "lbl_title": "Identity",
+            "lbl_select_registrar": "Please select a registrar:",
+            "lbl_no_results": "No results",
+            "lbl_placeholder_registrar": "Select a registrar",
+            "lbl_placeholder_display_name": "Enter display name",
+            "lbl_placeholder_legal_name": "Enter legal name",
+            "lbl_placeholder_email": "Enter email",
+            "lbl_placeholder_web_address": "Enter web address",
+            "lbl_placeholder_twitter": "Enter twitter",
+            "lbl_placeholder_discord": "Enter discord",
+            "lbl_placeholder_riot_name": "Enter riot name",
+            "lbl_placeholder_request_judgement": "Request for judgement"
+        },
+        "dlg_join_pool": {
+            "lbl_title": "Join a mining pool",
+            "lbl_no_results": "No results.",
+            "lbl_btn_select_pool": "Select a pool",
+            "lbl_btn_join_pool": "Join the pool"
+        },
+        "dlg_leave_pool": {
+            "lbl_title": "Leave a mining pool",
+            "lbl_no_results": "No results.",
+            "lbl_btn_select_pool": "Select a pool",
+            "lbl_btn_leave_pool": "Leave pool"
+        },
+        "dlg_import_address": {
+            "lbl_btn_import": "Import",
+            "lbl_btn_paste": "Paste",
+            "lbl_passphrase": "Passphrase"
+        },
+        "dlg_wallet": {
+            "lbl_title": "Address",
+            "lbl_btn_copy": "Copy",
+            "lbl_keep_seed": "Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.",
+            "lbl_password": "Passphrase",
+            "lbl_more": "More",
+            "lbl_create": "Create"
+        },
+        "dlg_close_pool": {
+            "lbl_title": "Close the mining pool",
+            "lbl_btn_close_pool": "Close Pool"
+        },
+        "dlg_miner": {
+            "lbl_miner_address": "Enter a miner address",
+            "lbl_btn_add_miner": "Add a miner",
+            "lbl_member_added_to_pool": "The member was added to the mining pool"
+        },
+        "dlg_send": {
+            "lbl_address": "Enter address to send to",
+            "lbl_amount": "Amount",
+            "lbl_tip": "Enter optional tips to increase transaction priority",
+            "lbl_btn_send": "Send"
+        }
+    }
+}
