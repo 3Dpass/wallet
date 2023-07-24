@@ -8,6 +8,7 @@ import { poolIdsAtom } from "../../atoms";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -16,6 +17,7 @@ type IProps = {
 };
 
 export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -39,7 +41,7 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "Account is locked",
+        message: t('messages.lbl_account_locked'),
       });
       return;
     }
@@ -66,7 +68,7 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Mining Pool will be closed",
+        message: t('messages.lbl_closing_mining_pool'),
       });
     } catch (e: any) {
       toaster.show({

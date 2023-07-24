@@ -9,8 +9,10 @@ import { useAccounts, useApi } from "../Api";
 import { useAtomValue, useSetAtom } from "jotai/index";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
 import { convertPool } from "../../utils/pool";
+import { useTranslation } from "react-i18next";
 
 export default function Wallet() {
+  const { t } = useTranslation();
   const toaster = useToaster();
 
   const api = useApi();
@@ -46,7 +48,7 @@ export default function Wallet() {
           toaster.show({
             icon: "warning-sign",
             intent: Intent.WARNING,
-            message: "Wallet already imported",
+            message: t('messages.lbl_wallet_already_imported'),
           });
         }
         dialogToggle("seed_phrase");
@@ -96,9 +98,9 @@ export default function Wallet() {
         return <Account key={pair.address} pair={pair} />;
       })}
       <Card className="grid gap-1" elevation={Elevation.ZERO}>
-        <Button icon="new-object" text="Create new address..." onClick={() => dialogToggle("create")} />
-        <Button icon="add" text="Import from seed phrase..." onClick={() => dialogToggle("seed_phrase")} />
-        <Button icon="import" text="Import from JSON..." onClick={() => dialogToggle("json")} />
+        <Button icon="new-object" text={t('root_wallet.lbl_btn_create_new_address')} onClick={() => dialogToggle("create")} />
+        <Button icon="add" text={t('root_wallet.lbl_btn_import_from_seed')} onClick={() => dialogToggle("seed_phrase")} />
+        <Button icon="import" text={t('root_wallet.lbl_btn_import_from_json')} onClick={() => dialogToggle("json")} />
       </Card>
     </div>
   );

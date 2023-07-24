@@ -4,6 +4,7 @@ import keyring from "@polkadot/ui-keyring";
 import { useState } from "react";
 import TitledValue from "../common/TitledValue";
 import useToaster from "../../hooks/useToaster";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface IProps {
 }
 
 export default function DialogCreateAddress({ isOpen, onClose }: IProps) {
+  const { t } = useTranslation();
   const toaster = useToaster();
   const dataInitial = {
     address: "",
@@ -40,7 +42,7 @@ export default function DialogCreateAddress({ isOpen, onClose }: IProps) {
     toaster.show({
       icon: "tick",
       intent: Intent.SUCCESS,
-      message: "Seed phrase copied to clipboard",
+      message: t('messages.lbl_wallet_seed_phrase_copied'),
     });
   }
 
@@ -48,12 +50,12 @@ export default function DialogCreateAddress({ isOpen, onClose }: IProps) {
     <>
       <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
         <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-          <TitledValue title="Address" value={data.address} fontMono={true} />
-          <div className="text-gray-500">Keep your seed phrase safe. Import the seed phrase in your wallet in order to recover the account.</div>
+          <TitledValue title={t('dlg_wallet.lbl_title')} value={data.address} fontMono={true} />
+          <div className="text-gray-500">{t('dlg_wallet.lbl_keep_seed')}</div>
           <Card>
             <div className="text-center font-mono text-xl">{data.mnemonic}</div>
             <div className="text-center mt-4">
-              <Button icon="duplicate" text="Copy" onClick={handleCopy} />
+              <Button icon="duplicate" text={t('dlg_wallet.lbl_btn_copy')} onClick={handleCopy} />
             </div>
           </Card>
           <InputGroup
@@ -61,7 +63,7 @@ export default function DialogCreateAddress({ isOpen, onClose }: IProps) {
             large={true}
             className="font-mono"
             spellCheck={false}
-            placeholder="Passphrase"
+            placeholder={t('dlg_wallet.lbl_password')}
             onChange={(e) => setData((prev) => ({ ...prev, passphrase: e.target.value }))}
             value={data.passphrase}
             leftElement={<Icon icon="lock" />}
@@ -69,9 +71,9 @@ export default function DialogCreateAddress({ isOpen, onClose }: IProps) {
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button intent={Intent.NONE} onClick={onClose} icon="cross" text="Cancel" />
-            <Button intent={Intent.NONE} onClick={onGenerateClick} icon="refresh" text="More" />
-            <Button intent={Intent.PRIMARY} onClick={handleCreateClick} icon="plus" text="Create" />
+            <Button intent={Intent.NONE} onClick={onClose} icon="cross" text={t('commons.lbl_btn_cancel')} />
+            <Button intent={Intent.NONE} onClick={onGenerateClick} icon="refresh" text={t('dlg_wallet.lbl_more')} />
+            <Button intent={Intent.PRIMARY} onClick={handleCreateClick} icon="plus" text={t('dlg_wallet.lbl_create')} />
           </div>
         </div>
       </Dialog>
