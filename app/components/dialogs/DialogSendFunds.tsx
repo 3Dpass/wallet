@@ -59,7 +59,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "Account is locked",
+        message: t('messages.lbl_account_locked'),
       });
       return;
     }
@@ -79,7 +79,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: "Transaction sent",
+          message: t('messages.lbl_tx_sent'),
         });
         setIsLoading(false);
         onAfterSubmit();
@@ -109,7 +109,7 @@ export default function DialogSendFunds({ pair, isOpen, onClose, onAfterSubmit }
           value={data.address}
           leftElement={addressIcon}
         />
-        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
+        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} placeholder={t('commons.lbl_amount')} />
         <AmountInput disabled={isLoading} onValueChange={handleTipsChange} placeholder={t('dlg_send.lbl_tip')} />
       </div>
       <div className={Classes.DIALOG_FOOTER}>

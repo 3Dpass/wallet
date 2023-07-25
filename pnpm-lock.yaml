@@ -31,6 +31,7 @@ specifiers:
   eslint: 8.42.0
   graphql: 16.6.0
   i18next: ^23.2.11
+  i18next-browser-languagedetector: ^7.1.0
   jotai: 2.1.1
   moment: 2.29.4
   postcss: 8.4.24
@@ -77,6 +78,7 @@ dependencies:
   eslint: 8.42.0
   graphql: 16.6.0
   i18next: 23.2.11
+  i18next-browser-languagedetector: 7.1.0
   jotai: 2.1.1_4dc0b67e673d35efb2cf8b39ddc82eba
   moment: 2.29.4
   postcss: 8.4.24
@@ -6537,6 +6539,12 @@ packages:
   /human-signals/4.3.1:
     resolution: {integrity: sha512-nZXjEF2nbo7lIw3mgYjItAfgQXog3OjJogSbKa2CQIIvSGWcKgeJnQlNXip6NglNzYH45nSRiEVimMvYL8DDqQ==}
     engines: {node: '>=14.18.0'}
+    dev: false
+
+  /i18next-browser-languagedetector/7.1.0:
+    resolution: {integrity: sha512-cr2k7u1XJJ4HTOjM9GyOMtbOA47RtUoWRAtt52z43r3AoMs2StYKyjS3URPhzHaf+mn10hY9dZWamga5WPQjhA==}
+    dependencies:
+      '@babel/runtime': 7.22.6
     dev: false
 
   /i18next/23.2.11:

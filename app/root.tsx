@@ -1,7 +1,7 @@
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 // @ts-expect-error
 import styles from "./styles/app.css";
-import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
+import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster, MenuItem } from "@blueprintjs/core";
 import type { FormEvent, LegacyRef } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiEndpointAtom, apiExplorerEndpointAtom, toasterAtom } from "./atoms";
@@ -12,10 +12,13 @@ import { isValidPolkadotAddress } from "./utils/address";
 import { ApiCtxRoot } from "./components/Api";
 import { ClientOnly } from "remix-utils";
 
-import i18n from "i18next";
+import i18next from "i18next";
 import { useTranslation, initReactI18next } from "react-i18next";
+import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './translations/en.json';
 import es from './translations/es.json';
+import fr from './translations/fr.json';
+import pt from './translations/pt.json';
 
 export function meta() {
   return [{ charset: "utf-8" }, { title: "3DPass Wallet" }, { viewport: "width=device-width,initial-scale=1" }];
@@ -32,19 +35,32 @@ export function links() {
   ];
 }
 
-i18n
+const lngDetector = new LanguageDetector(null, {
+  order: ['querystring', 'cookie', 'localStorage', 'sessionStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
+  lookupCookie: "i18next",
+  lookupLocalStorage: "i18next",
+  lookupQuerystring: 'lng',
+  lookupSessionStorage: 'i18nextLng',
+  lookupFromPathIndex: 0,
+  lookupFromSubdomainIndex: 0,  
+  caches: ["localStorage", "cookie"]
+});
+
+i18next
+  .use(lngDetector)
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
     // Add the imported language to resource object
     resources: {
       en,
       es,
+      fr,
+      pt
     },
-    lng: "en", // if you're using a language detector, do not define the lng option
     fallbackLng: "en",
 
     interpolation: {
-      escapeValue: false // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
+      escapeValue: false
     }
   });
 
@@ -55,7 +71,10 @@ export default function App() {
   const setToaster = useSetAtom(toasterAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  // const [data, setData] = useState<string[]>([]);
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
+
+  // setData(langs);
 
   useEffect(() => {
     setToaster(toasterRef.current);
@@ -80,6 +99,52 @@ export default function App() {
     },
     [searchValue]
   );
+
+  //   <NavbarGroup align={Alignment.RIGHT}>
+  //   <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
+  //     <Select2
+  //       items={data}
+  //       itemPredicate={filterLanguage}
+  //       itemRenderer={renderLanguage}
+  //       menuProps={{ className: "max-h-[300px] overflow-auto" }}
+  //       noResults={<MenuItem disabled={true} text={t('dlg_join_pool.lbl_no_results')} roleStructure="listoption" />}
+  //       onItemSelect={(lang) => handleLanguage(lang)}
+  //       popoverProps={{ matchTargetWidth: true }}
+  //       fill={true}
+  //     ></Select2>
+  //   </div>
+  // </NavbarGroup>
+
+  // const handleLanguage = (lang: string) => {
+  //   i18next.changeLanguage(lang)
+  // }
+
+  // const filterLanguage: ItemPredicate<string> = (query, language, _index, exactMatch) => {
+  //   const normalizedId = language.toLowerCase();
+  //   const normalizedQuery = query.toLowerCase();
+  //   if (exactMatch) {
+  //     return normalizedId === normalizedQuery;
+  //   }
+  //   return normalizedId.indexOf(normalizedQuery) >= 0;
+  // };
+
+  // const renderLanguage: ItemRenderer<string> = (language: string, { handleClick, handleFocus, modifiers }) => {
+  //   if (!modifiers.matchesPredicate) {
+  //     return null;
+  //   }
+  //   return (
+  //     <MenuItem
+  //       className="font-mono"
+  //       active={modifiers.active}
+  //       disabled={modifiers.disabled}
+  //       key={language}
+  //       text={language}
+  //       onClick={handleClick as MouseEventHandler}
+  //       onFocus={handleFocus}
+  //       roleStructure="listoption"
+  //     />
+  //   );
+  // };
 
   return (
     <html lang="en">

@@ -2,6 +2,7 @@ import { Button, Classes, Dialog, Icon, InputGroup, Intent } from "@blueprintjs/
 import { useCallback, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import useToaster from "../../hooks/useToaster";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -10,6 +11,7 @@ type IProps = {
 };
 
 export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
+  const { t } = useTranslation();
   const toaster = useToaster();
   const [passphrase, setPassphrase] = useState("");
 
@@ -23,7 +25,7 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Account is unlocked",
+        message: t('messages.lbl_account_locked'),
       });
       onClose();
     } catch (e: any) {
@@ -36,14 +38,14 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
   }, [pair, passphrase, onClose, toaster]);
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Unlock account">
+    <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title={t('dlg_unlock_account.lbl_title')}>
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <InputGroup
           type="password"
           large={true}
           className="font-mono"
           spellCheck={false}
-          placeholder="Passphrase"
+          placeholder={t('commons.lbl_passphrase')}
           onChange={(e) => setPassphrase(e.target.value)}
           value={passphrase}
           leftElement={<Icon icon="lock" />}
@@ -56,8 +58,8 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" />
-          <Button intent={Intent.PRIMARY} onClick={handleSendClick} text="OK" />
+          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} />
+          <Button intent={Intent.PRIMARY} onClick={handleSendClick} text={t('dlg_unlock_account.lbl_btn_unlock')} />
         </div>
       </div>
     </Dialog>

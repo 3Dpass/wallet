@@ -14,8 +14,10 @@ import { ExplorerUrl } from "../components/common/ExplorerForward";
 import TitledValue from "../components/common/TitledValue";
 import { useAtomValue } from "jotai/index";
 import { formatOptionsAtom } from "../atoms";
+import { useTranslation } from "react-i18next";
 
 export default function Address() {
+  const { t } = useTranslation();
   const { address } = useParams();
   const accountIdHex = u8aToHex(decodeAddress(address));
   const formatOptions = useAtomValue(formatOptionsAtom);
@@ -28,17 +30,17 @@ export default function Address() {
 
   return (
     <Card>
-      <TitledValue title="Address" value={<Link to={ExplorerUrl.account({ address })}>{address}</Link>} fontMono={true} />
+      <TitledValue title={t('screen_address.lbl_title')} value={<Link to={ExplorerUrl.account({ address })}>{address}</Link>} fontMono={true} />
       <Divider className="my-5" />
       <HTMLTable striped={true} width="100%">
         <thead>
           <tr>
-            <th>Block</th>
-            <th>Date</th>
-            <th>Extrinsic</th>
-            <th>Address</th>
+            <th>{t('root.lbl_block')}</th>
+            <th>{t('commons.lbl_date')}</th>
+            <th>{t('screen_address.lbl_extrinsic')}</th>
+            <th>{t('screen_address.lbl_title')}</th>
             <th>
-              <div className="text-right">Value</div>
+              <div className="text-right">{t('screen_address.lbl_value')}</div>
             </th>
             <th />
           </tr>

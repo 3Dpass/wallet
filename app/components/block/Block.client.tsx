@@ -9,12 +9,14 @@ import { Buffer } from "buffer";
 import { useAtomValue } from "jotai";
 import { bestNumberFinalizedAtom } from "../../atoms";
 import { Canvas } from "@react-three/fiber";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
   block: IBlock;
 }
 
 export default function Block({ block }: IProps) {
+  const { t } = useTranslation();
   const bestNumberFinalized = useAtomValue(bestNumberFinalizedAtom);
   const objectHashAlgo = Buffer.from(block.objectHashAlgo, "hex").toString("utf8");
   const blockNumber = block.block.header.number.toNumber();
@@ -26,19 +28,19 @@ export default function Block({ block }: IProps) {
     <Card elevation={Elevation.ZERO}>
       <div className="flex justify-between items-start">
         <TitledValue
-          title="Block"
+          title={t('root.lbl_block')}
           value={
             blockNumber <= bestNumberFinalized ? (
               <>
                 <Link to={`/block/${blockNumber}`} target="_blank" rel="noopener noreferrer">
                   {blockNumber.toLocaleString()}
                 </Link>{" "}
-                <div className="small-title">✓ Finalized</div>
+                <div className="small-title">✓ {t('root.lbl_finalized')}</div>
               </>
             ) : (
               <>
                 {blockNumber.toLocaleString()}
-                <div className="small-title">Not finalized</div>
+                <div className="small-title">{t('root.lbl_block_not_finalized')}</div>
               </>
             )
           }
@@ -52,7 +54,7 @@ export default function Block({ block }: IProps) {
               <div className="p-4">
                 {block.objectHashAlgo && (
                   <div className="font-mono mb-2">
-                    Object Hash Algo: <strong>{objectHashAlgo}</strong>
+                    {t('root.lbl_object_hash_algo')} <strong>{objectHashAlgo}</strong>
                   </div>
                 )}
                 <code className="block text-xs">

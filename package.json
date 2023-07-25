@@ -41,6 +41,7 @@
     "eslint": "8.42.0",
     "graphql": "16.6.0",
     "i18next": "^23.2.11",
+    "i18next-browser-languagedetector": "^7.1.0",
     "jotai": "2.1.1",
     "moment": "2.29.4",
     "postcss": "8.4.24",

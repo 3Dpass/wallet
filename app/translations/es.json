@@ -3,33 +3,51 @@
         "commons": {
             "lbl_btn_cancel": "Cancelar",
             "lbl_btn_delete": "Eliminar",
-            "lbl_cancelled": "Acción cancelada"
+            "lbl_btn_copy": "Copiar",
+            "lbl_btn_paste": "Pegar",
+            "lbl_btn_close": "Cerrar",
+            "lbl_cancelled": "Acción cancelada",
+            "lbl_passphrase": "Contraseña",
+            "lbl_amount": "Cantidad",
+            "lbl_add_judgement": "Agregar juicio",
+            "lbl_no_judgement_requested": "No hay solicitudes de juicio",
+            "lbl_loading": "Cargando...",
+            "lbl_block": "Bloque",
+            "lbl_date": "Fecha"
         },
         "messages": {
             "lbl_account_locked": "Cuenta bloqueada",
-            "lbl_kyc_changed": "KYC del grupo de minería ha sido cambiado",
+            "lbl_kyc_changed": "Se ha cambiado el KYC del pool de minería",
             "lbl_address_copied": "Dirección copiada al portapapeles",
             "lbl_unlock_request_sent": "Solicitud de desbloqueo enviada",
-            "lbl_mining_pool_created": "Grupo de minería ha sido creado",
-            "lbl_creating_mining_pool": "Creando Grupo de minería...",
+            "lbl_mining_pool_created": "Se ha creado un pool de minería",
+            "lbl_creating_mining_pool": "Creando pool de minería...",
             "lbl_delete_confirmation_1": "¿Estás seguro de que deseas eliminar la dirección ",
-            "lbl_delete_confirmation_2": " de la cartera?",
-            "lbl_wallet_already_imported": "Cartera ya importada",
+            "lbl_delete_confirmation_2": " del monedero?",
+            "lbl_wallet_already_imported": "Monedero ya importado",
             "lbl_wallet_seed_phrase_copied": "Frase de recuperación copiada al portapapeles",
-            "lbl_closing_mining_pool": "El Grupo de minería será cerrado",
+            "lbl_closing_mining_pool": "El pool de minería será cerrado",
             "lbl_judgement_requested": "Has solicitado un juicio.",
-            "lbl_working_on_request": "Estamos trabajando en tu solicitud. Por favor, ten paciencia, ya que está siendo procesada a través de la red, lo que puede llevar aproximadamente de 1 a 3 minutos.",
-            "lbl_joined_pool": "Te has unido al grupo de minería",
-            "lbl_left_mining_pool": "Has abandonado el grupo de minería"
+            "lbl_working_on_request": "Estamos procesando tu solicitud. Por favor, ten paciencia mientras se procesa a través de la red, lo cual puede tomar aproximadamente de 1 a 3 minutos.",
+            "lbl_joined_pool": "Te has unido al pool de minería",
+            "lbl_left_mining_pool": "Has abandonado el pool de minería",
+            "lbl_lock_requested": "Solicitud de bloqueo enviada",
+            "lbl_removed_from_mining_pool": "El miembro ha sido eliminado del pool de minería",
+            "lbl_tx_sent": "Transacción enviada",
+            "lbl_pool_difficulty_set": "Se ha establecido la dificultad del pool",
+            "lbl_interest_set": "Se ha establecido el interés del pool",
+            "lbl_message_copied": "Mensaje copiado al portapapeles",
+            "lbl_raw_messages_not_supported": "El firmante no admite la firma de mensajes en bruto",
+            "lbl_judgement_sent": "Tu juicio ha sido enviado",
+            "lbl_error_loading_block_data": "Error al cargar los datos del bloque, intenta recargar."
         },
         "root": {
-            "lbl_app_name": "Cartera",
+            "lbl_app_name": "Monedero",
             "lbl_search_box": "Buscar dirección o número de bloque...",
             "lbl_total_balance": "Saldo total",
             "lbl_transferable": "Transferible",
             "lbl_locked": "Bloqueado",
             "lbl_btn_send": "Enviar...",
-            "lbl_btn_copy": "Copiar",
             "lbl_btn_sign_verify": "Firmar y Verificar",
             "lbl_btn_unlock": "Desbloquear",
             "lbl_btn_lock": "Bloquear...",
@@ -43,6 +61,7 @@
             "lbl_total_issuance": "Emisión total",
             "lbl_block": "Bloque",
             "lbl_block_not_finalized": "No finalizado",
+            "lbl_object_hash_algo": "Algoritmo de Hash del Objeto:",
             "lbl_btn_kyc": "KYC",
             "lbl_btn_no_kyc": "sin KYC",
             "lbl_btn_create": "Crear",
@@ -51,10 +70,14 @@
             "lbl_btn_join": "Unirse",
             "lbl_btn_leave": "Salir",
             "lbl_btn_close_pool": "Cerrar",
-            "lbl_btn_add_miner": "Añadir minero",
+            "lbl_btn_add_miner": "Agregar minero",
             "lbl_btn_remove_miner": "Eliminar minero",
-            "lbl_pool_actions": "Acciones del Grupo de minería",
-            "lbl_judgements_requests": "Solicitudes de juicios"
+            "lbl_pool_actions": "Acciones del pool de minería",
+            "lbl_judgements_requests": "Solicitudes de juicio",
+            "lbl_account_is_password_protected_1": "La cuenta está protegida con ",
+            "lbl_account_is_password_protected_2": "contraseña, debes ",
+            "lbl_account_is_password_protected_3": "desbloquearla",
+            "lbl_account_is_password_protected_4": " antes de usarla"
         },
         "root_wallet": {
             "lbl_btn_create_new_address": "Crear nueva dirección...",
@@ -64,56 +87,118 @@
         "dlg_identity": {
             "lbl_title": "Identidad",
             "lbl_select_registrar": "Por favor, selecciona un registrador:",
-            "lbl_no_results": "No hay resultados",
+            "lbl_no_results": "Sin resultados",
             "lbl_placeholder_registrar": "Seleccionar un registrador",
-            "lbl_placeholder_display_name": "Introducir nombre para mostrar",
+            "lbl_placeholder_display_name": "Introducir nombre de visualización",
             "lbl_placeholder_legal_name": "Introducir nombre legal",
             "lbl_placeholder_email": "Introducir correo electrónico",
             "lbl_placeholder_web_address": "Introducir dirección web",
             "lbl_placeholder_twitter": "Introducir Twitter",
             "lbl_placeholder_discord": "Introducir Discord",
             "lbl_placeholder_riot_name": "Introducir nombre de Riot",
-            "lbl_placeholder_request_judgement": "Solicitar juicio"
+            "lbl_placeholder_request_judgement": "Solicitud de juicio"
         },
         "dlg_join_pool": {
-            "lbl_title": "Unirse a un grupo de minería",
-            "lbl_no_results": "No hay resultados.",
-            "lbl_btn_select_pool": "Seleccionar un grupo",
-            "lbl_btn_join_pool": "Unirse al grupo"
+            "lbl_title": "Unirse a un pool de minería",
+            "lbl_no_results": "Sin resultados.",
+            "lbl_btn_select_pool": "Seleccionar un pool",
+            "lbl_btn_join_pool": "Unirse al pool"
         },
         "dlg_leave_pool": {
-            "lbl_title": "Salir de un grupo de minería",
-            "lbl_no_results": "No hay resultados.",
-            "lbl_btn_select_pool": "Seleccionar un grupo",
-            "lbl_btn_leave_pool": "Salir del grupo"
+            "lbl_title": "Salir de un pool de minería",
+            "lbl_no_results": "Sin resultados.",
+            "lbl_btn_select_pool": "Seleccionar un pool",
+            "lbl_btn_leave_pool": "Salir del pool"
+        },
+        "dlg_remove_miner": {
+            "lbl_title": "Eliminar un minero",
+            "lbl_no_results": "Sin resultados.",
+            "lbl_btn_select_miner": "Seleccionar un minero",
+            "lbl_btn_remove_miner": "Eliminar un minero"
+        },
+        "dlg_lock_funds": {
+            "lbl_release_lock_after": "Liberar fondos después de este bloque",
+            "lbl_block_number": "Número de bloque",
+            "lbl_chk_extended": "Extender automáticamente cada ",
+            "lbl_chk_extended_1": " bloques",
+            "lbl_btn_lock_funds": "Bloquear fondos"
         },
         "dlg_import_address": {
             "lbl_btn_import": "Importar",
             "lbl_btn_paste": "Pegar",
-            "lbl_passphrase": "Frase de recuperación"
+            "lbl_passphrase": "Frase de contraseña"
         },
         "dlg_wallet": {
             "lbl_title": "Dirección",
             "lbl_btn_copy": "Copiar",
-            "lbl_keep_seed": "Guarda tu frase de recuperación de forma segura. Importa la frase de recuperación en tu cartera para recuperar la cuenta.",
-            "lbl_password": "Contraseña",
+            "lbl_keep_seed": "Mantén tu frase de recuperación segura. Importa la frase de recuperación en tu monedero para recuperar la cuenta.",
+            "lbl_password": "Frase de contraseña",
             "lbl_more": "Más",
             "lbl_create": "Crear"
         },
         "dlg_close_pool": {
-            "lbl_title": "Cerrar el grupo de minería",
-            "lbl_btn_close_pool": "Cerrar Grupo de minería"
+            "lbl_title": "Cerrar el pool de minería",
+            "lbl_btn_close_pool": "Cerrar pool de minería"
         },
         "dlg_miner": {
-            "lbl_miner_address": "Introducir dirección de minero",
-            "lbl_btn_add_miner": "Añadir un minero",
-            "lbl_member_added_to_pool": "El miembro ha sido añadido al grupo de minería"
+            "lbl_miner_address": "Introduce una dirección de minero",
+            "lbl_btn_add_miner": "Agregar un minero",
+            "lbl_member_added_to_pool": "El miembro ha sido agregado al pool de minería"
         },
         "dlg_send": {
-            "lbl_address": "Introducir dirección de destino",
+            "lbl_address": "Introduce la dirección de destino",
             "lbl_amount": "Cantidad",
-            "lbl_tip": "Introducir consejos opcionales para aumentar la prioridad de la transacción",
+            "lbl_tip": "Introduce propinas opcionales para aumentar la prioridad de la transacción",
             "lbl_btn_send": "Enviar"
+        },
+        "dlg_pool_difficulty": {
+            "lbl_title": "Establecer dificultad del pool",
+            "lbl_pool_difficulty": "Dificultad del pool",
+            "lbl_btn_set_difficulty": "Establecer dificultad"
+        },
+        "dlg_pool_interest": {
+            "lbl_title": "Establecer interés del pool",
+            "lbl_pool_interest": "porcentaje",
+            "lbl_btn_set_interest": "Establecer dificultad"
+        },
+        "dlg_settings": {
+            "lbl_api_address": "API RPC",
+            "lbl_explorer_graphql": "Explorador GraphQL",
+            "lbl_advanced_mode": "Modo avanzado",
+            "lbl_btn_save": "Guardar"
+        },
+        "dlg_sign_verify": {
+            "lbl_title": "Firmar y Verificar Mensaje",
+            "lbl_signed_message": "Mensaje firmado",
+            "lbl_rd_sign": "Firmar",
+            "lbl_rd_verify": "Verificar",
+            "lbl_placeholder_message": "Mensaje",
+            "lbl_btn_sign": "Firmar",
+            "lbl_verified": "¡Verificado!",
+            "lbl_invalid_signature": "Firma inválida"
+        },
+        "dlg_unlock_account": {
+            "lbl_title": "Desbloquear cuenta",
+            "lbl_btn_unlock": "Desbloquear"
+        },
+        "user_card": {
+            "lbl_no_display_name": "SIN NOMBRE DE VISUALIZACIÓN",
+            "lbl_email": "Correo electrónico",
+            "lbl_website": "Sitio web",
+            "lbl_twitter": "Twitter"
+        },
+        "screen_address": {
+            "lbl_title": "Dirección",
+            "lbl_extrinsic": "Extrínseco",
+            "lbl_value": "Valor"
+        },
+        "screen_block": {
+            "lbl_hash": "Hash",
+            "lbl_spec_name": "Nombre de especificación",
+            "lbl_spec_version": "Versión de especificación",
+            "lbl_extrinsics": "Extrínsecos",
+            "lbl_events": "Eventos",
+            "lbl_logs": "Registros"
         }
     }
 }

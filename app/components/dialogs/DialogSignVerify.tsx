@@ -6,6 +6,7 @@ import { u8aToHex } from "@polkadot/util";
 import { keyring } from "@polkadot/ui-keyring";
 import React, { useState } from "react";
 import useToaster from "../../hooks/useToaster";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -29,6 +30,7 @@ type IData = {
 };
 
 export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
+  const { t } = useTranslation();
   const toaster = useToaster();
   const dataInitial: IData = {
     isSignatureValid: false,
@@ -52,7 +54,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   function handleCopyClick() {
     navigator.clipboard.writeText(signatureTemplate).then(() => {
       toaster.show({
-        message: "Message copied to clipboard!",
+        message: t('messages.lbl_message_copied'),
         intent: Intent.SUCCESS,
         icon: "tick",
       });
@@ -72,7 +74,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       const injected = await web3FromSource(pair.meta.source as string);
       const signer = injected.signer;
       if (!signer.signRaw) {
-        throw new Error("Signer does not support signing raw messages");
+        throw new Error(t('messages.lbl_raw_messages_not_supported'));
       }
       const signed = await signer.signRaw({
         address: pair.address,
@@ -171,7 +173,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
   }
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title="Sign and Verify Message" style={{ width: "550px" }}>
+    <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title={t('dlg_sign_verify.lbl_title')} style={{ width: "550px" }}>
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-2`}>
         <div className="flex justify-center mt-2 text-lg">
           <RadioGroup
@@ -185,18 +187,18 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             }}
             selectedValue={data.messageType}
           >
-            <Radio label="Sign" value={DIALOG_SIGN} />
-            <Radio label="Verify" value={DIALOG_VERIFY} />
+            <Radio label={t('dlg_sign_verify.lbl_rd_sign')} value={DIALOG_SIGN} />
+            <Radio label={t('dlg_sign_verify.lbl_rd_verify')} value={DIALOG_VERIFY} />
           </RadioGroup>
         </div>
         {data.messageType === DIALOG_SIGN && (
           <>
             <Label>
-              Message
+              {t('dlg_sign_verify.lbl_placeholder_message')}
               <InputGroup
                 large={true}
                 spellCheck={false}
-                placeholder="Message"
+                placeholder={t('dlg_sign_verify.lbl_placeholder_message')}
                 onChange={handleMessageChange}
                 value={data.message}
                 leftElement={<Icon icon="edit" />}
@@ -204,10 +206,10 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
               />
             </Label>
             <Label>
-              Signed message
+              {t('dlg_sign_verify.lbl_signed_message')}
               <div className="relative">
                 <TextArea className="font-mono h-80 w-full p-2 text-left" value={signatureTemplate} />
-                {canCopyToClipboard && <Button className="bp3-dark absolute bottom-2 right-2" onClick={handleCopyClick} text="Copy" />}
+                {canCopyToClipboard && <Button className="bp3-dark absolute bottom-2 right-2" onClick={handleCopyClick} text={t('commons.lbl_btn_copy')} />}
               </div>
             </Label>
           </>
@@ -216,7 +218,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
           <>
             <div className="relative">
               <TextArea className="font-mono h-80 w-full p-2 text-left" value={data.messageToVerify} onChange={handleVerifyMessageChange} />
-              {canPasteFromClipboard && <Button className="bp3-dark absolute bottom-2 right-2" onClick={handlePasteClick} text="Paste" />}
+              {canPasteFromClipboard && <Button className="bp3-dark absolute bottom-2 right-2" onClick={handlePasteClick} text={t('commons.lbl_btn_paste')} />}
             </div>
           </>
         )}
@@ -224,8 +226,8 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       <div className={Classes.DIALOG_FOOTER}>
         {data.messageType === DIALOG_SIGN && (
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={onClose} text="Cancel" />
-            <Button icon="edit" intent={Intent.PRIMARY} onClick={handleSignClick} text="Sign" />
+            <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} />
+            <Button icon="edit" intent={Intent.PRIMARY} onClick={handleSignClick} text={t('dlg_sign_verify.lbl_btn_sign')} />
           </div>
         )}
         {data.messageType === DIALOG_VERIFY && (
@@ -235,17 +237,17 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
                 {data.showValidationResults && data.isSignatureValid && (
                   <div className="flex items-center gap-2">
                     <Icon icon="endorsed" intent={Intent.SUCCESS} />
-                    Verified!
+                    {t('dlg_sign_verify.lbl_verified')}
                   </div>
                 )}
                 {data.showValidationResults && !data.isSignatureValid && (
                   <div className="flex items-center gap-2">
                     <Icon icon="warning-sign" intent={Intent.DANGER} />
-                    Invalid signature
+                    {t('dlg_sign_verify.lbl_invalid_signature')}
                   </div>
                 )}
               </div>
-              <Button onClick={onClose} text="Close" />
+              <Button onClick={onClose} text={t('commons.lbl_btn_close')} />
             </div>
           </>
         )}

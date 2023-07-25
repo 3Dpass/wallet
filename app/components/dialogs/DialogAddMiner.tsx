@@ -37,24 +37,22 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
     if (isLocked) {
-      const message = t('commons.lbl_account_locked')
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message,
+        message: t('commons.lbl_account_locked'),
       });
       return;
     }
     setIsLoading(true);
     try {
-      const message = t('dlg_miner.lbl_member_added_to_pool')
       const tx = api.tx.miningPool.addMember(data);
       const options: Partial<SignerOptions> = {};
       await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message,
+        message: t('dlg_miner.lbl_member_added_to_pool'),
       });
     } catch (e: any) {
       toaster.show({

@@ -283,16 +283,16 @@ export default function Account({ pair }: IProps) {
             </div>
             {accountLocked && (
               <div className="my-2 text-center">
-                Account is <Icon icon="lock" /> password protected, you need to{" "}
+                {t('root.lbl_account_is_password_protected_1')} <Icon icon="lock" /> {t('root.lbl_account_is_password_protected_2')}{" "}
                 <span onClick={handleUnlockAccount} className="text-white underline underline-offset-4 cursor-pointer">
-                  unlock it
+                {t('root.lbl_account_is_password_protected_3')}
                 </span>{" "}
-                before use
+                {t('root.lbl_account_is_password_protected_4')}
               </div>
             )}
             <div className="grid grid-cols-3 gap-1">
               <Button icon="send-to" text={t('root.lbl_btn_send')} onClick={() => dialogToggle("send")} disabled={accountLocked} />
-              <Button icon="duplicate" text={t('root.lbl_btn_copy')} onClick={handleCopyAddress} />
+              <Button icon="duplicate" text={t('commons.lbl_btn_copy')} onClick={handleCopyAddress} />
               <Button icon="endorsed" text={t('root.lbl_btn_sign_verify')} onClick={handleSignVerify} disabled={accountLocked} />
               <Button icon="unlock" text={t('root.lbl_btn_unlock')} onClick={handleUnlockFundsClick} disabled={balances.lockedBalance.toBigInt() <= 0 || accountLocked} />
               <Button icon="lock" text={t('root.lbl_btn_lock')} onClick={handleLockFundsClick} disabled={accountLocked} />
