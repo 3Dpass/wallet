@@ -1,7 +1,7 @@
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 // @ts-expect-error
 import styles from "./styles/app.css";
-import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster, MenuItem } from "@blueprintjs/core";
+import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
 import type { FormEvent, LegacyRef } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiEndpointAtom, apiExplorerEndpointAtom, toasterAtom } from "./atoms";
@@ -71,10 +71,7 @@ export default function App() {
   const setToaster = useSetAtom(toasterAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  // const [data, setData] = useState<string[]>([]);
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
-
-  // setData(langs);
 
   useEffect(() => {
     setToaster(toasterRef.current);
@@ -99,52 +96,6 @@ export default function App() {
     },
     [searchValue]
   );
-
-  //   <NavbarGroup align={Alignment.RIGHT}>
-  //   <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-  //     <Select2
-  //       items={data}
-  //       itemPredicate={filterLanguage}
-  //       itemRenderer={renderLanguage}
-  //       menuProps={{ className: "max-h-[300px] overflow-auto" }}
-  //       noResults={<MenuItem disabled={true} text={t('dlg_join_pool.lbl_no_results')} roleStructure="listoption" />}
-  //       onItemSelect={(lang) => handleLanguage(lang)}
-  //       popoverProps={{ matchTargetWidth: true }}
-  //       fill={true}
-  //     ></Select2>
-  //   </div>
-  // </NavbarGroup>
-
-  // const handleLanguage = (lang: string) => {
-  //   i18next.changeLanguage(lang)
-  // }
-
-  // const filterLanguage: ItemPredicate<string> = (query, language, _index, exactMatch) => {
-  //   const normalizedId = language.toLowerCase();
-  //   const normalizedQuery = query.toLowerCase();
-  //   if (exactMatch) {
-  //     return normalizedId === normalizedQuery;
-  //   }
-  //   return normalizedId.indexOf(normalizedQuery) >= 0;
-  // };
-
-  // const renderLanguage: ItemRenderer<string> = (language: string, { handleClick, handleFocus, modifiers }) => {
-  //   if (!modifiers.matchesPredicate) {
-  //     return null;
-  //   }
-  //   return (
-  //     <MenuItem
-  //       className="font-mono"
-  //       active={modifiers.active}
-  //       disabled={modifiers.disabled}
-  //       key={language}
-  //       text={language}
-  //       onClick={handleClick as MouseEventHandler}
-  //       onFocus={handleFocus}
-  //       roleStructure="listoption"
-  //     />
-  //   );
-  // };
 
   return (
     <html lang="en">
