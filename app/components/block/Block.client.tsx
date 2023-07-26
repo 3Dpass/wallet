@@ -28,19 +28,19 @@ export default function Block({ block }: IProps) {
     <Card elevation={Elevation.ZERO}>
       <div className="flex justify-between items-start">
         <TitledValue
-          title={t('root.lbl_block')}
+          title={t("root.lbl_block")}
           value={
             blockNumber <= bestNumberFinalized ? (
               <>
                 <Link to={`/block/${blockNumber}`} target="_blank" rel="noopener noreferrer">
                   {blockNumber.toLocaleString()}
                 </Link>{" "}
-                <div className="small-title">✓ {t('root.lbl_finalized')}</div>
+                <div className="small-title">✓ {t("root.lbl_finalized")}</div>
               </>
             ) : (
               <>
                 {blockNumber.toLocaleString()}
-                <div className="small-title">{t('root.lbl_block_not_finalized')}</div>
+                <div className="small-title">{t("root.lbl_block_not_finalized")}</div>
               </>
             )
           }
@@ -54,7 +54,7 @@ export default function Block({ block }: IProps) {
               <div className="p-4">
                 {block.objectHashAlgo && (
                   <div className="font-mono mb-2">
-                    {t('root.lbl_object_hash_algo')} <strong>{objectHashAlgo}</strong>
+                    {t("root.lbl_object_hash_algo")} <strong>{objectHashAlgo}</strong>
                   </div>
                 )}
                 <code className="block text-xs">

@@ -40,7 +40,7 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t('commons.lbl_account_locked'),
+        message: t("commons.lbl_account_locked"),
       });
       return;
     }
@@ -52,7 +52,7 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: t('dlg_miner.lbl_member_added_to_pool'),
+        message: t("dlg_miner.lbl_member_added_to_pool"),
       });
     } catch (e: any) {
       toaster.show({
@@ -76,7 +76,7 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
           large={true}
           className="font-mono"
           spellCheck={false}
-          placeholder={t('dlg_miner.lbl_miner_address')}
+          placeholder={t("dlg_miner.lbl_miner_address")}
           onChange={(e) => setData(e.target.value)}
           value={data}
           leftElement={addressIcon}
@@ -84,14 +84,14 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
+          <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="send-message"
             loading={isLoading}
-            text={t('dlg_miner.lbl_btn_add_miner')}
+            text={t("dlg_miner.lbl_btn_add_miner")}
           />
         </div>
       </div>

@@ -48,7 +48,7 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t('messages.lbl_account_locked'),
+        message: t("messages.lbl_account_locked"),
       });
       return;
     }
@@ -60,7 +60,7 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: t('messages.lbl_interest_set'),
+        message: t("messages.lbl_interest_set"),
       });
     } catch (e: any) {
       toaster.show({
@@ -75,20 +75,32 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
   }
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title={t('dlg_pool_interest.lbl_title')} onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog
+      isOpen={isOpen}
+      usePortal={true}
+      onOpening={handleOnOpening}
+      title={t("dlg_pool_interest.lbl_title")}
+      onClose={onClose}
+      className="w-[90%] sm:w-[640px]"
+    >
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <AmountInput disabled={isLoading} onValueChange={handleInterestChange} placeholder={t('dlg_pool_interest.lbl_pool_interest')} formatOptionsUnit="%" />
+        <AmountInput
+          disabled={isLoading}
+          onValueChange={handleInterestChange}
+          placeholder={t("dlg_pool_interest.lbl_pool_interest")}
+          formatOptionsUnit="%"
+        />
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
+          <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="arrow-right"
             loading={isLoading}
-            text={t('dlg_pool_interest.lbl_btn_set_interest')}
+            text={t("dlg_pool_interest.lbl_btn_set_interest")}
           />
         </div>
       </div>

@@ -25,7 +25,7 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: t('messages.lbl_account_locked'),
+        message: t("messages.lbl_account_locked"),
       });
       onClose();
     } catch (e: any) {
@@ -38,14 +38,14 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
   }, [pair, passphrase, onClose, toaster]);
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title={t('dlg_unlock_account.lbl_title')}>
+    <Dialog isOpen={isOpen} onClose={onClose} onOpening={handleOnOpening} title={t("dlg_unlock_account.lbl_title")}>
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <InputGroup
           type="password"
           large={true}
           className="font-mono"
           spellCheck={false}
-          placeholder={t('commons.lbl_passphrase')}
+          placeholder={t("commons.lbl_passphrase")}
           onChange={(e) => setPassphrase(e.target.value)}
           value={passphrase}
           leftElement={<Icon icon="lock" />}
@@ -58,8 +58,8 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} />
-          <Button intent={Intent.PRIMARY} onClick={handleSendClick} text={t('dlg_unlock_account.lbl_btn_unlock')} />
+          <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} />
+          <Button intent={Intent.PRIMARY} onClick={handleSendClick} text={t("dlg_unlock_account.lbl_btn_unlock")} />
         </div>
       </div>
     </Dialog>

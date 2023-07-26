@@ -44,7 +44,7 @@ export default function UserCard({ registrarInfo }: IProps) {
             {registrarInfo.info?.display?.Raw ? (
               <div className="text-lg">{registrarInfo.info?.display?.Raw as string}</div>
             ) : (
-              <div className="text-lg">{t('user_card.lbl_no_display_name')}</div>
+              <div className="text-lg">{t("user_card.lbl_no_display_name")}</div>
             )}
             <AddressItem address={registrarInfo.account} />
           </div>
@@ -55,15 +55,15 @@ export default function UserCard({ registrarInfo }: IProps) {
         <HTMLTable>
           <tbody>
             <tr>
-              <td className="shadow-none">{t('user_card.lbl_email')}</td>
+              <td className="shadow-none">{t("user_card.lbl_email")}</td>
               <td className="shadow-none">{registrarInfo.info?.email.Raw as string}</td>
             </tr>
             <tr>
-              <td>{t('user_card.lbl_website')}</td>
+              <td>{t("user_card.lbl_website")}</td>
               <td>{registrarInfo.info?.web.Raw as string}</td>
             </tr>
             <tr>
-              <td>{t('user_card.lbl_twitter')}</td>
+              <td>{t("user_card.lbl_twitter")}</td>
               <td>{registrarInfo.info?.twitter.Raw as string}</td>
             </tr>
             {registrarInfo.info.additional &&

@@ -62,7 +62,7 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t('messages.lbl_account_locked'),
+        message: t("messages.lbl_account_locked"),
       });
       return;
     }
@@ -74,7 +74,7 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: t('messages.lbl_removed_from_mining_pool'),
+        message: t("messages.lbl_removed_from_mining_pool"),
       });
     } catch (e: any) {
       toaster.show({
@@ -121,13 +121,20 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
   };
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title={t('dlg_remove_miner.lbl_title')} onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog
+      isOpen={isOpen}
+      usePortal={true}
+      onOpening={handleOnOpening}
+      title={t("dlg_remove_miner.lbl_title")}
+      onClose={onClose}
+      className="w-[90%] sm:w-[640px]"
+    >
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <Select2
           items={data.miners}
           itemPredicate={filterMember}
           itemRenderer={renderMemberId}
-          noResults={<MenuItem disabled={true} text={t('dlg_remove_miner.lbl_no_results')} roleStructure="listoption" />}
+          noResults={<MenuItem disabled={true} text={t("dlg_remove_miner.lbl_no_results")} roleStructure="listoption" />}
           onItemSelect={setMember}
           popoverProps={{ matchTargetWidth: true }}
           fill={true}
@@ -135,21 +142,21 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
           <Button
             text={data.memberToRemove}
             rightIcon="double-caret-vertical"
-            placeholder={t('dlg_remove_miner.lbl_select_miner')}
+            placeholder={t("dlg_remove_miner.lbl_select_miner")}
             className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono text-lg`}
           />
         </Select2>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
+          <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="remove"
             loading={isLoading}
-            text={t('dlg_remove_miner.lbl_btn_remove_miner')}
+            text={t("dlg_remove_miner.lbl_btn_remove_miner")}
           />
         </div>
       </div>

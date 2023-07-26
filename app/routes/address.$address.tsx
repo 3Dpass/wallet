@@ -30,17 +30,17 @@ export default function Address() {
 
   return (
     <Card>
-      <TitledValue title={t('screen_address.lbl_title')} value={<Link to={ExplorerUrl.account({ address })}>{address}</Link>} fontMono={true} />
+      <TitledValue title={t("screen_address.lbl_title")} value={<Link to={ExplorerUrl.account({ address })}>{address}</Link>} fontMono={true} />
       <Divider className="my-5" />
       <HTMLTable striped={true} width="100%">
         <thead>
           <tr>
-            <th>{t('root.lbl_block')}</th>
-            <th>{t('commons.lbl_date')}</th>
-            <th>{t('screen_address.lbl_extrinsic')}</th>
-            <th>{t('screen_address.lbl_title')}</th>
+            <th>{t("root.lbl_block")}</th>
+            <th>{t("commons.lbl_date")}</th>
+            <th>{t("screen_address.lbl_extrinsic")}</th>
+            <th>{t("screen_address.lbl_title")}</th>
             <th>
-              <div className="text-right">{t('screen_address.lbl_value')}</div>
+              <div className="text-right">{t("screen_address.lbl_value")}</div>
             </th>
             <th />
           </tr>

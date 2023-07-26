@@ -48,7 +48,7 @@ export default function Wallet() {
           toaster.show({
             icon: "warning-sign",
             intent: Intent.WARNING,
-            message: t('messages.lbl_wallet_already_imported'),
+            message: t("messages.lbl_wallet_already_imported"),
           });
         }
         dialogToggle("seed_phrase");
@@ -98,9 +98,9 @@ export default function Wallet() {
         return <Account key={pair.address} pair={pair} />;
       })}
       <Card className="grid gap-1" elevation={Elevation.ZERO}>
-        <Button icon="new-object" text={t('root_wallet.lbl_btn_create_new_address')} onClick={() => dialogToggle("create")} />
-        <Button icon="add" text={t('root_wallet.lbl_btn_import_from_seed')} onClick={() => dialogToggle("seed_phrase")} />
-        <Button icon="import" text={t('root_wallet.lbl_btn_import_from_json')} onClick={() => dialogToggle("json")} />
+        <Button icon="new-object" text={t("root_wallet.lbl_btn_create_new_address")} onClick={() => dialogToggle("create")} />
+        <Button icon="add" text={t("root_wallet.lbl_btn_import_from_seed")} onClick={() => dialogToggle("seed_phrase")} />
+        <Button icon="import" text={t("root_wallet.lbl_btn_import_from_json")} onClick={() => dialogToggle("json")} />
       </Card>
     </div>
   );

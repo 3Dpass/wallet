@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 export default function useToaster(): ToasterInstance {
   const { t } = useTranslation();
   const dummy = {
-    show: () => t('commons.lbl_loading'),
+    show: () => t("commons.lbl_loading"),
     dismiss() {},
     clear() {},
     getToasts() {

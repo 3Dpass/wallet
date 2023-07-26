@@ -38,7 +38,7 @@ export default function DialogImportAddress({ isOpen, showPassword, onImport, on
           <TextArea className="w-full font-mono" rows={5} onChange={handleSeedPhraseChange} value={data.seed_phrase} />
           {canPaste && (
             <div className="text-center">
-              <Button icon="clipboard" text={t('dlg_import_address.lbl_btn_paste')} onClick={handlePaste} />
+              <Button icon="clipboard" text={t("dlg_import_address.lbl_btn_paste")} onClick={handlePaste} />
             </div>
           )}
           {showPassword && (
@@ -47,7 +47,7 @@ export default function DialogImportAddress({ isOpen, showPassword, onImport, on
               large={true}
               className="font-mono"
               spellCheck={false}
-              placeholder={t('dlg_import_address.lbl_passphrase')}
+              placeholder={t("dlg_import_address.lbl_passphrase")}
               onChange={(e) => setData((prev) => ({ ...prev, passphrase: e.target.value }))}
               value={data.passphrase}
               leftElement={<Icon icon="lock" />}
@@ -56,8 +56,13 @@ export default function DialogImportAddress({ isOpen, showPassword, onImport, on
         </div>
         <div className={Classes.DIALOG_FOOTER}>
           <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} />
-            <Button intent={Intent.PRIMARY} onClick={() => onImport(data.seed_phrase, data.passphrase)} icon="add" text={t('dlg_import_address.lbl_btn_import')} />
+            <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} />
+            <Button
+              intent={Intent.PRIMARY}
+              onClick={() => onImport(data.seed_phrase, data.passphrase)}
+              icon="add"
+              text={t("dlg_import_address.lbl_btn_import")}
+            />
           </div>
         </div>
       </Dialog>

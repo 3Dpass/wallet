@@ -49,7 +49,7 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t('messages.lbl_account_locked'),
+        message: t("messages.lbl_account_locked"),
       });
       return;
     }
@@ -61,7 +61,7 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: t('messages.lbl_pool_difficulty_set'),
+        message: t("messages.lbl_pool_difficulty_set"),
       });
     } catch (e: any) {
       toaster.show({
@@ -76,28 +76,35 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
   }
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title={t('dlg_pool_difficulty.lbl_title')} onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog
+      isOpen={isOpen}
+      usePortal={true}
+      onOpening={handleOnOpening}
+      title={t("dlg_pool_difficulty.lbl_title")}
+      onClose={onClose}
+      className="w-[90%] sm:w-[640px]"
+    >
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <NumericInput
           disabled={isLoading}
           buttonPosition={"none"}
           large={true}
           fill={true}
-          placeholder={t('dlg_pool_difficulty.lbl_pool_difficulty')}
+          placeholder={t("dlg_pool_difficulty.lbl_pool_difficulty")}
           onValueChange={handleDifficultyChange}
           value={data.difficulty}
         />
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
+          <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="arrow-right"
             loading={isLoading}
-            text={t('dlg_pool_difficulty.lbl_btn_set_difficulty')}
+            text={t("dlg_pool_difficulty.lbl_btn_set_difficulty")}
           />
         </div>
       </div>

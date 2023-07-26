@@ -9,7 +9,7 @@ export type IPool = {
 export type IPoolBox = {
   pools: IPool[];
   poolIds: string[];
-}
+};
 
 export const convertPool = (poolsSource: [StorageKey<AnyTuple>, Codec][]): IPoolBox => {
   let pools: IPool[] = [];
@@ -18,14 +18,14 @@ export const convertPool = (poolsSource: [StorageKey<AnyTuple>, Codec][]): IPool
   poolsSource.forEach(function (p: [StorageKey<AnyTuple>, Codec]) {
     currentPoolId = (p[0].toHuman() as string[])[0];
     if (currentPoolId && p[1]) {
-      pools.push({ poolId: currentPoolId, poolMembers: (p[1].toHuman() as string[]) });
+      pools.push({ poolId: currentPoolId, poolMembers: p[1].toHuman() as string[] });
       poolIds.push(currentPoolId);
     }
-  })
+  });
   return {
     pools: pools,
     poolIds: poolIds,
-  }
+  };
 };
 
 export const poolsWithMember = (poolBox: IPoolBox, accountId: string): IPoolBox => {
@@ -40,5 +40,5 @@ export const poolsWithMember = (poolBox: IPoolBox, accountId: string): IPoolBox 
   return {
     pools: poolsNew,
     poolIds: poolIdsNew,
-  }
+  };
 };

@@ -85,7 +85,7 @@ export default function Account({ pair }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: t('messages.lbl_kyc_changed'),
+        message: t("messages.lbl_kyc_changed"),
       });
     } catch (e: any) {
       showError(e.message);
@@ -146,7 +146,7 @@ export default function Account({ pair }: IProps) {
     toaster.show({
       icon: "tick",
       intent: Intent.SUCCESS,
-      message: t('messages.lbl_address_copied'),
+      message: t("messages.lbl_address_copied"),
     });
   }, [pair, toaster]);
 
@@ -161,7 +161,7 @@ export default function Account({ pair }: IProps) {
       toaster.show({
         icon: "tick",
         intent: Intent.SUCCESS,
-        message: t('messages.lbl_unlock_request_sent'),
+        message: t("messages.lbl_unlock_request_sent"),
       });
     } catch (e: any) {
       showError(e.message);
@@ -174,7 +174,7 @@ export default function Account({ pair }: IProps) {
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
     if (isLocked) {
-      showError(t('messages.lbl_account_locked'));
+      showError(t("messages.lbl_account_locked"));
       return;
     }
     setIsCreatePoolLoading(true);
@@ -200,14 +200,14 @@ export default function Account({ pair }: IProps) {
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: t('messages.lbl_mining_pool_created'),
+          message: t("messages.lbl_mining_pool_created"),
         });
         setPoolIds([pair.address, ...poolIds]);
       });
       toaster.show({
         icon: "time",
         intent: Intent.PRIMARY,
-        message: t('messages.lbl_creating_mining_pool'),
+        message: t("messages.lbl_creating_mining_pool"),
       });
     } catch (e: any) {
       setIsCreatePoolLoading(false);
@@ -226,8 +226,8 @@ export default function Account({ pair }: IProps) {
   const dialogElements = (
     <>
       <Alert
-        cancelButtonText={t('commons.lbl_btn_cancel')}
-        confirmButtonText={t('commons.lbl_btn_delete')}
+        cancelButtonText={t("commons.lbl_btn_cancel")}
+        confirmButtonText={t("commons.lbl_btn_delete")}
         icon="cross"
         intent={Intent.DANGER}
         isOpen={dialogs.delete}
@@ -237,7 +237,7 @@ export default function Account({ pair }: IProps) {
         onConfirm={handleAddressDelete}
       >
         <p>
-          {t('messages.lbl_delete_confirmation_1')} <code className="block my-3">{pair?.address}</code> {t('messages.lbl_delete_confirmation_2')}
+          {t("messages.lbl_delete_confirmation_1")} <code className="block my-3">{pair?.address}</code> {t("messages.lbl_delete_confirmation_2")}
         </p>
       </Alert>
       <DialogSendFunds pair={pair} isOpen={dialogs.send} onAfterSubmit={() => dialogToggle("send")} onClose={() => dialogToggle("send")} />
@@ -277,41 +277,46 @@ export default function Account({ pair }: IProps) {
         {balances && (
           <>
             <div className="grid grid-cols-3 gap-1 py-2">
-              <TitledValue title={t('root.lbl_total_balance')} value={<FormattedAmount value={balances.freeBalance.toBigInt()} />} />
-              <TitledValue title={t('root.lbl_transferable')} value={<FormattedAmount value={balances.availableBalance.toBigInt()} />} />
-              <TitledValue title={t('root.lbl_locked')} value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />} />
+              <TitledValue title={t("root.lbl_total_balance")} value={<FormattedAmount value={balances.freeBalance.toBigInt()} />} />
+              <TitledValue title={t("root.lbl_transferable")} value={<FormattedAmount value={balances.availableBalance.toBigInt()} />} />
+              <TitledValue title={t("root.lbl_locked")} value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />} />
             </div>
             {accountLocked && (
               <div className="my-2 text-center">
-                {t('root.lbl_account_is_password_protected_1')} <Icon icon="lock" /> {t('root.lbl_account_is_password_protected_2')}{" "}
+                {t("root.lbl_account_is_password_protected_1")} <Icon icon="lock" /> {t("root.lbl_account_is_password_protected_2")}{" "}
                 <span onClick={handleUnlockAccount} className="text-white underline underline-offset-4 cursor-pointer">
-                {t('root.lbl_account_is_password_protected_3')}
+                  {t("root.lbl_account_is_password_protected_3")}
                 </span>{" "}
-                {t('root.lbl_account_is_password_protected_4')}
+                {t("root.lbl_account_is_password_protected_4")}
               </div>
             )}
             <div className="grid grid-cols-3 gap-1">
-              <Button icon="send-to" text={t('root.lbl_btn_send')} onClick={() => dialogToggle("send")} disabled={accountLocked} />
-              <Button icon="duplicate" text={t('commons.lbl_btn_copy')} onClick={handleCopyAddress} />
-              <Button icon="endorsed" text={t('root.lbl_btn_sign_verify')} onClick={handleSignVerify} disabled={accountLocked} />
-              <Button icon="unlock" text={t('root.lbl_btn_unlock')} onClick={handleUnlockFundsClick} disabled={balances.lockedBalance.toBigInt() <= 0 || accountLocked} />
-              <Button icon="lock" text={t('root.lbl_btn_lock')} onClick={handleLockFundsClick} disabled={accountLocked} />
+              <Button icon="send-to" text={t("root.lbl_btn_send")} onClick={() => dialogToggle("send")} disabled={accountLocked} />
+              <Button icon="duplicate" text={t("commons.lbl_btn_copy")} onClick={handleCopyAddress} />
+              <Button icon="endorsed" text={t("root.lbl_btn_sign_verify")} onClick={handleSignVerify} disabled={accountLocked} />
+              <Button
+                icon="unlock"
+                text={t("root.lbl_btn_unlock")}
+                onClick={handleUnlockFundsClick}
+                disabled={balances.lockedBalance.toBigInt() <= 0 || accountLocked}
+              />
+              <Button icon="lock" text={t("root.lbl_btn_lock")} onClick={handleLockFundsClick} disabled={accountLocked} />
               {!pair.meta.isInjected && (
                 <>
-                  <Button icon="delete" text={t('root.lbl_btn_remove')} onClick={() => dialogToggle("delete")} />
+                  <Button icon="delete" text={t("root.lbl_btn_remove")} onClick={() => dialogToggle("delete")} />
                 </>
               )}
               {!accountLocked && (
                 <div className="flex items-center justify-center gap-1 cursor-pointer group" onClick={() => dialogToggle("identity")}>
                   {isRegistrar ? (
-                    <span className="font-bold underline underline-offset-2 text-center">{t('root.lbl_judgements_requests')}&nbsp;&rarr;</span>
+                    <span className="font-bold underline underline-offset-2 text-center">{t("root.lbl_judgements_requests")}&nbsp;&rarr;</span>
                   ) : (
                     <>
-                      <span className="group-hover:underline underline-offset-2">{t('root.lbl_identity')}:</span>
+                      <span className="group-hover:underline underline-offset-2">{t("root.lbl_identity")}:</span>
                       {hasIdentity ? (
                         <Icon className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`} icon="endorsed" size={IconSize.LARGE} />
                       ) : (
-                        <span className="font-bold underline underline-offset-2">{t('root.lbl_identity_not_claimed')} &rarr;</span>
+                        <span className="font-bold underline underline-offset-2">{t("root.lbl_identity_not_claimed")} &rarr;</span>
                       )}
                     </>
                   )}
@@ -320,27 +325,37 @@ export default function Account({ pair }: IProps) {
             </div>
             {apiAdvancedMode && (
               <>
-                <Text className="font-bold pt-4 pb-2">{t('root.lbl_pool_actions')}</Text>
+                <Text className="font-bold pt-4 pb-2">{t("root.lbl_pool_actions")}</Text>
                 <div className="grid grid-cols-3 gap-1">
-                  {!poolAlreadyExist && <Button text={t('root.lbl_btn_create')} loading={isCreatePoolLoading} onClick={handleCreatePoolClick} disabled={accountLocked} />}
+                  {!poolAlreadyExist && (
+                    <Button text={t("root.lbl_btn_create")} loading={isCreatePoolLoading} onClick={handleCreatePoolClick} disabled={accountLocked} />
+                  )}
                   {poolAlreadyExist && (
                     <div className="grid grid-cols-2 gap-1">
-                      <Button text={t('root.lbl_btn_kyc')} onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />
-                      <Button text={t('root.lbl_btn_no_kyc')} onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />
+                      <Button text={t("root.lbl_btn_kyc")} onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />
+                      <Button text={t("root.lbl_btn_no_kyc")} onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />
                     </div>
                   )}
-                  {poolAlreadyExist && <Button text={t('root.lbl_btn_close_pool')} onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />}
-                  <Button text={t('root.lbl_btn_fee')} onClick={() => dialogToggle("set_pool_interest")} disabled={accountLocked || !poolAlreadyExist} />
+                  {poolAlreadyExist && (
+                    <Button text={t("root.lbl_btn_close_pool")} onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />
+                  )}
+                  <Button
+                    text={t("root.lbl_btn_fee")}
+                    onClick={() => dialogToggle("set_pool_interest")}
+                    disabled={accountLocked || !poolAlreadyExist}
+                  />
                   <Button
                     className="text-center"
-                    text={t('root.lbl_btn_difficulty')}
+                    text={t("root.lbl_btn_difficulty")}
                     onClick={() => dialogToggle("set_pool_difficulty")}
                     disabled={accountLocked || !poolAlreadyExist}
                   />
-                  {poolAlreadyExist && <Button text={t('root.lbl_btn_add_miner')} onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
-                  {poolAlreadyExist && <Button text={t('root.lbl_btn_remove_miner')} onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />}
-                  {!poolAlreadyExist && <Button text={t('root.lbl_btn_join')} onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />}
-                  {!poolAlreadyExist && <Button text={t('root.lbl_btn_leave')} onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />}
+                  {poolAlreadyExist && <Button text={t("root.lbl_btn_add_miner")} onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
+                  {poolAlreadyExist && (
+                    <Button text={t("root.lbl_btn_remove_miner")} onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />
+                  )}
+                  {!poolAlreadyExist && <Button text={t("root.lbl_btn_join")} onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />}
+                  {!poolAlreadyExist && <Button text={t("root.lbl_btn_leave")} onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />}
                 </div>
               </>
             )}

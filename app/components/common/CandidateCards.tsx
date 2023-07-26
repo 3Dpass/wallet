@@ -58,7 +58,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: t('messages.lbl_judgement_sent'),
+        message: t("messages.lbl_judgement_sent"),
       });
     } catch (e: any) {
       toaster.show({
@@ -73,9 +73,9 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
   }
 
   if (queryEvents.loading || !dataState.candidateList) return <Spinner />;
-  if (queryEvents.error) return <Error>{t('messages.lbl_error_loading_block_data')}</Error>;
+  if (queryEvents.error) return <Error>{t("messages.lbl_error_loading_block_data")}</Error>;
 
-  if (!dataState.candidateList || dataState.candidateList.length == 0) return <div>{t('commons.lbl_no_judgement_requested')}</div>;
+  if (!dataState.candidateList || dataState.candidateList.length == 0) return <div>{t("commons.lbl_no_judgement_requested")}</div>;
 
   return (
     <div>
@@ -90,7 +90,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
                   void handleSubmitAddJudgement(candidateInfo.account);
                 }}
                 loading={addressLoading == candidateInfo.account}
-                text={t('commons.lbl_add_judgement')}
+                text={t("commons.lbl_add_judgement")}
                 className="absolute top-2 right-2"
               />
             </div>

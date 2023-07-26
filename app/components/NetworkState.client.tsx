@@ -100,11 +100,11 @@ export default function NetworkState() {
   return (
     <Card className="mb-4" elevation={Elevation.ZERO}>
       <div className={cardClassName}>
-        <TitledValue title={t('root.lbl_best_block')} value={networkState.bestNumber.toLocaleString()} />
-        <TitledValue title={t('root.lbl_finalized')} value={networkState.bestNumberFinalized.toLocaleString()} />
-        <TitledValue title={t('root.lbl_latest_block')} value={<TimeAgo date={networkState.timestamp} live={true} />} />
-        <TitledValue title={t('root.lbl_target')} value={formatDuration(networkState.targetBlockTime)} />
-        <TitledValue title={t('root.lbl_total_issuance')} value={<FormattedAmount value={networkState.totalIssuance} />} />
+        <TitledValue title={t("root.lbl_best_block")} value={networkState.bestNumber.toLocaleString()} />
+        <TitledValue title={t("root.lbl_finalized")} value={networkState.bestNumberFinalized.toLocaleString()} />
+        <TitledValue title={t("root.lbl_latest_block")} value={<TimeAgo date={networkState.timestamp} live={true} />} />
+        <TitledValue title={t("root.lbl_target")} value={formatDuration(networkState.targetBlockTime)} />
+        <TitledValue title={t("root.lbl_total_issuance")} value={<FormattedAmount value={networkState.totalIssuance} />} />
       </div>
     </Card>
   );

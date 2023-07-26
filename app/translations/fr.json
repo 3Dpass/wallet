@@ -1,204 +1,204 @@
 {
-    "translation": {
-        "commons": {
-            "lbl_btn_cancel": "Annuler",
-            "lbl_btn_delete": "Supprimer",
-            "lbl_btn_copy": "Copier",
-            "lbl_btn_paste": "Coller",
-            "lbl_btn_close": "Fermer",
-            "lbl_cancelled": "Action annulée",
-            "lbl_passphrase": "Phrase secrète",
-            "lbl_amount": "Montant",
-            "lbl_add_judgement": "Ajouter un jugement",
-            "lbl_no_judgement_requested": "Aucune demande de jugement",
-            "lbl_loading": "Chargement en cours...",
-            "lbl_block": "Bloc",
-            "lbl_date": "Date"
-        },
-        "messages": {
-            "lbl_account_locked": "Compte verrouillé",
-            "lbl_kyc_changed": "Le KYC de la piscine de minage a été modifié",
-            "lbl_address_copied": "Adresse copiée dans le presse-papiers",
-            "lbl_unlock_request_sent": "Demande de déverrouillage envoyée",
-            "lbl_mining_pool_created": "La piscine de minage a été créée",
-            "lbl_creating_mining_pool": "Création de la piscine de minage...",
-            "lbl_delete_confirmation_1": "Êtes-vous sûr de vouloir supprimer l'adresse ",
-            "lbl_delete_confirmation_2": " du portefeuille ?",
-            "lbl_wallet_already_imported": "Portefeuille déjà importé",
-            "lbl_wallet_seed_phrase_copied": "Phrase de récupération du portefeuille copiée dans le presse-papiers",
-            "lbl_closing_mining_pool": "La piscine de minage sera fermée",
-            "lbl_judgement_requested": "Vous avez demandé un jugement.",
-            "lbl_working_on_request": "Nous travaillons actuellement sur votre demande. Veuillez patienter pendant qu'elle est traitée par le réseau, cela peut prendre environ 1 à 3 minutes.",
-            "lbl_joined_pool": "Vous avez rejoint la piscine de minage",
-            "lbl_left_mining_pool": "Vous avez quitté la piscine de minage",
-            "lbl_lock_requested": "Demande de verrouillage soumise",
-            "lbl_removed_from_mining_pool": "Le membre a été retiré de la piscine de minage",
-            "lbl_tx_sent": "Transaction envoyée",
-            "lbl_pool_difficulty_set": "La difficulté de la piscine a été définie",
-            "lbl_interest_set": "L'intérêt de la piscine a été défini",
-            "lbl_message_copied": "Message copié dans le presse-papiers !",
-            "lbl_raw_messages_not_supported": "Le signataire ne prend pas en charge la signature des messages bruts",
-            "lbl_judgement_sent": "Votre jugement a été envoyé",
-            "lbl_error_loading_block_data": "Erreur lors du chargement des données du bloc, essayez de recharger."
-        },
-        "root": {
-            "lbl_app_name": "Portefeuille",
-            "lbl_search_box": "Rechercher une adresse ou un numéro de bloc...",
-            "lbl_total_balance": "Solde total",
-            "lbl_transferable": "Transférable",
-            "lbl_locked": "Verrouillé",
-            "lbl_btn_send": "Envoyer...",
-            "lbl_btn_sign_verify": "Signer et vérifier",
-            "lbl_btn_unlock": "Déverrouiller",
-            "lbl_btn_lock": "Verrouiller...",
-            "lbl_btn_remove": "Supprimer",
-            "lbl_identity": "Identité",
-            "lbl_identity_not_claimed": "réclamer",
-            "lbl_best_block": "Meilleur bloc",
-            "lbl_finalized": "Finalisé",
-            "lbl_latest_block": "Dernier bloc",
-            "lbl_target": "Cible",
-            "lbl_total_issuance": "Émission totale",
-            "lbl_block": "Bloc",
-            "lbl_block_not_finalized": "Non finalisé",
-            "lbl_object_hash_algo": "Algorithme de hachage d'objet :",
-            "lbl_btn_kyc": "KYC",
-            "lbl_btn_no_kyc": "pas de KYC",
-            "lbl_btn_create": "Créer",
-            "lbl_btn_fee": "Configurer les frais",
-            "lbl_btn_difficulty": "Configurer la difficulté",
-            "lbl_btn_join": "Rejoindre",
-            "lbl_btn_leave": "Quitter",
-            "lbl_btn_close_pool": "Fermer",
-            "lbl_btn_add_miner": "Ajouter un mineur",
-            "lbl_btn_remove_miner": "Supprimer un mineur",
-            "lbl_pool_actions": "Actions de la piscine",
-            "lbl_judgements_requests": "Demandes de jugements",
-            "lbl_account_is_password_protected_1": "Le compte est protégé par ",
-            "lbl_account_is_password_protected_2": ", vous devez le ",
-            "lbl_account_is_password_protected_3": "déverrouiller",
-            "lbl_account_is_password_protected_4": " avant de l'utiliser"
-        },
-        "root_wallet": {
-            "lbl_btn_create_new_address": "Créer une nouvelle adresse...",
-            "lbl_btn_import_from_seed": "Importer à partir de la phrase de récupération...",
-            "lbl_btn_import_from_json": "Importer à partir de JSON..."
-        },
-        "dlg_identity": {
-            "lbl_title": "Identité",
-            "lbl_select_registrar": "Veuillez sélectionner un bureau d'enregistrement :",
-            "lbl_no_results": "Aucun résultat",
-            "lbl_placeholder_registrar": "Sélectionnez un bureau d'enregistrement",
-            "lbl_placeholder_display_name": "Entrez un nom d'affichage",
-            "lbl_placeholder_legal_name": "Entrez un nom légal",
-            "lbl_placeholder_email": "Entrez une adresse e-mail",
-            "lbl_placeholder_web_address": "Entrez une adresse web",
-            "lbl_placeholder_twitter": "Entrez un compte Twitter",
-            "lbl_placeholder_discord": "Entrez un compte Discord",
-            "lbl_placeholder_riot_name": "Entrez un nom Riot",
-            "lbl_placeholder_request_judgement": "Demande de jugement"
-        },
-        "dlg_join_pool": {
-            "lbl_title": "Rejoindre une piscine de minage",
-            "lbl_no_results": "Aucun résultat.",
-            "lbl_btn_select_pool": "Sélectionner une piscine",
-            "lbl_btn_join_pool": "Rejoindre la piscine"
-        },
-        "dlg_leave_pool": {
-            "lbl_title": "Quitter une piscine de minage",
-            "lbl_no_results": "Aucun résultat.",
-            "lbl_btn_select_pool": "Sélectionner une piscine",
-            "lbl_btn_leave_pool": "Quitter la piscine"
-        },
-        "dlg_remove_miner": {
-            "lbl_title": "Supprimer un mineur",
-            "lbl_no_results": "Aucun résultat.",
-            "lbl_btn_select_miner": "Sélectionner un mineur",
-            "lbl_btn_remove_miner": "Supprimer un mineur"
-        },
-        "dlg_lock_funds": {
-            "lbl_release_lock_after": "Libérer les fonds après ce bloc",
-            "lbl_block_number": "Numéro de bloc",
-            "lbl_chk_extended": "Prolonger automatiquement chaque ",
-            "lbl_chk_extended_1": " blocs",
-            "lbl_btn_lock_funds": "Verrouiller les fonds"
-        },
-        "dlg_import_address": {
-            "lbl_btn_import": "Importer",
-            "lbl_btn_paste": "Coller",
-            "lbl_passphrase": "Phrase secrète"
-        },
-        "dlg_wallet": {
-            "lbl_title": "Adresse",
-            "lbl_btn_copy": "Copier",
-            "lbl_keep_seed": "Conservez votre phrase de récupération en lieu sûr. Importez la phrase de récupération dans votre portefeuille pour récupérer le compte.",
-            "lbl_password": "Phrase secrète",
-            "lbl_more": "Plus",
-            "lbl_create": "Créer"
-        },
-        "dlg_close_pool": {
-            "lbl_title": "Fermer la piscine de minage",
-            "lbl_btn_close_pool": "Fermer la piscine"
-        },
-        "dlg_miner": {
-            "lbl_miner_address": "Entrez une adresse de mineur",
-            "lbl_btn_add_miner": "Ajouter un mineur",
-            "lbl_member_added_to_pool": "Le membre a été ajouté à la piscine de minage"
-        },
-        "dlg_send": {
-            "lbl_address": "Entrez l'adresse de destination",
-            "lbl_amount": "Montant",
-            "lbl_tip": "Entrez des pourboires facultatifs pour augmenter la priorité de la transaction",
-            "lbl_btn_send": "Envoyer"
-        },
-        "dlg_pool_difficulty": {
-            "lbl_title": "Définir la difficulté de la piscine",
-            "lbl_pool_difficulty": "Difficulté de la piscine",
-            "lbl_btn_set_difficulty": "Définir la difficulté"
-        },
-        "dlg_pool_interest": {
-            "lbl_title": "Définir l'intérêt de la piscine",
-            "lbl_pool_interest": "pourcentage",
-            "lbl_btn_set_interest": "Définir l'intérêt"
-        },
-        "dlg_settings": {
-            "lbl_api_address": "Adresse RPC API",
-            "lbl_explorer_graphql": "Explorer GraphQL",
-            "lbl_advanced_mode": "Mode avancé",
-            "lbl_btn_save": "Enregistrer"
-        },
-        "dlg_sign_verify": {
-            "lbl_title": "Signer et vérifier un message",
-            "lbl_signed_message": "Message signé",
-            "lbl_rd_sign": "Signer",
-            "lbl_rd_verify": "Vérifier",
-            "lbl_placeholder_message": "Message",
-            "lbl_btn_sign": "Signer",
-            "lbl_verified": "Vérifié !",
-            "lbl_invalid_signature": "Signature invalide"
-        },
-        "dlg_unlock_account": {
-            "lbl_title": "Déverrouiller le compte",
-            "lbl_btn_unlock": "Déverrouiller"
-        },
-        "user_card": {
-            "lbl_no_display_name": "PAS DE NOM D'AFFICHAGE",
-            "lbl_email": "E-mail",
-            "lbl_website": "Site Web",
-            "lbl_twitter": "Twitter"
-        },
-        "screen_address": {
-            "lbl_title": "Adresse",
-            "lbl_extrinsic": "Extrinsèque",
-            "lbl_value": "Valeur"
-        },
-        "screen_block": {
-            "lbl_hash": "Hachage",
-            "lbl_spec_name": "Nom de la spécification",
-            "lbl_spec_version": "Version de la spécification",
-            "lbl_extrinsics": "Extrinsèques",
-            "lbl_events": "Événements",
-            "lbl_logs": "Journaux"
-        }
+  "translation": {
+    "commons": {
+      "lbl_btn_cancel": "Annuler",
+      "lbl_btn_delete": "Supprimer",
+      "lbl_btn_copy": "Copier",
+      "lbl_btn_paste": "Coller",
+      "lbl_btn_close": "Fermer",
+      "lbl_cancelled": "Action annulée",
+      "lbl_passphrase": "Phrase secrète",
+      "lbl_amount": "Montant",
+      "lbl_add_judgement": "Ajouter un jugement",
+      "lbl_no_judgement_requested": "Aucune demande de jugement",
+      "lbl_loading": "Chargement en cours...",
+      "lbl_block": "Bloc",
+      "lbl_date": "Date"
+    },
+    "messages": {
+      "lbl_account_locked": "Compte verrouillé",
+      "lbl_kyc_changed": "Le KYC de la piscine de minage a été modifié",
+      "lbl_address_copied": "Adresse copiée dans le presse-papiers",
+      "lbl_unlock_request_sent": "Demande de déverrouillage envoyée",
+      "lbl_mining_pool_created": "La piscine de minage a été créée",
+      "lbl_creating_mining_pool": "Création de la piscine de minage...",
+      "lbl_delete_confirmation_1": "Êtes-vous sûr de vouloir supprimer l'adresse ",
+      "lbl_delete_confirmation_2": " du portefeuille ?",
+      "lbl_wallet_already_imported": "Portefeuille déjà importé",
+      "lbl_wallet_seed_phrase_copied": "Phrase de récupération du portefeuille copiée dans le presse-papiers",
+      "lbl_closing_mining_pool": "La piscine de minage sera fermée",
+      "lbl_judgement_requested": "Vous avez demandé un jugement.",
+      "lbl_working_on_request": "Nous travaillons actuellement sur votre demande. Veuillez patienter pendant qu'elle est traitée par le réseau, cela peut prendre environ 1 à 3 minutes.",
+      "lbl_joined_pool": "Vous avez rejoint la piscine de minage",
+      "lbl_left_mining_pool": "Vous avez quitté la piscine de minage",
+      "lbl_lock_requested": "Demande de verrouillage soumise",
+      "lbl_removed_from_mining_pool": "Le membre a été retiré de la piscine de minage",
+      "lbl_tx_sent": "Transaction envoyée",
+      "lbl_pool_difficulty_set": "La difficulté de la piscine a été définie",
+      "lbl_interest_set": "L'intérêt de la piscine a été défini",
+      "lbl_message_copied": "Message copié dans le presse-papiers !",
+      "lbl_raw_messages_not_supported": "Le signataire ne prend pas en charge la signature des messages bruts",
+      "lbl_judgement_sent": "Votre jugement a été envoyé",
+      "lbl_error_loading_block_data": "Erreur lors du chargement des données du bloc, essayez de recharger."
+    },
+    "root": {
+      "lbl_app_name": "Portefeuille",
+      "lbl_search_box": "Rechercher une adresse ou un numéro de bloc...",
+      "lbl_total_balance": "Solde total",
+      "lbl_transferable": "Transférable",
+      "lbl_locked": "Verrouillé",
+      "lbl_btn_send": "Envoyer...",
+      "lbl_btn_sign_verify": "Signer et vérifier",
+      "lbl_btn_unlock": "Déverrouiller",
+      "lbl_btn_lock": "Verrouiller...",
+      "lbl_btn_remove": "Supprimer",
+      "lbl_identity": "Identité",
+      "lbl_identity_not_claimed": "réclamer",
+      "lbl_best_block": "Meilleur bloc",
+      "lbl_finalized": "Finalisé",
+      "lbl_latest_block": "Dernier bloc",
+      "lbl_target": "Cible",
+      "lbl_total_issuance": "Émission totale",
+      "lbl_block": "Bloc",
+      "lbl_block_not_finalized": "Non finalisé",
+      "lbl_object_hash_algo": "Algorithme de hachage d'objet :",
+      "lbl_btn_kyc": "KYC",
+      "lbl_btn_no_kyc": "pas de KYC",
+      "lbl_btn_create": "Créer",
+      "lbl_btn_fee": "Configurer les frais",
+      "lbl_btn_difficulty": "Configurer la difficulté",
+      "lbl_btn_join": "Rejoindre",
+      "lbl_btn_leave": "Quitter",
+      "lbl_btn_close_pool": "Fermer",
+      "lbl_btn_add_miner": "Ajouter un mineur",
+      "lbl_btn_remove_miner": "Supprimer un mineur",
+      "lbl_pool_actions": "Actions de la piscine",
+      "lbl_judgements_requests": "Demandes de jugements",
+      "lbl_account_is_password_protected_1": "Le compte est protégé par ",
+      "lbl_account_is_password_protected_2": ", vous devez le ",
+      "lbl_account_is_password_protected_3": "déverrouiller",
+      "lbl_account_is_password_protected_4": " avant de l'utiliser"
+    },
+    "root_wallet": {
+      "lbl_btn_create_new_address": "Créer une nouvelle adresse...",
+      "lbl_btn_import_from_seed": "Importer à partir de la phrase de récupération...",
+      "lbl_btn_import_from_json": "Importer à partir de JSON..."
+    },
+    "dlg_identity": {
+      "lbl_title": "Identité",
+      "lbl_select_registrar": "Veuillez sélectionner un bureau d'enregistrement :",
+      "lbl_no_results": "Aucun résultat",
+      "lbl_placeholder_registrar": "Sélectionnez un bureau d'enregistrement",
+      "lbl_placeholder_display_name": "Entrez un nom d'affichage",
+      "lbl_placeholder_legal_name": "Entrez un nom légal",
+      "lbl_placeholder_email": "Entrez une adresse e-mail",
+      "lbl_placeholder_web_address": "Entrez une adresse web",
+      "lbl_placeholder_twitter": "Entrez un compte Twitter",
+      "lbl_placeholder_discord": "Entrez un compte Discord",
+      "lbl_placeholder_riot_name": "Entrez un nom Riot",
+      "lbl_placeholder_request_judgement": "Demande de jugement"
+    },
+    "dlg_join_pool": {
+      "lbl_title": "Rejoindre une piscine de minage",
+      "lbl_no_results": "Aucun résultat.",
+      "lbl_btn_select_pool": "Sélectionner une piscine",
+      "lbl_btn_join_pool": "Rejoindre la piscine"
+    },
+    "dlg_leave_pool": {
+      "lbl_title": "Quitter une piscine de minage",
+      "lbl_no_results": "Aucun résultat.",
+      "lbl_btn_select_pool": "Sélectionner une piscine",
+      "lbl_btn_leave_pool": "Quitter la piscine"
+    },
+    "dlg_remove_miner": {
+      "lbl_title": "Supprimer un mineur",
+      "lbl_no_results": "Aucun résultat.",
+      "lbl_btn_select_miner": "Sélectionner un mineur",
+      "lbl_btn_remove_miner": "Supprimer un mineur"
+    },
+    "dlg_lock_funds": {
+      "lbl_release_lock_after": "Libérer les fonds après ce bloc",
+      "lbl_block_number": "Numéro de bloc",
+      "lbl_chk_extended": "Prolonger automatiquement chaque ",
+      "lbl_chk_extended_1": " blocs",
+      "lbl_btn_lock_funds": "Verrouiller les fonds"
+    },
+    "dlg_import_address": {
+      "lbl_btn_import": "Importer",
+      "lbl_btn_paste": "Coller",
+      "lbl_passphrase": "Phrase secrète"
+    },
+    "dlg_wallet": {
+      "lbl_title": "Adresse",
+      "lbl_btn_copy": "Copier",
+      "lbl_keep_seed": "Conservez votre phrase de récupération en lieu sûr. Importez la phrase de récupération dans votre portefeuille pour récupérer le compte.",
+      "lbl_password": "Phrase secrète",
+      "lbl_more": "Plus",
+      "lbl_create": "Créer"
+    },
+    "dlg_close_pool": {
+      "lbl_title": "Fermer la piscine de minage",
+      "lbl_btn_close_pool": "Fermer la piscine"
+    },
+    "dlg_miner": {
+      "lbl_miner_address": "Entrez une adresse de mineur",
+      "lbl_btn_add_miner": "Ajouter un mineur",
+      "lbl_member_added_to_pool": "Le membre a été ajouté à la piscine de minage"
+    },
+    "dlg_send": {
+      "lbl_address": "Entrez l'adresse de destination",
+      "lbl_amount": "Montant",
+      "lbl_tip": "Entrez des pourboires facultatifs pour augmenter la priorité de la transaction",
+      "lbl_btn_send": "Envoyer"
+    },
+    "dlg_pool_difficulty": {
+      "lbl_title": "Définir la difficulté de la piscine",
+      "lbl_pool_difficulty": "Difficulté de la piscine",
+      "lbl_btn_set_difficulty": "Définir la difficulté"
+    },
+    "dlg_pool_interest": {
+      "lbl_title": "Définir l'intérêt de la piscine",
+      "lbl_pool_interest": "pourcentage",
+      "lbl_btn_set_interest": "Définir l'intérêt"
+    },
+    "dlg_settings": {
+      "lbl_api_address": "Adresse RPC API",
+      "lbl_explorer_graphql": "Explorer GraphQL",
+      "lbl_advanced_mode": "Mode avancé",
+      "lbl_btn_save": "Enregistrer"
+    },
+    "dlg_sign_verify": {
+      "lbl_title": "Signer et vérifier un message",
+      "lbl_signed_message": "Message signé",
+      "lbl_rd_sign": "Signer",
+      "lbl_rd_verify": "Vérifier",
+      "lbl_placeholder_message": "Message",
+      "lbl_btn_sign": "Signer",
+      "lbl_verified": "Vérifié !",
+      "lbl_invalid_signature": "Signature invalide"
+    },
+    "dlg_unlock_account": {
+      "lbl_title": "Déverrouiller le compte",
+      "lbl_btn_unlock": "Déverrouiller"
+    },
+    "user_card": {
+      "lbl_no_display_name": "PAS DE NOM D'AFFICHAGE",
+      "lbl_email": "E-mail",
+      "lbl_website": "Site Web",
+      "lbl_twitter": "Twitter"
+    },
+    "screen_address": {
+      "lbl_title": "Adresse",
+      "lbl_extrinsic": "Extrinsèque",
+      "lbl_value": "Valeur"
+    },
+    "screen_block": {
+      "lbl_hash": "Hachage",
+      "lbl_spec_name": "Nom de la spécification",
+      "lbl_spec_version": "Version de la spécification",
+      "lbl_extrinsics": "Extrinsèques",
+      "lbl_events": "Événements",
+      "lbl_logs": "Journaux"
     }
+  }
 }
