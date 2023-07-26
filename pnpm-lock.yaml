@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@apollo/client':
-    specifier: 3.7.15
-    version: 3.7.15(graphql@16.7.1)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+    specifier: 3.7.17
+    version: 3.7.17(graphql@16.7.1)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
   '@blueprintjs/core':
     specifier: 4.20.1
     version: 4.20.1(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
@@ -161,8 +161,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.18
     dev: false
 
-  /@apollo/client@3.7.15(graphql@16.7.1)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
-    resolution: {integrity: sha512-pLScjo4GAQRWKWyEg2J3FlQr9fbUAuADT0EI2+JlLf2BjaU9I7WUaZVD9w+0qNPE8BZqs53MRQq0OCm1QCW+eg==}
+  /@apollo/client@3.7.17(graphql@16.7.1)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
+    resolution: {integrity: sha512-0EErSHEtKPNl5wgWikHJbKFAzJ/k11O0WO2QyqZSHpdxdAnw7UWHY4YiLbHCFG7lhrD+NTQ3Z/H9Jn4rcikoJA==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
       graphql-ws: ^5.5.5
