@@ -46,10 +46,10 @@ dependencies:
     version: 12.3.2(@polkadot/util@12.3.2)
   '@react-three/drei':
     specifier: 9.80.0
-    version: 9.80.0(@react-three/fiber@8.13.6)(@types/three@0.154.0)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.153.0)
+    version: 9.80.0(@react-three/fiber@8.13.6)(@types/three@0.154.0)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.154.0)
   '@react-three/fiber':
     specifier: 8.13.6
-    version: 8.13.6(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.153.0)
+    version: 8.13.6(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.154.0)
   '@remix-run/dev':
     specifier: 1.19.1
     version: 1.19.1(@remix-run/serve@1.19.1)
@@ -132,11 +132,11 @@ dependencies:
     specifier: 3.3.3
     version: 3.3.3
   three:
-    specifier: 0.153.0
-    version: 0.153.0
+    specifier: 0.154.0
+    version: 0.154.0
   three-stdlib:
-    specifier: 2.23.7
-    version: 2.23.7(three@0.153.0)
+    specifier: 2.23.13
+    version: 2.23.13(three@0.154.0)
   typescript:
     specifier: 5.1.6
     version: 5.1.6
@@ -2740,7 +2740,7 @@ packages:
       react: 18.3.0-next-9c54b29b4-20230322
     dev: false
 
-  /@react-spring/three@9.6.1(@react-three/fiber@8.13.6)(react@18.3.0-next-9c54b29b4-20230322)(three@0.153.0):
+  /@react-spring/three@9.6.1(@react-three/fiber@8.13.6)(react@18.3.0-next-9c54b29b4-20230322)(three@0.154.0):
     resolution: {integrity: sha512-Tyw2YhZPKJAX3t2FcqvpLRb71CyTe1GvT3V+i+xJzfALgpk10uPGdGaQQ5Xrzmok1340DAeg2pR/MCfaW7b8AA==}
     peerDependencies:
       '@react-three/fiber': '>=6.0'
@@ -2751,16 +2751,16 @@ packages:
       '@react-spring/core': 9.6.1(react@18.3.0-next-9c54b29b4-20230322)
       '@react-spring/shared': 9.6.1(react@18.3.0-next-9c54b29b4-20230322)
       '@react-spring/types': 9.6.1
-      '@react-three/fiber': 8.13.6(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.153.0)
+      '@react-three/fiber': 8.13.6(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.154.0)
       react: 18.3.0-next-9c54b29b4-20230322
-      three: 0.153.0
+      three: 0.154.0
     dev: false
 
   /@react-spring/types@9.6.1:
     resolution: {integrity: sha512-POu8Mk0hIU3lRXB3bGIGe4VHIwwDsQyoD1F394OK7STTiX9w4dG3cTLljjYswkQN+hDSHRrj4O36kuVa7KPU8Q==}
     dev: false
 
-  /@react-three/drei@9.80.0(@react-three/fiber@8.13.6)(@types/three@0.154.0)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.153.0):
+  /@react-three/drei@9.80.0(@react-three/fiber@8.13.6)(@types/three@0.154.0)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.154.0):
     resolution: {integrity: sha512-quBD0Ap7ygf9Yg94keIQpQNnveNSKoZUge9ybHd6UgE9QTdpfkPF3YgzTJLbDEoZKepCTE9ngpwUgFy+cpL9Pg==}
     peerDependencies:
       '@react-three/fiber': '>=8.0'
@@ -2773,17 +2773,17 @@ packages:
     dependencies:
       '@babel/runtime': 7.22.6
       '@mediapipe/tasks-vision': 0.10.2
-      '@react-spring/three': 9.6.1(@react-three/fiber@8.13.6)(react@18.3.0-next-9c54b29b4-20230322)(three@0.153.0)
-      '@react-three/fiber': 8.13.6(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.153.0)
+      '@react-spring/three': 9.6.1(@react-three/fiber@8.13.6)(react@18.3.0-next-9c54b29b4-20230322)(three@0.154.0)
+      '@react-three/fiber': 8.13.6(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.154.0)
       '@use-gesture/react': 10.2.27(react@18.3.0-next-9c54b29b4-20230322)
-      camera-controls: 2.7.0(three@0.153.0)
+      camera-controls: 2.7.0(three@0.154.0)
       detect-gpu: 5.0.34
       glsl-noise: 0.0.0
       lodash.clamp: 4.0.3
       lodash.omit: 4.5.0
       lodash.pick: 4.4.0
-      maath: 0.6.0(@types/three@0.154.0)(three@0.153.0)
-      meshline: 3.1.6(three@0.153.0)
+      maath: 0.6.0(@types/three@0.154.0)(three@0.154.0)
+      meshline: 3.1.6(three@0.154.0)
       react: 18.3.0-next-9c54b29b4-20230322
       react-composer: 5.0.3(react@18.3.0-next-9c54b29b4-20230322)
       react-dom: 18.3.0-next-9c54b29b4-20230322(react@18.3.0-next-9c54b29b4-20230322)
@@ -2791,17 +2791,17 @@ packages:
       stats-gl: 1.0.4
       stats.js: 0.17.0
       suspend-react: 0.1.3(react@18.3.0-next-9c54b29b4-20230322)
-      three: 0.153.0
-      three-mesh-bvh: 0.6.3(three@0.153.0)
-      three-stdlib: 2.23.13(three@0.153.0)
-      troika-three-text: 0.47.2(three@0.153.0)
+      three: 0.154.0
+      three-mesh-bvh: 0.6.3(three@0.154.0)
+      three-stdlib: 2.23.13(three@0.154.0)
+      troika-three-text: 0.47.2(three@0.154.0)
       utility-types: 3.10.0
       zustand: 3.7.2(react@18.3.0-next-9c54b29b4-20230322)
     transitivePeerDependencies:
       - '@types/three'
     dev: false
 
-  /@react-three/fiber@8.13.6(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.153.0):
+  /@react-three/fiber@8.13.6(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)(three@0.154.0):
     resolution: {integrity: sha512-V49lldHcbsC7PMnnf4aYrMpHPQe8R7hJYL0AEFjqwioY0nkwga9A+Jx6lCLVG02DF03xwCfJZv5cjZCChffsWg==}
     peerDependencies:
       expo: '>=43.0'
@@ -2832,7 +2832,7 @@ packages:
       react-use-measure: 2.1.1(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
       scheduler: 0.21.0
       suspend-react: 0.1.3(react@18.3.0-next-9c54b29b4-20230322)
-      three: 0.153.0
+      three: 0.154.0
       zustand: 3.7.2(react@18.3.0-next-9c54b29b4-20230322)
     dev: false
 
@@ -4089,12 +4089,12 @@ packages:
     resolution: {integrity: sha512-dU+Tx2fsypxTgtLoE36npi3UqcjSSMNYfkqgmoEhtZrraP5VWq0K7FkWVTYa8eMPtnU/G2txVsfdCJTn9uzpuQ==}
     dev: false
 
-  /camera-controls@2.7.0(three@0.153.0):
+  /camera-controls@2.7.0(three@0.154.0):
     resolution: {integrity: sha512-HONMoMYHieOCQOoweS639bdWHP/P/fvVGR08imnECGVUp04mqGfsX/zp1ZufLeiAA5hA6i1JhP6SrnOwh01C0w==}
     peerDependencies:
       three: '>=0.126.1'
     dependencies:
-      three: 0.153.0
+      three: 0.154.0
     dev: false
 
   /caniuse-lite@1.0.30001517:
@@ -6732,14 +6732,14 @@ packages:
     hasBin: true
     dev: false
 
-  /maath@0.6.0(@types/three@0.154.0)(three@0.153.0):
+  /maath@0.6.0(@types/three@0.154.0)(three@0.154.0):
     resolution: {integrity: sha512-dSb2xQuP7vDnaYqfoKzlApeRcR2xtN8/f7WV/TMAkBC8552TwTLtOO0JTcSygkYMjNDPoo6V01jTw/aPi4JrMw==}
     peerDependencies:
       '@types/three': '>=0.144.0'
       three: '>=0.144.0'
     dependencies:
       '@types/three': 0.154.0
-      three: 0.153.0
+      three: 0.154.0
     dev: false
 
   /markdown-extensions@1.1.1:
@@ -6897,12 +6897,12 @@ packages:
     engines: {node: '>= 8'}
     dev: false
 
-  /meshline@3.1.6(three@0.153.0):
+  /meshline@3.1.6(three@0.154.0):
     resolution: {integrity: sha512-8JZJOdaL5oz3PI/upG8JvP/5FfzYUOhrkJ8np/WKvXzl0/PZ2V9pqTvCIjSKv+w9ccg2xb+yyBhXAwt6ier3ug==}
     peerDependencies:
       three: '>=0.137'
     dependencies:
-      three: 0.153.0
+      three: 0.154.0
     dev: false
 
   /meshoptimizer@0.18.1:
@@ -9211,15 +9211,15 @@ packages:
       any-promise: 1.3.0
     dev: false
 
-  /three-mesh-bvh@0.6.3(three@0.153.0):
+  /three-mesh-bvh@0.6.3(three@0.154.0):
     resolution: {integrity: sha512-xjuGLSI9nBATIsWcT/DnnNma5xXYyvBiXfUbhGLAFqItOlOKYF5JWsUOX+cuSAnSWovEoHzd5Emx23qKiByrlw==}
     peerDependencies:
       three: '>= 0.151.0'
     dependencies:
-      three: 0.153.0
+      three: 0.154.0
     dev: false
 
-  /three-stdlib@2.23.13(three@0.153.0):
+  /three-stdlib@2.23.13(three@0.154.0):
     resolution: {integrity: sha512-WU4XHs4E6szAyoREzTs5bUAc1WFadiz5jRjNlA7aIIqf+raT4jfA320P0XmlyZz/wJwmpZnOuki4kAFsmadkTQ==}
     peerDependencies:
       three: '>=0.128.0'
@@ -9234,31 +9234,12 @@ packages:
       mmd-parser: 1.0.4
       opentype.js: 1.3.4
       potpack: 1.0.2
-      three: 0.153.0
+      three: 0.154.0
       zstddec: 0.0.2
     dev: false
 
-  /three-stdlib@2.23.7(three@0.153.0):
-    resolution: {integrity: sha512-nxs0z6OthtN+Qy6N1Ee0ztR87IcaCEOF+WHCJCzjpu+37c+/IFDzI9igg7xgw4qWM05vETxUAkrXnLRxSZlgcw==}
-    peerDependencies:
-      three: '>=0.128.0'
-    dependencies:
-      '@types/draco3d': 1.4.2
-      '@types/offscreencanvas': 2019.7.0
-      '@types/webxr': 0.5.2
-      chevrotain: 10.5.0
-      draco3d: 1.5.6
-      fflate: 0.6.10
-      ktx-parse: 0.4.5
-      mmd-parser: 1.0.4
-      opentype.js: 1.3.4
-      potpack: 1.0.2
-      three: 0.153.0
-      zstddec: 0.0.2
-    dev: false
-
-  /three@0.153.0:
-    resolution: {integrity: sha512-OCP2/uQR6GcDpSLnJt/3a4mdS0kNWcbfUXIwLoEMgLzEUIVIYsSDwskpmOii/AkDM+BBwrl6+CKgrjX9+E2aWg==}
+  /three@0.154.0:
+    resolution: {integrity: sha512-Uzz8C/5GesJzv8i+Y2prEMYUwodwZySPcNhuJUdsVMH2Yn4Nm8qlbQe6qRN5fOhg55XB0WiLfTPBxVHxpE60ug==}
     dev: false
 
   /through2@2.0.5:
@@ -9322,24 +9303,24 @@ packages:
     hasBin: true
     dev: false
 
-  /troika-three-text@0.47.2(three@0.153.0):
+  /troika-three-text@0.47.2(three@0.154.0):
     resolution: {integrity: sha512-qylT0F+U7xGs+/PEf3ujBdJMYWbn0Qci0kLqI5BJG2kW1wdg4T1XSxneypnF05DxFqJhEzuaOR9S2SjiyknMng==}
     peerDependencies:
       three: '>=0.125.0'
     dependencies:
       bidi-js: 1.0.2
-      three: 0.153.0
-      troika-three-utils: 0.47.2(three@0.153.0)
+      three: 0.154.0
+      troika-three-utils: 0.47.2(three@0.154.0)
       troika-worker-utils: 0.47.2
       webgl-sdf-generator: 1.1.1
     dev: false
 
-  /troika-three-utils@0.47.2(three@0.153.0):
+  /troika-three-utils@0.47.2(three@0.154.0):
     resolution: {integrity: sha512-/28plhCxfKtH7MSxEGx8e3b/OXU5A0xlwl+Sbdp0H8FXUHKZDoksduEKmjQayXYtxAyuUiCRunYIv/8Vi7aiyg==}
     peerDependencies:
       three: '>=0.125.0'
     dependencies:
-      three: 0.153.0
+      three: 0.154.0
     dev: false
 
   /troika-worker-utils@0.47.2:
