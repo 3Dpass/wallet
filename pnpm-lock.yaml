@@ -9,14 +9,14 @@ dependencies:
     specifier: 3.7.17
     version: 3.7.17(graphql@16.7.1)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
   '@blueprintjs/core':
-    specifier: 4.20.1
-    version: 4.20.1(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+    specifier: 5.1.5
+    version: 5.1.5(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
   '@blueprintjs/popover2':
-    specifier: 1.14.9
-    version: 1.14.9(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+    specifier: 2.0.7
+    version: 2.0.7(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
   '@blueprintjs/select':
-    specifier: 4.9.22
-    version: 4.9.22(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+    specifier: 5.0.7
+    version: 5.0.7(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
   '@polkadot/api':
     specifier: 10.7.3
     version: 10.7.3
@@ -1487,14 +1487,14 @@ packages:
       to-fast-properties: 2.0.0
     dev: false
 
-  /@blueprintjs/colors@4.2.1:
-    resolution: {integrity: sha512-Cx7J2YnUuxn+fi+y5XtXnBB7+cFHN4xBrRkaAetp78i3VTCXjUk+d1omrOr8TqbRucUXTdrhbZOUHpzRLFcJpQ==}
+  /@blueprintjs/colors@5.0.1:
+    resolution: {integrity: sha512-Lz3TSHJBL7+Ar/pQS15ewbNMMZc9p0CyBTPvICx4sWVH2STIJrvh05f+rdOBsKyx+FdTGTBoISyw67ZOSXvWVA==}
     dependencies:
       tslib: 2.5.3
     dev: false
 
-  /@blueprintjs/core@4.20.1(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
-    resolution: {integrity: sha512-nKFXfWj8PQrkweLrCr6VazYd4JJHCwiAxcgT9zzoxbEs0mSJF4yI7Qjoh5QkomtWugXrVLCDSzs4uJdaO1reAA==}
+  /@blueprintjs/core@5.1.5(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
+    resolution: {integrity: sha512-eyPTQZUVFE1ZO/4g+JWAybbdTvZu8isZh7MFxBegrMvXvhS8i8qNv0lnEwYcWTkNkBOiVRhnE1fn1LVNUoFL/g==}
     hasBin: true
     peerDependencies:
       '@types/react': ^16.14.32 || 17 || 18
@@ -1504,54 +1504,39 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@blueprintjs/colors': 4.2.1
-      '@blueprintjs/icons': 4.16.0
-      '@juggle/resize-observer': 3.4.0
-      '@types/dom4': 2.0.2
+      '@blueprintjs/colors': 5.0.1
+      '@blueprintjs/icons': 5.1.4(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+      '@popperjs/core': 2.11.8
       '@types/react': 18.2.8
       classnames: 2.3.2
-      dom4: 2.1.6
       normalize.css: 8.0.1
-      popper.js: 1.16.1
       react: 18.3.0-next-9c54b29b4-20230322
       react-dom: 18.3.0-next-9c54b29b4-20230322(react@18.3.0-next-9c54b29b4-20230322)
-      react-popper: 1.3.11(react@18.3.0-next-9c54b29b4-20230322)
+      react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
       react-transition-group: 4.4.5(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
       tslib: 2.5.3
     dev: false
 
-  /@blueprintjs/icons@4.16.0:
-    resolution: {integrity: sha512-cyfgjUZcZCtQrXWUV8FwqYTFEzduV4a0N7yhOU38jY+cBRCLu/sDrD0Osvfk4DGRvNe4YjY7pohVLFSxpg68Uw==}
+  /@blueprintjs/icons@5.1.4(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
+    resolution: {integrity: sha512-2Vb8kneLZkKkH0VAkFbWHUixvI1UgFeDolev/TnyKHIaAPdGSmhoktmYsZNtcPiznZRrpb2PE03lU8fmBTi2KA==}
+    peerDependencies:
+      '@types/react': ^16.14.32 || 17 || 18
+      react: ^16.8 || 17 || 18
+      react-dom: ^16.8 || 17 || 18
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
     dependencies:
+      '@types/react': 18.2.8
       change-case: 4.1.2
       classnames: 2.3.2
-      tslib: 2.5.3
-    dev: false
-
-  /@blueprintjs/popover2@1.14.9(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
-    resolution: {integrity: sha512-46gesoxeEbp1owKDGz7JwurXmVqSLq9ALes5etHqtjwdCpenBQc7GM+sFuJoLlEU7twcIlzwE6xaSU2+vnYVCQ==}
-    peerDependencies:
-      '@types/react': ^16.14.32 || 17 || 18
-      react: ^16.8 || 17 || 18
-      react-dom: ^16.8 || 17 || 18
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@blueprintjs/core': 4.20.1(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
-      '@juggle/resize-observer': 3.4.0
-      '@popperjs/core': 2.11.8
-      '@types/react': 18.2.8
-      classnames: 2.3.2
-      dom4: 2.1.6
       react: 18.3.0-next-9c54b29b4-20230322
       react-dom: 18.3.0-next-9c54b29b4-20230322(react@18.3.0-next-9c54b29b4-20230322)
-      react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
       tslib: 2.5.3
     dev: false
 
-  /@blueprintjs/select@4.9.22(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
-    resolution: {integrity: sha512-T5ofz571kPfycbxAuXlTrE7ndXIiHPCDMjADYJpb5HVOk0SYwwzDvnWjsYbyAj1SONbxOAKh4/wmFTDjZv7G2g==}
+  /@blueprintjs/popover2@2.0.7(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
+    resolution: {integrity: sha512-lZBbLSeHL9WtUUXqtbHY10QW8YSTEtzWw0vWR14BJRq3AHQOkCT4Q4tizLYZXSuKouD96Mig8cQJtH3JjJmIGA==}
     peerDependencies:
       '@types/react': ^16.14.32 || 17 || 18
       react: ^16.8 || 17 || 18
@@ -1560,8 +1545,26 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@blueprintjs/core': 4.20.1(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
-      '@blueprintjs/popover2': 1.14.9(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+      '@blueprintjs/core': 5.1.5(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+      '@types/react': 18.2.8
+      classnames: 2.3.2
+      react: 18.3.0-next-9c54b29b4-20230322
+      react-dom: 18.3.0-next-9c54b29b4-20230322(react@18.3.0-next-9c54b29b4-20230322)
+      tslib: 2.5.3
+    dev: false
+
+  /@blueprintjs/select@5.0.7(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
+    resolution: {integrity: sha512-E1BhFjgzq7dXN2rK2Q0hw/zgdNe+EgzFdkOs2nriNr8cxenxK/nSOB4+lTCx3HTyueNSAIqxJv+Q6OPcw0bTYA==}
+    peerDependencies:
+      '@types/react': ^16.14.32 || 17 || 18
+      react: ^16.8 || 17 || 18
+      react-dom: ^16.8 || 17 || 18
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@blueprintjs/core': 5.1.5(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
+      '@blueprintjs/icons': 5.1.4(@types/react@18.2.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322)
       '@types/react': 18.2.8
       classnames: 2.3.2
       react: 18.3.0-next-9c54b29b4-20230322
@@ -2292,18 +2295,6 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: false
 
-  /@hypnosphi/create-react-context@0.3.1(prop-types@15.8.1)(react@18.3.0-next-9c54b29b4-20230322):
-    resolution: {integrity: sha512-V1klUed202XahrWJLLOT3EXNeCpFHCcJntdFGI15ntCwau+jfT386w7OFTMaCqOgXUH1fa0w/I1oZs+i/Rfr0A==}
-    peerDependencies:
-      prop-types: ^15.0.0
-      react: '>=0.14.0'
-    dependencies:
-      gud: 1.0.0
-      prop-types: 15.8.1
-      react: 18.3.0-next-9c54b29b4-20230322
-      warning: 4.0.3
-    dev: false
-
   /@jridgewell/gen-mapping@0.3.3:
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}
     engines: {node: '>=6.0.0'}
@@ -2336,10 +2327,6 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
-    dev: false
-
-  /@juggle/resize-observer@3.4.0:
-    resolution: {integrity: sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==}
     dev: false
 
   /@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1:
@@ -3660,10 +3647,6 @@ packages:
     resolution: {integrity: sha512-/vPO1EPOs306Cvhwv7KfVfYvOJqA/S/AXjaHQiJboCZzcNDb+TIJFN9/2C9DZ//ijSKWioNyUxD792QmDJ+HKQ==}
     dependencies:
       '@types/ms': 0.7.31
-    dev: false
-
-  /@types/dom4@2.0.2:
-    resolution: {integrity: sha512-Rt4IC1T7xkCWa0OG1oSsPa0iqnxlDeQqKXZAHrQGLb7wFGncWm85MaxKUjAGejOrUynOgWlFi4c6S6IyJwoK4g==}
     dev: false
 
   /@types/draco3d@1.4.2:
@@ -4995,17 +4978,6 @@ packages:
       mimic-response: 3.1.0
     dev: false
 
-  /deep-equal@1.1.1:
-    resolution: {integrity: sha512-yd9c5AdiqVcR+JjcwUQb9DkhJc8ngNr0MahEBGvDiJw8puWab2yZlh+nkasOnZP+EGTAP6rRp2JzJhJZzvNF8g==}
-    dependencies:
-      is-arguments: 1.1.1
-      is-date-object: 1.0.5
-      is-regex: 1.1.4
-      object-is: 1.1.5
-      object-keys: 1.1.1
-      regexp.prototype.flags: 1.5.0
-    dev: false
-
   /deep-equal@2.2.2:
     resolution: {integrity: sha512-xjVyBf0w5vH0I42jdAZzOKVldmPgSulmiyPRywoyq7HXC9qdgo17kxJE+rdnif5Tz6+pIrpJI8dCpMNLIGkUiA==}
     dependencies:
@@ -5168,10 +5140,6 @@ packages:
     dependencies:
       '@babel/runtime': 7.22.6
       csstype: 3.1.2
-    dev: false
-
-  /dom4@2.1.6:
-    resolution: {integrity: sha512-JkCVGnN4ofKGbjf5Uvc8mmxaATIErKQKSgACdBXpsQ3fY6DlIpAyWfiBSrGkttATssbDCp3psiAKWXk5gmjycA==}
     dev: false
 
   /dot-case@3.0.4:
@@ -6450,10 +6418,6 @@ packages:
   /graphql@16.7.1:
     resolution: {integrity: sha512-DRYR9tf+UGU0KOsMcKAlXeFfX89UiiIZ0dRU3mR0yJfu6OjZqUcp68NnFLnqQU5RexygFoDy1EW+ccOYcPfmHg==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
-    dev: false
-
-  /gud@1.0.0:
-    resolution: {integrity: sha512-zGEOVKFM5sVPPrYs7J5/hYEw2Pof8KCyOwyhG8sAF26mCAeUFAcYPu1mwB7hhpIP29zOIBaDqwuHdLp0jvZXjw==}
     dev: false
 
   /gunzip-maybe@1.4.2:
@@ -8436,11 +8400,6 @@ packages:
     resolution: {integrity: sha512-95ChzOoYLOPIyVmL+Y6X+abKGXUJlvOVLkB1QQkyXl7Uczc6FElUy/x01NS7r2GX6GRezloO/ecCX9h4U9KadA==}
     dev: false
 
-  /popper.js@1.16.1:
-    resolution: {integrity: sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==}
-    deprecated: You can find the new Popper v2 at @popperjs/core, this package is dedicated to the legacy v1
-    dev: false
-
   /postcss-discard-duplicates@5.1.0(postcss@8.4.27):
     resolution: {integrity: sha512-zmX3IoSI2aoenxHV6C7plngHWWhUOV3sP1T8y2ifzxzbtnuhk1EdPwm0S1bIUNaJ2eNbWeGLEwzw8huPD67aQw==}
     engines: {node: ^10 || ^12 || >=14.0}
@@ -8824,21 +8783,6 @@ packages:
       moment: 2.29.4
       prop-types: 15.8.1
       react: 18.3.0-next-9c54b29b4-20230322
-    dev: false
-
-  /react-popper@1.3.11(react@18.3.0-next-9c54b29b4-20230322):
-    resolution: {integrity: sha512-VSA/bS+pSndSF2fiasHK/PTEEAyOpX60+H5EPAjoArr8JGm+oihu4UbrqcEBpQibJxBVCpYyjAX7abJ+7DoYVg==}
-    peerDependencies:
-      react: 0.14.x || ^15.0.0 || ^16.0.0 || ^17.0.0
-    dependencies:
-      '@babel/runtime': 7.22.6
-      '@hypnosphi/create-react-context': 0.3.1(prop-types@15.8.1)(react@18.3.0-next-9c54b29b4-20230322)
-      deep-equal: 1.1.1
-      popper.js: 1.16.1
-      prop-types: 15.8.1
-      react: 18.3.0-next-9c54b29b4-20230322
-      typed-styles: 0.0.7
-      warning: 4.0.3
     dev: false
 
   /react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@18.3.0-next-9c54b29b4-20230322)(react@18.3.0-next-9c54b29b4-20230322):
@@ -10055,10 +9999,6 @@ packages:
       call-bind: 1.0.2
       for-each: 0.3.3
       is-typed-array: 1.1.12
-    dev: false
-
-  /typed-styles@0.0.7:
-    resolution: {integrity: sha512-pzP0PWoZUhsECYjABgCGQlRGL1n7tOHsgwYv3oIiEpJwGhFTuty/YNeduxQYzXXa3Ge5BdT6sHYIQYpl4uJ+5Q==}
     dev: false
 
   /typescript@5.1.6:

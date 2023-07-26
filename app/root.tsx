@@ -1,7 +1,8 @@
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 // @ts-expect-error
 import styles from "./styles/app.css";
-import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, Toaster } from "@blueprintjs/core";
+import type { Toaster } from "@blueprintjs/core";
+import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, OverlayToaster } from "@blueprintjs/core";
 import type { FormEvent, LegacyRef } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiEndpointAtom, apiExplorerEndpointAtom, toasterAtom } from "./atoms";
@@ -46,7 +47,7 @@ const lngDetector = new LanguageDetector(null, {
   caches: ["localStorage", "cookie"],
 });
 
-i18next
+void i18next
   .use(lngDetector)
   .use(initReactI18next) // passes i18n down to react-i18next
   .init({
@@ -104,7 +105,7 @@ export default function App() {
         <Links />
       </head>
       <body className={Classes.DARK}>
-        <Toaster ref={toasterRef as LegacyRef<Toaster>} />
+        <OverlayToaster ref={toasterRef as LegacyRef<OverlayToaster>} />
         <ClientOnly>
           {() => (
             <ApiCtxRoot apiUrl={apiUrl}>

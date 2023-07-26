@@ -148,7 +148,7 @@ export default function Account({ pair }: IProps) {
       intent: Intent.SUCCESS,
       message: t("messages.lbl_address_copied"),
     });
-  }, [pair, toaster]);
+  }, [pair.address, t, toaster]);
 
   const handleUnlockFundsClick = useCallback(async () => {
     if (!api) {
