@@ -6,6 +6,7 @@ import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -14,6 +15,7 @@ type IProps = {
 };
 
 export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -47,7 +49,7 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "Account is locked",
+        message: t('messages.lbl_account_locked'),
       });
       return;
     }
@@ -59,7 +61,7 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Pool difficulty was set",
+        message: t('messages.lbl_pool_difficulty_set'),
       });
     } catch (e: any) {
       toaster.show({
@@ -74,28 +76,28 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
   }
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Set pool difficulty" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title={t('dlg_pool_difficulty.lbl_title')} onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <NumericInput
           disabled={isLoading}
           buttonPosition={"none"}
           large={true}
           fill={true}
-          placeholder="Pool difficulty"
+          placeholder={t('dlg_pool_difficulty.lbl_pool_difficulty')}
           onValueChange={handleDifficultyChange}
           value={data.difficulty}
         />
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="arrow-right"
             loading={isLoading}
-            text="Set difficulty"
+            text={t('dlg_pool_difficulty.lbl_btn_set_difficulty')}
           />
         </div>
       </div>

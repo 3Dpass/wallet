@@ -10,6 +10,7 @@ import { convertPool } from "../../utils/pool";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
 import type { ApiPromise } from "@polkadot/api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -23,6 +24,7 @@ type IPoolData = {
 };
 
 export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -59,7 +61,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "Account is locked",
+        message: t('messages.lbl_account_locked'),
       });
       return;
     }
@@ -71,7 +73,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
           toaster.show({
             icon: "endorsed",
             intent: Intent.SUCCESS,
-            message: "You have joined the mining pool",
+            message: t('messages.lbl_joined_pool'),
           });
           setIsLoading(false);
           onClose();
@@ -120,14 +122,14 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
   };
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Join a mining pool" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title={t('dlg_join_pool.lbl_title')} onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <Select2
           items={data.pools}
           itemPredicate={filterPool}
           itemRenderer={renderPool}
           menuProps={{ className: "max-h-[300px] overflow-auto" }}
-          noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
+          noResults={<MenuItem disabled={true} text={t('dlg_join_pool.lbl_no_results')} roleStructure="listoption" />}
           onItemSelect={setPool}
           popoverProps={{ matchTargetWidth: true }}
           fill={true}
@@ -135,7 +137,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
           <Button
             text={data.poolToJoin}
             rightIcon="double-caret-vertical"
-            placeholder="Select a pool"
+            placeholder={t('dlg_join_pool.lbl_btn_select_pool')}
             className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono`}
           />
         </Select2>
@@ -143,14 +145,14 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
       {data.poolToJoin && <div className="font-mono px-4 text-gray-400">$ pass3d-pool run --pool-id {data.poolToJoin} ...</div>}
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="add"
             loading={isLoading}
-            text="Join the pool"
+            text={t('dlg_join_pool.lbl_btn_join_pool')}
           />
         </div>
       </div>

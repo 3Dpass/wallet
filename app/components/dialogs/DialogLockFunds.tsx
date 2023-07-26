@@ -5,6 +5,7 @@ import AmountInput from "../common/AmountInput";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -16,6 +17,7 @@ type IProps = {
 const autoExtendPeriod = 45000;
 
 export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -90,7 +92,7 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: "Lock request is submitted",
+          message: t('messages.lbl_lock_requested'),
         });
         setIsLoading(false);
         onAfterSubmit();
@@ -108,29 +110,29 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
   return (
     <Dialog isOpen={isOpen} usePortal={true} onClose={onClose} onOpening={handleOnOpening} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} />
+        <AmountInput disabled={isLoading} onValueChange={handleAmountChange} placeholder={t('commons.lbl_amount')} />
         <NumericInput
           disabled={isLoading}
           buttonPosition={"none"}
           large={true}
           fill={true}
-          placeholder="Release funds after this block"
+          placeholder={t('dlg_lock_funds.lbl_release_lock_after')}
           leftIcon="cube"
           onValueChange={handleBlockChange}
           value={data.block}
-          rightElement={<Tag minimal={true}>Block Number</Tag>}
+          rightElement={<Tag minimal={true}>{t('dlg_lock_funds.lbl_block_number')}</Tag>}
         />
         <Checkbox checked={data.auto_extend} large={true} onChange={handleAutoExtendChange}>
-          Automatically extend each {autoExtendPeriod} blocks
+          {t('dlg_lock_funds.lbl_chk_extended')} {autoExtendPeriod} {t('dlg_lock_funds.lbl_chk_extended_1')}
         </Checkbox>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             icon="lock"
-            text="Lock funds"
+            text={t('dlg_lock_funds.lbl_btn_lock_funds')}
             disabled={isLoading || !canSubmit}
             loading={isLoading}
             onClick={handleSubmitClick}

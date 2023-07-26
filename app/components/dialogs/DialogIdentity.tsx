@@ -15,6 +15,7 @@ import { useApi } from "../Api";
 import useToaster from "../../hooks/useToaster";
 import { FormattedAmount } from "../common/FormattedAmount";
 import type { Codec } from "@polkadot/types/types";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -45,6 +46,7 @@ type IIdentityData = {
 };
 
 export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isRegistrar }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [isIdentityLoading, setIsIdentityLoading] = useState(false);
@@ -133,7 +135,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
               toaster.show({
                 icon: "endorsed",
                 intent: Intent.SUCCESS,
-                message: "You have requested a judgement.",
+                message: t('messages.lbl_judgement_requested'),
               });
               setIsIdentityLoading(false);
               onClose();
@@ -145,8 +147,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
       toaster.show({
         icon: "warning-sign",
         intent: Intent.WARNING,
-        message:
-          "We are currently working on your request. Please bear with us as it is being processed through the network, which may take approximately 1-3 minutes.",
+        message: t('messages.lbl_working_on_request'),
         timeout: 20000,
       });
     } catch (e: any) {
@@ -203,16 +204,16 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
   };
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Identity" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title={t('dlg_identity.lbl_title')} onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         {!isRegistrar && !hasIdentity && (
           <>
-            {!dataState.registrarData && <div>Please select a registrar:</div>}
+            {!dataState.registrarData && <div>{t('dlg_identity.lbl_select_registrar')}</div>}
             <Select2
               items={dataState.registrarList}
               itemPredicate={filterRegistrar}
               itemRenderer={renderRegistrar}
-              noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
+              noResults={<MenuItem disabled={true} text={t('dlg_identity.lbl_no_results')} roleStructure="listoption" />}
               onItemSelect={setRegistrar}
               popoverProps={{ matchTargetWidth: true }}
               fill={true}
@@ -221,7 +222,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
               <Button
                 text={dataState.registrarData?.account}
                 rightIcon="double-caret-vertical"
-                placeholder="Select a registrar"
+                placeholder={t('dlg_identity.lbl_placeholder_registrar')}
                 className={`${Classes.CONTEXT_MENU} ${Classes.FILL}`}
               />
             </Select2>
@@ -232,7 +233,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                   large={true}
                   className="font-mono"
                   spellCheck={false}
-                  placeholder="Enter display name"
+                  placeholder={t('dlg_identity.lbl_placeholder_display_name')}
                   onChange={(e) => {
                     let ci = dataState.candidateInfo;
                     ci.display = e.target.value;
@@ -245,7 +246,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                   large={true}
                   className="font-mono"
                   spellCheck={false}
-                  placeholder="Enter legal name"
+                  placeholder={t('dlg_identity.lbl_placeholder_legal_name')}
                   onChange={(e) => {
                     let ci = dataState.candidateInfo;
                     ci.legal = e.target.value;
@@ -258,7 +259,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                   large={true}
                   className="font-mono"
                   spellCheck={false}
-                  placeholder="Enter email"
+                  placeholder={t('dlg_identity.lbl_placeholder_email')}
                   onChange={(e) => {
                     let ci = dataState.candidateInfo;
                     ci.email = e.target.value;
@@ -271,7 +272,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                   large={true}
                   className="font-mono"
                   spellCheck={false}
-                  placeholder="Enter web address"
+                  placeholder={t('dlg_identity.lbl_placeholder_web_address')}
                   onChange={(e) => {
                     let ci = dataState.candidateInfo;
                     ci.web = e.target.value;
@@ -284,7 +285,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                   large={true}
                   className="font-mono"
                   spellCheck={false}
-                  placeholder="Enter twitter"
+                  placeholder={t('dlg_identity.lbl_placeholder_twitter')}
                   onChange={(e) => {
                     let ci = dataState.candidateInfo;
                     ci.twitter = e.target.value;
@@ -297,7 +298,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                   large={true}
                   className="font-mono"
                   spellCheck={false}
-                  placeholder="Enter discord"
+                  placeholder={t('dlg_identity.lbl_placeholder_discord')}
                   onChange={(e) => {
                     let ci = dataState.candidateInfo;
                     ci.discord = e.target.value;
@@ -310,7 +311,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                   large={true}
                   className="font-mono"
                   spellCheck={false}
-                  placeholder="Enter riot name"
+                  placeholder={t('dlg_identity.lbl_placeholder_riot_name')}
                   onChange={(e) => {
                     let ci = dataState.candidateInfo;
                     ci.riot = e.target.value;
@@ -323,7 +324,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                   disabled={isIdentityLoading || !api}
                   onClick={handleSubmitRequestForJudgement}
                   loading={isIdentityLoading}
-                  text="Request for judgement"
+                  text={t('dlg_identity.lbl_placeholder_request_judgement')}
                 />
                 <UserCard registrarInfo={dataState.registrarData} />
               </>

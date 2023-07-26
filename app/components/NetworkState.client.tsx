@@ -10,6 +10,7 @@ import type { ApiPromise } from "@polkadot/api";
 import { FormattedAmount } from "./common/FormattedAmount";
 import TimeAgo from "react-timeago";
 import { useApi } from "./Api";
+import { useTranslation } from "react-i18next";
 
 type INetworkState = {
   totalIssuance: bigint;
@@ -20,6 +21,7 @@ type INetworkState = {
 };
 
 export default function NetworkState() {
+  const { t } = useTranslation();
   const api = useApi();
   const [blocks, setBlocks] = useAtom(blocksAtom);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,11 +100,11 @@ export default function NetworkState() {
   return (
     <Card className="mb-4" elevation={Elevation.ZERO}>
       <div className={cardClassName}>
-        <TitledValue title="Best block" value={networkState.bestNumber.toLocaleString()} />
-        <TitledValue title="Finalized" value={networkState.bestNumberFinalized.toLocaleString()} />
-        <TitledValue title="Latest block" value={<TimeAgo date={networkState.timestamp} live={true} />} />
-        <TitledValue title="Target" value={formatDuration(networkState.targetBlockTime)} />
-        <TitledValue title="Total issuance" value={<FormattedAmount value={networkState.totalIssuance} />} />
+        <TitledValue title={t('root.lbl_best_block')} value={networkState.bestNumber.toLocaleString()} />
+        <TitledValue title={t('root.lbl_finalized')} value={networkState.bestNumberFinalized.toLocaleString()} />
+        <TitledValue title={t('root.lbl_latest_block')} value={<TimeAgo date={networkState.timestamp} live={true} />} />
+        <TitledValue title={t('root.lbl_target')} value={formatDuration(networkState.targetBlockTime)} />
+        <TitledValue title={t('root.lbl_total_issuance')} value={<FormattedAmount value={networkState.totalIssuance} />} />
       </div>
     </Card>
   );

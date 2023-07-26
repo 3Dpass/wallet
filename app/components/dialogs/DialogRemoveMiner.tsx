@@ -7,6 +7,7 @@ import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -14,24 +15,37 @@ type IProps = {
   onClose: () => void;
 };
 
+type IMinerData = {
+  miners: string[];
+  memberToRemove: string;
+};
+
 export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<string[]>([]);
-  const [memberToRemove, setMemberToRemove] = useState<string>("");
+
+  const dataInitial: IMinerData = {
+    miners: [],
+    memberToRemove: "",
+  };
+
+  const [data, setData] = useState(dataInitial);
 
   async function loadMembers() {
     if (!api) {
       return;
     }
     const members = await api.query.miningPool.pools(pair.address);
-    setData(members.toHuman() as string[]);
+    const membersConverted = members.toHuman() as string[];
+    setData((prev) => ({ ...prev, miners: membersConverted, memberToRemove: membersConverted[0] }));
   }
 
   function handleOnOpening() {
     setIsLoading(false);
+    setData(dataInitial);
     void loadMembers();
   }
 
@@ -43,27 +57,24 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
     if (!api) {
       return;
     }
-    if (memberToRemove == "") {
-      return;
-    }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
     if (isLocked) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "Account is locked",
+        message: t('messages.lbl_account_locked'),
       });
       return;
     }
     setIsLoading(true);
     try {
-      const tx = api.tx.miningPool.removeMember(memberToRemove);
+      const tx = api.tx.miningPool.removeMember(data.memberToRemove);
       const options: Partial<SignerOptions> = {};
       await signAndSend(tx, pair, options);
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "The member was removed from the mining pool",
+        message: t('messages.lbl_removed_from_mining_pool'),
       });
     } catch (e: any) {
       toaster.show({
@@ -75,6 +86,10 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
       setIsLoading(false);
       onClose();
     }
+  }
+
+  function setMember(memberId: string) {
+    setData((prev) => ({ ...prev, memberToRemove: memberId }));
   }
 
   const filterMember: ItemPredicate<string> = (query, poolId, _index, exactMatch) => {
@@ -106,35 +121,35 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
   };
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title="Remove a miner" onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} title={t('dlg_remove_miner.lbl_title')} onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <Select2
-          items={data}
+          items={data.miners}
           itemPredicate={filterMember}
           itemRenderer={renderMemberId}
-          noResults={<MenuItem disabled={true} text="No results." roleStructure="listoption" />}
-          onItemSelect={(m) => setMemberToRemove(m)}
+          noResults={<MenuItem disabled={true} text={t('dlg_remove_miner.lbl_no_results')} roleStructure="listoption" />}
+          onItemSelect={setMember}
           popoverProps={{ matchTargetWidth: true }}
           fill={true}
         >
           <Button
-            text={data}
+            text={data.memberToRemove}
             rightIcon="double-caret-vertical"
-            placeholder="Select a miner"
+            placeholder={t('dlg_remove_miner.lbl_select_miner')}
             className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono text-lg`}
           />
         </Select2>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="remove"
             loading={isLoading}
-            text="Remove a miner"
+            text={t('dlg_remove_miner.lbl_btn_remove_miner')}
           />
         </div>
       </div>

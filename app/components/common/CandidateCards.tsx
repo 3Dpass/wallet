@@ -14,6 +14,7 @@ import Error from "../../components/common/Error";
 import type { IFormatOptions } from "../../atoms";
 import { formatOptionsAtom } from "../../atoms";
 import { useAtomValue } from "jotai";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   regIndex: number;
@@ -28,6 +29,7 @@ type IData = {
 };
 
 export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [addressLoading, setAddressLoading] = useState("");
@@ -56,7 +58,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "Your judgement was sent",
+        message: t('messages.lbl_judgement_sent'),
       });
     } catch (e: any) {
       toaster.show({
@@ -71,9 +73,9 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
   }
 
   if (queryEvents.loading || !dataState.candidateList) return <Spinner />;
-  if (queryEvents.error) return <Error>Error loading block data, try to reload.</Error>;
+  if (queryEvents.error) return <Error>{t('messages.lbl_error_loading_block_data')}</Error>;
 
-  if (!dataState.candidateList || dataState.candidateList.length == 0) return <div>No judgements requests</div>;
+  if (!dataState.candidateList || dataState.candidateList.length == 0) return <div>{t('commons.lbl_no_judgement_requested')}</div>;
 
   return (
     <div>
@@ -88,7 +90,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
                   void handleSubmitAddJudgement(candidateInfo.account);
                 }}
                 loading={addressLoading == candidateInfo.account}
-                text="Add judgement"
+                text={t('commons.lbl_add_judgement')}
                 className="absolute top-2 right-2"
               />
             </div>

@@ -7,6 +7,7 @@ import type { SignerOptions } from "@polkadot/api/types";
 import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
+import { useTranslation } from "react-i18next";
 
 type IProps = {
   pair: KeyringPair;
@@ -15,6 +16,7 @@ type IProps = {
 };
 
 export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
+  const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [canSubmit, setCanSubmit] = useState(false);
@@ -38,7 +40,7 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "Account is locked",
+        message: t('commons.lbl_account_locked'),
       });
       return;
     }
@@ -50,7 +52,7 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
       toaster.show({
         icon: "endorsed",
         intent: Intent.SUCCESS,
-        message: "The member was added to the mining pool",
+        message: t('dlg_miner.lbl_member_added_to_pool'),
       });
     } catch (e: any) {
       toaster.show({
@@ -74,7 +76,7 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
           large={true}
           className="font-mono"
           spellCheck={false}
-          placeholder="Enter a miner address"
+          placeholder={t('dlg_miner.lbl_miner_address')}
           onChange={(e) => setData(e.target.value)}
           value={data}
           leftElement={addressIcon}
@@ -82,14 +84,14 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose} text="Cancel" disabled={isLoading} />
+          <Button onClick={onClose} text={t('commons.lbl_btn_cancel')} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
             disabled={isLoading || !canSubmit}
             onClick={handleSubmitClick}
             icon="send-message"
             loading={isLoading}
-            text="Add a miner"
+            text={t('dlg_miner.lbl_btn_add_miner')}
           />
         </div>
       </div>
