@@ -13,12 +13,12 @@ import { ApiCtxRoot } from "./components/Api";
 import { ClientOnly } from "remix-utils";
 
 import i18next from "i18next";
-import { useTranslation, initReactI18next } from "react-i18next";
-import LanguageDetector from 'i18next-browser-languagedetector';
-import en from './translations/en.json';
-import es from './translations/es.json';
-import fr from './translations/fr.json';
-import pt from './translations/pt.json';
+import { initReactI18next, useTranslation } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import en from "./translations/en.json";
+import es from "./translations/es.json";
+import fr from "./translations/fr.json";
+import pt from "./translations/pt.json";
 
 export function meta() {
   return [{ charset: "utf-8" }, { title: "3DPass Wallet" }, { viewport: "width=device-width,initial-scale=1" }];
@@ -36,14 +36,14 @@ export function links() {
 }
 
 const lngDetector = new LanguageDetector(null, {
-  order: ['querystring', 'cookie', 'localStorage', 'sessionStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
+  order: ["querystring", "cookie", "localStorage", "sessionStorage", "navigator", "htmlTag", "path", "subdomain"],
   lookupCookie: "i18next",
   lookupLocalStorage: "i18next",
-  lookupQuerystring: 'lng',
-  lookupSessionStorage: 'i18nextLng',
+  lookupQuerystring: "lng",
+  lookupSessionStorage: "i18nextLng",
   lookupFromPathIndex: 0,
-  lookupFromSubdomainIndex: 0,  
-  caches: ["localStorage", "cookie"]
+  lookupFromSubdomainIndex: 0,
+  caches: ["localStorage", "cookie"],
 });
 
 i18next
@@ -55,13 +55,13 @@ i18next
       en,
       es,
       fr,
-      pt
+      pt,
     },
     fallbackLng: "en",
 
     interpolation: {
-      escapeValue: false
-    }
+      escapeValue: false,
+    },
   });
 
 export default function App() {
@@ -115,7 +115,7 @@ export default function App() {
                       <NavbarHeading className="whitespace-nowrap flex">
                         <Link to="" className="text-white hover:no-underline flex items-center gap-2">
                           <img src="/logo.svg" alt="3Dpass Logo" className="h-7" />
-                          <span className="mb-[-3px]">{t('root.lbl_app_name')}</span>
+                          <span className="mb-[-3px]">{t("root.lbl_app_name")}</span>
                         </Link>
                         <Button className="ml-2" icon="cog" minimal={true} onClick={() => setIsSettingsDialogOpen(true)} />
                         <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
@@ -126,7 +126,7 @@ export default function App() {
                         <InputGroup
                           leftIcon="search"
                           onChange={(e) => setSearchValue(e.target.value)}
-                          placeholder={t('root.lbl_search_box')}
+                          placeholder={t("root.lbl_search_box")}
                           value={searchValue}
                           size={40}
                           type="search"
