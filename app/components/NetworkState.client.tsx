@@ -30,7 +30,7 @@ export default function NetworkState() {
 
   async function loadNetworkState(api: ApiPromise) {
     setIsLoading(true);
-    // @ts-ignore
+    // @ts-expect-error
     const [totalIssuance, timestamp, bestNumber, bestNumberFinalized, targetBlockTime] = await Promise.all([
       api.query.balances.totalIssuance(),
       api.query.timestamp.now(),
