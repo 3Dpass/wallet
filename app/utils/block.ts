@@ -28,12 +28,12 @@ export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock>
     offset += objectHashLength;
   }
 
-  // @ts-ignore
+  // @ts-expect-error
   const objectObjRaw: Text = await api.rpc.poscan.getMiningObject(blockHash);
   const objectObj: string = objectObjRaw.toString();
 
   const loader = new OBJLoader();
-  // @ts-ignore
+  // @ts-expect-error
   const object3d: Mesh = loader.parse(objectObj).children[0]; // typed as `Object3D` but really returns the `Mesh` objectẞ
 
   return {
