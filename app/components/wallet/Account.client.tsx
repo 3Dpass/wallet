@@ -269,7 +269,7 @@ export default function Account({ pair }: IProps) {
   const accountLocked: boolean = pair.isLocked && !pair.meta.isInjected;
 
   return (
-    <div className="relative p-3 pt-9 text-sm border border-gray-600">
+    <div className="relative p-3 pt-9 text-sm border-b border-l border-gray-600">
       {dialogElements}
       <AddressItem address={pair.address} />
       <div className="grid gap-1">
@@ -277,24 +277,14 @@ export default function Account({ pair }: IProps) {
         {balances && (
           <>
             <div className="grid grid-cols-3 gap-1 py-2">
-              <TitledValue
-                title={t("root.lbl_total_balance")}
-                fontMono
-                fontSmall
-                value={<FormattedAmount value={balances.freeBalance.toBigInt()} />}
-              />
+              <TitledValue title={t("root.lbl_total_balance")} fontMono fontSmall value={<FormattedAmount value={balances.freeBalance.toBigInt()} />} />
               <TitledValue
                 title={t("root.lbl_transferable")}
                 fontMono
                 fontSmall
                 value={<FormattedAmount value={balances.availableBalance.toBigInt()} />}
               />
-              <TitledValue
-                title={t("root.lbl_locked")}
-                fontMono
-                fontSmall
-                value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />}
-              />
+              <TitledValue title={t("root.lbl_locked")} fontMono fontSmall value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />} />
             </div>
             {accountLocked && (
               <div className="my-2 text-center">
