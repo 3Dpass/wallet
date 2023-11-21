@@ -78,7 +78,7 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
   return (
     <Dialog
       isOpen={isOpen}
-      usePortal={true}
+      usePortal
       onOpening={handleOnOpening}
       title={t("dlg_pool_difficulty.lbl_title")}
       onClose={onClose}
@@ -88,8 +88,8 @@ export default function DialogSetPoolDifficulty({ isOpen, onClose, pair }: IProp
         <NumericInput
           disabled={isLoading}
           buttonPosition={"none"}
-          large={true}
-          fill={true}
+          large
+          fill
           placeholder={t("dlg_pool_difficulty.lbl_pool_difficulty")}
           onValueChange={handleDifficultyChange}
           value={data.difficulty}

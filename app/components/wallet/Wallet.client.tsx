@@ -88,7 +88,7 @@ export default function Wallet() {
     <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
       <DialogImportAddress
         isOpen={dialogs.seed_phrase}
-        showPassword={true}
+        showPassword
         onClose={() => dialogToggle("seed_phrase")}
         onImport={handleSeedPhraseImportClick}
       />

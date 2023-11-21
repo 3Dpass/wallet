@@ -123,7 +123,7 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog
       isOpen={isOpen}
-      usePortal={true}
+      usePortal
       onOpening={handleOnOpening}
       title={t("dlg_remove_miner.lbl_title")}
       onClose={onClose}
@@ -134,10 +134,10 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
           items={data.miners}
           itemPredicate={filterMember}
           itemRenderer={renderMemberId}
-          noResults={<MenuItem disabled={true} text={t("dlg_remove_miner.lbl_no_results")} roleStructure="listoption" />}
+          noResults={<MenuItem disabled text={t("dlg_remove_miner.lbl_no_results")} roleStructure="listoption" />}
           onItemSelect={setMember}
           popoverProps={{ matchTargetWidth: true }}
-          fill={true}
+          fill
         >
           <Button
             text={data.memberToRemove}

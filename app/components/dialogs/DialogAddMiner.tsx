@@ -69,11 +69,11 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
   const addressIcon = isValidPolkadotAddress(data) ? <AddressIcon address={data} className="m-2" /> : <Icon icon="asterisk" />;
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <InputGroup
           disabled={isLoading}
-          large={true}
+          large
           className="font-mono"
           spellCheck={false}
           placeholder={t("dlg_miner.lbl_miner_address")}

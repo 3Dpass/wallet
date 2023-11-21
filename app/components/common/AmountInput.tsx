@@ -22,17 +22,17 @@ export default function AmountInput({ disabled, onValueChange, placeholder, form
   return (
     <NumericInput
       disabled={disabled}
-      selectAllOnFocus={true}
-      large={true}
+      selectAllOnFocus
+      large
       buttonPosition={"none"}
       leftIcon="send-to"
       placeholder={placeholder || "Amount"}
       onValueChange={handleAmountChange}
       value={amount}
-      fill={true}
+      fill
       min={0}
       minorStepSize={0.001}
-      rightElement={<Tag minimal={true}>{formatOptionsUnit || (formatOptions?.unit)}</Tag>}
+      rightElement={<Tag minimal>{formatOptionsUnit || (formatOptions?.unit)}</Tag>}
     />
   );
 }

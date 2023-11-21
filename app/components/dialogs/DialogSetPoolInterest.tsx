@@ -77,7 +77,7 @@ export default function DialogSetPoolInterest({ isOpen, onClose, pair }: IProps)
   return (
     <Dialog
       isOpen={isOpen}
-      usePortal={true}
+      usePortal
       onOpening={handleOnOpening}
       title={t("dlg_pool_interest.lbl_title")}
       onClose={onClose}

@@ -35,7 +35,7 @@ export default function DialogSettings({ isOpen, onClose }: IProps) {
 
   return (
     <>
-      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
+      <Dialog isOpen={isOpen} usePortal onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
         <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
           <TitledValue
             title={t("dlg_settings.lbl_api_address")}
@@ -46,7 +46,7 @@ export default function DialogSettings({ isOpen, onClose }: IProps) {
                 onChange={(e) => setData((prev) => ({ ...prev, api_endpoint: e.target.value }))}
               />
             }
-            fontMono={true}
+            fontMono
           />
           <TitledValue
             title={t("dlg_settings.lbl_explorer_graphql")}
@@ -57,7 +57,7 @@ export default function DialogSettings({ isOpen, onClose }: IProps) {
                 onChange={(e) => setData((prev) => ({ ...prev, api_explorer_endpoint: e.target.value }))}
               />
             }
-            fontMono={true}
+            fontMono
           />
         </div>
         <div className={Classes.DIALOG_FOOTER}>

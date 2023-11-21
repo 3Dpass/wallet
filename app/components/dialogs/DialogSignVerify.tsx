@@ -196,7 +196,7 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
             <Label>
               {t("dlg_sign_verify.lbl_placeholder_message")}
               <InputGroup
-                large={true}
+                large
                 spellCheck={false}
                 placeholder={t("dlg_sign_verify.lbl_placeholder_message")}
                 onChange={handleMessageChange}

@@ -125,7 +125,7 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog
       isOpen={isOpen}
-      usePortal={true}
+      usePortal
       onOpening={handleOnOpening}
       title={t("dlg_leave_pool.lbl_title")}
       onClose={onClose}
@@ -136,10 +136,10 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
           items={data.poolIds}
           itemPredicate={filterPool}
           itemRenderer={renderPoolId}
-          noResults={<MenuItem disabled={true} text={t("dlg_leave_pool.lbl_no_results")} roleStructure="listoption" />}
+          noResults={<MenuItem disabled text={t("dlg_leave_pool.lbl_no_results")} roleStructure="listoption" />}
           onItemSelect={setPool}
           popoverProps={{ matchTargetWidth: true }}
-          fill={true}
+          fill
         >
           <Button
             text={data.poolToLeave}

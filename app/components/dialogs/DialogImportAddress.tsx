@@ -33,7 +33,7 @@ export default function DialogImportAddress({ isOpen, showPassword, onImport, on
 
   return (
     <>
-      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
+      <Dialog isOpen={isOpen} usePortal onOpening={handleOnOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
         <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
           <TextArea className="w-full font-mono" rows={5} onChange={handleSeedPhraseChange} value={data.seed_phrase} />
           {canPaste && (
@@ -44,7 +44,7 @@ export default function DialogImportAddress({ isOpen, showPassword, onImport, on
           {showPassword && (
             <InputGroup
               type="password"
-              large={true}
+              large
               className="font-mono"
               spellCheck={false}
               placeholder={t("dlg_import_address.lbl_passphrase")}
