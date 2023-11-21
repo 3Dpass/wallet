@@ -83,7 +83,7 @@ export default function NetworkState() {
     void subscribe(api);
 
     return () => {
-      newHeadsUnsubscribe && newHeadsUnsubscribe();
+      newHeadsUnsubscribe?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [api]);

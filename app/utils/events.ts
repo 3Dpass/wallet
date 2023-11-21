@@ -29,7 +29,7 @@ export async function getIdentityJudgementRequests(
       candidateInfo = (await api.query.identity.identityOf(candidateAddress)).toHuman() as IPalletIdentityRegistrarInfo;
 
       let candidateHasIdentity = false;
-      if (candidateInfo && candidateInfo.judgements) {
+      if (candidateInfo?.judgements) {
         for (let i = 0; i < candidateInfo.judgements.length; i++) {
           if (candidateInfo.judgements[i][1].toString() == "Reasonable") {
             candidateHasIdentity = true;

@@ -32,7 +32,7 @@ export default function AmountInput({ disabled, onValueChange, placeholder, form
       fill={true}
       min={0}
       minorStepSize={0.001}
-      rightElement={<Tag minimal={true}>{formatOptionsUnit || (formatOptions && formatOptions.unit)}</Tag>}
+      rightElement={<Tag minimal={true}>{formatOptionsUnit || (formatOptions?.unit)}</Tag>}
     />
   );
 }

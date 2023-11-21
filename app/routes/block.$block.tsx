@@ -49,8 +49,7 @@ export default function Block() {
           <TitledValue title={t("screen_block.lbl_logs")} value={<Link to={blockUrl}>{queryBlock.data.getBlock.countLogs}</Link>} fontMono={true} />
         </div>
         <div className="flex flex-col gap-4 mt-6">
-          {queryLogs.data &&
-            queryLogs.data.getLogs.objects.map((log) => (
+          {queryLogs.data?.getLogs.objects.map((log) => (
               <div key={log.logIdx} className="flex flex-col gap-2">
                 <div className="flex gap-4">
                   <TitledValue title="Log Idx" value={log.logIdx} fontMono={true} fontSmall={true} />
