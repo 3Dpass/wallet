@@ -21,7 +21,6 @@ async function loadNetworkState() {
     "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
     "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
   ];
-  // @ts-expect-error
   const balances = await api.query.system.account.multi<AccountInfo>(staffAndInvestors);
   const balancesNumber = balances.map((balance) => {
     const data = balance.data as AccountData;

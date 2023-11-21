@@ -1,5 +1,5 @@
 import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
-// @ts-expect-error
+// @ts-expect-error - can't find styles file, fix later
 import styles from "./styles/app.css";
 import type { Toaster } from "@blueprintjs/core";
 import { Alignment, Button, Classes, InputGroup, Navbar, NavbarGroup, NavbarHeading, OverlayToaster } from "@blueprintjs/core";
