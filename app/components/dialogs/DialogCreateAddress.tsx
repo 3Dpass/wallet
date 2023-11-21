@@ -48,9 +48,9 @@ export default function DialogCreateAddress({ isOpen, onClose }: IProps) {
 
   return (
     <>
-      <Dialog isOpen={isOpen} usePortal={true} onOpening={handleOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
+      <Dialog isOpen={isOpen} usePortal onOpening={handleOpening} onClose={onClose} className="w-[90%] sm:w-[640px]">
         <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-          <TitledValue title={t("dlg_wallet.lbl_title")} value={data.address} fontMono={true} />
+          <TitledValue title={t("dlg_wallet.lbl_title")} value={data.address} fontMono />
           <div className="text-gray-500">{t("dlg_wallet.lbl_keep_seed")}</div>
           <Card>
             <div className="text-center font-mono text-xl">{data.mnemonic}</div>
@@ -60,7 +60,7 @@ export default function DialogCreateAddress({ isOpen, onClose }: IProps) {
           </Card>
           <InputGroup
             type="password"
-            large={true}
+            large
             className="font-mono"
             spellCheck={false}
             placeholder={t("dlg_wallet.lbl_password")}

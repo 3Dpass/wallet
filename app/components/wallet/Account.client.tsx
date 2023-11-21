@@ -231,8 +231,8 @@ export default function Account({ pair }: IProps) {
         icon="cross"
         intent={Intent.DANGER}
         isOpen={dialogs.delete}
-        canEscapeKeyCancel={true}
-        canOutsideClickCancel={true}
+        canEscapeKeyCancel
+        canOutsideClickCancel
         onCancel={() => dialogToggle("delete")}
         onConfirm={handleAddressDelete}
       >
@@ -279,20 +279,20 @@ export default function Account({ pair }: IProps) {
             <div className="grid grid-cols-3 gap-1 py-2">
               <TitledValue
                 title={t("root.lbl_total_balance")}
-                fontMono={true}
-                fontSmall={true}
+                fontMono
+                fontSmall
                 value={<FormattedAmount value={balances.freeBalance.toBigInt()} />}
               />
               <TitledValue
                 title={t("root.lbl_transferable")}
-                fontMono={true}
-                fontSmall={true}
+                fontMono
+                fontSmall
                 value={<FormattedAmount value={balances.availableBalance.toBigInt()} />}
               />
               <TitledValue
                 title={t("root.lbl_locked")}
-                fontMono={true}
-                fontSmall={true}
+                fontMono
+                fontSmall
                 value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />}
               />
             </div>

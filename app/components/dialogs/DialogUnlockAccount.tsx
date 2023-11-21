@@ -42,7 +42,7 @@ export default function DialogUnlockAccount({ pair, isOpen, onClose }: IProps) {
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <InputGroup
           type="password"
-          large={true}
+          large
           className="font-mono"
           spellCheck={false}
           placeholder={t("commons.lbl_passphrase")}

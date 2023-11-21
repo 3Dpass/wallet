@@ -30,9 +30,9 @@ export default function Address() {
 
   return (
     <Card>
-      <TitledValue title={t("screen_address.lbl_title")} value={<Link to={ExplorerUrl.account({ address })}>{address}</Link>} fontMono={true} />
+      <TitledValue title={t("screen_address.lbl_title")} value={<Link to={ExplorerUrl.account({ address })}>{address}</Link>} fontMono />
       <Divider className="my-5" />
-      <HTMLTable striped={true} width="100%">
+      <HTMLTable striped width="100%">
         <thead>
           <tr>
             <th>{t("root.lbl_block")}</th>

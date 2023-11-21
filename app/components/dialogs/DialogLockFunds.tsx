@@ -108,21 +108,21 @@ export default function DialogLockFunds({ pair, isOpen, onClose, onAfterSubmit }
   }, [api, data, onAfterSubmit, pair, toaster]);
 
   return (
-    <Dialog isOpen={isOpen} usePortal={true} onClose={onClose} onOpening={handleOnOpening} className="w-[90%] sm:w-[640px]">
+    <Dialog isOpen={isOpen} usePortal onClose={onClose} onOpening={handleOnOpening} className="w-[90%] sm:w-[640px]">
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
         <AmountInput disabled={isLoading} onValueChange={handleAmountChange} placeholder={t("commons.lbl_amount")} />
         <NumericInput
           disabled={isLoading}
           buttonPosition={"none"}
-          large={true}
-          fill={true}
+          large
+          fill
           placeholder={t("dlg_lock_funds.lbl_release_lock_after")}
           leftIcon="cube"
           onValueChange={handleBlockChange}
           value={data.block}
-          rightElement={<Tag minimal={true}>{t("dlg_lock_funds.lbl_block_number")}</Tag>}
+          rightElement={<Tag minimal>{t("dlg_lock_funds.lbl_block_number")}</Tag>}
         />
-        <Checkbox checked={data.auto_extend} large={true} onChange={handleAutoExtendChange}>
+        <Checkbox checked={data.auto_extend} large onChange={handleAutoExtendChange}>
           {t("dlg_lock_funds.lbl_chk_extended")} {autoExtendPeriod} {t("dlg_lock_funds.lbl_chk_extended_1")}
         </Checkbox>
       </div>

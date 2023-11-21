@@ -124,7 +124,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog
       isOpen={isOpen}
-      usePortal={true}
+      usePortal
       onOpening={handleOnOpening}
       title={t("dlg_join_pool.lbl_title")}
       onClose={onClose}
@@ -136,10 +136,10 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
           itemPredicate={filterPool}
           itemRenderer={renderPool}
           menuProps={{ className: "max-h-[300px] overflow-auto" }}
-          noResults={<MenuItem disabled={true} text={t("dlg_join_pool.lbl_no_results")} roleStructure="listoption" />}
+          noResults={<MenuItem disabled text={t("dlg_join_pool.lbl_no_results")} roleStructure="listoption" />}
           onItemSelect={setPool}
           popoverProps={{ matchTargetWidth: true }}
-          fill={true}
+          fill
         >
           <Button
             text={data.poolToJoin}

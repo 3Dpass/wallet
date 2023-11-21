@@ -29,33 +29,33 @@ export default function Block() {
     queryBlock.data && (
       <Card>
         <div className="flex gap-4 mb-6">
-          <TitledValue title={t("commons.lbl_block")} value={<Link to={blockUrl}>{block}</Link>} fontMono={true} />
+          <TitledValue title={t("commons.lbl_block")} value={<Link to={blockUrl}>{block}</Link>} fontMono />
           <TitledValue title={t("commons.lbl_date")} value={<Moment date={queryBlock.data.getBlock.datetime} format="lll Z" interval={0} />} />
         </div>
         <div className="flex gap-4 mb-3">
-          <TitledValue title={t("screen_block.lbl_hash")} value={queryBlock.data.getBlock.hash} fontMono={true} />
+          <TitledValue title={t("screen_block.lbl_hash")} value={queryBlock.data.getBlock.hash} fontMono />
         </div>
         <div className="flex gap-4 mb-3">
-          <TitledValue title={t("screen_block.lbl_spec_name")} value={queryBlock.data.getBlock.specName} fontMono={true} />
-          <TitledValue title={t("screen_block.lbl_spec_version")} value={queryBlock.data.getBlock.specVersion} fontMono={true} />
+          <TitledValue title={t("screen_block.lbl_spec_name")} value={queryBlock.data.getBlock.specName} fontMono />
+          <TitledValue title={t("screen_block.lbl_spec_version")} value={queryBlock.data.getBlock.specVersion} fontMono />
         </div>
         <div className="flex gap-4 mb-3">
           <TitledValue
             title={t("screen_block.lbl_extrinsics")}
             value={<Link to={blockUrl}>{queryBlock.data.getBlock.countExtrinsics}</Link>}
-            fontMono={true}
+            fontMono
           />
-          <TitledValue title={t("screen_block.lbl_events")} value={<Link to={blockUrl}>{queryBlock.data.getBlock.countEvents}</Link>} fontMono={true} />
-          <TitledValue title={t("screen_block.lbl_logs")} value={<Link to={blockUrl}>{queryBlock.data.getBlock.countLogs}</Link>} fontMono={true} />
+          <TitledValue title={t("screen_block.lbl_events")} value={<Link to={blockUrl}>{queryBlock.data.getBlock.countEvents}</Link>} fontMono />
+          <TitledValue title={t("screen_block.lbl_logs")} value={<Link to={blockUrl}>{queryBlock.data.getBlock.countLogs}</Link>} fontMono />
         </div>
         <div className="flex flex-col gap-4 mt-6">
           {queryLogs.data?.getLogs.objects.map((log) => (
               <div key={log.logIdx} className="flex flex-col gap-2">
                 <div className="flex gap-4">
-                  <TitledValue title="Log Idx" value={log.logIdx} fontMono={true} fontSmall={true} />
-                  <TitledValue title="Type" value={log.typeName} fontMono={true} fontSmall={true} />
+                  <TitledValue title="Log Idx" value={log.logIdx} fontMono fontSmall />
+                  <TitledValue title="Type" value={log.typeName} fontMono fontSmall />
                 </div>
-                <TitledValue title="Data" value={log.data} fontMono={true} fontSmall={true} />
+                <TitledValue title="Data" value={log.data} fontMono fontSmall />
               </div>
             ))}
         </div>

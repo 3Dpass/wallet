@@ -206,7 +206,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
   return (
     <Dialog
       isOpen={isOpen}
-      usePortal={true}
+      usePortal
       onOpening={handleOnOpening}
       title={t("dlg_identity.lbl_title")}
       onClose={onClose}
@@ -220,10 +220,10 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
               items={dataState.registrarList}
               itemPredicate={filterRegistrar}
               itemRenderer={renderRegistrar}
-              noResults={<MenuItem disabled={true} text={t("dlg_identity.lbl_no_results")} roleStructure="listoption" />}
+              noResults={<MenuItem disabled text={t("dlg_identity.lbl_no_results")} roleStructure="listoption" />}
               onItemSelect={setRegistrar}
               popoverProps={{ matchTargetWidth: true }}
-              fill={true}
+              fill
               disabled={isIdentityLoading}
             >
               <Button
@@ -237,7 +237,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
               <>
                 <InputGroup
                   disabled={isIdentityLoading}
-                  large={true}
+                  large
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_display_name")}
@@ -250,7 +250,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                 />
                 <InputGroup
                   disabled={isIdentityLoading}
-                  large={true}
+                  large
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_legal_name")}
@@ -263,7 +263,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                 />
                 <InputGroup
                   disabled={isIdentityLoading}
-                  large={true}
+                  large
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_email")}
@@ -276,7 +276,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                 />
                 <InputGroup
                   disabled={isIdentityLoading}
-                  large={true}
+                  large
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_web_address")}
@@ -289,7 +289,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                 />
                 <InputGroup
                   disabled={isIdentityLoading}
-                  large={true}
+                  large
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_twitter")}
@@ -302,7 +302,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                 />
                 <InputGroup
                   disabled={isIdentityLoading}
-                  large={true}
+                  large
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_discord")}
@@ -315,7 +315,7 @@ export default function DialogIdentity({ isOpen, onClose, pair, hasIdentity, isR
                 />
                 <InputGroup
                   disabled={isIdentityLoading}
-                  large={true}
+                  large
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_riot_name")}

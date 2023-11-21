@@ -85,7 +85,7 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
   return (
     <Dialog
       isOpen={isOpen}
-      usePortal={true}
+      usePortal
       onOpening={handleOnOpening}
       title={t("dlg_close_pool.lbl_title")}
       onClose={onClose}
