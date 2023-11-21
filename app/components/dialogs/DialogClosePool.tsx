@@ -55,7 +55,7 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
         }
         events.forEach(({ phase, event: { data, method, section } }) => {
           if (method == "ExtrinsicSuccess" && poolIds.includes(pair.address)) {
-            poolIds;
+            
             setPoolIds(
               poolIds.filter(function (item) {
                 return item !== pair.address;
