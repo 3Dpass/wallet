@@ -66,12 +66,10 @@ export default function UserCard({ registrarInfo }: IProps) {
               <td>{t("user_card.lbl_twitter")}</td>
               <td>{registrarInfo.info?.twitter.Raw as string}</td>
             </tr>
-            {registrarInfo.info.additional &&
-              registrarInfo.info.additional.map((addItem, i) => {
+            {registrarInfo.info.additional?.map((addItem, i) => {
                 return (
                   <tr key={i}>
-                    {addItem &&
-                      addItem.map((item, j) => {
+                    {addItem?.map((item, j) => {
                         return <td key={item.Raw}>{item.Raw}</td>;
                       })}
                   </tr>
@@ -93,7 +91,7 @@ export default function UserCard({ registrarInfo }: IProps) {
                     }
                     return <span key={index}></span>;
                   })
-                : registrarInfo.judgements && registrarInfo.judgements[0] && registrarInfo.judgements[0][1]}
+                : registrarInfo.judgements?.[0] && registrarInfo.judgements[0][1]}
             </Tag>
           </div>
         )}

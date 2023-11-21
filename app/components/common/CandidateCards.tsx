@@ -79,8 +79,7 @@ export default function CandidateCards({ regIndex, pair, dateMonthAgo, onClose }
 
   return (
     <div>
-      {dataState.candidateList &&
-        dataState.candidateList.map((candidateInfo) => {
+      {dataState.candidateList?.map((candidateInfo) => {
           return (
             <div key={candidateInfo.account} className="relative">
               <UserCard registrarInfo={candidateInfo} />
