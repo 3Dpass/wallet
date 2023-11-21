@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Classes, Elevation, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
+import { Alert, Button, Classes, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
@@ -269,7 +269,7 @@ export default function Account({ pair }: IProps) {
   const accountLocked: boolean = pair.isLocked && !pair.meta.isInjected;
 
   return (
-    <Card elevation={Elevation.ZERO} className="relative pt-9 pb-4">
+    <div className="relative p-3 pt-9 text-sm border border-gray-600">
       {dialogElements}
       <AddressItem address={pair.address} />
       <div className="grid gap-1">
@@ -277,9 +277,24 @@ export default function Account({ pair }: IProps) {
         {balances && (
           <>
             <div className="grid grid-cols-3 gap-1 py-2">
-              <TitledValue title={t("root.lbl_total_balance")} value={<FormattedAmount value={balances.freeBalance.toBigInt()} />} />
-              <TitledValue title={t("root.lbl_transferable")} value={<FormattedAmount value={balances.availableBalance.toBigInt()} />} />
-              <TitledValue title={t("root.lbl_locked")} value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />} />
+              <TitledValue
+                title={t("root.lbl_total_balance")}
+                fontMono={true}
+                fontSmall={true}
+                value={<FormattedAmount value={balances.freeBalance.toBigInt()} />}
+              />
+              <TitledValue
+                title={t("root.lbl_transferable")}
+                fontMono={true}
+                fontSmall={true}
+                value={<FormattedAmount value={balances.availableBalance.toBigInt()} />}
+              />
+              <TitledValue
+                title={t("root.lbl_locked")}
+                fontMono={true}
+                fontSmall={true}
+                value={<FormattedAmount value={balances.lockedBalance.toBigInt()} />}
+              />
             </div>
             {accountLocked && (
               <div className="my-2 text-center">
@@ -291,32 +306,33 @@ export default function Account({ pair }: IProps) {
               </div>
             )}
             <div className="grid grid-cols-3 gap-1">
-              <Button icon="send-to" text={t("root.lbl_btn_send")} onClick={() => dialogToggle("send")} disabled={accountLocked} />
-              <Button icon="duplicate" text={t("commons.lbl_btn_copy")} onClick={handleCopyAddress} />
-              <Button icon="endorsed" text={t("root.lbl_btn_sign_verify")} onClick={handleSignVerify} disabled={accountLocked} />
+              <Button className="text-xs" icon="send-to" text={t("root.lbl_btn_send")} onClick={() => dialogToggle("send")} disabled={accountLocked} />
+              <Button className="text-xs" icon="duplicate" text={t("commons.lbl_btn_copy")} onClick={handleCopyAddress} />
+              <Button className="text-xs" icon="endorsed" text={t("root.lbl_btn_sign_verify")} onClick={handleSignVerify} disabled={accountLocked} />
               <Button
+                className="text-xs"
                 icon="unlock"
                 text={t("root.lbl_btn_unlock")}
                 onClick={handleUnlockFundsClick}
                 disabled={balances.lockedBalance.toBigInt() <= 0 || accountLocked}
               />
-              <Button icon="lock" text={t("root.lbl_btn_lock")} onClick={handleLockFundsClick} disabled={accountLocked} />
+              <Button className="text-xs" icon="lock" text={t("root.lbl_btn_lock")} onClick={handleLockFundsClick} disabled={accountLocked} />
               {!pair.meta.isInjected && (
                 <>
-                  <Button icon="delete" text={t("root.lbl_btn_remove")} onClick={() => dialogToggle("delete")} />
+                  <Button className="text-xs" icon="delete" text={t("root.lbl_btn_remove")} onClick={() => dialogToggle("delete")} />
                 </>
               )}
               {!accountLocked && (
                 <div className="flex items-center justify-center gap-1 cursor-pointer group" onClick={() => dialogToggle("identity")}>
                   {isRegistrar ? (
-                    <span className="font-bold underline underline-offset-2 text-center">{t("root.lbl_judgements_requests")}&nbsp;&rarr;</span>
+                    <span className="font-bold underline underline-offset-2 text-center text-xs">{t("root.lbl_judgements_requests")}&nbsp;&rarr;</span>
                   ) : (
                     <>
-                      <span className="group-hover:underline underline-offset-2">{t("root.lbl_identity")}:</span>
+                      <span className="group-hover:underline underline-offset-2 text-xs">{t("root.lbl_identity")}:</span>
                       {hasIdentity ? (
-                        <Icon className={`${Classes.ICON} ${Classes.INTENT_SUCCESS}`} icon="endorsed" size={IconSize.LARGE} />
+                        <Icon className={`${Classes.ICON} ${Classes.INTENT_SUCCESS} `} icon="endorsed" size={IconSize.STANDARD} />
                       ) : (
-                        <span className="font-bold underline underline-offset-2">{t("root.lbl_identity_not_claimed")} &rarr;</span>
+                        <span className="font-bold underline underline-offset-2 text-xs">{t("root.lbl_identity_not_claimed")} &rarr;</span>
                       )}
                     </>
                   )}
@@ -328,31 +344,50 @@ export default function Account({ pair }: IProps) {
                 <Text className="font-bold pt-4 pb-2">{t("root.lbl_pool_actions")}</Text>
                 <div className="grid grid-cols-3 gap-1">
                   {!poolAlreadyExist && (
-                    <Button text={t("root.lbl_btn_create")} loading={isCreatePoolLoading} onClick={handleCreatePoolClick} disabled={accountLocked} />
+                    <Button
+                      className="text-xs"
+                      text={t("root.lbl_btn_create")}
+                      loading={isCreatePoolLoading}
+                      onClick={handleCreatePoolClick}
+                      disabled={accountLocked}
+                    />
                   )}
                   {poolAlreadyExist && (
                     <div className="grid grid-cols-2 gap-1">
-                      <Button text={t("root.lbl_btn_kyc")} onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />
-                      <Button text={t("root.lbl_btn_no_kyc")} onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />
+                      <Button className="text-xs" text={t("root.lbl_btn_kyc")} onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />
+                      <Button className="text-xs" text={t("root.lbl_btn_no_kyc")} onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />
                     </div>
                   )}
                   {poolAlreadyExist && (
-                    <Button text={t("root.lbl_btn_close_pool")} onClick={() => dialogToggle("close_pool")} disabled={accountLocked} />
+                    <Button
+                      className="text-xs"
+                      text={t("root.lbl_btn_close_pool")}
+                      onClick={() => dialogToggle("close_pool")}
+                      disabled={accountLocked}
+                    />
                   )}
                   <Button
+                    className="text-xs"
                     text={t("root.lbl_btn_fee")}
                     onClick={() => dialogToggle("set_pool_interest")}
                     disabled={accountLocked || !poolAlreadyExist}
                   />
                   <Button
-                    className="text-center"
+                    className="text-xs text-center"
                     text={t("root.lbl_btn_difficulty")}
                     onClick={() => dialogToggle("set_pool_difficulty")}
                     disabled={accountLocked || !poolAlreadyExist}
                   />
-                  {poolAlreadyExist && <Button text={t("root.lbl_btn_add_miner")} onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />}
                   {poolAlreadyExist && (
-                    <Button text={t("root.lbl_btn_remove_miner")} onClick={() => dialogToggle("remove_miner")} disabled={accountLocked} />
+                    <Button className="text-xs" text={t("root.lbl_btn_add_miner")} onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />
+                  )}
+                  {poolAlreadyExist && (
+                    <Button
+                      className="text-xs"
+                      text={t("root.lbl_btn_remove_miner")}
+                      onClick={() => dialogToggle("remove_miner")}
+                      disabled={accountLocked}
+                    />
                   )}
                   {!poolAlreadyExist && <Button text={t("root.lbl_btn_join")} onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />}
                   {!poolAlreadyExist && <Button text={t("root.lbl_btn_leave")} onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />}
@@ -363,7 +398,7 @@ export default function Account({ pair }: IProps) {
         )}
       </div>
       {Boolean(pair.meta.isInjected) && (
-        <div className="absolute top-0 right-0 flex gap-1 text-xs px-2 py-1 bg-gray-600 rounded-bl text-gray-400">
+        <div className="absolute top-0 right-0 flex gap-1 text-xs px-2 py-1 bg-gray-600 text-gray-400">
           {Boolean(pair.meta.name) && (
             <span>
               <span className="font-bold text-white">{pair.meta.name as string}</span>
@@ -372,6 +407,6 @@ export default function Account({ pair }: IProps) {
           extension
         </div>
       )}
-    </Card>
+    </div>
   );
 }
