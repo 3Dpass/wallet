@@ -4,6 +4,7 @@ import type { AccountInfo } from "@polkadot/types/interfaces/system/types";
 import type { AccountData } from "@polkadot/types/interfaces";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { RPC_CONFIG, RPC_TYPES } from "../api.config";
+import { BigInt } from "@polkadot/x-bigint";
 
 async function loadNetworkState() {
   const provider = new WsProvider(defaultEndpoint, false);
@@ -14,32 +15,30 @@ async function loadNetworkState() {
   const totalIssuanceNumber = BigInt(totalIssuance.toPrimitive() as number);
   const totalSupply = BigInt(1_000_000_000) * BigInt(1_000_000_000_000);
 
-  const staffAndInvestors = [
-    "d1CNDotJXNPvnSA5EQXpSbkUyXBVmaggkARY7kcgXim4BqeBJ",
-    "d1GZ8GxP3KzKJGRYmp9HMwxurnSKx3ACcqeZqLY5kpbLEyjzE",
-    "d1GA9xWx3WgpQHp8LHCXHbYoZdvjY3NHhU6gR2fsdVCiC4TdF",
-    "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
+  const budgets = [
     "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
+    "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
+    "d1EjCsWUVnKTG3dysQC2MWDfZKngtiwV2ZLegWRfFMbUR5d6c",
   ];
-  const balances = await api.query.system.account.multi<AccountInfo>(staffAndInvestors);
-  const balancesNumber = balances.map((balance) => {
-    const data = balance.data as AccountData;
-    return data.free.toBigInt();
+  const budgetBalances = await api.query.system.account.multi<AccountInfo>(budgets);
+  const budgetBalancesValues = budgetBalances.map((balance) => {
+    const { free, miscFrozen, feeFrozen } = balance.data as AccountData;
+    const frozenValue = BigInt(Math.max(Number(miscFrozen.toBigInt()), Number(feeFrozen.toBigInt())));
+    return free.toBigInt() - frozenValue;
   });
-  const staffAndInvestorsSum = balancesNumber.reduce((a, b) => a + b, BigInt(0));
+  const budgetBalancesSum = budgetBalancesValues.reduce((a, b) => a + b, BigInt(0));
 
-  let frozen = BigInt(0);
   let circulating = BigInt(0);
   const accounts = await api.query.system.account.entries<AccountInfo>();
   accounts.forEach(([, account]) => {
-    const { miscFrozen, free } = account.data as AccountData;
-    frozen += miscFrozen.toBigInt();
-    circulating += free.toBigInt();
+    const { free, miscFrozen, feeFrozen } = account.data as AccountData;
+    const frozenValue = BigInt(Math.max(Number(miscFrozen.toBigInt()), Number(feeFrozen.toBigInt())));
+    circulating += free.toBigInt() - frozenValue;
   });
 
   return {
     totalIssuance: totalIssuanceNumber.toString(),
-    circulatingSupply: (circulating - frozen - staffAndInvestorsSum).toString(),
+    circulatingSupply: (circulating - budgetBalancesSum).toString(),
     totalSupply: totalSupply.toString(),
   };
 }
