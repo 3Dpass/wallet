@@ -91,7 +91,7 @@ jobs:
           field: "app"
 
       - name: 🚀 Deploy Production
-        uses: superfly/flyctl-actions@1.5
+        uses: superfly/flyctl-actions@v2
         with:
           args: "deploy --image registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.ref_name }}-${{ github.sha }}"
         env:
