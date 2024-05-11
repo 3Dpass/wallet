@@ -7,7 +7,7 @@ The wallet page: https://wallet.3dpass.org/
 The wallet interacts directly from your browser to the blockchain [Node](https://github.com/3Dpass/3DP) using either public or private API websocket endpoint.
 
 ### 3DPass API Endpoints:
-- Mainnet `wss://rpc.3dpass.org`
+- Mainnet `wss://rpc.3dpscan.io`
 - Mainnet `wss://rpc2.3dpass.org`
 - Testnet `wss://test-rpc.3dpass.org`
 
