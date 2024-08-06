@@ -1,17 +1,16 @@
-# 3DPass Web Wallet
-3DPass wallet is a WEB3 browser light wallet UI for ["The Ledger of Things"](https://github.com/3Dpass/3DP). It might also be used as a wallet app for [Substrate](https://github.com/paritytech/substrate)-based blockchains.
+# 3DPass Web3 Wallet
+3DPass wallet is a WEB3 browser light wallet UI for ["The Ledger of Things"](https://github.com/3Dpass/3DP).
 
 The wallet page: https://wallet.3dpass.org/
 
 ## Interaction
 The wallet interacts directly from your browser to the blockchain [Node](https://github.com/3Dpass/3DP) using either public or private API websocket endpoint.
 
-### 3DPass API Endpoints:
+### 3DPass RPC API Endpoints:
 - Mainnet `wss://rpc.3dpscan.io`
-- Mainnet `wss://rpc2.3dpass.org`
 - Testnet `wss://test-rpc.3dpass.org`
 
-In order to connect the wallet to the local Node you can set up `wss://127.0.0.1:9944`
+In order to connect the wallet to the Node in local you neeed to set up `wss://127.0.0.1:9944`
 
 ## Explorer features Integration
 The wallet reaches out to [Block Explorer](https://github.com/3Dpass/explorer) API for block detais.
@@ -40,13 +39,13 @@ Then run the app in production mode:
 pnpm start
 ```
 
-Now you'll need to pick a host to deploy it to.
+Now you'll need to pick up a host to deploy it to.
 
-## Adding New Languages
+## UI language localization
 
-To add support for a new language in the application, you need to create a new JSON file with the language code as the name (e.g., "en.json" for English) and place it in the translations folder. The JSON file should contain key-value pairs where the keys are the identifiers used in the application code, and the values are the translated text for that language.
+In order for the application to support new local translation on the UI, it is required that you create a JSON file with the language code for its name (e.g., "en.json" for English) and place it into the translations folder. The JSON file must contain key-value pairs where the keys are the identifiers used in the application code, and the values are the translated text in that language.
 
-Follow these steps to add a new language:
+Follow these steps to add a new local translation:
 
 Go to the translations folder.
 
@@ -100,4 +99,4 @@ After completing these steps, the application should be able to load and use the
 ## Copyright
 3DPass web wallet
 
-Copyright (C) 2022-2023  3DPass 3dpass.org
+Copyright (C) 2022-2024  3DPass 3dpass.org
