@@ -1,19 +1,24 @@
 # 3DPass Web3 Wallet
-3DPass wallet is a WEB3 browser light wallet UI for ["The Ledger of Things"](https://github.com/3Dpass/3DP).
+The wallet is a WEB3 UI for ["The Ledger of Things" (LoT)](https://github.com/3Dpass/3DP), which is a non-custodial js app that allows for import of user accounts directly or its injection from a third-party keychain extension (ex. from the [polka js](https://polkadot.js.org/extension/) extension).
 
 The wallet page: https://wallet.3dpass.org/
 
 ## Interaction
-The wallet interacts directly from your browser to the blockchain [Node](https://github.com/3Dpass/3DP) using either public or private API websocket endpoint.
+The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) available via the RPC API websocket endpoint directly from your web browser. You can change the RPC API endpoint in Settings. Explore these ["How To" tips](https://3dpass.org/mainnet#wallet) for more detail.  
 
-### 3DPass RPC API Endpoints:
+### The LoT RPC API Endpoints:
 - Mainnet `wss://rpc.3dpscan.io`
 - Testnet `wss://test-rpc.3dpass.org`
+- Local Node `wss://127.0.0.1:9944`
 
-In order to connect the wallet to the Node in local you neeed to set up `wss://127.0.0.1:9944`
+### Transaction history
+The wallet fetches transaction history available for finalized blocks via the [Block Explorer graphql server](https://explorer-api.3dpscan.io/graphql/) API.
 
-## Explorer features Integration
-The wallet reaches out to [Block Explorer](https://github.com/3Dpass/explorer) API for block detais.
+## Installation
+
+```sh
+pnpm install
+```
 
 ## Development
 
@@ -41,7 +46,7 @@ pnpm start
 
 Now you'll need to pick up a host to deploy it to.
 
-## UI language localization
+## Localization
 
 In order for the application to support new local translation on the UI, it is required that you create a JSON file with the language code for its name (e.g., "en.json" for English) and place it into the translations folder. The JSON file must contain key-value pairs where the keys are the identifiers used in the application code, and the values are the translated text in that language.
 
