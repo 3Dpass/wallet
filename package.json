@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@apollo/client": "3.7.17",
-    "@blueprintjs/core": "5.1.5",
-    "@blueprintjs/popover2": "2.0.7",
-    "@blueprintjs/select": "5.0.7",
+    "@blueprintjs/core": "5.11.0",
+    "@blueprintjs/popover2": "2.1.8",
+    "@blueprintjs/select": "5.2.2",
     "@polkadot/api": "10.9.1",
     "@polkadot/api-derive": "10.9.1",
     "@polkadot/extension-dapp": "0.46.5",
