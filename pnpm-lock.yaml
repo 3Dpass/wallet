@@ -65,9 +65,6 @@ importers:
       '@remix-run/serve':
         specifier: 1.19.1
         version: 1.19.1
-      '@types/prettier':
-        specifier: 3.0.0
-        version: 3.0.0
       '@types/react':
         specifier: 18.3.3
         version: 18.3.3
@@ -1719,10 +1716,6 @@ packages:
 
   '@types/offscreencanvas@2019.7.3':
     resolution: {integrity: sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==}
-
-  '@types/prettier@3.0.0':
-    resolution: {integrity: sha512-mFMBfMOz8QxhYVbuINtswBp9VL2b4Y0QqYHwqLz3YbgtfAcat2Dl6Y1o4e22S/OVE6Ebl9m7wWiMT2lSbAs1wA==}
-    deprecated: This is a stub types definition. prettier provides its own type definitions, so you do not need this installed.
 
   '@types/prop-types@15.7.12':
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
@@ -7235,10 +7228,6 @@ snapshots:
       undici-types: 6.13.0
 
   '@types/offscreencanvas@2019.7.3': {}
-
-  '@types/prettier@3.0.0':
-    dependencies:
-      prettier: 3.3.3
 
   '@types/prop-types@15.7.12': {}
 
