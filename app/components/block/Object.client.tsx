@@ -40,11 +40,8 @@ export default function Object({ geometry }: IProps) {
 
   return (
     <>
-      <ambientLight color={[1, 1, 1]} />
-      <pointLight intensity={2} position={[-10, -10, -10]} />
-      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
       <mesh ref={meshRef} geometry={geometry}>
-        <meshPhongMaterial color="#fff" envMap={textureCube} refractionRatio={0.7} reflectivity={1} flatShading />
+        <meshPhongMaterial emissive="#fff" envMap={textureCube} refractionRatio={0.7} reflectivity={1} flatShading />
       </mesh>
     </>
   );
