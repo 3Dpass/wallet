@@ -11,7 +11,7 @@
     "dev:css": "tailwindcss -w -i ./styles/app.css -o app/styles/app.css"
   },
   "dependencies": {
-    "@apollo/client": "3.7.17",
+    "@apollo/client": "3.11.4",
     "@blueprintjs/core": "5.11.0",
     "@blueprintjs/select": "5.2.2",
     "@polkadot/api": "10.9.1",
@@ -38,7 +38,7 @@
     "autoprefixer": "10.4.20",
     "concurrently": "8.2.2",
     "eslint": "9.9.0",
-    "graphql": "16.7.1",
+    "graphql": "16.9.0",
     "i18next": "^23.2.11",
     "i18next-browser-languagedetector": "^7.1.0",
     "jotai": "2.2.2",
