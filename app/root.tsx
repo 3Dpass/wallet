@@ -138,6 +138,9 @@ export default function App() {
                   <Outlet />
                   <footer className="p-4 py-8">
                     <div className="flex items-center gap-6 justify-end">
+                      <a href="https://swap.3dpscan.io/swap" target="_blank" rel="noopener noreferrer">
+                        DEX/Swap
+                      </a>
                       <a href="https://play.google.com/store/apps/details?id=com.threedpass.wallet" target="_blank" rel="noopener noreferrer">
                         <img src="/google-play.png" alt="Google Play" className="h-8" />
                       </a>
