@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { Link } from "@remix-run/react";
-import { Button, Card, Classes, Elevation, Icon } from "@blueprintjs/core";
-import { Popover2 } from "@blueprintjs/popover2";
+import { Button, Card, Classes, Elevation, Icon, Popover } from "@blueprintjs/core";
 import Object from "./Object.client";
 import TitledValue from "../common/TitledValue";
 import type { IBlock } from "../types";
@@ -49,7 +48,7 @@ export default function Block({ block }: IProps) {
           <a className={Classes.BUTTON} href={downloadUrl} download={downloadFilename}>
             <Icon icon="download" />
           </a>
-          <Popover2
+          <Popover
             content={
               <div className="p-4">
                 {block.objectHashAlgo && (
@@ -66,7 +65,7 @@ export default function Block({ block }: IProps) {
             }
           >
             <Button icon="info-sign" />
-          </Popover2>
+          </Popover>
         </div>
       </div>
       <div className="w-full h-[300px]">
