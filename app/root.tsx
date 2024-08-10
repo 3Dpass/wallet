@@ -136,9 +136,12 @@ export default function App() {
                     </NavbarGroup>
                   </Navbar>
                   <Outlet />
-                  <footer className="p-4">
-                    <div className="text-right">
-                      <a href="https://github.com/3Dpass/wallet" className="inline-block">
+                  <footer className="p-4 py-8">
+                    <div className="flex items-center gap-6 justify-end">
+                      <a href="https://play.google.com/store/apps/details?id=com.threedpass.wallet" target="_blank" rel="noopener noreferrer">
+                        <img src="/google-play.png" alt="Google Play" className="h-8" />
+                      </a>
+                      <a href="https://github.com/3Dpass/wallet" target="_blank" rel="noopener noreferrer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                           <path
                             fill="#fff"
