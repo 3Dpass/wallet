@@ -23,6 +23,7 @@
     "@polkadot/ui-keyring": "3.8.3",
     "@polkadot/util": "13.0.2",
     "@polkadot/util-crypto": "13.0.2",
+    "@polkadot/x-bigint": "^13.0.2",
     "@react-three/drei": "9.109.5",
     "@react-three/fiber": "8.16.8",
     "@remix-run/dev": "1.19.1",

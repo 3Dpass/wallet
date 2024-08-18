@@ -21,20 +21,20 @@ async function loadNetworkState() {
     "d1EjCsWUVnKTG3dysQC2MWDfZKngtiwV2ZLegWRfFMbUR5d6c",
   ];
   const budgetBalances = await api.query.system.account.multi<AccountInfo>(budgets);
-  const budgetBalancesValues = budgetBalances.map((balance) => {
+  let budgetBalancesSum = BigInt(0);
+  for (const balance of budgetBalances) {
     const { free, miscFrozen, feeFrozen } = balance.data as AccountData;
     const frozenValue = BigInt(Math.max(Number(miscFrozen.toBigInt()), Number(feeFrozen.toBigInt())));
-    return free.toBigInt() - frozenValue;
-  });
-  const budgetBalancesSum = budgetBalancesValues.reduce((a, b) => a + b, BigInt(0));
+    budgetBalancesSum += free.toBigInt() - frozenValue;
+  }
 
   let circulating = BigInt(0);
   const accounts = await api.query.system.account.entries<AccountInfo>();
-  accounts.forEach(([, account]) => {
+  for (const [, account] of accounts) {
     const { free, miscFrozen, feeFrozen } = account.data as AccountData;
     const frozenValue = BigInt(Math.max(Number(miscFrozen.toBigInt()), Number(feeFrozen.toBigInt())));
     circulating += free.toBigInt() - frozenValue;
-  });
+  }
 
   return {
     totalIssuance: totalIssuanceNumber.toString(),

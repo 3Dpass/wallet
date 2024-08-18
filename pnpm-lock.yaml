@@ -44,6 +44,9 @@ importers:
       '@polkadot/util-crypto':
         specifier: 13.0.2
         version: 13.0.2(@polkadot/util@13.0.2)
+      '@polkadot/x-bigint':
+        specifier: ^13.0.2
+        version: 13.0.2
       '@react-three/drei':
         specifier: 9.109.5
         version: 9.109.5(@react-three/fiber@8.16.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.167.1))(@types/react@18.3.3)(@types/three@0.167.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.167.1)
