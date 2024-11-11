@@ -118,6 +118,9 @@ export default function App() {
                           <img src="/logo.svg" alt="3Dpass Logo" className="h-7" />
                           <span className="mb-[-3px]">{t("root.lbl_app_name")}</span>
                         </Link>
+                        <Link to="/governance/members" className="ml-3 mb-[-3px]">
+                          <Button minimal text={t("governance.title")} />
+                        </Link>
                         <Button className="ml-2" icon="cog" minimal onClick={() => setIsSettingsDialogOpen(true)} />
                         <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
                       </NavbarHeading>

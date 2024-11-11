@@ -199,6 +199,20 @@
       "lbl_extrinsics": "Extrinsèques",
       "lbl_events": "Événements",
       "lbl_logs": "Journaux"
+    },
+    "governance": {
+      "title": "Gouvernance",
+      "council_members": "Membres du Conseil",
+      "active_motions": "Motions Actives",
+      "proposer": "Proposant",
+      "votes": "Votes",
+      "threshold": "Seuil",
+      "no_active_motions": "Aucune motion active",
+      "motions": "Motions",
+      "votes_threshold": "{{ayes}}/{{threshold}} votes",
+      "ayes": "Pour",
+      "nays": "Contre",
+      "members": "Membres"
     }
   }
 }
