@@ -107,7 +107,7 @@ export default function GovernanceMembers() {
       }
     }
 
-    void fetchCouncilData();
+    fetchCouncilData();
   }, [api, electionsInfo, allVotes]);
 
   if (loading) {

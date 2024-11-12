@@ -25,7 +25,7 @@ export default function GovernanceMotions() {
       }
     }
 
-    void fetchMotions();
+    fetchMotions();
   }, [api]);
 
   if (loading) {

@@ -21,12 +21,12 @@ export function extractIdentity(identity: DeriveAccountRegistration): AccountNam
   
   const displayName = isGood
     ? (identity.display || '')
-    : (identity.display || '').replace(/[^\x20-\x7E]/g, '');
+    : (identity.display || '').replace(/[^\u0020-\u007E]/gu, '');
   
   const displayParent = identity.displayParent && (
     isGood
       ? identity.displayParent
-      : identity.displayParent.replace(/[^\x20-\x7E]/g, '')
+      : identity.displayParent.replace(/[^\u0020-\u007E]/gu, '')
   );
 
   return {
@@ -55,7 +55,7 @@ export function AccountName({ address, identity }: AccountNameProps) {
       }
     }
 
-    void fetchIdentity();
+    fetchIdentity();
   }, [api, address, identity]);
 
   return (
