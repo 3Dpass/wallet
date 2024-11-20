@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "@remix-run/react";
 
-// Add this function before your component
 const getNavLinkClass = ({ isActive }: { isActive: boolean }): string => 
   `px-4 py-2 ${isActive ? 'bg-gray-700 text-white' : 'text-gray-400 hover:bg-gray-800'}`;
 
