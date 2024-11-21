@@ -14,26 +14,20 @@ interface AccountNameProps {
   };
 }
 
-export function extractIdentity(identity: DeriveAccountRegistration): AccountNameProps['identity'] {
+export function extractIdentity(identity: DeriveAccountRegistration): AccountNameProps["identity"] {
   const judgements = identity.judgements.filter(([, judgement]) => !judgement.isFeePaid);
   const isGood = judgements.some(([, judgement]) => judgement.isKnownGood || judgement.isReasonable);
   const isBad = judgements.some(([, judgement]) => judgement.isErroneous || judgement.isLowQuality);
-  
-  const displayName = isGood
-    ? (identity.display || '')
-    : (identity.display || '').replace(/[^\u0020-\u007E]/gu, '');
-  
-  const displayParent = identity.displayParent && (
-    isGood
-      ? identity.displayParent
-      : identity.displayParent.replace(/[^\u0020-\u007E]/gu, '')
-  );
+
+  const displayName = isGood ? identity.display || "" : (identity.display || "").replace(/[^\u0020-\u007E]/gu, "");
+
+  const displayParent = identity.displayParent && (isGood ? identity.displayParent : identity.displayParent.replace(/[^\u0020-\u007E]/gu, ""));
 
   return {
     display: displayName,
     parent: displayParent,
     isGood,
-    isBad
+    isBad,
   };
 }
 
@@ -44,7 +38,7 @@ export function AccountName({ address, identity }: AccountNameProps) {
   useEffect(() => {
     async function fetchIdentity() {
       if (!api || identity) return;
-      
+
       try {
         const accountInfo = await api.derive.accounts.info(address);
         if (accountInfo.identity?.display) {
@@ -63,23 +57,15 @@ export function AccountName({ address, identity }: AccountNameProps) {
       <AddressIcon address={address} />
       <div className="ml-3">
         {localIdentity ? (
-          <div className={`${localIdentity.isGood ? 'text-green-501' : localIdentity.isBad ? 'text-red-500' : 'text-gray-500'}`}>
-            {localIdentity.parent && (
-              <span className="text-gray-601">{localIdentity.parent}/</span>
-            )}
-            <span className="border-b border-b-gray-501 group-hover:border-b-white">
-              {localIdentity.display}
-            </span>
-            {localIdentity.isGood && !localIdentity.isBad && (
-              <span className="ml-2">✓</span>
-            )}
+          <div className={`${localIdentity.isGood ? "text-green-501" : localIdentity.isBad ? "text-red-500" : "text-gray-500"}`}>
+            {localIdentity.parent && <span className="text-gray-601">{localIdentity.parent}/</span>}
+            <span className="border-b border-b-gray-501 group-hover:border-b-white">{localIdentity.display}</span>
+            {localIdentity.isGood && !localIdentity.isBad && <span className="ml-2">✓</span>}
           </div>
         ) : (
-          <div className="font-mono text-ellipsis overflow-hidden border-b border-b-gray-501 group-hover:border-b-white">
-            {address}
-          </div>
+          <div className="font-mono text-ellipsis overflow-hidden border-b border-b-gray-501 group-hover:border-b-white">{address}</div>
         )}
       </div>
     </Link>
   );
-} 
+}

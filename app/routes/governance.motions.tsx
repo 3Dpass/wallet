@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Card, Elevation, Spinner } from '@blueprintjs/core';
-import { useApi } from 'app/components/Api';
-import { DeriveCollectiveProposal } from '@polkadot/api-derive/types';
-import { AccountName } from 'app/components/common/AccountName';
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { Card, Elevation, Spinner } from "@blueprintjs/core";
+import { useApi } from "app/components/Api";
+import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
+import { AccountName } from "app/components/common/AccountName";
 
 export default function GovernanceMotions() {
   const { t } = useTranslation();
@@ -48,14 +48,14 @@ export default function GovernanceMotions() {
                     <div className="text-sm text-gray-500">
                       {t("governance.votes_threshold", {
                         ayes: motion.votes.ayes?.length || 0,
-                        threshold: motion.votes.threshold?.toNumber() || 0
+                        threshold: motion.votes.threshold?.toNumber() || 0,
                       })}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <div className="font-medium mb-2">{t("governance.ayes")}</div>
-                      {motion.votes.ayes?.map(address => (
+                      {motion.votes.ayes?.map((address) => (
                         <div key={address.toString()} className="mb-1">
                           <AccountName address={address.toString()} />
                         </div>
@@ -63,7 +63,7 @@ export default function GovernanceMotions() {
                     </div>
                     <div>
                       <div className="font-medium mb-2">{t("governance.nays")}</div>
-                      {motion.votes.nays?.map(address => (
+                      {motion.votes.nays?.map((address) => (
                         <div key={address.toString()} className="mb-1">
                           <AccountName address={address.toString()} />
                         </div>
@@ -78,4 +78,4 @@ export default function GovernanceMotions() {
       </div>
     </Card>
   );
-} 
+}
