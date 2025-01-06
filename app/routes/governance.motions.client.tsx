@@ -318,7 +318,7 @@ export default function GovernanceMotions() {
                             <Tag
                               key={address.toString()}
                               minimal
-                              className={`${Classes.TEXT_SMALL} ${address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900" : ""}`}
+                              className={`${Classes.TEXT_SMALL} px-2 py-1.5 rounded-md ${address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900" : ""}`}
                             >
                               <AccountName address={address.toString()} />
                             </Tag>
@@ -335,7 +335,7 @@ export default function GovernanceMotions() {
                               <Tag
                                 key={address.toString()}
                                 minimal
-                                className={`${Classes.TEXT_SMALL} ${address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900" : ""}`}
+                                className={`${Classes.TEXT_SMALL} px-2 py-1.5 rounded-md ${address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900" : ""}`}
                               >
                                 <AccountName address={address.toString()} />
                               </Tag>
