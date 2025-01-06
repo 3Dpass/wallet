@@ -23,8 +23,8 @@ export default function Governance() {
       <div className="grid gap-6">
         <div className="flex justify-between items-center">
           <Tabs id="governance-tabs" selectedTabId={currentTab} onChange={handleTabChange} animate={true} large={true}>
-            <Tab id="members" title={t("governance.members")} />
             <Tab id="motions" title={t("governance.motions")} />
+            <Tab id="members" title={t("governance.members")} />
           </Tabs>
           <AccountSelector onAccountChange={setSelectedAddress} selectedAddress={selectedAddress} />
         </div>

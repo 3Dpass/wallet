@@ -122,7 +122,7 @@ export default function App() {
                           <span className="mb-[-3px]">{t("root.lbl_app_name")}</span>
                         </Link>
                         <Link
-                          to="/governance/members"
+                          to="/governance"
                           className={`text-white hover:no-underline px-1 ms-3 flex items-center gap-2 ${
                             location.pathname.startsWith("/governance") ? "font-bold" : ""
                           }`}
