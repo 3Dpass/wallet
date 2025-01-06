@@ -7,6 +7,8 @@ import { BountyDetails } from "./BountyDetails";
 import { useApi } from "app/components/Api";
 import { useEffect, useState } from "react";
 import { formatDuration } from "app/utils/time";
+import { useLocation } from "@remix-run/react";
+import useToaster from "app/hooks/useToaster";
 
 // Constants
 const BLOCK_TIME_SECONDS = 60;
@@ -128,6 +130,7 @@ interface MotionDetailsProps {
   onClose?: (motion: DeriveCollectiveProposal) => void;
   votingLoading?: { [key: string]: boolean };
   closeMotionLoading?: { [key: string]: boolean };
+  highlight?: boolean;
 }
 
 function formatProposalArgument(section: string, method: string, arg: any, index: number): string {
@@ -171,44 +174,56 @@ function StatusBar({
   totalVotes,
   threshold,
   isThresholdReached,
+  onShare,
 }: {
   motion: DeriveCollectiveProposal;
   totalVotes: number;
   threshold: number;
   isThresholdReached: boolean;
+  onShare: () => void;
 }) {
   const { t } = useTranslation();
   const progress = threshold > 0 ? totalVotes / threshold : 0;
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <Tag minimal round intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY}>
-            #{motion.votes?.index.toString()}
-          </Tag>
-          <div className="h-5 w-[1px] bg-gray-300 dark:bg-gray-600" />
-          <div className="flex items-center">
-            <Icon icon="people" size={14} className="mr-1 text-gray-500" />
-            <span className="font-medium">
-              {totalVotes}/{threshold}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Tag minimal round intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY}>
+              #{motion.votes?.index.toString()}
+            </Tag>
+            <div className="h-5 w-[1px] bg-gray-300 dark:bg-gray-600" />
+            <div className="flex items-center">
+              <Icon icon="people" size={14} className="mr-1 text-gray-500" />
+              <span className="font-medium">
+                {totalVotes}/{threshold}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <TimeRemaining motion={motion} />
+            <div className="h-5 w-[1px] bg-gray-300 dark:bg-gray-600" />
+            <span className="text-sm text-gray-500">
+              {isThresholdReached ? (
+                <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
+                  <Icon icon="tick-circle" size={14} />
+                  {t("governance.threshold_reached")}
+                </span>
+              ) : (
+                t("governance.votes_needed", { remaining: threshold - totalVotes })
+              )}
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <TimeRemaining motion={motion} />
-          <div className="h-5 w-[1px] bg-gray-300 dark:bg-gray-600" />
-          <span className="text-sm text-gray-500">
-            {isThresholdReached ? (
-              <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
-                <Icon icon="tick-circle" size={14} />
-                {t("governance.threshold_reached")}
-              </span>
-            ) : (
-              t("governance.votes_needed", { remaining: threshold - totalVotes })
-            )}
-          </span>
-        </div>
+        <Button
+          small
+          minimal
+          icon="share"
+          onClick={onShare}
+          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          title={t("commons.lbl_btn_share")}
+        />
       </div>
       <div className="flex items-center">
         <div className="flex-grow">
@@ -233,8 +248,11 @@ export function MotionDetails({
   onClose,
   votingLoading = {},
   closeMotionLoading = {},
+  highlight = false,
 }: MotionDetailsProps) {
   const { t } = useTranslation();
+  const location = useLocation();
+  const toaster = useToaster();
 
   if (!motion?.proposal || !motion?.votes) return null;
 
@@ -280,11 +298,23 @@ export function MotionDetails({
 
   const proposalDescription = getProposalDescription(section, method, args);
 
+  const handleShare = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("highlight", hash);
+    navigator.clipboard.writeText(url.toString()).then(() => {
+      toaster.show({
+        icon: "tick",
+        intent: "success",
+        message: t("messages.lbl_copied_to_clipboard"),
+      });
+    });
+  };
+
   return (
-    <Card className="mb-3">
+    <Card className={`mb-3 ${highlight ? "ring-4 ring-blue-500 dark:ring-blue-400" : ""}`}>
       <div className="flex justify-between items-start">
         <div className="w-full">
-          <StatusBar motion={motion} totalVotes={totalVotes} threshold={threshold} isThresholdReached={isThresholdReached} />
+          <StatusBar motion={motion} totalVotes={totalVotes} threshold={threshold} isThresholdReached={isThresholdReached} onShare={handleShare} />
           <div className="text-sm text-gray-600 dark:text-gray-300 mt-6">{proposalDescription}</div>
         </div>
       </div>

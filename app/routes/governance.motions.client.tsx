@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Elevation, Spinner, Switch, Classes } from "@blueprintjs/core";
 import { useApi, useAccounts } from "app/components/Api";
@@ -10,6 +10,7 @@ import { mockVotes } from "app/utils/mock";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
 import { MotionDetails } from "app/components/governance/MotionDetails";
+import { useSearchParams } from "@remix-run/react";
 
 export default function GovernanceMotions() {
   const { t } = useTranslation();
@@ -18,11 +19,24 @@ export default function GovernanceMotions() {
   const toaster = useToaster();
   const [motions, setMotions] = useState<DeriveCollectiveProposal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [detailsLoaded, setDetailsLoaded] = useState(false);
   const [councilMemberAddresses, setCouncilMemberAddresses] = useState<string[]>([]);
   const [votingLoading, setVotingLoading] = useState<{ [key: string]: boolean }>({});
   const [selectedAddress, setSelectedAddress] = useAtom(lastSelectedAccountAtom);
   const [isMockMode, setIsMockMode] = useState(false);
   const [closeMotionLoading, setCloseMotionLoading] = useState<{ [key: string]: boolean }>({});
+  const [searchParams] = useSearchParams();
+  const highlightMotionHash = searchParams.get("highlight");
+  const highlightedMotionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (highlightMotionHash && highlightedMotionRef.current && !loading && detailsLoaded) {
+      const timeoutId = setTimeout(() => {
+        highlightedMotionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [highlightMotionHash, loading, detailsLoaded]);
 
   useEffect(() => {
     if (isMockMode && motions.length === 0) {
@@ -64,10 +78,12 @@ export default function GovernanceMotions() {
         console.error("Error fetching motions:", error);
       } finally {
         setLoading(false);
+        setTimeout(() => setDetailsLoaded(true), 500);
       }
     }
 
     fetchMotions();
+    return () => setDetailsLoaded(false);
   }, [api, isMockMode]);
 
   useEffect(() => {
@@ -278,16 +294,18 @@ export default function GovernanceMotions() {
               return indexB - indexA;
             })
             .map((motion) => (
-              <MotionDetails
-                key={motion.hash?.toString()}
-                motion={motion}
-                isCouncilMember={isSelectedCouncilMember}
-                selectedAddress={selectedAddress}
-                onVote={handleVote}
-                onClose={handleCloseMotion}
-                votingLoading={votingLoading}
-                closeMotionLoading={closeMotionLoading}
-              />
+              <div key={motion.hash?.toString()} ref={motion.hash?.toString() === highlightMotionHash ? highlightedMotionRef : undefined}>
+                <MotionDetails
+                  motion={motion}
+                  isCouncilMember={isSelectedCouncilMember}
+                  selectedAddress={selectedAddress}
+                  onVote={handleVote}
+                  onClose={handleCloseMotion}
+                  votingLoading={votingLoading}
+                  closeMotionLoading={closeMotionLoading}
+                  highlight={motion.hash?.toString() === highlightMotionHash}
+                />
+              </div>
             ))}
         </div>
       </div>
