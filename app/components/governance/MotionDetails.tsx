@@ -112,7 +112,12 @@ function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
 
   const display = timeRemaining > 0 ? formatTimeLeft(timeRemaining) : "(ended)";
 
-  return <span className="text-sm text-gray-500 ml-2">{display}</span>;
+  return (
+    <div className="flex items-center">
+      <Icon icon="time" size={14} className="mr-1 text-gray-500" />
+      <span className="font-medium">{display}</span>
+    </div>
+  );
 }
 
 interface MotionDetailsProps {
