@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Elevation, Spinner } from "@blueprintjs/core";
+import { Card, Elevation, Spinner, Tag, Intent, HTMLTable, Classes } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { AccountName } from "app/components/common/AccountName";
@@ -33,50 +33,73 @@ export default function GovernanceMotions() {
   }
 
   return (
-    <Card elevation={Elevation.ONE}>
-      <h2 className="text-xl mb-4">{t("governance.motions")}</h2>
-      <div className="grid gap-4">
-        {motions.map((motion, index) => (
-          <Card key={motion.hash.toString()} elevation={Elevation.TWO}>
-            <div className="p-4">
-              {motion.proposal && motion.votes && (
-                <>
-                  <div className="flex justify-between mb-3">
-                    <div className="text-lg font-medium">
-                      <span className="mr-2 text-gray-500">#{motion.votes.index.toString()}</span>
+    <Card elevation={Elevation.ONE} className="p-4">
+      <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.motions")}</h2>
+      <HTMLTable className="w-full">
+        <thead>
+          <tr>
+            <th className="w-16">#</th>
+            <th>{t("governance.motion")}</th>
+            <th>{t("governance.votes")}</th>
+            <th className="w-24 text-right">{t("governance.threshold")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {motions.map(
+            (motion) =>
+              motion.proposal &&
+              motion.votes && (
+                <tr key={motion.hash.toString()}>
+                  <td>
+                    <Tag minimal round>
+                      {motion.votes.index.toString()}
+                    </Tag>
+                  </td>
+                  <td>
+                    <div className={`${Classes.TEXT_LARGE} font-medium`}>
                       {motion.proposal.section}.{motion.proposal.method}
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {t("governance.votes_threshold", {
-                        ayes: motion.votes.ayes?.length || 0,
-                        threshold: motion.votes.threshold?.toNumber() || 0,
-                      })}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="font-medium mb-2">{t("governance.ayes")}</div>
-                      {motion.votes.ayes?.map((address) => (
-                        <div key={address.toString()} className="mb-1">
-                          <AccountName address={address.toString()} />
+                  </td>
+                  <td>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <Tag intent={Intent.SUCCESS} minimal>
+                          {motion.votes.ayes?.length || 0}
+                        </Tag>
+                        <div className="flex flex-wrap gap-1">
+                          {motion.votes?.ayes?.map((address) => (
+                            <Tag key={address.toString()} minimal className={Classes.TEXT_SMALL}>
+                              <AccountName address={address.toString()} />
+                            </Tag>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    <div>
-                      <div className="font-medium mb-2">{t("governance.nays")}</div>
-                      {motion.votes.nays?.map((address) => (
-                        <div key={address.toString()} className="mb-1">
-                          <AccountName address={address.toString()} />
+                      </div>
+                      {motion.votes?.nays?.length ? (
+                        <div className="flex items-center gap-2">
+                          <Tag intent={Intent.DANGER} minimal>
+                            {motion.votes.nays.length}
+                          </Tag>
+                          <div className="flex flex-wrap gap-1">
+                            {motion.votes?.nays?.map((address) => (
+                              <Tag key={address.toString()} minimal className={Classes.TEXT_SMALL}>
+                                <AccountName address={address.toString()} />
+                              </Tag>
+                            ))}
+                          </div>
                         </div>
-                      ))}
+                      ) : null}
                     </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </Card>
-        ))}
-      </div>
+                  </td>
+                  <td className="text-right">
+                    <Tag intent={Intent.PRIMARY} minimal>
+                      {motion.votes.ayes?.length || 0}/{motion.votes.threshold?.toNumber() || 0}
+                    </Tag>
+                  </td>
+                </tr>
+              )
+          )}
+        </tbody>
+      </HTMLTable>
     </Card>
   );
 }
