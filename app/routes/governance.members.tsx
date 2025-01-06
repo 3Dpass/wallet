@@ -1,7 +1,7 @@
 import { useApi } from "../components/Api";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Elevation, Spinner } from "@blueprintjs/core";
+import { Card, Elevation, Spinner, Tag, Intent, HTMLTable, Classes } from "@blueprintjs/core";
 import type { AccountId } from "@polkadot/types/interfaces";
 import type { DeriveElectionsInfo, DeriveCouncilVotes } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
@@ -111,25 +111,38 @@ export default function GovernanceMembers() {
   }
 
   return (
-    <Card elevation={Elevation.ONE}>
-      <h2 className="text-xl mb-4">{t("governance.council_members")}</h2>
-      <div className="grid gap-2">
-        {councilMembers.map((member) => (
-          <Card key={member.address} elevation={Elevation.TWO}>
-            <div className="flex items-center justify-between p-2">
-              <div className="flex-1">
-                <AccountName address={member.address} identity={member.identity} />
-              </div>
-              <div className="flex flex-col items-end">
-                <div className="text-sm text-gray-600">
-                  {t("governance.votes")}: {member.votes}
+    <Card elevation={Elevation.ONE} className="p-4">
+      <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.council_members")}</h2>
+      <HTMLTable className="w-full">
+        <thead>
+          <tr>
+            <th>{t("governance.member")}</th>
+            <th className="text-right">{t("governance.votes")}</th>
+            <th className="text-right">{t("governance.balance")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {councilMembers.map((member) => (
+            <tr key={member.address}>
+              <td>
+                <div className={`${Classes.TEXT_LARGE} font-medium`}>
+                  <AccountName address={member.address} identity={member.identity} />
                 </div>
-                <div className="text-sm text-gray-600">{member.balance}</div>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+              </td>
+              <td className="text-right">
+                <Tag intent={Intent.SUCCESS} minimal>
+                  {member.votes}
+                </Tag>
+              </td>
+              <td className="text-right">
+                <Tag intent={Intent.PRIMARY} minimal>
+                  {member.balance}
+                </Tag>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </HTMLTable>
     </Card>
   );
 }
