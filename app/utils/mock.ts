@@ -57,11 +57,40 @@ export const createMockApi = () => {
           members: [], // Will be set by the component
         }),
       },
+      chain: {
+        bestNumber: async () => ({
+          toNumber: () => 1000,
+        }),
+      },
+    },
+    consts: {
+      council: {
+        votingPeriod: {
+          toNumber: () => 50400, // About 7 days with 12-second blocks
+          toJSON: () => 50400,
+        },
+      },
+      collective: {
+        votingPeriod: {
+          toNumber: () => 50400, // About 7 days with 12-second blocks
+          toJSON: () => 50400,
+        },
+      },
     },
     registry: {
       chainDecimals: [12],
       chainTokens: ["UNIT"],
       chainSS58: 42,
+      getModuleInstances: (specName: string, module: string) => {
+        if (module === "council") return ["council"];
+        if (module === "collective") return ["collective"];
+        return undefined;
+      },
+    },
+    runtimeVersion: {
+      specName: {
+        toString: () => "polkadot",
+      },
     },
   };
 };

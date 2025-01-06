@@ -5,6 +5,116 @@ import { AccountName } from "app/components/common/AccountName";
 import { formatBalance } from "@polkadot/util";
 import { BountyApproval } from "./BountyApproval";
 import { BountyCuratorProposal } from "./BountyCuratorProposal";
+import { useApi } from "app/components/Api";
+import { useEffect, useState } from "react";
+import { formatDuration } from "app/utils/time";
+
+// Constants
+const BLOCK_TIME_SECONDS = 60;
+const DEFAULT_VOTING_PERIOD = 2880; // About 2 days with 60-second blocks
+
+function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
+  const api = useApi();
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [currentBlock, setCurrentBlock] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!api) return;
+
+    let unsubscribe: () => void;
+
+    const updateTime = async () => {
+      try {
+        // Try both council and collective modules
+        const councilInstance = api.registry.getModuleInstances?.(api.runtimeVersion.specName.toString(), "council") || ["council"];
+        const collectiveInstance = api.registry.getModuleInstances?.(api.runtimeVersion.specName.toString(), "collective") || ["collective"];
+
+        // Try to get voting period from various sources
+        let votingPeriod = DEFAULT_VOTING_PERIOD;
+
+        // Try runtime constants first
+        const runtimeVotingPeriod = api.consts.democracy?.votingPeriod || api.consts.council?.votingPeriod;
+
+        // Then try module instances
+        const configuredPeriod =
+          runtimeVotingPeriod ||
+          api.consts[councilInstance[0]]?.votingPeriod ||
+          api.consts[collectiveInstance[0]]?.votingPeriod ||
+          api.consts.collective?.votingPeriod;
+
+        if (configuredPeriod) {
+          try {
+            votingPeriod = (configuredPeriod as unknown as { toNumber: () => number }).toNumber();
+          } catch (e) {
+            // Fallback to default voting period
+          }
+        }
+
+        // Get the end block from the motion itself if available
+        const endBlock = motion.votes?.end?.toNumber();
+
+        const bestNumber = await api.derive.chain.bestNumber();
+        const current = bestNumber.toNumber();
+
+        const startBlock = motion.votes?.index.toNumber() || 0;
+        const finalEndBlock = endBlock || startBlock + votingPeriod;
+
+        setCurrentBlock(current);
+        if (current <= finalEndBlock) {
+          const remaining = finalEndBlock - current;
+          setTimeRemaining(remaining);
+        } else {
+          setTimeRemaining(0);
+        }
+      } catch (error) {
+        console.error("Error updating time:", error);
+      }
+    };
+
+    // Initial update
+    updateTime();
+
+    // Subscribe to new blocks
+    api.rpc.chain
+      .subscribeNewHeads(() => {
+        updateTime();
+      })
+      .then((u) => {
+        unsubscribe = u;
+      })
+      .catch((error) => {
+        console.error("Failed to subscribe to new blocks:", error);
+      });
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, [api, motion]);
+
+  if (timeRemaining === null || currentBlock === null) {
+    return null;
+  }
+
+  const formatTimeLeft = (blocks: number) => {
+    const seconds = blocks * BLOCK_TIME_SECONDS;
+    const hours = Math.floor(seconds / 3600);
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+
+    if (days > 0) {
+      return `${days}d ${remainingHours}h left`;
+    }
+    if (hours > 0) {
+      return `${hours}h left`;
+    }
+    const minutes = Math.ceil(seconds / 60);
+    return `${minutes}m left`;
+  };
+
+  const display = timeRemaining > 0 ? formatTimeLeft(timeRemaining) : "(ended)";
+
+  return <span className="text-sm text-gray-500 ml-2">{display}</span>;
+}
 
 interface MotionDetailsProps {
   motion: DeriveCollectiveProposal;
@@ -116,6 +226,7 @@ export function MotionDetails({
             <Tag intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} minimal>
               {totalVotes}/{threshold}
             </Tag>
+            <TimeRemaining motion={motion} />
             <span className="text-sm text-gray-500">
               {isThresholdReached ? t("governance.threshold_reached") : t("governance.votes_needed", { remaining: threshold - totalVotes })}
             </span>
