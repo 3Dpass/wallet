@@ -287,7 +287,9 @@ export function MotionDetails({
                 <Tag
                   key={address.toString()}
                   minimal
-                  className={`${Classes.TEXT_SMALL} px-2 py-1 ${address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900" : ""}`}
+                  className={`${Classes.TEXT_SMALL} px-2 py-1.5 ${
+                    address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900 !ring-1 !ring-green-600 dark:!ring-green-300" : ""
+                  }`}
                 >
                   <AccountName address={address.toString()} />
                 </Tag>
@@ -304,7 +306,9 @@ export function MotionDetails({
                   <Tag
                     key={address.toString()}
                     minimal
-                    className={`${Classes.TEXT_SMALL} px-2 py-1 ${address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900" : ""}`}
+                    className={`${Classes.TEXT_SMALL} px-2 py-0.5 ${
+                      address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900 !ring-1 !ring-red-600 dark:!ring-red-300" : ""
+                    }`}
                   >
                     <AccountName address={address.toString()} />
                   </Tag>
@@ -318,23 +322,23 @@ export function MotionDetails({
           <div>
             {!isThresholdReached ? (
               <div className="flex gap-3">
-                <Button intent={Intent.SUCCESS} loading={votingLoading[`${hash}-true`]} onClick={() => onVote(motion, true)} className="min-w-[100px]">
-                  {ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? (
-                    <span className="inline-flex items-center gap-3">
-                      <Icon icon="tick" size={14} /> {t("governance.ayes")}
-                    </span>
-                  ) : (
-                    t("governance.ayes")
-                  )}
+                <Button
+                  intent={Intent.SUCCESS}
+                  loading={votingLoading[`${hash}-true`]}
+                  onClick={() => onVote(motion, true)}
+                  className="min-w-[140px] !h-10"
+                  icon={ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? "tick" : undefined}
+                >
+                  {ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? t("governance.ayes") : t("governance.ayes")}
                 </Button>
-                <Button intent={Intent.DANGER} loading={votingLoading[`${hash}-false`]} onClick={() => onVote(motion, false)} className="min-w-[100px]">
-                  {nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? (
-                    <span className="inline-flex items-center gap-3">
-                      <Icon icon="tick" size={14} /> {t("governance.nays")}
-                    </span>
-                  ) : (
-                    t("governance.nays")
-                  )}
+                <Button
+                  intent={Intent.DANGER}
+                  loading={votingLoading[`${hash}-false`]}
+                  onClick={() => onVote(motion, false)}
+                  className="min-w-[140px] !h-10"
+                  icon={nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? "tick" : undefined}
+                >
+                  {nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? t("governance.nays") : t("governance.nays")}
                 </Button>
               </div>
             ) : (
@@ -343,7 +347,7 @@ export function MotionDetails({
                 icon="tick-circle"
                 loading={closeMotionLoading[hash]}
                 onClick={() => onClose(motion)}
-                className="min-w-[120px]"
+                className="min-w-[140px] !h-10"
               >
                 {t("governance.close_motion")}
               </Button>
