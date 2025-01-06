@@ -62,7 +62,11 @@ export function ApiCtxRoot({ apiUrl, children, isMockMode = false }: Props): Rea
       const isMainnet = ss58Format === ss58formats[NETWORK_MAINNET];
       const genesisHash = genesisHashes[isMainnet ? NETWORK_MAINNET : NETWORK_TEST];
       const injected = await loadWeb3Accounts(genesisHash, ss58Format);
-      keyring.loadAll({ ss58Format, type: "sr25519" }, injected);
+      const accounts = injected?.map(({ address, meta }) => ({
+        address,
+        meta: { ...meta, genesisHash: meta.genesisHash as `0x${string}` | null | undefined },
+      }));
+      keyring.loadAll({ ss58Format, type: "sr25519" }, accounts);
     }
 
     let subscription: any;
