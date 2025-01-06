@@ -212,7 +212,10 @@
       "votes_threshold": "{{ayes}}/{{threshold}} votes",
       "ayes": "Ayes",
       "nays": "Nays",
-      "members": "Members"
+      "members": "Members",
+      "member": "Council Member",
+      "balance": "Stake Balance",
+      "motion": "Motion"
     }
   }
 }

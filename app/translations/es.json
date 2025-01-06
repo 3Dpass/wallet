@@ -212,7 +212,10 @@
       "votes_threshold": "{{ayes}}/{{threshold}} votos",
       "ayes": "A favor",
       "nays": "En contra",
-      "members": "Miembros"
+      "members": "Miembros",
+      "member": "Miembro del Consejo",
+      "balance": "Balance en Stake",
+      "motion": "Moción"
     }
   }
 }
