@@ -20,6 +20,7 @@ import en from "./translations/en.json";
 import es from "./translations/es.json";
 import fr from "./translations/fr.json";
 import pt from "./translations/pt.json";
+import zh from "./translations/zh.json";
 
 export function meta() {
   return [{ charset: "utf-8" }, { title: "3DPass Wallet" }, { viewport: "width=device-width,initial-scale=1" }];
@@ -57,6 +58,7 @@ void i18next
       es,
       fr,
       pt,
+      zh,
     },
     fallbackLng: "en",
 
