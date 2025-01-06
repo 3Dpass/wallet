@@ -8,6 +8,8 @@ import useToaster from "app/hooks/useToaster";
 import { signAndSend, enableMockMode, disableMockMode } from "app/utils/sign";
 import { AccountSelector } from "app/components/governance/AccountSelector";
 import { mockVotes } from "app/utils/mock";
+import { useAtom } from "jotai";
+import { lastSelectedAccountAtom } from "app/atoms";
 
 export default function GovernanceMotions() {
   const { t } = useTranslation();
@@ -18,7 +20,7 @@ export default function GovernanceMotions() {
   const [loading, setLoading] = useState(true);
   const [councilMemberAddresses, setCouncilMemberAddresses] = useState<string[]>([]);
   const [votingLoading, setVotingLoading] = useState<{ [key: string]: boolean }>({});
-  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+  const [selectedAddress, setSelectedAddress] = useAtom(lastSelectedAccountAtom);
   const [isMockMode, setIsMockMode] = useState(false);
   const [closeMotionLoading, setCloseMotionLoading] = useState<{ [key: string]: boolean }>({});
 

@@ -22,3 +22,4 @@ export const apiExplorerEndpointAtom = atomWithStorage<string>("apiExplorerEndpo
 export const toasterAtom = atom<ToasterInstance | undefined>(undefined);
 export const blocksAtom = atom<IBlock[]>([]);
 export const bestNumberFinalizedAtom = atom<bigint>(BigInt(0));
+export const lastSelectedAccountAtom = atomWithStorage<string | null>("lastSelectedAccount_v1", null);
