@@ -1,4 +1,4 @@
-import { Card, Spinner, H4, Tag, Intent, HTMLTable } from "@blueprintjs/core";
+import { Spinner, H4, Tag, Intent, HTMLTable } from "@blueprintjs/core";
 import { useTranslation } from "react-i18next";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { AccountName } from "app/components/common/AccountName";
@@ -59,32 +59,32 @@ export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDe
 
   if (loading) {
     return (
-      <Card>
+      <div>
         <H4>
           {title} #{bountyId}
         </H4>
         <div className="flex items-center gap-2 mt-2">
           <Spinner size={16} /> {t("common.loading")}
         </div>
-      </Card>
+      </div>
     );
   }
 
   if (!bountyData) {
     return (
-      <Card>
+      <div>
         <H4>
           {title} #{bountyId}
         </H4>
         <Tag intent={Intent.DANGER} className="mt-2">
           {t("governance.bounty_not_found")}
         </Tag>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="max-w-4xl w-full">
+    <div className="max-w-4xl w-full">
       <div className="mb-3">
         <H4>
           {title} #{bountyId}
@@ -138,6 +138,6 @@ export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDe
           )}
         </tbody>
       </HTMLTable>
-    </Card>
+    </div>
   );
 }
