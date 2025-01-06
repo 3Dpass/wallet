@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "@remix-run/react";
-import { Tab, Tabs } from "@blueprintjs/core";
+import { Tab, Tabs, Icon } from "@blueprintjs/core";
 import { Container } from "app/components/common/Container";
 import { AccountSelector } from "app/components/governance/AccountSelector";
 import { useAtom } from "jotai";
@@ -23,9 +23,9 @@ export default function Governance() {
       <div className="grid gap-6">
         <div className="flex justify-between items-center">
           <Tabs id="governance-tabs" selectedTabId={currentTab} onChange={handleTabChange} animate={true} large={true}>
-            <Tab id="motions" title={t("governance.motions")} />
-            <Tab id="members" title={t("governance.members")} />
-            <Tab id="bounties" title={t("governance.bounties")} />
+            <Tab id="motions" title={t("governance.motions")} icon={<Icon icon="take-action" className="mr-2" />} />
+            <Tab id="members" title={t("governance.members")} icon={<Icon icon="people" className="mr-2" />} />
+            <Tab id="bounties" title={t("governance.bounties")} icon={<Icon icon="dollar" className="mr-2" />} />
           </Tabs>
           <AccountSelector onAccountChange={setSelectedAddress} selectedAddress={selectedAddress} />
         </div>
