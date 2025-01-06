@@ -36,13 +36,14 @@ export default function GovernanceMotions() {
     <Card elevation={Elevation.ONE}>
       <h2 className="text-xl mb-4">{t("governance.motions")}</h2>
       <div className="grid gap-4">
-        {motions.map((motion) => (
+        {motions.map((motion, index) => (
           <Card key={motion.hash.toString()} elevation={Elevation.TWO}>
             <div className="p-4">
               {motion.proposal && motion.votes && (
                 <>
                   <div className="flex justify-between mb-3">
                     <div className="text-lg font-medium">
+                      <span className="mr-2 text-gray-500">#{motion.votes.index.toString()}</span>
                       {motion.proposal.section}.{motion.proposal.method}
                     </div>
                     <div className="text-sm text-gray-500">
