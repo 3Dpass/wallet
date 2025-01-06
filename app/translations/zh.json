@@ -203,11 +203,11 @@
     "governance": {
       "title": "治理",
       "council_members": "理事会成员",
-      "active_motions": "活跃提案",
+      "active_motions": "活动提案",
       "proposer": "提案人",
       "votes": "投票",
       "threshold": "阈值",
-      "no_active_motions": "无活跃提案",
+      "no_active_motions": "没有活动提案",
       "motions": "提案",
       "ayes": "赞成",
       "nays": "反对",
@@ -216,11 +216,12 @@
       "balance": "质押余额",
       "motion": "提案",
       "vote": "投票",
-      "active_account": "活跃账户",
+      "active_account": "活动账户",
       "select_account": "选择账户",
       "no_accounts": "没有可用账户。创建或导入账户以参与治理。",
       "already_voted": "已投票",
-      "mock_mode": "测试模式（无网络）"
+      "mock_mode": "测试模式（无网络）",
+      "close_motion": "结束提案"
     }
   }
 }

@@ -20,6 +20,7 @@ export default function GovernanceMotions() {
   const [votingLoading, setVotingLoading] = useState<{ [key: string]: boolean }>({});
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
   const [isMockMode, setIsMockMode] = useState(false);
+  const [closeMotionLoading, setCloseMotionLoading] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     if (isMockMode && motions.length === 0) {
@@ -198,6 +199,60 @@ export default function GovernanceMotions() {
     setIsMockMode(!isMockMode);
   };
 
+  const handleCloseMotion = async (motion: DeriveCollectiveProposal) => {
+    if (!api || !motion.votes || !selectedAddress) return;
+
+    const account = accounts.find((a) => a.address === selectedAddress);
+    if (!account) return;
+
+    const hash = motion.hash.toString();
+    setCloseMotionLoading((prev) => ({ ...prev, [hash]: true }));
+
+    try {
+      if (!motion.proposal) {
+        throw new Error("No proposal data available");
+      }
+
+      // Check if the motion has failed (not enough votes)
+      const hasFailed = motion.votes.ayes.length < motion.votes.threshold.toNumber();
+
+      // Calculate weight and length
+      const encodedLength = motion.proposal.encodedLength || 0;
+      const weight = BigInt(1_000_000_000);
+
+      // If failed, use 0 for both weight and length bounds
+      const params = hasFailed ? [motion.hash, motion.votes.index, 0, 0] : [motion.hash, motion.votes.index, weight, encodedLength];
+
+      const tx = api.tx.council.close(...params);
+      await signAndSend(tx, account, {}, async ({ status }) => {
+        if (!status.isInBlock) return;
+
+        if (isMockMode) {
+          setMotions(motions.filter((m) => m.hash.toString() !== motion.hash.toString()));
+        } else {
+          const proposals = await api.derive.council.proposals();
+          setMotions(proposals);
+        }
+
+        if (status.isFinalized) {
+          toaster.show({
+            icon: "tick",
+            intent: Intent.SUCCESS,
+            message: t("messages.lbl_tx_sent"),
+          });
+          setCloseMotionLoading((prev) => ({ ...prev, [hash]: false }));
+        }
+      });
+    } catch (e: any) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e.message,
+      });
+      setCloseMotionLoading((prev) => ({ ...prev, [hash]: false }));
+    }
+  };
+
   if (loading) {
     return <Spinner />;
   }
@@ -234,6 +289,9 @@ export default function GovernanceMotions() {
               const nayVotes = motion.votes.nays || [];
               const section = motion.proposal.section || "mock";
               const method = motion.proposal.method || "proposal";
+
+              const totalVotes = ayeVotes.length + nayVotes.length;
+              const isThresholdReached = totalVotes >= threshold;
 
               return (
                 <tr key={hash}>
@@ -278,38 +336,45 @@ export default function GovernanceMotions() {
                     </div>
                   </td>
                   <td className="text-right">
-                    <Tag intent={Intent.PRIMARY} minimal>
-                      {ayeVotes.length + nayVotes.length}/{threshold}
+                    <Tag intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} minimal>
+                      {totalVotes}/{threshold}
                     </Tag>
                   </td>
                   {isSelectedCouncilMember && selectedAccount && (
                     <td className="text-right">
                       <div className="flex justify-end gap-2">
-                        {!hasVoted(motion, selectedAccount.address) ? (
+                        {!isThresholdReached ? (
                           <div className="flex gap-2">
                             <Button
                               intent={Intent.SUCCESS}
-                              icon="small-tick"
                               loading={votingLoading[`${hash}-true`]}
                               onClick={() => handleVote(motion, true)}
                               className="min-w-[80px]"
                             >
-                              {t("governance.ayes")}
+                              {hasVoted(motion, selectedAccount.address) && ayeVotes.map((a) => a.toString()).includes(selectedAccount.address)
+                                ? `✓ ${t("governance.ayes")}`
+                                : t("governance.ayes")}
                             </Button>
                             <Button
                               intent={Intent.DANGER}
-                              icon="small-cross"
                               loading={votingLoading[`${hash}-false`]}
                               onClick={() => handleVote(motion, false)}
                               className="min-w-[80px]"
                             >
-                              {t("governance.nays")}
+                              {hasVoted(motion, selectedAccount.address) && nayVotes.map((a) => a.toString()).includes(selectedAccount.address)
+                                ? `✓ ${t("governance.nays")}`
+                                : t("governance.nays")}
                             </Button>
                           </div>
                         ) : (
-                          <Tag minimal intent={Intent.WARNING}>
-                            {t("governance.already_voted")}
-                          </Tag>
+                          <Button
+                            intent={Intent.PRIMARY}
+                            icon="tick-circle"
+                            loading={closeMotionLoading[hash]}
+                            onClick={() => handleCloseMotion(motion)}
+                          >
+                            {t("governance.close_motion")}
+                          </Button>
                         )}
                       </div>
                     </td>

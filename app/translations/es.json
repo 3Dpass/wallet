@@ -220,7 +220,8 @@
       "select_account": "Seleccionar cuenta",
       "no_accounts": "No hay cuentas disponibles. Crea o importa una cuenta para participar en la gobernanza.",
       "already_voted": "Ya has votado",
-      "mock_mode": "Modo de Prueba (Sin Red)"
+      "mock_mode": "Modo de Prueba (Sin Red)",
+      "close_motion": "Cerrar Moción"
     }
   }
 }

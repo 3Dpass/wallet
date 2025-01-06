@@ -220,7 +220,8 @@
       "select_account": "Select account",
       "no_accounts": "No accounts available. Create or import an account to participate in governance.",
       "already_voted": "Already voted",
-      "mock_mode": "Test Mode (No Network)"
+      "mock_mode": "Test Mode (No Network)",
+      "close_motion": "Close Motion"
     }
   }
 }
