@@ -333,28 +333,24 @@ export function MotionDetails({
           </div>
           <div className="flex flex-wrap gap-1">
             {ayeVotes.map((address) => (
-              <Tag
+              <div
                 key={address.toString()}
-                minimal
-                intent={Intent.SUCCESS}
-                className={`${Classes.TEXT_SMALL} px-2 py-1.5 ${
+                className={`inline-flex items-center rounded px-2 py-2 text-sm bg-green-50 text-green-700 dark:bg-green-900/50 dark:text-green-300 ${
                   address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900 !ring-1 !ring-green-600 dark:!ring-green-300" : ""
                 }`}
               >
                 <AccountName address={address.toString()} />
-              </Tag>
+              </div>
             ))}
             {nayVotes.map((address) => (
-              <Tag
+              <div
                 key={address.toString()}
-                minimal
-                intent={Intent.DANGER}
-                className={`${Classes.TEXT_SMALL} px-2 py-1.5 ${
+                className={`inline-flex items-center rounded px-2 py-2 text-sm bg-red-50 text-red-700 dark:bg-red-900/50 dark:text-red-300 ${
                   address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900 !ring-1 !ring-red-600 dark:!ring-red-300" : ""
                 }`}
               >
                 <AccountName address={address.toString()} />
-              </Tag>
+              </div>
             ))}
           </div>
         </div>

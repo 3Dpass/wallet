@@ -3,7 +3,7 @@ import { AddressIcon } from "./AddressIcon";
 import { useState, useEffect } from "react";
 import { DeriveAccountRegistration } from "@polkadot/api-derive/types";
 import { useApi } from "../Api";
-import { Icon, Intent, Tooltip, Classes } from "@blueprintjs/core";
+import { Icon, Intent } from "@blueprintjs/core";
 
 interface AccountNameProps {
   address: string;
@@ -54,35 +54,37 @@ export function AccountName({ address, identity }: AccountNameProps) {
   }, [api, address, identity]);
 
   const content = (
-    <Link to={`/address/${address}`} className="flex items-center gap-1 text-white no-underline group">
+    <Link to={`/address/${address}`} className="flex items-center gap-1.5 text-white no-underline group">
       <AddressIcon address={address} />
       <div className="flex-1">
         {localIdentity ? (
           <div
-            className={`flex items-center gap-2 ${localIdentity.isGood ? "text-green-501" : localIdentity.isBad ? "text-red-500" : "text-yellow-500"}`}
+            className={`flex items-center gap-2 ${localIdentity.isGood ? "text-green-300" : localIdentity.isBad ? "text-red-300" : "text-yellow-300"}`}
           >
             {localIdentity.parent && (
               <>
-                <span className="text-gray-601">{localIdentity.parent}</span>
-                <span className="text-gray-601">/</span>
+                <span className="text-gray-300">{localIdentity.parent}</span>
+                <span className="text-gray-300">/</span>
               </>
             )}
-            <span className="border-b border-b-gray-501 group-hover:border-b-white">{localIdentity.display}</span>
+            <span
+              className={`border-b leading-tight ${
+                localIdentity.isGood ? "border-b-green-300/50" : localIdentity.isBad ? "border-b-red-300/50" : "border-b-yellow-300/50"
+              } group-hover:border-b-current`}
+            >
+              {localIdentity.display}
+            </span>
             {localIdentity.isGood && !localIdentity.isBad && <Icon icon="endorsed" intent={Intent.SUCCESS} />}
             {!localIdentity.isGood && !localIdentity.isBad && <Icon icon="warning-sign" intent={Intent.WARNING} />}
           </div>
         ) : (
-          <div className="inline-flex font-mono text-ellipsis overflow-hidden border-b border-b-gray-501 group-hover:border-b-white">{address}</div>
+          <div className="inline-flex font-mono text-ellipsis overflow-hidden border-b border-b-gray-300/50 group-hover:border-b-current leading-tight">
+            {address}
+          </div>
         )}
       </div>
     </Link>
   );
 
-  return localIdentity ? (
-    <Tooltip popoverClassName={`${Classes.DARK} bg-gray-700`} content={<span className="font-mono">{address}</span>}>
-      {content}
-    </Tooltip>
-  ) : (
-    content
-  );
+  return content;
 }
