@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Classes, HTMLSelect, Intent } from "@blueprintjs/core";
+import { Button, Classes, HTMLSelect, Intent, Spinner } from "@blueprintjs/core";
 import { useAccounts } from "app/components/Api";
 import { AccountName } from "app/components/common/AccountName";
 
@@ -31,9 +31,9 @@ export function AccountSelector({ onAccountChange, selectedAddress }: AccountSel
 
   if (accounts.length === 0) {
     return (
-      <div className="text-center">
-        <p className="mb-2">{t("governance.no_accounts")}</p>
-        <Button intent={Intent.PRIMARY} icon="plus" text={t("root_wallet.lbl_btn_create_new_address")} />
+      <div className="flex items-center gap-2">
+        <div className="font-medium whitespace-nowrap">{t("governance.active_account")}:</div>
+        <Spinner size={16} />
       </div>
     );
   }

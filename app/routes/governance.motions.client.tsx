@@ -279,35 +279,32 @@ export default function GovernanceMotions() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <AccountSelector onAccountChange={setSelectedAddress} selectedAddress={selectedAddress} />
+      <div className="flex justify-between items-center mb-4">
+        <h2 className={Classes.HEADING}>{t("governance.motions")}</h2>
         {process.env.NODE_ENV === "development" && <Switch checked={isMockMode} label={t("governance.mock_mode")} onChange={handleMockModeToggle} />}
       </div>
-      <div>
-        <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.motions")}</h2>
-        <div className="space-y-3">
-          {motions
-            .slice()
-            .sort((a, b) => {
-              const indexA = a.votes?.index?.toNumber() ?? 0;
-              const indexB = b.votes?.index?.toNumber() ?? 0;
-              return indexB - indexA;
-            })
-            .map((motion) => (
-              <div key={motion.hash?.toString()} ref={motion.hash?.toString() === highlightMotionHash ? highlightedMotionRef : undefined}>
-                <MotionDetails
-                  motion={motion}
-                  isCouncilMember={isSelectedCouncilMember}
-                  selectedAddress={selectedAddress}
-                  onVote={handleVote}
-                  onClose={handleCloseMotion}
-                  votingLoading={votingLoading}
-                  closeMotionLoading={closeMotionLoading}
-                  highlight={motion.hash?.toString() === highlightMotionHash}
-                />
-              </div>
-            ))}
-        </div>
+      <div className="space-y-3">
+        {motions
+          .slice()
+          .sort((a, b) => {
+            const indexA = a.votes?.index?.toNumber() ?? 0;
+            const indexB = b.votes?.index?.toNumber() ?? 0;
+            return indexB - indexA;
+          })
+          .map((motion) => (
+            <div key={motion.hash?.toString()} ref={motion.hash?.toString() === highlightMotionHash ? highlightedMotionRef : undefined}>
+              <MotionDetails
+                motion={motion}
+                isCouncilMember={isSelectedCouncilMember}
+                selectedAddress={selectedAddress}
+                onVote={handleVote}
+                onClose={handleCloseMotion}
+                votingLoading={votingLoading}
+                closeMotionLoading={closeMotionLoading}
+                highlight={motion.hash?.toString() === highlightMotionHash}
+              />
+            </div>
+          ))}
       </div>
     </div>
   );
