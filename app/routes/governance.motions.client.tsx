@@ -250,7 +250,7 @@ export default function GovernanceMotions() {
                   <td>
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
-                        <Tag intent={Intent.SUCCESS} minimal>
+                        <Tag intent={Intent.SUCCESS} minimal className="min-w-12 text-center">
                           {ayeVotes.length} {t("governance.ayes")}
                         </Tag>
                         <div className="flex flex-wrap gap-1">
@@ -263,7 +263,7 @@ export default function GovernanceMotions() {
                       </div>
                       {nayVotes.length > 0 && (
                         <div className="flex items-center gap-2">
-                          <Tag intent={Intent.DANGER} minimal>
+                          <Tag intent={Intent.DANGER} minimal className="min-w-12 text-center">
                             {nayVotes.length} {t("governance.nays")}
                           </Tag>
                           <div className="flex flex-wrap gap-1">
