@@ -1,4 +1,4 @@
-import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
+import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "@remix-run/react";
 // @ts-expect-error - can't find styles file, fix later
 import styles from "./styles/app.css";
 import type { Toaster } from "@blueprintjs/core";
@@ -69,6 +69,7 @@ void i18next
 
 export default function App() {
   const { t } = useTranslation();
+  const location = useLocation();
   const apiUrl = useAtomValue(apiEndpointAtom);
   const toasterRef = useRef<Toaster>();
   const setToaster = useSetAtom(toasterAtom);
@@ -113,15 +114,20 @@ export default function App() {
             <ApiCtxRoot apiUrl={apiUrl}>
               <ApolloProvider client={client}>
                 <div className="container mx-auto px-4">
-                  <Navbar className="flex justify-between overflow-x-auto overflow-y-hidden mb-4">
+                  <Navbar className="flex justify-between overflow-x-auto overflow-y-hidden mb-4 mt-2">
                     <NavbarGroup align={Alignment.LEFT}>
                       <NavbarHeading className="whitespace-nowrap flex">
                         <Link to="" className="text-white hover:no-underline flex items-center gap-2">
                           <img src="/logo.svg" alt="3Dpass Logo" className="h-7" />
                           <span className="mb-[-3px]">{t("root.lbl_app_name")}</span>
                         </Link>
-                        <Link to="/governance/members" className="ml-3 mb-[-3px]">
-                          <Button minimal text={t("governance.title")} />
+                        <Link
+                          to="/governance/members"
+                          className={`text-white hover:no-underline px-1 ms-3 flex items-center gap-2 ${
+                            location.pathname.startsWith("/governance") ? "font-bold" : ""
+                          }`}
+                        >
+                          <span className="mb-[-3px]">{t("governance.title")}</span>
                         </Link>
                         <Button className="ml-2" icon="cog" minimal onClick={() => setIsSettingsDialogOpen(true)} />
                         <DialogSettings isOpen={isSettingsDialogOpen} onClose={() => setIsSettingsDialogOpen(false)} />
