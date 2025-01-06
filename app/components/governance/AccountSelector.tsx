@@ -14,13 +14,18 @@ export function AccountSelector({ onAccountChange, selectedAddress }: AccountSel
   const accounts = useAccounts();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
-    // If we have accounts but no selection, default to first account
-    if (accounts.length > 0 && !selectedAddress) {
-      onAccountChange(accounts[0].address);
+    // Only set default account if we haven't initialized yet and there's no stored selection
+    if (!hasInitialized && accounts.length > 0 && !selectedAddress) {
+      const storedAccount = localStorage.getItem("lastSelectedAccount_v1");
+      if (!storedAccount) {
+        onAccountChange(accounts[0].address);
+      }
+      setHasInitialized(true);
     }
-  }, [accounts, selectedAddress, onAccountChange]);
+  }, [accounts, selectedAddress, onAccountChange, hasInitialized]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
