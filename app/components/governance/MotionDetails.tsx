@@ -284,43 +284,41 @@ export function MotionDetails({
       <div className="mt-6 space-y-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Tag intent={Intent.SUCCESS} minimal className="min-w-12 text-center">
-              {ayeVotes.length} {t("governance.ayes")}
-            </Tag>
-            <div className="flex flex-wrap gap-1">
-              {ayeVotes.map((address) => (
-                <Tag
-                  key={address.toString()}
-                  minimal
-                  className={`${Classes.TEXT_SMALL} px-2 py-1.5 ${
-                    address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900 !ring-1 !ring-green-600 dark:!ring-green-300" : ""
-                  }`}
-                >
-                  <AccountName address={address.toString()} />
-                </Tag>
-              ))}
-            </div>
-          </div>
-          {nayVotes.length > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex gap-2">
+              <Tag intent={Intent.SUCCESS} minimal className="min-w-12 text-center">
+                {ayeVotes.length} {t("governance.ayes")}
+              </Tag>
               <Tag intent={Intent.DANGER} minimal className="min-w-12 text-center">
                 {nayVotes.length} {t("governance.nays")}
               </Tag>
-              <div className="flex flex-wrap gap-1">
-                {nayVotes.map((address) => (
-                  <Tag
-                    key={address.toString()}
-                    minimal
-                    className={`${Classes.TEXT_SMALL} px-2 py-0.5 ${
-                      address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900 !ring-1 !ring-red-600 dark:!ring-red-300" : ""
-                    }`}
-                  >
-                    <AccountName address={address.toString()} />
-                  </Tag>
-                ))}
-              </div>
             </div>
-          )}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {ayeVotes.map((address) => (
+              <Tag
+                key={address.toString()}
+                minimal
+                intent={Intent.SUCCESS}
+                className={`${Classes.TEXT_SMALL} px-2 py-1.5 ${
+                  address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900 !ring-1 !ring-green-600 dark:!ring-green-300" : ""
+                }`}
+              >
+                <AccountName address={address.toString()} />
+              </Tag>
+            ))}
+            {nayVotes.map((address) => (
+              <Tag
+                key={address.toString()}
+                minimal
+                intent={Intent.DANGER}
+                className={`${Classes.TEXT_SMALL} px-2 py-1.5 ${
+                  address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900 !ring-1 !ring-red-600 dark:!ring-red-300" : ""
+                }`}
+              >
+                <AccountName address={address.toString()} />
+              </Tag>
+            ))}
+          </div>
         </div>
 
         {isCouncilMember && onVote && onClose && (
