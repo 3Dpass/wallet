@@ -3,7 +3,7 @@ import { AddressIcon } from "./AddressIcon";
 import { useState, useEffect } from "react";
 import { DeriveAccountRegistration } from "@polkadot/api-derive/types";
 import { useApi } from "../Api";
-import { Icon, Intent } from "@blueprintjs/core";
+import { Icon, Intent, Tooltip, Classes } from "@blueprintjs/core";
 
 interface AccountNameProps {
   address: string;
@@ -53,7 +53,7 @@ export function AccountName({ address, identity }: AccountNameProps) {
     fetchIdentity();
   }, [api, address, identity]);
 
-  return (
+  const content = (
     <Link to={`/address/${address}`} className="flex items-center gap-1 text-white no-underline group">
       <AddressIcon address={address} />
       <div className="flex-1">
@@ -76,5 +76,13 @@ export function AccountName({ address, identity }: AccountNameProps) {
         )}
       </div>
     </Link>
+  );
+
+  return localIdentity ? (
+    <Tooltip popoverClassName={`${Classes.DARK} bg-gray-700`} content={<span className="font-mono">{address}</span>}>
+      {content}
+    </Tooltip>
+  ) : (
+    content
   );
 }
