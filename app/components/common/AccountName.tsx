@@ -13,6 +13,7 @@ interface AccountNameProps {
     isGood: boolean;
     isBad: boolean;
   };
+  short?: boolean;
 }
 
 export function extractIdentity(identity: DeriveAccountRegistration): AccountNameProps["identity"] {
@@ -32,7 +33,7 @@ export function extractIdentity(identity: DeriveAccountRegistration): AccountNam
   };
 }
 
-export function AccountName({ address, identity }: AccountNameProps) {
+export function AccountName({ address, identity, short }: AccountNameProps) {
   const api = useApi();
   const [localIdentity, setLocalIdentity] = useState(identity);
 
@@ -89,8 +90,12 @@ export function AccountName({ address, identity }: AccountNameProps) {
             </span>
           </div>
         ) : (
-          <div className="inline-flex font-mono text-ellipsis overflow-hidden border-b border-b-gray-300/50 group-hover:border-b-current leading-tight">
-            {address}
+          <div className="inline-flex font-mono text-ellipsis overflow-hidden">
+            {short ? (
+              <span className="opacity-50 [mask-image:linear-gradient(to_right,transparent_0%,white_25%,white_100%)]">{address.slice(-12)}</span>
+            ) : (
+              <span className="border-b border-b-gray-300/50 group-hover:border-b-current leading-tight">{address}</span>
+            )}
           </div>
         )}
       </div>
