@@ -262,8 +262,8 @@ export default function GovernanceMotions() {
   const isSelectedCouncilMember = selectedAddress ? isCouncilMember(selectedAddress) : false;
 
   return (
-    <>
-      <div className="flex justify-between items-center mb-3">
+    <div>
+      <div className="flex justify-between items-center mb-6">
         <AccountSelector onAccountChange={setSelectedAddress} selectedAddress={selectedAddress} />
         {process.env.NODE_ENV === "development" && <Switch checked={isMockMode} label={t("governance.mock_mode")} onChange={handleMockModeToggle} />}
       </div>
@@ -284,6 +284,6 @@ export default function GovernanceMotions() {
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }

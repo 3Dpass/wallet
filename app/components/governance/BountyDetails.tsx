@@ -94,13 +94,13 @@ export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDe
         <tbody>
           {description && (
             <tr>
-              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.description")}</td>
+              <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.description")}</td>
               <td>{description}</td>
             </tr>
           )}
           {type === "curator" && curator && (
             <tr>
-              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.curator")}</td>
+              <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.curator")}</td>
               <td>
                 <AccountName address={curator} />
               </td>
@@ -108,21 +108,21 @@ export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDe
           )}
           {type === "curator" && fee !== undefined && (
             <tr>
-              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.curator_fee")}</td>
+              <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.curator_fee")}</td>
               <td>
                 <FormattedAmount value={fee} />
               </td>
             </tr>
           )}
           <tr>
-            <td className="text-gray-500 whitespace-nowrap pr-8">{type === "approval" ? t("governance.value") : t("governance.bounty_value")}</td>
+            <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{type === "approval" ? t("governance.value") : t("governance.bounty_value")}</td>
             <td>
               <FormattedAmount value={bountyData.value.toBigInt()} />
             </td>
           </tr>
           {bountyData.fee && type === "approval" && (
             <tr>
-              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.fee")}</td>
+              <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.fee")}</td>
               <td>
                 <FormattedAmount value={bountyData.fee.toBigInt()} />
               </td>
@@ -130,7 +130,7 @@ export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDe
           )}
           {bountyData.proposer && (
             <tr>
-              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.proposer")}</td>
+              <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.proposer")}</td>
               <td>
                 <AccountName address={bountyData.proposer.toString()} />
               </td>

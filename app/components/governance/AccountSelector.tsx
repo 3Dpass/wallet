@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Card, Classes, HTMLSelect, Intent } from "@blueprintjs/core";
+import { Button, Classes, HTMLSelect, Intent } from "@blueprintjs/core";
 import { useAccounts } from "app/components/Api";
 import { AccountName } from "app/components/common/AccountName";
 
@@ -31,28 +31,24 @@ export function AccountSelector({ onAccountChange, selectedAddress }: AccountSel
 
   if (accounts.length === 0) {
     return (
-      <Card>
-        <div className="text-center">
-          <p className="mb-2">{t("governance.no_accounts")}</p>
-          <Button intent={Intent.PRIMARY} icon="plus" text={t("root_wallet.lbl_btn_create_new_address")} />
-        </div>
-      </Card>
+      <div className="text-center">
+        <p className="mb-2">{t("governance.no_accounts")}</p>
+        <Button intent={Intent.PRIMARY} icon="plus" text={t("root_wallet.lbl_btn_create_new_address")} />
+      </div>
     );
   }
 
   return (
-    <Card>
-      <div className="flex items-center gap-4">
-        <div className="font-medium">{t("governance.active_account")}:</div>
-        <HTMLSelect value={selected || ""} onChange={handleAccountChange} className={Classes.HTML_SELECT}>
-          <option value="">{t("governance.select_account")}</option>
-          {accounts.map((account) => (
-            <option key={account.address} value={account.address}>
-              {account.meta.name || <AccountName address={account.address} />}
-            </option>
-          ))}
-        </HTMLSelect>
-      </div>
-    </Card>
+    <div className="flex items-center gap-2">
+      <div className="font-medium whitespace-nowrap">{t("governance.active_account")}:</div>
+      <HTMLSelect value={selected || ""} onChange={handleAccountChange} className={Classes.HTML_SELECT}>
+        <option value="">{t("governance.select_account")}</option>
+        {accounts.map((account) => (
+          <option key={account.address} value={account.address}>
+            {account.meta.name || <AccountName address={account.address} />}
+          </option>
+        ))}
+      </HTMLSelect>
+    </div>
   );
 }
