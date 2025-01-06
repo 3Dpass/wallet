@@ -76,6 +76,9 @@ export function AccountName({ address, identity }: AccountNameProps) {
             </span>
             {localIdentity.isGood && !localIdentity.isBad && <Icon icon="endorsed" intent={Intent.SUCCESS} />}
             {!localIdentity.isGood && !localIdentity.isBad && <Icon icon="warning-sign" intent={Intent.WARNING} />}
+            <span className="font-mono opacity-50 -ml-2 [mask-image:linear-gradient(to_right,transparent_0%,white_25%,white_100%)]">
+              {address.slice(-6)}
+            </span>
           </div>
         ) : (
           <div className="inline-flex font-mono text-ellipsis overflow-hidden border-b border-b-gray-300/50 group-hover:border-b-current leading-tight">
