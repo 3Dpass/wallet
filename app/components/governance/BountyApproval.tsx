@@ -76,34 +76,34 @@ export function BountyApproval({ bountyId, motion }: BountyApprovalProps) {
   }
 
   return (
-    <Card>
+    <Card className="max-w-4xl w-full">
       <H4>Approve Bounty #{bountyId}</H4>
-      <HTMLTable className="w-full mt-4">
+      <HTMLTable className="w-full mt-4 min-w-[600px]" compact={true} striped={true}>
         <tbody>
           {description && (
             <tr>
-              <td className="w-1/4 font-medium">{t("governance.description")}</td>
-              <td>{description}</td>
+              <td className="w-1/4 font-medium py-2 px-3">{t("governance.description")}</td>
+              <td className="py-2 px-3">{description}</td>
             </tr>
           )}
           <tr>
-            <td className="w-1/4 font-medium">{t("governance.value")}</td>
-            <td>
+            <td className="w-1/4 font-medium py-2 px-3">{t("governance.value")}</td>
+            <td className="py-2 px-3">
               <FormattedAmount value={bountyData.value.toBigInt()} />
             </td>
           </tr>
           {bountyData.fee && (
             <tr>
-              <td className="w-1/4 font-medium">{t("governance.fee")}</td>
-              <td>
+              <td className="w-1/4 font-medium py-2 px-3">{t("governance.fee")}</td>
+              <td className="py-2 px-3">
                 <FormattedAmount value={bountyData.fee.toBigInt()} />
               </td>
             </tr>
           )}
           {bountyData.proposer && (
             <tr>
-              <td className="w-1/4 font-medium">{t("governance.proposer")}</td>
-              <td>
+              <td className="w-1/4 font-medium py-2 px-3">{t("governance.proposer")}</td>
+              <td className="py-2 px-3">
                 <AccountName address={bountyData.proposer.toString()} />
               </td>
             </tr>
