@@ -209,7 +209,7 @@ export default function GovernanceMotions() {
     <>
       <div className="flex justify-between items-center">
         <AccountSelector onAccountChange={setSelectedAddress} selectedAddress={selectedAddress} />
-        <Switch checked={isMockMode} label={t("governance.mock_mode")} onChange={handleMockModeToggle} />
+        {process.env.NODE_ENV === "development" && <Switch checked={isMockMode} label={t("governance.mock_mode")} onChange={handleMockModeToggle} />}
       </div>
       <Card elevation={Elevation.ONE} className="p-4">
         <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.motions")}</h2>
