@@ -8,7 +8,7 @@ import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
 import keyring from "@polkadot/ui-keyring";
 import { FormattedAmount } from "../common/FormattedAmount";
-import { AddressItem } from "../common/AddressItem";
+import { AccountName } from "../common/AccountName";
 import TitledValue from "../common/TitledValue";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
@@ -271,7 +271,7 @@ export default function Account({ pair }: IProps) {
   return (
     <div className="relative p-3 pt-9 text-sm border-b border-l border-gray-600">
       {dialogElements}
-      <AddressItem address={pair.address} />
+      <AccountName address={pair.address} />
       <div className="grid gap-1">
         {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
         {balances && (

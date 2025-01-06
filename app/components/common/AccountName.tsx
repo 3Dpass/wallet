@@ -59,7 +59,7 @@ export function AccountName({ address, identity }: AccountNameProps) {
       <div className="flex-1">
         {localIdentity ? (
           <div
-            className={`flex items-center gap-2 ${localIdentity.isGood ? "text-green-501" : localIdentity.isBad ? "text-red-500" : "text-gray-500"}`}
+            className={`flex items-center gap-2 ${localIdentity.isGood ? "text-green-501" : localIdentity.isBad ? "text-red-500" : "text-yellow-500"}`}
           >
             {localIdentity.parent && (
               <>
@@ -69,6 +69,7 @@ export function AccountName({ address, identity }: AccountNameProps) {
             )}
             <span className="border-b border-b-gray-501 group-hover:border-b-white">{localIdentity.display}</span>
             {localIdentity.isGood && !localIdentity.isBad && <Icon icon="endorsed" intent={Intent.SUCCESS} />}
+            {!localIdentity.isGood && !localIdentity.isBad && <Icon icon="warning-sign" intent={Intent.WARNING} />}
           </div>
         ) : (
           <div className="inline-flex font-mono text-ellipsis overflow-hidden border-b border-b-gray-501 group-hover:border-b-white">{address}</div>
