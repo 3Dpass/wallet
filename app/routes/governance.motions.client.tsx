@@ -5,7 +5,6 @@ import { useApi, useAccounts } from "app/components/Api";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import useToaster from "app/hooks/useToaster";
 import { signAndSend, enableMockMode, disableMockMode } from "app/utils/sign";
-import { AccountSelector } from "app/components/governance/AccountSelector";
 import { mockVotes } from "app/utils/mock";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";

@@ -6,8 +6,8 @@ import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
 import useToaster from "../../hooks/useToaster";
 import { useAccounts, useApi } from "../Api";
-import { useAtom, useAtomValue, useSetAtom } from "jotai/index";
-import { apiAdvancedModeAtom, lastSelectedAccountAtom, poolIdsAtom } from "../../atoms";
+import { useAtomValue, useSetAtom } from "jotai/index";
+import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
 import { convertPool } from "../../utils/pool";
 import { useTranslation } from "react-i18next";
 
@@ -19,7 +19,6 @@ export default function Wallet() {
   const accounts = useAccounts();
   const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
   const setPoolIds = useSetAtom(poolIdsAtom);
-  const [selectedAccount, setSelectedAccount] = useAtom(lastSelectedAccountAtom);
 
   const dialogsInitial = {
     seed_phrase: false,
@@ -30,12 +29,6 @@ export default function Wallet() {
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
-
-  useEffect(() => {
-    if (accounts.length > 0 && !selectedAccount) {
-      setSelectedAccount(accounts[0].address);
-    }
-  }, [accounts, selectedAccount, setSelectedAccount]);
 
   useEffect(() => {
     if (apiAdvancedMode) {
@@ -91,11 +84,7 @@ export default function Wallet() {
       <DialogCreateAddress isOpen={dialogs.create} onClose={() => dialogToggle("create")} />
       {accounts.map((pair) => {
         return (
-          <div
-            key={pair.address}
-            className={pair.address === selectedAccount ? "border border-blue-500 rounded" : undefined}
-            onClick={() => setSelectedAccount(pair.address)}
-          >
+          <div key={pair.address}>
             <Account pair={pair} />
           </div>
         );

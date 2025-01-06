@@ -47,7 +47,7 @@ export function AccountSelector({ onAccountChange, selectedAddress }: AccountSel
   return (
     <div className="flex items-center gap-2">
       <div className="font-medium whitespace-nowrap">{t("governance.active_account")}:</div>
-      <div className="relative w-full max-w-md" ref={dropdownRef}>
+      <div className="relative w-full" ref={dropdownRef}>
         <Button
           className="w-full justify-between items-center bg-gray-700 hover:bg-gray-600 !pr-2"
           onClick={() => setIsOpen(!isOpen)}
