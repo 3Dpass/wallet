@@ -3,6 +3,16 @@
  */
 module.exports = {
   ignoredRouteFiles: ["**/.*"],
+  serverDependenciesToBundle: [
+    "@apollo/client",
+    "@wry/equality",
+    "@wry/trie",
+    "ts-invariant",
+    "@wry/caches",
+    "optimism",
+    "zen-observable-ts",
+    "@wry/context",
+  ],
   future: {
     v2_errorBoundary: true,
     v2_normalizeFormMethod: true,
