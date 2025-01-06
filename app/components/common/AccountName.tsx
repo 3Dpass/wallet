@@ -71,7 +71,7 @@ export function AccountName({ address, identity }: AccountNameProps) {
             {localIdentity.isGood && !localIdentity.isBad && <Icon icon="endorsed" intent={Intent.SUCCESS} />}
           </div>
         ) : (
-          <div className="font-mono text-ellipsis overflow-hidden border-b border-b-gray-501 group-hover:border-b-white">{address}</div>
+          <div className="inline-flex font-mono text-ellipsis overflow-hidden border-b border-b-gray-501 group-hover:border-b-white">{address}</div>
         )}
       </div>
     </Link>
