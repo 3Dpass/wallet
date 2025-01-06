@@ -214,7 +214,13 @@
       "members": "Miembros",
       "member": "Miembro del Consejo",
       "balance": "Balance en Stake",
-      "motion": "Moción"
+      "motion": "Moción",
+      "vote": "Votar",
+      "active_account": "Cuenta Activa",
+      "select_account": "Seleccionar cuenta",
+      "no_accounts": "No hay cuentas disponibles. Crea o importa una cuenta para participar en la gobernanza.",
+      "already_voted": "Ya has votado",
+      "mock_mode": "Modo de Prueba (Sin Red)"
     }
   }
 }

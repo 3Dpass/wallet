@@ -214,7 +214,13 @@
       "members": "成员",
       "member": "理事会成员",
       "balance": "质押余额",
-      "motion": "提案"
+      "motion": "提案",
+      "vote": "投票",
+      "active_account": "活跃账户",
+      "select_account": "选择账户",
+      "no_accounts": "没有可用账户。创建或导入账户以参与治理。",
+      "already_voted": "已投票",
+      "mock_mode": "测试模式（无网络）"
     }
   }
 }
