@@ -360,7 +360,7 @@ export function MotionDetails({
         </div>
 
         {isCouncilMember && onVote && onClose && (
-          <div>
+          <div className="flex justify-center">
             {!isThresholdReached ? (
               <div className="flex gap-3">
                 <Button
@@ -369,6 +369,7 @@ export function MotionDetails({
                   onClick={() => onVote(motion, true)}
                   className="min-w-[140px] !h-10"
                   icon={ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? "tick" : undefined}
+                  disabled={ayeVotes.map((a) => a.toString()).includes(selectedAddress || "")}
                 >
                   {ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? t("governance.ayes") : t("governance.ayes")}
                 </Button>
@@ -378,6 +379,7 @@ export function MotionDetails({
                   onClick={() => onVote(motion, false)}
                   className="min-w-[140px] !h-10"
                   icon={nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? "tick" : undefined}
+                  disabled={nayVotes.map((a) => a.toString()).includes(selectedAddress || "")}
                 >
                   {nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? t("governance.nays") : t("governance.nays")}
                 </Button>
