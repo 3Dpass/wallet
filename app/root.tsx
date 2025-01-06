@@ -134,13 +134,13 @@ export default function App() {
                       </NavbarHeading>
                     </NavbarGroup>
                     <NavbarGroup align={Alignment.RIGHT}>
-                      <form onSubmit={handleSearchSubmit}>
+                      <form onSubmit={handleSearchSubmit} className="w-full sm:w-auto">
                         <InputGroup
                           leftIcon="search"
                           onChange={(e) => setSearchValue(e.target.value)}
                           placeholder={t("root.lbl_search_box")}
                           value={searchValue}
-                          size={40}
+                          className="w-full sm:min-w-[300px]"
                           type="search"
                         />
                       </form>
