@@ -315,7 +315,11 @@ export default function GovernanceMotions() {
                         </Tag>
                         <div className="flex flex-wrap gap-1">
                           {ayeVotes.map((address) => (
-                            <Tag key={address.toString()} minimal className={Classes.TEXT_SMALL}>
+                            <Tag
+                              key={address.toString()}
+                              minimal
+                              className={`${Classes.TEXT_SMALL} ${address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900" : ""}`}
+                            >
                               <AccountName address={address.toString()} />
                             </Tag>
                           ))}
@@ -328,7 +332,11 @@ export default function GovernanceMotions() {
                           </Tag>
                           <div className="flex flex-wrap gap-1">
                             {nayVotes.map((address) => (
-                              <Tag key={address.toString()} minimal className={Classes.TEXT_SMALL}>
+                              <Tag
+                                key={address.toString()}
+                                minimal
+                                className={`${Classes.TEXT_SMALL} ${address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900" : ""}`}
+                              >
                                 <AccountName address={address.toString()} />
                               </Tag>
                             ))}
