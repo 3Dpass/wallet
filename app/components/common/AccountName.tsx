@@ -74,8 +74,16 @@ export function AccountName({ address, identity }: AccountNameProps) {
             >
               {localIdentity.display}
             </span>
-            {localIdentity.isGood && !localIdentity.isBad && <Icon icon="endorsed" intent={Intent.SUCCESS} />}
-            {!localIdentity.isGood && !localIdentity.isBad && <Icon icon="warning-sign" intent={Intent.WARNING} />}
+            {localIdentity.isGood && !localIdentity.isBad && (
+              <div className="[filter:drop-shadow(0_0_1px_rgba(15,164,108,0.5))]">
+                <Icon icon="endorsed" intent={Intent.SUCCESS} />
+              </div>
+            )}
+            {!localIdentity.isGood && !localIdentity.isBad && (
+              <div className="[filter:drop-shadow(0_0_1px_rgba(217,130,43,0.5))]">
+                <Icon icon="warning-sign" intent={Intent.WARNING} />
+              </div>
+            )}
             <span className="font-mono opacity-50 -ml-2 [mask-image:linear-gradient(to_right,transparent_0%,white_25%,white_100%)]">
               {address.slice(-6)}
             </span>
