@@ -1,11 +1,10 @@
-import { Card, Classes, Tag, Intent, Button, Icon, Spinner } from "@blueprintjs/core";
+import { Card, Classes, Tag, Intent, Button, Icon } from "@blueprintjs/core";
 import { useTranslation } from "react-i18next";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { AccountName } from "app/components/common/AccountName";
 import { formatBalance } from "@polkadot/util";
 import { BountyApproval } from "./BountyApproval";
 import { BountyCuratorProposal } from "./BountyCuratorProposal";
-import { useState } from "react";
 
 interface MotionDetailsProps {
   motion: DeriveCollectiveProposal;
@@ -63,7 +62,6 @@ export function MotionDetails({
   closeMotionLoading = {},
 }: MotionDetailsProps) {
   const { t } = useTranslation();
-  const [showTechDetails, setShowTechDetails] = useState(false);
 
   if (!motion?.proposal || !motion?.votes) return null;
 
@@ -75,7 +73,6 @@ export function MotionDetails({
   const section = motion.proposal.section || "mock";
   const method = motion.proposal.method || "proposal";
   const args = motion.proposal.args || [];
-  const proposalHash = motion.proposal.hash?.toString() || "";
 
   const totalVotes = ayeVotes.length + nayVotes.length;
   const isThresholdReached = totalVotes >= threshold;
@@ -112,51 +109,23 @@ export function MotionDetails({
     <Card className="mb-3">
       <div className="flex justify-between items-start mb-3">
         <div>
-          <Tag minimal round className="mb-1">
-            #{index}
-          </Tag>
+          <div className="flex items-center gap-2 mb-3">
+            <Tag minimal round>
+              #{index}
+            </Tag>
+            <Tag intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} minimal>
+              {totalVotes}/{threshold}
+            </Tag>
+            <span className="text-sm text-gray-500">
+              {isThresholdReached ? t("governance.threshold_reached") : t("governance.votes_needed", { remaining: threshold - totalVotes })}
+            </span>
+          </div>
           <div className="text-sm text-gray-600 dark:text-gray-300">{proposalDescription}</div>
         </div>
-        <Tag intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} minimal>
-          {totalVotes}/{threshold}
-        </Tag>
-      </div>
-
-      <div className="mb-3">
-        <Button
-          minimal
-          small
-          onClick={() => setShowTechDetails(!showTechDetails)}
-          rightIcon={<Icon icon={showTechDetails ? "chevron-up" : "chevron-down"} />}
-        >
-          {t("governance.technical_info")}
-        </Button>
-
-        {showTechDetails && (
-          <div className="mt-2 text-sm">
-            <div className="mb-3">
-              <div className="text-gray-500 dark:text-gray-400 mb-1">{t("governance.details")}</div>
-              <div className="space-y-1">
-                {args.map((arg, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <Tag minimal className="shrink-0">
-                      {t("governance.parameter")} {index + 1}
-                    </Tag>
-                    <div className="font-mono text-sm break-all">{formatProposalArgument(section, method, arg, index)}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div className="text-gray-500 dark:text-gray-400 mb-1">{t("governance.technical_info")}</div>
-              <div className="font-mono text-xs break-all text-gray-500">{proposalHash}</div>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="space-y-2">
-        <div className="space-y-1">
+        <div className="space-y-1 pt-3">
           <div className="flex items-center gap-2">
             <Tag intent={Intent.SUCCESS} minimal className="min-w-12 text-center">
               {ayeVotes.length} {t("governance.ayes")}
@@ -194,7 +163,7 @@ export function MotionDetails({
         </div>
 
         {isCouncilMember && onVote && onClose && (
-          <div className="flex justify-end gap-2 mt-3">
+          <div className="flex justify-start gap-2 pt-6">
             {!isThresholdReached ? (
               <div className="flex gap-2">
                 <Button intent={Intent.SUCCESS} loading={votingLoading[`${hash}-true`]} onClick={() => onVote(motion, true)} className="min-w-[100px]">
