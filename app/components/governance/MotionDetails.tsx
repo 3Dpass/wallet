@@ -364,21 +364,19 @@ export function MotionDetails({
                   loading={votingLoading[`${hash}-true`]}
                   onClick={() => onVote(motion, true)}
                   className="min-w-[140px] !h-10"
+                  text={t("governance.ayes")}
                   icon={ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? "tick" : undefined}
                   disabled={ayeVotes.map((a) => a.toString()).includes(selectedAddress || "")}
-                >
-                  {ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? t("governance.ayes") : t("governance.ayes")}
-                </Button>
+                ></Button>
                 <Button
                   intent={Intent.DANGER}
                   loading={votingLoading[`${hash}-false`]}
                   onClick={() => onVote(motion, false)}
                   className="min-w-[140px] !h-10"
+                  text={t("governance.nays")}
                   icon={nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? "tick" : undefined}
                   disabled={nayVotes.map((a) => a.toString()).includes(selectedAddress || "")}
-                >
-                  {nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? t("governance.nays") : t("governance.nays")}
-                </Button>
+                ></Button>
               </div>
             ) : (
               <Button
