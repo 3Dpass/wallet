@@ -270,18 +270,25 @@ export default function GovernanceMotions() {
       <div>
         <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.motions")}</h2>
         <div className="space-y-3">
-          {motions.map((motion) => (
-            <MotionDetails
-              key={motion.hash?.toString()}
-              motion={motion}
-              isCouncilMember={isSelectedCouncilMember}
-              selectedAddress={selectedAddress}
-              onVote={handleVote}
-              onClose={handleCloseMotion}
-              votingLoading={votingLoading}
-              closeMotionLoading={closeMotionLoading}
-            />
-          ))}
+          {motions
+            .slice()
+            .sort((a, b) => {
+              const indexA = a.votes?.index?.toNumber() ?? 0;
+              const indexB = b.votes?.index?.toNumber() ?? 0;
+              return indexB - indexA;
+            })
+            .map((motion) => (
+              <MotionDetails
+                key={motion.hash?.toString()}
+                motion={motion}
+                isCouncilMember={isSelectedCouncilMember}
+                selectedAddress={selectedAddress}
+                onVote={handleVote}
+                onClose={handleCloseMotion}
+                votingLoading={votingLoading}
+                closeMotionLoading={closeMotionLoading}
+              />
+            ))}
         </div>
       </div>
     </div>
