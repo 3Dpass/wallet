@@ -215,7 +215,12 @@
       "members": "Members",
       "member": "Council Member",
       "balance": "Stake Balance",
-      "motion": "Motion"
+      "motion": "Motion",
+      "vote": "Vote",
+      "active_account": "Active Account",
+      "select_account": "Select account",
+      "no_accounts": "No accounts available. Create or import an account to participate in governance.",
+      "already_voted": "Already voted"
     }
   }
 }
