@@ -1,5 +1,5 @@
 import { Card, Classes, HTMLTable, Icon, IconSize, Tag } from "@blueprintjs/core";
-import { AddressItem } from "./AddressItem";
+import { AccountName } from "./AccountName";
 import { useTranslation } from "react-i18next";
 
 type IRegistrarInfoItem = {
@@ -46,7 +46,7 @@ export default function UserCard({ registrarInfo }: IProps) {
             ) : (
               <div className="text-lg">{t("user_card.lbl_no_display_name")}</div>
             )}
-            <AddressItem address={registrarInfo.account} />
+            <AccountName address={registrarInfo.account} />
           </div>
         </div>
       </div>
@@ -67,14 +67,14 @@ export default function UserCard({ registrarInfo }: IProps) {
               <td>{registrarInfo.info?.twitter.Raw as string}</td>
             </tr>
             {registrarInfo.info.additional?.map((addItem, i) => {
-                return (
-                  <tr key={i}>
-                    {addItem?.map((item, j) => {
-                        return <td key={item.Raw}>{item.Raw}</td>;
-                      })}
-                  </tr>
-                );
-              })}
+              return (
+                <tr key={i}>
+                  {addItem?.map((item, j) => {
+                    return <td key={item.Raw}>{item.Raw}</td>;
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </HTMLTable>
         {registrarInfo.judgements && (

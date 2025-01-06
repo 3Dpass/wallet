@@ -9,7 +9,7 @@ import { FormattedAmount } from "../components/common/FormattedAmount";
 import { encodeAddress } from "@polkadot/util-crypto/address/encode";
 import { useQuery } from "@apollo/client";
 import Error from "../components/common/Error";
-import { AddressItem } from "../components/common/AddressItem";
+import { AccountName } from "../components/common/AccountName";
 import { ExplorerUrl } from "../components/common/ExplorerForward";
 import TitledValue from "../components/common/TitledValue";
 import { useAtomValue } from "jotai/index";
@@ -47,35 +47,35 @@ export default function Address() {
         </thead>
         <tbody>
           {data?.getTransfers.objects.map((transfer) => {
-              const fromAddress = encodeAddress(transfer.fromMultiAddressAccountId, formatOptions.chainSS58);
-              const toAddress = encodeAddress(transfer.toMultiAddressAccountId, formatOptions.chainSS58);
-              const otherAddress = fromAddress !== address ? fromAddress : toAddress;
-              const outgoing = fromAddress === address;
-              return (
-                <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
-                  <td>
-                    <Link to={`/block/${transfer.blockNumber}`}> {transfer.blockNumber}</Link>
-                  </td>
-                  <td>
-                    <Moment date={transfer.blockDatetime} format="DD.MM.YY HH:MM" interval={0} />
-                  </td>
-                  <td>
-                    <Link to={ExplorerUrl.extrinsic(transfer.blockNumber, transfer.extrinsicIdx)} target="_self">
-                      {transfer.extrinsicIdx}
-                    </Link>
-                  </td>
-                  <td>
-                    <AddressItem address={otherAddress} />
-                  </td>
-                  <td className="font-mono">
-                    <div className="text-right">
-                      <FormattedAmount value={transfer.value} />
-                    </div>
-                  </td>
-                  <td>{outgoing ? <Icon icon="remove" className="text-red-500" /> : <Icon icon="add" className="text-green-500" />}</td>
-                </tr>
-              );
-            })}
+            const fromAddress = encodeAddress(transfer.fromMultiAddressAccountId, formatOptions.chainSS58);
+            const toAddress = encodeAddress(transfer.toMultiAddressAccountId, formatOptions.chainSS58);
+            const otherAddress = fromAddress !== address ? fromAddress : toAddress;
+            const outgoing = fromAddress === address;
+            return (
+              <tr key={`${transfer.blockNumber}:${transfer.extrinsicIdx}`}>
+                <td>
+                  <Link to={`/block/${transfer.blockNumber}`}> {transfer.blockNumber}</Link>
+                </td>
+                <td>
+                  <Moment date={transfer.blockDatetime} format="DD.MM.YY HH:MM" interval={0} />
+                </td>
+                <td>
+                  <Link to={ExplorerUrl.extrinsic(transfer.blockNumber, transfer.extrinsicIdx)} target="_self">
+                    {transfer.extrinsicIdx}
+                  </Link>
+                </td>
+                <td>
+                  <AccountName address={otherAddress} />
+                </td>
+                <td className="font-mono">
+                  <div className="text-right">
+                    <FormattedAmount value={transfer.value} />
+                  </div>
+                </td>
+                <td>{outgoing ? <Icon icon="remove" className="text-red-500" /> : <Icon icon="add" className="text-green-500" />}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </HTMLTable>
     </Card>
