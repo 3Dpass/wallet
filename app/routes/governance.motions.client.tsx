@@ -263,25 +263,27 @@ export default function GovernanceMotions() {
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-3">
         <AccountSelector onAccountChange={setSelectedAddress} selectedAddress={selectedAddress} />
         {process.env.NODE_ENV === "development" && <Switch checked={isMockMode} label={t("governance.mock_mode")} onChange={handleMockModeToggle} />}
       </div>
-      <Card elevation={Elevation.ONE} className="p-4">
+      <div>
         <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.motions")}</h2>
-        {motions.map((motion) => (
-          <MotionDetails
-            key={motion.hash?.toString()}
-            motion={motion}
-            isCouncilMember={isSelectedCouncilMember}
-            selectedAddress={selectedAddress}
-            onVote={handleVote}
-            onClose={handleCloseMotion}
-            votingLoading={votingLoading}
-            closeMotionLoading={closeMotionLoading}
-          />
-        ))}
-      </Card>
+        <div className="space-y-3">
+          {motions.map((motion) => (
+            <MotionDetails
+              key={motion.hash?.toString()}
+              motion={motion}
+              isCouncilMember={isSelectedCouncilMember}
+              selectedAddress={selectedAddress}
+              onVote={handleVote}
+              onClose={handleCloseMotion}
+              votingLoading={votingLoading}
+              closeMotionLoading={closeMotionLoading}
+            />
+          ))}
+        </div>
+      </div>
     </>
   );
 }
