@@ -11,7 +11,7 @@ import { hexToString } from "@polkadot/util";
 interface BountyDetailsProps {
   bountyId: string;
   motion: DeriveCollectiveProposal;
-  type: "approval" | "curator";
+  type: "approval" | "curator" | "close";
   curator?: string;
   fee?: bigint;
 }
@@ -55,7 +55,11 @@ export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDe
     loadBounty();
   }, [api, bountyId]);
 
-  const title = type === "approval" ? "Approve Bounty" : "Propose Curator for Bounty";
+  const title = {
+    approval: "Approve Bounty",
+    curator: "Propose Curator for Bounty",
+    close: "Close Bounty",
+  }[type];
 
   if (loading) {
     return (

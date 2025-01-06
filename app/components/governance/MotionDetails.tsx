@@ -267,6 +267,8 @@ export function MotionDetails({
         );
       case "bounties.approveBounty":
         return <BountyDetails bountyId={args[0].toString()} motion={motion} type="approval" />;
+      case "bounties.closeBounty":
+        return <BountyDetails bountyId={args[0].toString()} motion={motion} type="close" />;
       case "bounties.proposeCurator":
         return <BountyDetails bountyId={args[0].toString()} curator={args[1].toString()} fee={args[2].toBigInt()} motion={motion} type="curator" />;
       case "council.close":
