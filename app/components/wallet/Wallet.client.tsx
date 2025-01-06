@@ -6,8 +6,8 @@ import DialogCreateAddress from "../dialogs/DialogCreateAddress";
 import Account from "./Account.client";
 import useToaster from "../../hooks/useToaster";
 import { useAccounts, useApi } from "../Api";
-import { useAtomValue, useSetAtom } from "jotai/index";
-import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
+import { useAtom, useAtomValue, useSetAtom } from "jotai/index";
+import { apiAdvancedModeAtom, lastSelectedAccountAtom, poolIdsAtom } from "../../atoms";
 import { convertPool } from "../../utils/pool";
 import { useTranslation } from "react-i18next";
 
@@ -19,6 +19,7 @@ export default function Wallet() {
   const accounts = useAccounts();
   const apiAdvancedMode = useAtomValue(apiAdvancedModeAtom);
   const setPoolIds = useSetAtom(poolIdsAtom);
+  const [selectedAccount, setSelectedAccount] = useAtom(lastSelectedAccountAtom);
 
   const dialogsInitial = {
     seed_phrase: false,
@@ -29,6 +30,12 @@ export default function Wallet() {
   const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
+
+  useEffect(() => {
+    if (accounts.length > 0 && !selectedAccount) {
+      setSelectedAccount(accounts[0].address);
+    }
+  }, [accounts, selectedAccount, setSelectedAccount]);
 
   useEffect(() => {
     if (apiAdvancedMode) {
@@ -48,36 +55,24 @@ export default function Wallet() {
           toaster.show({
             icon: "warning-sign",
             intent: Intent.WARNING,
-            message: t("messages.lbl_wallet_already_imported"),
+            message: t("wallet.msg_address_already_exists"),
           });
+          return;
         }
-        dialogToggle("seed_phrase");
-      } catch (e: any) {
         toaster.show({
-          icon: "ban-circle",
+          icon: "tick",
+          intent: Intent.SUCCESS,
+          message: t("wallet.msg_address_imported"),
+        });
+      } catch (e) {
+        toaster.show({
+          icon: "error",
           intent: Intent.DANGER,
-          message: e.message,
+          message: t("wallet.msg_invalid_seed_phrase"),
         });
       }
     },
-    [dialogToggle, toaster]
-  );
-
-  const handleJSONWalletImportClick = useCallback(
-    (json: string) => {
-      try {
-        const pair = keyring.createFromJson(JSON.parse(json));
-        keyring.addPair(pair, "");
-        dialogToggle("json");
-      } catch (e: any) {
-        toaster.show({
-          icon: "ban-circle",
-          intent: Intent.DANGER,
-          message: e.message,
-        });
-      }
-    },
-    [dialogToggle, toaster]
+    [t, toaster]
   );
 
   if (!api) {
@@ -88,14 +83,22 @@ export default function Wallet() {
     <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
       <DialogImportAddress
         isOpen={dialogs.seed_phrase}
-        showPassword
+        showPassword={true}
         onClose={() => dialogToggle("seed_phrase")}
         onImport={handleSeedPhraseImportClick}
       />
-      <DialogImportAddress isOpen={dialogs.json} showPassword={false} onClose={() => dialogToggle("json")} onImport={handleJSONWalletImportClick} />
+      <DialogImportAddress isOpen={dialogs.json} showPassword={false} onClose={() => dialogToggle("json")} onImport={handleSeedPhraseImportClick} />
       <DialogCreateAddress isOpen={dialogs.create} onClose={() => dialogToggle("create")} />
       {accounts.map((pair) => {
-        return <Account key={pair.address} pair={pair} />;
+        return (
+          <div
+            key={pair.address}
+            className={pair.address === selectedAccount ? "border border-blue-500 rounded" : undefined}
+            onClick={() => setSelectedAccount(pair.address)}
+          >
+            <Account pair={pair} />
+          </div>
+        );
       })}
       <div className="grid gap-1">
         <Button icon="new-object" text={t("root_wallet.lbl_btn_create_new_address")} onClick={() => dialogToggle("create")} />
