@@ -228,7 +228,10 @@
       "bounty_not_found": "Bounty not found",
       "description": "Description",
       "value": "Value",
-      "fee": "Fee"
+      "fee": "Fee",
+      "curator": "Curator",
+      "curator_fee": "Curator Fee",
+      "bounty_value": "Bounty Value"
     }
   }
 }

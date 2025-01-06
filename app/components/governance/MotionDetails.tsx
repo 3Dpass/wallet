@@ -4,6 +4,7 @@ import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { AccountName } from "app/components/common/AccountName";
 import { formatBalance } from "@polkadot/util";
 import { BountyApproval } from "./BountyApproval";
+import { BountyCuratorProposal } from "./BountyCuratorProposal";
 import { useState } from "react";
 
 interface MotionDetailsProps {
@@ -96,6 +97,8 @@ export function MotionDetails({
         );
       case "bounties.approveBounty":
         return <BountyApproval bountyId={args[0].toString()} motion={motion} />;
+      case "bounties.proposeCurator":
+        return <BountyCuratorProposal bountyId={args[0].toString()} curator={args[1].toString()} fee={args[2].toBigInt()} motion={motion} />;
       case "council.close":
         return `Close proposal with hash ${args[0].toString().slice(0, 8)}... at index #${args[1].toString()}`;
       default:
