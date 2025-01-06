@@ -14,9 +14,10 @@ interface BountyDetailsProps {
   type: "approval" | "curator" | "close";
   curator?: string;
   fee?: bigint;
+  showHeader?: boolean;
 }
 
-export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDetailsProps) {
+export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader = true }: BountyDetailsProps) {
   const { t } = useTranslation();
   const api = useApi();
   const [bountyData, setBountyData] = useState<any | null>(null);
@@ -87,15 +88,42 @@ export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDe
     );
   }
 
+  const getStatusIntent = (status: { type: string }) => {
+    switch (status.type) {
+      case "Active":
+        return Intent.SUCCESS;
+      case "PendingPayout":
+        return Intent.WARNING;
+      case "Proposed":
+        return Intent.PRIMARY;
+      case "CuratorProposed":
+        return Intent.PRIMARY;
+      case "Funded":
+        return Intent.SUCCESS;
+      default:
+        return Intent.NONE;
+    }
+  };
+
   return (
     <div className="max-w-4xl w-full">
-      <div className="mb-3">
-        <H4>
-          {title} #{bountyId}
-        </H4>
-      </div>
+      {showHeader && (
+        <div className="mb-3">
+          <H4>
+            {title} #{bountyId}
+          </H4>
+        </div>
+      )}
       <HTMLTable striped className="w-full">
         <tbody>
+          {bountyData?.status && (
+            <tr>
+              <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.bounty_status")}</td>
+              <td>
+                <Tag intent={getStatusIntent(bountyData.status)}>{bountyData.status.type}</Tag>
+              </td>
+            </tr>
+          )}
           {description && (
             <tr>
               <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.description")}</td>

@@ -12,7 +12,7 @@ export default function Governance() {
   const navigate = useNavigate();
   const [selectedAddress, setSelectedAddress] = useAtom(lastSelectedAccountAtom);
 
-  const currentTab = location.pathname.includes("members") ? "members" : "motions";
+  const currentTab = location.pathname.includes("members") ? "members" : location.pathname.includes("bounties") ? "bounties" : "motions";
 
   const handleTabChange = (newTabId: string) => {
     navigate(`/governance/${newTabId}`);
@@ -25,6 +25,7 @@ export default function Governance() {
           <Tabs id="governance-tabs" selectedTabId={currentTab} onChange={handleTabChange} animate={true} large={true}>
             <Tab id="motions" title={t("governance.motions")} />
             <Tab id="members" title={t("governance.members")} />
+            <Tab id="bounties" title={t("governance.bounties")} />
           </Tabs>
           <AccountSelector onAccountChange={setSelectedAddress} selectedAddress={selectedAddress} />
         </div>
