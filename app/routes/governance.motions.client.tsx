@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Elevation, Spinner, Tag, Intent, HTMLTable, Classes, Button, Switch } from "@blueprintjs/core";
+import { Card, Elevation, Spinner, Tag, Intent, HTMLTable, Classes, Button, Switch, Icon } from "@blueprintjs/core";
 import { useApi, useAccounts } from "app/components/Api";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { AccountName } from "app/components/common/AccountName";
@@ -361,9 +361,13 @@ export default function GovernanceMotions() {
                               onClick={() => handleVote(motion, true)}
                               className="min-w-[80px]"
                             >
-                              {hasVoted(motion, selectedAccount.address) && ayeVotes.map((a) => a.toString()).includes(selectedAccount.address)
-                                ? `✓ ${t("governance.ayes")}`
-                                : t("governance.ayes")}
+                              {hasVoted(motion, selectedAccount.address) && ayeVotes.map((a) => a.toString()).includes(selectedAccount.address) ? (
+                                <span className="inline-flex items-center gap-4">
+                                  <Icon icon="tick" size={12} /> {t("governance.ayes")}
+                                </span>
+                              ) : (
+                                t("governance.ayes")
+                              )}
                             </Button>
                             <Button
                               intent={Intent.DANGER}
@@ -371,9 +375,13 @@ export default function GovernanceMotions() {
                               onClick={() => handleVote(motion, false)}
                               className="min-w-[80px]"
                             >
-                              {hasVoted(motion, selectedAccount.address) && nayVotes.map((a) => a.toString()).includes(selectedAccount.address)
-                                ? `✓ ${t("governance.nays")}`
-                                : t("governance.nays")}
+                              {hasVoted(motion, selectedAccount.address) && nayVotes.map((a) => a.toString()).includes(selectedAccount.address) ? (
+                                <span className="inline-flex items-center gap-4">
+                                  <Icon icon="tick" size={12} /> {t("governance.nays")}
+                                </span>
+                              ) : (
+                                t("governance.nays")
+                              )}
                             </Button>
                           </div>
                         ) : (
