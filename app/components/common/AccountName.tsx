@@ -3,6 +3,7 @@ import { AddressIcon } from "./AddressIcon";
 import { useState, useEffect } from "react";
 import { DeriveAccountRegistration } from "@polkadot/api-derive/types";
 import { useApi } from "../Api";
+import { Icon, Intent } from "@blueprintjs/core";
 
 interface AccountNameProps {
   address: string;
@@ -53,14 +54,21 @@ export function AccountName({ address, identity }: AccountNameProps) {
   }, [api, address, identity]);
 
   return (
-    <Link to={`/address/${address}`} className="flex items-center text-white no-underline group">
+    <Link to={`/address/${address}`} className="flex items-center gap-3 text-white no-underline group">
       <AddressIcon address={address} />
-      <div className="ml-3">
+      <div className="flex-1">
         {localIdentity ? (
-          <div className={`${localIdentity.isGood ? "text-green-501" : localIdentity.isBad ? "text-red-500" : "text-gray-500"}`}>
-            {localIdentity.parent && <span className="text-gray-601">{localIdentity.parent}/</span>}
+          <div
+            className={`flex items-center gap-2 ${localIdentity.isGood ? "text-green-501" : localIdentity.isBad ? "text-red-500" : "text-gray-500"}`}
+          >
+            {localIdentity.parent && (
+              <>
+                <span className="text-gray-601">{localIdentity.parent}</span>
+                <span className="text-gray-601">/</span>
+              </>
+            )}
             <span className="border-b border-b-gray-501 group-hover:border-b-white">{localIdentity.display}</span>
-            {localIdentity.isGood && !localIdentity.isBad && <span className="ml-2">✓</span>}
+            {localIdentity.isGood && !localIdentity.isBad && <Icon icon="endorsed" intent={Intent.SUCCESS} />}
           </div>
         ) : (
           <div className="font-mono text-ellipsis overflow-hidden border-b border-b-gray-501 group-hover:border-b-white">{address}</div>
