@@ -31,7 +31,7 @@ export function AccountSelector({ onAccountChange, selectedAddress }: AccountSel
 
   if (accounts.length === 0) {
     return (
-      <Card className="mb-4">
+      <Card>
         <div className="text-center">
           <p className="mb-2">{t("governance.no_accounts")}</p>
           <Button intent={Intent.PRIMARY} icon="plus" text={t("root_wallet.lbl_btn_create_new_address")} />
@@ -41,7 +41,7 @@ export function AccountSelector({ onAccountChange, selectedAddress }: AccountSel
   }
 
   return (
-    <Card className="mb-4">
+    <Card>
       <div className="flex items-center gap-4">
         <div className="font-medium">{t("governance.active_account")}:</div>
         <HTMLSelect value={selected || ""} onChange={handleAccountChange} className={Classes.HTML_SELECT}>

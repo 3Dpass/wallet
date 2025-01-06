@@ -209,9 +209,8 @@
       "threshold": "Threshold",
       "no_active_motions": "No active motions",
       "motions": "Motions",
-      "votes_threshold": "{{ayes}}/{{threshold}} votes",
-      "ayes": "Ayes",
-      "nays": "Nays",
+      "ayes": "Yes",
+      "nays": "No",
       "members": "Members",
       "member": "Council Member",
       "balance": "Stake Balance",
@@ -220,7 +219,8 @@
       "active_account": "Active Account",
       "select_account": "Select account",
       "no_accounts": "No accounts available. Create or import an account to participate in governance.",
-      "already_voted": "Already voted"
+      "already_voted": "Already voted",
+      "mock_mode": "Test Mode (No Network)"
     }
   }
 }

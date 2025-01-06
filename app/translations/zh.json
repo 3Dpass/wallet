@@ -209,7 +209,6 @@
       "threshold": "阈值",
       "no_active_motions": "无活跃提案",
       "motions": "提案",
-      "votes_threshold": "{{ayes}}/{{threshold}} 票",
       "ayes": "赞成",
       "nays": "反对",
       "members": "成员",

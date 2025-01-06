@@ -209,7 +209,6 @@
       "threshold": "Limite",
       "no_active_motions": "Sem moções ativas",
       "motions": "Moções",
-      "votes_threshold": "{{ayes}}/{{threshold}} votos",
       "ayes": "A favor",
       "nays": "Contra",
       "members": "Membros",

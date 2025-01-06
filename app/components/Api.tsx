@@ -7,10 +7,12 @@ import { cryptoWaitReady } from "@polkadot/util-crypto";
 import keyring from "@polkadot/ui-keyring";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { loadWeb3Accounts } from "./Web3.client";
+import { createMockApi } from "../utils/mock";
 
 interface Props {
   children: React.ReactNode;
   apiUrl: string;
+  isMockMode?: boolean;
 }
 
 interface Context {
@@ -21,13 +23,18 @@ interface Context {
 
 export const ApiCtx = React.createContext<Context>({ api: undefined, keyringLoaded: false, accounts: [] });
 
-export function ApiCtxRoot({ apiUrl, children }: Props): React.ReactElement<Props> | null {
+export function ApiCtxRoot({ apiUrl, children, isMockMode = false }: Props): React.ReactElement<Props> | null {
   const [api, setApi] = React.useState<ApiPromise>();
   const [accounts, setAccounts] = React.useState<KeyringPair[]>([]);
   const [keyringLoaded, setKeyringLoaded] = React.useState(false);
   const setFormatOptions = useSetAtom(formatOptionsAtom);
 
   useEffect(() => {
+    if (isMockMode) {
+      setApi(createMockApi() as unknown as ApiPromise);
+      return;
+    }
+
     const wsProvider = new WsProvider(apiUrl);
     ApiPromise.create({
       provider: wsProvider,
@@ -36,7 +43,7 @@ export function ApiCtxRoot({ apiUrl, children }: Props): React.ReactElement<Prop
     }).then((api) => {
       setApi(api);
     });
-  }, [apiUrl]);
+  }, [apiUrl, isMockMode]);
 
   useEffect(() => {
     if (!api || keyringLoaded) {

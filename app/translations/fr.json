@@ -209,7 +209,6 @@
       "threshold": "Seuil",
       "no_active_motions": "Aucune motion active",
       "motions": "Motions",
-      "votes_threshold": "{{ayes}}/{{threshold}} votes",
       "ayes": "Pour",
       "nays": "Contre",
       "members": "Membres",
