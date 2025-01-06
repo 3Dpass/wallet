@@ -54,7 +54,7 @@ export function AccountName({ address, identity }: AccountNameProps) {
   }, [api, address, identity]);
 
   return (
-    <Link to={`/address/${address}`} className="flex items-center gap-3 text-white no-underline group">
+    <Link to={`/address/${address}`} className="flex items-center gap-1 text-white no-underline group">
       <AddressIcon address={address} />
       <div className="flex-1">
         {localIdentity ? (
