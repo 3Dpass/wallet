@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Elevation, Spinner, Tag, Intent, HTMLTable, Classes, Button, Switch, Icon } from "@blueprintjs/core";
+import { Card, Elevation, Spinner, Switch, Classes } from "@blueprintjs/core";
 import { useApi, useAccounts } from "app/components/Api";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
-import { AccountName } from "app/components/common/AccountName";
 import useToaster from "app/hooks/useToaster";
 import { signAndSend, enableMockMode, disableMockMode } from "app/utils/sign";
 import { AccountSelector } from "app/components/governance/AccountSelector";
 import { mockVotes } from "app/utils/mock";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
+import { MotionDetails } from "app/components/governance/MotionDetails";
 
 export default function GovernanceMotions() {
   const { t } = useTranslation();
@@ -118,7 +118,7 @@ export default function GovernanceMotions() {
       if (isLocked) {
         toaster.show({
           icon: "error",
-          intent: Intent.DANGER,
+          intent: "danger",
           message: t("messages.lbl_account_locked"),
         });
         return;
@@ -173,7 +173,7 @@ export default function GovernanceMotions() {
         if (status.isFinalized) {
           toaster.show({
             icon: "tick",
-            intent: Intent.SUCCESS,
+            intent: "success",
             message: t("messages.lbl_tx_sent"),
           });
           setVotingLoading((prev) => ({ ...prev, [`${motion.hash.toString()}-${approve}`]: false }));
@@ -182,7 +182,7 @@ export default function GovernanceMotions() {
     } catch (e: any) {
       toaster.show({
         icon: "error",
-        intent: Intent.DANGER,
+        intent: "danger",
         message: e.message,
       });
       setVotingLoading((prev) => ({ ...prev, [`${motion.hash.toString()}-${approve}`]: false }));
@@ -239,7 +239,7 @@ export default function GovernanceMotions() {
         if (status.isFinalized) {
           toaster.show({
             icon: "tick",
-            intent: Intent.SUCCESS,
+            intent: "success",
             message: t("messages.lbl_tx_sent"),
           });
           setCloseMotionLoading((prev) => ({ ...prev, [hash]: false }));
@@ -248,7 +248,7 @@ export default function GovernanceMotions() {
     } catch (e: any) {
       toaster.show({
         icon: "error",
-        intent: Intent.DANGER,
+        intent: "danger",
         message: e.message,
       });
       setCloseMotionLoading((prev) => ({ ...prev, [hash]: false }));
@@ -259,7 +259,6 @@ export default function GovernanceMotions() {
     return <Spinner />;
   }
 
-  const selectedAccount = selectedAddress ? accounts.find((a) => a.address === selectedAddress) : null;
   const isSelectedCouncilMember = selectedAddress ? isCouncilMember(selectedAddress) : false;
 
   return (
@@ -270,138 +269,18 @@ export default function GovernanceMotions() {
       </div>
       <Card elevation={Elevation.ONE} className="p-4">
         <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.motions")}</h2>
-        <HTMLTable className="w-full">
-          <thead>
-            <tr>
-              <th className="w-16">#</th>
-              <th className="w-48">{t("governance.motion")}</th>
-              <th className="w-full">{t("governance.votes")}</th>
-              <th className="w-24 text-right">{t("governance.threshold")}</th>
-              {isSelectedCouncilMember && <th className="w-32 text-right">{t("governance.vote")}</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {motions.map((motion) => {
-              if (!motion?.proposal || !motion?.votes) return null;
-
-              const hash = motion.hash?.toString() || "";
-              const index = motion.votes.index?.toString() || "0";
-              const threshold = motion.votes.threshold?.toNumber() || 0;
-              const ayeVotes = motion.votes.ayes || [];
-              const nayVotes = motion.votes.nays || [];
-              const section = motion.proposal.section || "mock";
-              const method = motion.proposal.method || "proposal";
-
-              const totalVotes = ayeVotes.length + nayVotes.length;
-              const isThresholdReached = totalVotes >= threshold;
-
-              return (
-                <tr key={hash}>
-                  <td>
-                    <Tag minimal round>
-                      {index}
-                    </Tag>
-                  </td>
-                  <td>
-                    <div className={`${Classes.TEXT_LARGE} font-medium`}>
-                      {section}.{method}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <Tag intent={Intent.SUCCESS} minimal className="min-w-12 text-center">
-                          {ayeVotes.length} {t("governance.ayes")}
-                        </Tag>
-                        <div className="flex flex-wrap gap-1">
-                          {ayeVotes.map((address) => (
-                            <Tag
-                              key={address.toString()}
-                              minimal
-                              className={`${Classes.TEXT_SMALL} px-2 py-1.5 rounded-md ${address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900" : ""}`}
-                            >
-                              <AccountName address={address.toString()} />
-                            </Tag>
-                          ))}
-                        </div>
-                      </div>
-                      {nayVotes.length > 0 && (
-                        <div className="flex items-center gap-2">
-                          <Tag intent={Intent.DANGER} minimal className="min-w-12 text-center">
-                            {nayVotes.length} {t("governance.nays")}
-                          </Tag>
-                          <div className="flex flex-wrap gap-1">
-                            {nayVotes.map((address) => (
-                              <Tag
-                                key={address.toString()}
-                                minimal
-                                className={`${Classes.TEXT_SMALL} px-2 py-1.5 rounded-md ${address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900" : ""}`}
-                              >
-                                <AccountName address={address.toString()} />
-                              </Tag>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="text-right">
-                    <Tag intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} minimal>
-                      {totalVotes}/{threshold}
-                    </Tag>
-                  </td>
-                  {isSelectedCouncilMember && selectedAccount && (
-                    <td className="text-right">
-                      <div className="flex justify-end gap-2">
-                        {!isThresholdReached ? (
-                          <div className="flex gap-2">
-                            <Button
-                              intent={Intent.SUCCESS}
-                              loading={votingLoading[`${hash}-true`]}
-                              onClick={() => handleVote(motion, true)}
-                              className="min-w-[80px]"
-                            >
-                              {hasVoted(motion, selectedAccount.address) && ayeVotes.map((a) => a.toString()).includes(selectedAccount.address) ? (
-                                <span className="inline-flex items-center gap-4">
-                                  <Icon icon="tick" size={12} /> {t("governance.ayes")}
-                                </span>
-                              ) : (
-                                t("governance.ayes")
-                              )}
-                            </Button>
-                            <Button
-                              intent={Intent.DANGER}
-                              loading={votingLoading[`${hash}-false`]}
-                              onClick={() => handleVote(motion, false)}
-                              className="min-w-[80px]"
-                            >
-                              {hasVoted(motion, selectedAccount.address) && nayVotes.map((a) => a.toString()).includes(selectedAccount.address) ? (
-                                <span className="inline-flex items-center gap-4">
-                                  <Icon icon="tick" size={12} /> {t("governance.nays")}
-                                </span>
-                              ) : (
-                                t("governance.nays")
-                              )}
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            intent={Intent.PRIMARY}
-                            icon="tick-circle"
-                            loading={closeMotionLoading[hash]}
-                            onClick={() => handleCloseMotion(motion)}
-                          >
-                            {t("governance.close_motion")}
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              );
-            })}
-          </tbody>
-        </HTMLTable>
+        {motions.map((motion) => (
+          <MotionDetails
+            key={motion.hash?.toString()}
+            motion={motion}
+            isCouncilMember={isSelectedCouncilMember}
+            selectedAddress={selectedAddress}
+            onVote={handleVote}
+            onClose={handleCloseMotion}
+            votingLoading={votingLoading}
+            closeMotionLoading={closeMotionLoading}
+          />
+        ))}
       </Card>
     </>
   );

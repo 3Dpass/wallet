@@ -221,7 +221,14 @@
       "no_accounts": "No accounts available. Create or import an account to participate in governance.",
       "already_voted": "Already voted",
       "mock_mode": "Test Mode (No Network)",
-      "close_motion": "Close Motion"
+      "close_motion": "Close Motion",
+      "technical_info": "Technical Information",
+      "details": "Details",
+      "parameter": "Parameter",
+      "bounty_not_found": "Bounty not found",
+      "description": "Description",
+      "value": "Value",
+      "fee": "Fee"
     }
   }
 }
