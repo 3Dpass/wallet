@@ -241,7 +241,10 @@
       "curator_fee": "Curator Fee",
       "bounty_value": "Bounty Value",
       "threshold_reached": "Threshold reached",
-      "votes_needed": "{{remaining}} more votes needed"
+      "votes_needed": "{{remaining}} more votes needed",
+      "related_motions": "Related Motions",
+      "view_motion": "View Motion",
+      "no_related_motions": "No related motions"
     }
   }
 }
