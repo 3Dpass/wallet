@@ -8,14 +8,15 @@ import { useApi } from "app/components/Api";
 import { useEffect, useState } from "react";
 import { hexToString } from "@polkadot/util";
 
-interface BountyCuratorProposalProps {
+interface BountyDetailsProps {
   bountyId: string;
-  curator: string;
-  fee: bigint;
   motion: DeriveCollectiveProposal;
+  type: "approval" | "curator";
+  curator?: string;
+  fee?: bigint;
 }
 
-export function BountyCuratorProposal({ bountyId, curator, fee, motion }: BountyCuratorProposalProps) {
+export function BountyDetails({ bountyId, motion, type, curator, fee }: BountyDetailsProps) {
   const { t } = useTranslation();
   const api = useApi();
   const [bountyData, setBountyData] = useState<any | null>(null);
@@ -54,10 +55,14 @@ export function BountyCuratorProposal({ bountyId, curator, fee, motion }: Bounty
     loadBounty();
   }, [api, bountyId]);
 
+  const title = type === "approval" ? "Approve Bounty" : "Propose Curator for Bounty";
+
   if (loading) {
     return (
       <Card>
-        <H4>Propose Curator for Bounty #{bountyId}</H4>
+        <H4>
+          {title} #{bountyId}
+        </H4>
         <div className="flex items-center gap-2 mt-2">
           <Spinner size={16} /> {t("common.loading")}
         </div>
@@ -68,7 +73,9 @@ export function BountyCuratorProposal({ bountyId, curator, fee, motion }: Bounty
   if (!bountyData) {
     return (
       <Card>
-        <H4>Propose Curator for Bounty #{bountyId}</H4>
+        <H4>
+          {title} #{bountyId}
+        </H4>
         <Tag intent={Intent.DANGER} className="mt-2">
           {t("governance.bounty_not_found")}
         </Tag>
@@ -79,7 +86,9 @@ export function BountyCuratorProposal({ bountyId, curator, fee, motion }: Bounty
   return (
     <Card className="max-w-4xl w-full">
       <div className="mb-3">
-        <H4>Propose Curator for Bounty #{bountyId}</H4>
+        <H4>
+          {title} #{bountyId}
+        </H4>
       </div>
       <HTMLTable striped className="w-full">
         <tbody>
@@ -89,24 +98,36 @@ export function BountyCuratorProposal({ bountyId, curator, fee, motion }: Bounty
               <td>{description}</td>
             </tr>
           )}
+          {type === "curator" && curator && (
+            <tr>
+              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.curator")}</td>
+              <td>
+                <AccountName address={curator} />
+              </td>
+            </tr>
+          )}
+          {type === "curator" && fee !== undefined && (
+            <tr>
+              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.curator_fee")}</td>
+              <td>
+                <FormattedAmount value={fee} />
+              </td>
+            </tr>
+          )}
           <tr>
-            <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.curator")}</td>
-            <td>
-              <AccountName address={curator} />
-            </td>
-          </tr>
-          <tr>
-            <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.curator_fee")}</td>
-            <td>
-              <FormattedAmount value={fee} />
-            </td>
-          </tr>
-          <tr>
-            <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.bounty_value")}</td>
+            <td className="text-gray-500 whitespace-nowrap pr-8">{type === "approval" ? t("governance.value") : t("governance.bounty_value")}</td>
             <td>
               <FormattedAmount value={bountyData.value.toBigInt()} />
             </td>
           </tr>
+          {bountyData.fee && type === "approval" && (
+            <tr>
+              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.fee")}</td>
+              <td>
+                <FormattedAmount value={bountyData.fee.toBigInt()} />
+              </td>
+            </tr>
+          )}
           {bountyData.proposer && (
             <tr>
               <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.proposer")}</td>

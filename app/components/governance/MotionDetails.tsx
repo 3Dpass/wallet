@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { AccountName } from "app/components/common/AccountName";
 import { formatBalance } from "@polkadot/util";
-import { BountyApproval } from "./BountyApproval";
-import { BountyCuratorProposal } from "./BountyCuratorProposal";
+import { BountyDetails } from "./BountyDetails";
 import { useApi } from "app/components/Api";
 import { useEffect, useState } from "react";
 import { formatDuration } from "app/utils/time";
@@ -256,9 +255,9 @@ export function MotionDetails({
           </div>
         );
       case "bounties.approveBounty":
-        return <BountyApproval bountyId={args[0].toString()} motion={motion} />;
+        return <BountyDetails bountyId={args[0].toString()} motion={motion} type="approval" />;
       case "bounties.proposeCurator":
-        return <BountyCuratorProposal bountyId={args[0].toString()} curator={args[1].toString()} fee={args[2].toBigInt()} motion={motion} />;
+        return <BountyDetails bountyId={args[0].toString()} curator={args[1].toString()} fee={args[2].toBigInt()} motion={motion} type="curator" />;
       case "council.close":
         return `Close proposal with hash ${args[0].toString().slice(0, 8)}... at index #${args[1].toString()}`;
       default:
