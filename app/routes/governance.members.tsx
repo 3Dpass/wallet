@@ -111,24 +111,19 @@ export default function GovernanceMembers() {
   }
 
   return (
-    <Card elevation={Elevation.ONE} className="p-4">
+    <div>
       <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.council_members")}</h2>
-      <HTMLTable className="w-full">
+      <HTMLTable className="w-full" striped={true}>
         <thead>
           <tr>
-            <th>{t("governance.member")}</th>
-            <th className="text-right">{t("governance.votes")}</th>
-            <th className="text-right">{t("governance.balance")}</th>
+            <th className="text-right w-24">{t("governance.votes")}</th>
+            <th className="text-right w-32">{t("governance.balance")}</th>
+            <th className="w-full">{t("governance.member")}</th>
           </tr>
         </thead>
         <tbody>
           {councilMembers.map((member) => (
             <tr key={member.address}>
-              <td>
-                <div className={`${Classes.TEXT_LARGE} font-medium`}>
-                  <AccountName address={member.address} identity={member.identity} />
-                </div>
-              </td>
               <td className="text-right">
                 <Tag intent={Intent.SUCCESS} minimal>
                   {member.votes}
@@ -139,10 +134,13 @@ export default function GovernanceMembers() {
                   {member.balance}
                 </Tag>
               </td>
+              <td>
+                <AccountName address={member.address} identity={member.identity} />
+              </td>
             </tr>
           ))}
         </tbody>
       </HTMLTable>
-    </Card>
+    </div>
   );
 }
