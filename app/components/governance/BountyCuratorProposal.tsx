@@ -78,43 +78,43 @@ export function BountyCuratorProposal({ bountyId, curator, fee, motion }: Bounty
 
   return (
     <Card className="max-w-4xl w-full">
-      <H4>Propose Curator for Bounty #{bountyId}</H4>
-      <HTMLTable className="w-full mt-4 min-w-[600px]" compact={true} striped={true}>
-        <tbody>
-          {description && (
-            <tr>
-              <td className="w-1/4 font-medium py-2 px-3">{t("governance.description")}</td>
-              <td className="py-2 px-3">{description}</td>
-            </tr>
-          )}
-          <tr>
-            <td className="w-1/4 font-medium py-2 px-3">{t("governance.curator")}</td>
-            <td className="py-2 px-3">
-              <AccountName address={curator} />
-            </td>
-          </tr>
-          <tr>
-            <td className="w-1/4 font-medium py-2 px-3">{t("governance.curator_fee")}</td>
-            <td className="py-2 px-3">
-              <FormattedAmount value={fee} />
-            </td>
-          </tr>
-          <tr>
-            <td className="w-1/4 font-medium py-2 px-3">{t("governance.bounty_value")}</td>
-            <td className="py-2 px-3">
-              <FormattedAmount value={bountyData.value.toBigInt()} />
-            </td>
-          </tr>
-          {bountyData.proposer && (
-            <tr>
-              <td className="w-1/4 font-medium py-2 px-3">{t("governance.proposer")}</td>
-              <td className="py-2 px-3">
-                <AccountName address={bountyData.proposer.toString()} />
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </HTMLTable>
+      <div className="mb-3">
+        <H4>Propose Curator for Bounty #{bountyId}</H4>
+      </div>
+      <div className="space-y-2">
+        {description && (
+          <div className="flex">
+            <div className="w-1/4 text-gray-500">{t("governance.description")}</div>
+            <div className="w-3/4">{description}</div>
+          </div>
+        )}
+        <div className="flex">
+          <div className="w-1/4 text-gray-500">{t("governance.curator")}</div>
+          <div className="w-3/4">
+            <AccountName address={curator} />
+          </div>
+        </div>
+        <div className="flex">
+          <div className="w-1/4 text-gray-500">{t("governance.curator_fee")}</div>
+          <div className="w-3/4">
+            <FormattedAmount value={fee} />
+          </div>
+        </div>
+        <div className="flex">
+          <div className="w-1/4 text-gray-500">{t("governance.bounty_value")}</div>
+          <div className="w-3/4">
+            <FormattedAmount value={bountyData.value.toBigInt()} />
+          </div>
+        </div>
+        {bountyData.proposer && (
+          <div className="flex">
+            <div className="w-1/4 text-gray-500">{t("governance.proposer")}</div>
+            <div className="w-3/4">
+              <AccountName address={bountyData.proposer.toString()} />
+            </div>
+          </div>
+        )}
+      </div>
     </Card>
   );
 }

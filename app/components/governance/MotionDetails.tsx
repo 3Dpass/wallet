@@ -109,35 +109,34 @@ export function MotionDetails({
   const proposalDescription = getProposalDescription(section, method, args);
 
   return (
-    <Card className="mb-4">
-      <div className="flex justify-between items-start mb-4">
+    <Card className="mb-3">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <Tag minimal round className="mb-2">
+          <Tag minimal round className="mb-1">
             #{index}
           </Tag>
-          <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">{proposalDescription}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-300">{proposalDescription}</div>
         </div>
         <Tag intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} minimal>
           {totalVotes}/{threshold}
         </Tag>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-3">
         <Button
           minimal
           small
           onClick={() => setShowTechDetails(!showTechDetails)}
-          className="mb-2"
           rightIcon={<Icon icon={showTechDetails ? "chevron-up" : "chevron-down"} />}
         >
           {t("governance.technical_info")}
         </Button>
 
         {showTechDetails && (
-          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-            <div className="mb-4">
-              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t("governance.details")}</div>
-              <div className="grid gap-2">
+          <div className="mt-2 text-sm">
+            <div className="mb-3">
+              <div className="text-gray-500 dark:text-gray-400 mb-1">{t("governance.details")}</div>
+              <div className="space-y-1">
                 {args.map((arg, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <Tag minimal className="shrink-0">
@@ -149,15 +148,15 @@ export function MotionDetails({
               </div>
             </div>
             <div>
-              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t("governance.technical_info")}</div>
+              <div className="text-gray-500 dark:text-gray-400 mb-1">{t("governance.technical_info")}</div>
               <div className="font-mono text-xs break-all text-gray-500">{proposalHash}</div>
             </div>
           </div>
         )}
       </div>
 
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-1">
+      <div className="space-y-2">
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Tag intent={Intent.SUCCESS} minimal className="min-w-12 text-center">
               {ayeVotes.length} {t("governance.ayes")}
@@ -167,9 +166,7 @@ export function MotionDetails({
                 <Tag
                   key={address.toString()}
                   minimal
-                  className={`${Classes.TEXT_SMALL} px-2 py-1.5 rounded-md ${
-                    address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900" : ""
-                  }`}
+                  className={`${Classes.TEXT_SMALL} px-2 py-1 ${address.toString() === selectedAddress ? "!bg-green-100 dark:!bg-green-900" : ""}`}
                 >
                   <AccountName address={address.toString()} />
                 </Tag>
@@ -186,9 +183,7 @@ export function MotionDetails({
                   <Tag
                     key={address.toString()}
                     minimal
-                    className={`${Classes.TEXT_SMALL} px-2 py-1.5 rounded-md ${
-                      address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900" : ""
-                    }`}
+                    className={`${Classes.TEXT_SMALL} px-2 py-1 ${address.toString() === selectedAddress ? "!bg-red-100 dark:!bg-red-900" : ""}`}
                   >
                     <AccountName address={address.toString()} />
                   </Tag>
@@ -199,31 +194,21 @@ export function MotionDetails({
         </div>
 
         {isCouncilMember && onVote && onClose && (
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 mt-3">
             {!isThresholdReached ? (
               <div className="flex gap-2">
-                <Button
-                  intent={Intent.SUCCESS}
-                  loading={votingLoading[`${hash}-true`]}
-                  onClick={() => onVote(motion, true)}
-                  className="min-w-[100px] py-2 text-base"
-                >
+                <Button intent={Intent.SUCCESS} loading={votingLoading[`${hash}-true`]} onClick={() => onVote(motion, true)} className="min-w-[100px]">
                   {ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? (
-                    <span className="inline-flex items-center gap-4">
+                    <span className="inline-flex items-center gap-2">
                       <Icon icon="tick" size={14} /> {t("governance.ayes")}
                     </span>
                   ) : (
                     t("governance.ayes")
                   )}
                 </Button>
-                <Button
-                  intent={Intent.DANGER}
-                  loading={votingLoading[`${hash}-false`]}
-                  onClick={() => onVote(motion, false)}
-                  className="min-w-[100px] py-2 text-base"
-                >
+                <Button intent={Intent.DANGER} loading={votingLoading[`${hash}-false`]} onClick={() => onVote(motion, false)} className="min-w-[100px]">
                   {nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? (
-                    <span className="inline-flex items-center gap-4">
+                    <span className="inline-flex items-center gap-2">
                       <Icon icon="tick" size={14} /> {t("governance.nays")}
                     </span>
                   ) : (
@@ -237,7 +222,7 @@ export function MotionDetails({
                 icon="tick-circle"
                 loading={closeMotionLoading[hash]}
                 onClick={() => onClose(motion)}
-                className="min-w-[120px] py-2 text-base"
+                className="min-w-[120px]"
               >
                 {t("governance.close_motion")}
               </Button>
