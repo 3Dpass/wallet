@@ -276,7 +276,7 @@ export function MotionDetails({
         </div>
       </div>
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Tag intent={Intent.SUCCESS} minimal className="min-w-12 text-center">
@@ -315,12 +315,12 @@ export function MotionDetails({
         </div>
 
         {isCouncilMember && onVote && onClose && (
-          <div className="flex justify-start gap-2 mt-6">
+          <div>
             {!isThresholdReached ? (
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button intent={Intent.SUCCESS} loading={votingLoading[`${hash}-true`]} onClick={() => onVote(motion, true)} className="min-w-[100px]">
                   {ayeVotes.map((a) => a.toString()).includes(selectedAddress || "") ? (
-                    <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex items-center gap-3">
                       <Icon icon="tick" size={14} /> {t("governance.ayes")}
                     </span>
                   ) : (
@@ -329,7 +329,7 @@ export function MotionDetails({
                 </Button>
                 <Button intent={Intent.DANGER} loading={votingLoading[`${hash}-false`]} onClick={() => onVote(motion, false)} className="min-w-[100px]">
                   {nayVotes.map((a) => a.toString()).includes(selectedAddress || "") ? (
-                    <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex items-center gap-3">
                       <Icon icon="tick" size={14} /> {t("governance.nays")}
                     </span>
                   ) : (
