@@ -80,36 +80,38 @@ export function BountyApproval({ bountyId, motion }: BountyApprovalProps) {
       <div className="mb-3">
         <H4>Approve Bounty #{bountyId}</H4>
       </div>
-      <div className="space-y-2">
-        {description && (
-          <div className="flex">
-            <div className="w-1/4 text-gray-500">{t("governance.description")}</div>
-            <div className="w-3/4">{description}</div>
-          </div>
-        )}
-        <div className="flex">
-          <div className="w-1/4 text-gray-500">{t("governance.value")}</div>
-          <div className="w-3/4">
-            <FormattedAmount value={bountyData.value.toBigInt()} />
-          </div>
-        </div>
-        {bountyData.fee && (
-          <div className="flex">
-            <div className="w-1/4 text-gray-500">{t("governance.fee")}</div>
-            <div className="w-3/4">
-              <FormattedAmount value={bountyData.fee.toBigInt()} />
-            </div>
-          </div>
-        )}
-        {bountyData.proposer && (
-          <div className="flex">
-            <div className="w-1/4 text-gray-500">{t("governance.proposer")}</div>
-            <div className="w-3/4">
-              <AccountName address={bountyData.proposer.toString()} />
-            </div>
-          </div>
-        )}
-      </div>
+      <HTMLTable striped className="w-full">
+        <tbody>
+          {description && (
+            <tr>
+              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.description")}</td>
+              <td>{description}</td>
+            </tr>
+          )}
+          <tr>
+            <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.value")}</td>
+            <td>
+              <FormattedAmount value={bountyData.value.toBigInt()} />
+            </td>
+          </tr>
+          {bountyData.fee && (
+            <tr>
+              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.fee")}</td>
+              <td>
+                <FormattedAmount value={bountyData.fee.toBigInt()} />
+              </td>
+            </tr>
+          )}
+          {bountyData.proposer && (
+            <tr>
+              <td className="text-gray-500 whitespace-nowrap pr-8">{t("governance.proposer")}</td>
+              <td>
+                <AccountName address={bountyData.proposer.toString()} />
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </HTMLTable>
     </Card>
   );
 }

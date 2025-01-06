@@ -270,15 +270,15 @@ export function MotionDetails({
 
   return (
     <Card className="mb-3">
-      <div className="flex justify-between items-start mb-3">
+      <div className="flex justify-between items-start">
         <div className="w-full">
           <StatusBar motion={motion} totalVotes={totalVotes} threshold={threshold} isThresholdReached={isThresholdReached} />
-          <div className="text-sm text-gray-600 dark:text-gray-300 mt-4">{proposalDescription}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-300 mt-6">{proposalDescription}</div>
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="space-y-1 pt-3">
+      <div className="mt-6 space-y-4">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Tag intent={Intent.SUCCESS} minimal className="min-w-12 text-center">
               {ayeVotes.length} {t("governance.ayes")}
@@ -316,7 +316,7 @@ export function MotionDetails({
         </div>
 
         {isCouncilMember && onVote && onClose && (
-          <div className="flex justify-start gap-2 pt-6">
+          <div className="flex justify-start gap-2 mt-6">
             {!isThresholdReached ? (
               <div className="flex gap-2">
                 <Button intent={Intent.SUCCESS} loading={votingLoading[`${hash}-true`]} onClick={() => onVote(motion, true)} className="min-w-[100px]">
