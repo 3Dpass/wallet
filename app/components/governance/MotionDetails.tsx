@@ -1,4 +1,4 @@
-import { Card, Classes, Tag, Intent, Button, Icon } from "@blueprintjs/core";
+import { Card, Classes, Tag, Intent, Button, Icon, ProgressBar } from "@blueprintjs/core";
 import { useTranslation } from "react-i18next";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { AccountName } from "app/components/common/AccountName";
@@ -162,6 +162,59 @@ function formatProposalArgument(section: string, method: string, arg: any, index
   return arg.toString();
 }
 
+function StatusBar({
+  motion,
+  totalVotes,
+  threshold,
+  isThresholdReached,
+}: {
+  motion: DeriveCollectiveProposal;
+  totalVotes: number;
+  threshold: number;
+  isThresholdReached: boolean;
+}) {
+  const { t } = useTranslation();
+  const progress = threshold > 0 ? totalVotes / threshold : 0;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <Tag minimal round intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY}>
+            #{motion.votes?.index.toString()}
+          </Tag>
+          <div className="h-5 w-[1px] bg-gray-300 dark:bg-gray-600" />
+          <div className="flex items-center">
+            <Icon icon="people" size={14} className="mr-1 text-gray-500" />
+            <span className="font-medium">
+              {totalVotes}/{threshold}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <TimeRemaining motion={motion} />
+          <div className="h-5 w-[1px] bg-gray-300 dark:bg-gray-600" />
+          <span className="text-sm text-gray-500">
+            {isThresholdReached ? (
+              <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
+                <Icon icon="tick-circle" size={14} />
+                {t("governance.threshold_reached")}
+              </span>
+            ) : (
+              t("governance.votes_needed", { remaining: threshold - totalVotes })
+            )}
+          </span>
+        </div>
+      </div>
+      <div className="flex items-center">
+        <div className="flex-grow">
+          <ProgressBar animate={false} intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} value={progress} className="!h-1.5" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function MotionDetails({
   motion,
   isCouncilMember,
@@ -218,20 +271,9 @@ export function MotionDetails({
   return (
     <Card className="mb-3">
       <div className="flex justify-between items-start mb-3">
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Tag minimal round>
-              #{index}
-            </Tag>
-            <Tag intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} minimal>
-              {totalVotes}/{threshold}
-            </Tag>
-            <TimeRemaining motion={motion} />
-            <span className="text-sm text-gray-500">
-              {isThresholdReached ? t("governance.threshold_reached") : t("governance.votes_needed", { remaining: threshold - totalVotes })}
-            </span>
-          </div>
-          <div className="text-sm text-gray-600 dark:text-gray-300">{proposalDescription}</div>
+        <div className="w-full">
+          <StatusBar motion={motion} totalVotes={totalVotes} threshold={threshold} isThresholdReached={isThresholdReached} />
+          <div className="text-sm text-gray-600 dark:text-gray-300 mt-4">{proposalDescription}</div>
         </div>
       </div>
 
