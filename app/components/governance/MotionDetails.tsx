@@ -212,7 +212,13 @@ function StatusBar({
       </div>
       <div className="flex items-center">
         <div className="flex-grow">
-          <ProgressBar animate={false} intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY} value={progress} className="!h-1.5" />
+          <ProgressBar
+            animate={false}
+            stripes={false}
+            intent={isThresholdReached ? Intent.SUCCESS : Intent.PRIMARY}
+            value={progress}
+            className="!h-1.5"
+          />
         </div>
       </div>
     </div>
