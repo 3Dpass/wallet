@@ -217,8 +217,8 @@ export default function GovernanceMotions() {
           <thead>
             <tr>
               <th className="w-16">#</th>
-              <th>{t("governance.motion")}</th>
-              <th>{t("governance.votes")}</th>
+              <th className="w-48">{t("governance.motion")}</th>
+              <th className="w-full">{t("governance.votes")}</th>
               <th className="w-24 text-right">{t("governance.threshold")}</th>
               {isSelectedCouncilMember && <th className="w-32 text-right">{t("governance.vote")}</th>}
             </tr>
