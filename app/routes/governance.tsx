@@ -1,22 +1,24 @@
 import { useTranslation } from "react-i18next";
-import { NavLink, Outlet } from "@remix-run/react";
-
-const getNavLinkClass = ({ isActive }: { isActive: boolean }): string =>
-  `px-4 py-2 ${isActive ? "bg-gray-700 text-white" : "text-gray-400 hover:bg-gray-800"}`;
+import { Outlet, useLocation, useNavigate } from "@remix-run/react";
+import { Tab, Tabs } from "@blueprintjs/core";
 
 export default function Governance() {
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentTab = location.pathname.includes("members") ? "members" : "motions";
+
+  const handleTabChange = (newTabId: string) => {
+    navigate(`/governance/${newTabId}`);
+  };
 
   return (
     <div className="grid gap-4">
-      <nav className="flex gap-4 mb-4">
-        <NavLink to="/governance/members" className={getNavLinkClass}>
-          {t("governance.members")}
-        </NavLink>
-        <NavLink to="/governance/motions" className={getNavLinkClass}>
-          {t("governance.motions")}
-        </NavLink>
-      </nav>
+      <Tabs id="governance-tabs" selectedTabId={currentTab} onChange={handleTabChange} animate={true} large={true}>
+        <Tab id="members" title={t("governance.members")} />
+        <Tab id="motions" title={t("governance.motions")} />
+      </Tabs>
       <Outlet />
     </div>
   );
