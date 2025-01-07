@@ -260,7 +260,8 @@
       "bounty_next_action_active": "Waiting for bounty completion",
       "bounty_next_action_update_overdue": "Update from curator is overdue",
       "bounty_next_action_pending_payout": "Waiting for payout",
-      "bounty_next_action_claim_payout": "Claim payout"
+      "bounty_next_action_claim_payout": "Claim payout",
+      "no_motions": "No motions available."
     }
   }
 }

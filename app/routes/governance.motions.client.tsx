@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Elevation, Spinner, Switch, Classes } from "@blueprintjs/core";
+import { Card, Elevation, Spinner, Switch, Classes, Icon } from "@blueprintjs/core";
 import { useApi, useAccounts } from "app/components/Api";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import useToaster from "app/hooks/useToaster";
@@ -272,6 +272,15 @@ export default function GovernanceMotions() {
 
   if (loading) {
     return <Spinner />;
+  }
+
+  if (motions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full py-20 text-center text-gray-500">
+        <Icon icon="inbox" iconSize={50} className="mb-4" />
+        <div className="text-lg">{t("governance.no_motions")}</div>
+      </div>
+    );
   }
 
   const isSelectedCouncilMember = selectedAddress ? isCouncilMember(selectedAddress) : false;
