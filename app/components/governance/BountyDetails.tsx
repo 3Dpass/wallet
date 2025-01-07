@@ -159,7 +159,7 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
         <tbody>
           {bountyData?.status && (
             <tr>
-              <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.bounty_status")}</td>
+              <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.next_step")}</td>
               <td className="flex gap-2 items-center">
                 <BountyNextAction
                   status={bountyData.status.type}
