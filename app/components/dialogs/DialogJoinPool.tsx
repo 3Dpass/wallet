@@ -1,6 +1,6 @@
 import { Button, Classes, Dialog, Intent, MenuItem } from "@blueprintjs/core";
 import type { ItemPredicate, ItemRenderer } from "@blueprintjs/select";
-import { Select2 } from "@blueprintjs/select";
+import { Select } from "@blueprintjs/select";
 import type { MouseEventHandler } from "react";
 import { useEffect, useState } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
@@ -131,7 +131,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
       className="w-[90%] sm:w-[640px]"
     >
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <Select2
+        <Select
           items={data.pools}
           itemPredicate={filterPool}
           itemRenderer={renderPool}
@@ -141,13 +141,8 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
           popoverProps={{ matchTargetWidth: true }}
           fill
         >
-          <Button
-            text={data.poolToJoin}
-            rightIcon="double-caret-vertical"
-            placeholder={t("dlg_join_pool.lbl_btn_select_pool")}
-            className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono`}
-          />
-        </Select2>
+          <Button text={data.poolToJoin} rightIcon="double-caret-vertical" className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono`} />
+        </Select>
       </div>
       {data.poolToJoin && <div className="font-mono px-4 text-gray-400">$ pass3d-pool run --pool-id {data.poolToJoin} ...</div>}
       <div className={Classes.DIALOG_FOOTER}>
