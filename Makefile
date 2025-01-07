@@ -3,7 +3,7 @@ TAG_NUM := $(shell echo $(TAG) | sed 's/v//')
 NEXT_TAG := v$(shell echo $$(( $(TAG_NUM) + 1 )))
 
 update:
-	corepack prepare pnpm@latest --activate
+	pnpm self-update
 	pnpm update --interactive --latest
 
 deploy:
