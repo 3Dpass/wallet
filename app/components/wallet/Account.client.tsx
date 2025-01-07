@@ -271,7 +271,9 @@ export default function Account({ pair }: IProps) {
   return (
     <div className="relative p-3 text-sm border-b border-l border-gray-600">
       {dialogElements}
-      <AccountName address={pair.address} />
+      <div className="pr-12">
+        <AccountName address={pair.address} />
+      </div>
       <div className="grid gap-1">
         {!balances && <Spinner size={SpinnerSize.SMALL} className="my-5" />}
         {balances && (
@@ -297,7 +299,6 @@ export default function Account({ pair }: IProps) {
             )}
             <div className="grid grid-cols-3 gap-1">
               <Button className="text-xs" icon="send-to" text={t("root.lbl_btn_send")} onClick={() => dialogToggle("send")} disabled={accountLocked} />
-              <Button className="text-xs" icon="duplicate" text={t("commons.lbl_btn_copy")} onClick={handleCopyAddress} />
               <Button className="text-xs" icon="endorsed" text={t("root.lbl_btn_sign_verify")} onClick={handleSignVerify} disabled={accountLocked} />
               <Button
                 className="text-xs"
@@ -387,8 +388,8 @@ export default function Account({ pair }: IProps) {
           </>
         )}
       </div>
-      {Boolean(pair.meta.isInjected) && (
-        <div className="absolute top-2 right-2">
+      <div className="absolute top-2 right-2 flex items-center gap-2">
+        {Boolean(pair.meta.isInjected) && (
           <Tooltip
             position="bottom"
             content={
@@ -400,8 +401,15 @@ export default function Account({ pair }: IProps) {
           >
             <Icon icon="intersection" size={14} className="opacity-50" />
           </Tooltip>
-        </div>
-      )}
+        )}
+        <Icon
+          icon="duplicate"
+          size={14}
+          className="opacity-50 hover:opacity-100 cursor-pointer"
+          onClick={handleCopyAddress}
+          title={t("commons.lbl_btn_copy")}
+        />
+      </div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { Link } from "@remix-run/react";
-import { AddressIcon } from "./AddressIcon";
 import { useState, useEffect } from "react";
 import { DeriveAccountRegistration } from "@polkadot/api-derive/types";
 import { useApi } from "../Api";
@@ -56,8 +55,7 @@ export function AccountName({ address, identity, short, noLink }: AccountNamePro
   }, [api, address, identity]);
 
   const nameContent = (
-    <div className="flex items-center gap-1.5 text-white">
-      <AddressIcon address={address} />
+    <div className="flex items-center gap-1.5 text-white overflow-hidden">
       <div className="flex-1">
         {localIdentity ? (
           <div
