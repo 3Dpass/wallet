@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { hexToString } from "@polkadot/util";
 import { BountyProgress } from "./BountyProgress";
 import { BountyNextAction } from "./BountyNextAction";
+import { mockBounties } from "app/utils/mock";
 
 interface BountyDetailsProps {
   bountyId: string;
@@ -26,29 +27,66 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
   const [description, setDescription] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [bestNumber, setBestNumber] = useState<bigint | undefined>(undefined);
+  const isMockMode = process.env.NODE_ENV === "development" && mockBounties.size > 0;
 
   useEffect(() => {
     if (!api) return;
 
     const loadBounty = async () => {
       try {
-        const bountyInfo = (await api.query.bounties.bounties(bountyId)) as Option<any>;
-        const unwrapped = bountyInfo.unwrapOr(null);
-
-        // Fetch description from bounty description storage
-        const descriptionHash = (await api.query.bounties.bountyDescriptions(bountyId)) as Option<any>;
-        if (descriptionHash.isSome) {
-          const rawDescription = descriptionHash.unwrap();
-          try {
-            const decodedDescription = hexToString(rawDescription.toHex());
-            setDescription(decodedDescription);
-          } catch (error) {
-            console.error("Failed to decode description:", error);
-            setDescription(rawDescription.toString());
+        if (isMockMode) {
+          const mockBounty = mockBounties.get(bountyId);
+          if (mockBounty) {
+            const mockBountyData = {
+              proposer: { toString: () => mockBounty.proposer },
+              value: { toBigInt: () => mockBounty.value },
+              fee: mockBounty.fee ? { toBigInt: () => mockBounty.fee } : undefined,
+              curator: mockBounty.curator ? { toString: () => mockBounty.curator } : undefined,
+              status: {
+                type: mockBounty.status,
+                ...(mockBounty.status === "Active" && {
+                  asActive: {
+                    curator: { toString: () => mockBounty.curator },
+                    updateDue: { toBigInt: () => BigInt(1000) },
+                  },
+                }),
+                ...(mockBounty.status === "PendingPayout" && {
+                  asPendingPayout: {
+                    curator: { toString: () => mockBounty.curator },
+                    unlockAt: { toBigInt: () => BigInt(2000) },
+                  },
+                }),
+                ...(mockBounty.status === "CuratorProposed" && {
+                  asCuratorProposed: {
+                    curator: { toString: () => mockBounty.curator },
+                  },
+                }),
+              },
+            };
+            setBountyData(mockBountyData);
+            setDescription(mockBounty.description);
+          } else {
+            setBountyData(null);
           }
-        }
+        } else {
+          const bountyInfo = (await api.query.bounties.bounties(bountyId)) as Option<any>;
+          const unwrapped = bountyInfo.unwrapOr(null);
 
-        setBountyData(unwrapped);
+          // Fetch description from bounty description storage
+          const descriptionHash = (await api.query.bounties.bountyDescriptions(bountyId)) as Option<any>;
+          if (descriptionHash.isSome) {
+            const rawDescription = descriptionHash.unwrap();
+            try {
+              const decodedDescription = hexToString(rawDescription.toHex());
+              setDescription(decodedDescription);
+            } catch (error) {
+              console.error("Failed to decode description:", error);
+              setDescription(rawDescription.toString());
+            }
+          }
+
+          setBountyData(unwrapped);
+        }
       } catch (error) {
         console.error("Failed to load bounty:", error);
       } finally {
@@ -73,7 +111,7 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
         unsubscribe();
       }
     };
-  }, [api, bountyId]);
+  }, [api, bountyId, isMockMode]);
 
   const title = {
     approval: "Approve Bounty",
