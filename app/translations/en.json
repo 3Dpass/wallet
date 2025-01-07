@@ -240,7 +240,6 @@
       "fee": "Fee",
       "curator": "Curator",
       "curator_fee": "Curator Fee",
-      "bounty_value": "Bounty Value",
       "threshold_reached": "Threshold reached",
       "votes_needed": "{{remaining}} more votes needed",
       "related_motions": "Related Motions",
