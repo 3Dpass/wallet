@@ -1,7 +1,7 @@
 import { Alert, Button, Classes, Icon, IconSize, Intent, Spinner, SpinnerSize, Text, Tooltip } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
-import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
+import { useAtom } from "jotai";
+import { poolIdsAtom } from "../../atoms";
 import type { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
@@ -25,6 +25,7 @@ import { signAndSend } from "../../utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
 import { useTranslation } from "react-i18next";
+import PoolActions from "./PoolActions";
 
 type IProps = {
   pair: KeyringPair;
@@ -35,7 +36,6 @@ export default function Account({ pair }: IProps) {
   const api = useApi();
   const toaster = useToaster();
   const [balances, setBalances] = useState<DeriveBalancesAll | undefined>(undefined);
-  const apiAdvancedMode: boolean = useAtomValue(apiAdvancedModeAtom);
   const [poolIds, setPoolIds] = useAtom(poolIdsAtom);
   const poolAlreadyExist = poolIds.includes(pair.address);
 
@@ -330,61 +330,15 @@ export default function Account({ pair }: IProps) {
                 </div>
               )}
             </div>
-            {apiAdvancedMode && (
-              <>
-                <Text className="font-bold pt-4 pb-2">{t("root.lbl_pool_actions")}</Text>
-                <div className="grid grid-cols-3 gap-1">
-                  {!poolAlreadyExist && (
-                    <Button
-                      className="text-xs"
-                      text={t("root.lbl_btn_create")}
-                      loading={isCreatePoolLoading}
-                      onClick={handleCreatePoolClick}
-                      disabled={accountLocked}
-                    />
-                  )}
-                  {poolAlreadyExist && (
-                    <div className="grid grid-cols-2 gap-1">
-                      <Button className="text-xs" text={t("root.lbl_btn_kyc")} onClick={() => sendSetPoolMode(true)} disabled={accountLocked} />
-                      <Button className="text-xs" text={t("root.lbl_btn_no_kyc")} onClick={() => sendSetPoolMode(false)} disabled={accountLocked} />
-                    </div>
-                  )}
-                  {poolAlreadyExist && (
-                    <Button
-                      className="text-xs"
-                      text={t("root.lbl_btn_close_pool")}
-                      onClick={() => dialogToggle("close_pool")}
-                      disabled={accountLocked}
-                    />
-                  )}
-                  <Button
-                    className="text-xs"
-                    text={t("root.lbl_btn_fee")}
-                    onClick={() => dialogToggle("set_pool_interest")}
-                    disabled={accountLocked || !poolAlreadyExist}
-                  />
-                  <Button
-                    className="text-xs text-center"
-                    text={t("root.lbl_btn_difficulty")}
-                    onClick={() => dialogToggle("set_pool_difficulty")}
-                    disabled={accountLocked || !poolAlreadyExist}
-                  />
-                  {poolAlreadyExist && (
-                    <Button className="text-xs" text={t("root.lbl_btn_add_miner")} onClick={() => dialogToggle("add_miner")} disabled={accountLocked} />
-                  )}
-                  {poolAlreadyExist && (
-                    <Button
-                      className="text-xs"
-                      text={t("root.lbl_btn_remove_miner")}
-                      onClick={() => dialogToggle("remove_miner")}
-                      disabled={accountLocked}
-                    />
-                  )}
-                  {!poolAlreadyExist && <Button text={t("root.lbl_btn_join")} onClick={() => dialogToggle("join_pool")} disabled={accountLocked} />}
-                  {!poolAlreadyExist && <Button text={t("root.lbl_btn_leave")} onClick={() => dialogToggle("leave_pool")} disabled={accountLocked} />}
-                </div>
-              </>
-            )}
+            <PoolActions
+              pair={pair}
+              poolAlreadyExist={poolAlreadyExist}
+              accountLocked={accountLocked}
+              isCreatePoolLoading={isCreatePoolLoading}
+              onCreatePool={handleCreatePoolClick}
+              onSetPoolMode={sendSetPoolMode}
+              onDialogToggle={dialogToggle}
+            />
           </>
         )}
       </div>
