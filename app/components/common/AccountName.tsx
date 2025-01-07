@@ -14,6 +14,7 @@ interface AccountNameProps {
     isBad: boolean;
   };
   short?: boolean;
+  noLink?: boolean;
 }
 
 export function extractIdentity(identity: DeriveAccountRegistration): AccountNameProps["identity"] {
@@ -33,7 +34,7 @@ export function extractIdentity(identity: DeriveAccountRegistration): AccountNam
   };
 }
 
-export function AccountName({ address, identity, short }: AccountNameProps) {
+export function AccountName({ address, identity, short, noLink }: AccountNameProps) {
   const api = useApi();
   const [localIdentity, setLocalIdentity] = useState(identity);
 
@@ -54,8 +55,8 @@ export function AccountName({ address, identity, short }: AccountNameProps) {
     fetchIdentity();
   }, [api, address, identity]);
 
-  const content = (
-    <Link to={`/address/${address}`} className="flex items-center gap-1.5 text-white no-underline group">
+  const nameContent = (
+    <div className="flex items-center gap-1.5 text-white">
       <AddressIcon address={address} />
       <div className="flex-1">
         {localIdentity ? (
@@ -71,7 +72,7 @@ export function AccountName({ address, identity, short }: AccountNameProps) {
             <span
               className={`border-b leading-tight ${
                 localIdentity.isGood ? "border-b-green-300/50" : localIdentity.isBad ? "border-b-red-300/50" : "border-b-yellow-300/50"
-              } group-hover:border-b-current`}
+              } ${!noLink && "group-hover:border-b-current"}`}
             >
               {localIdentity.display}
             </span>
@@ -94,13 +95,21 @@ export function AccountName({ address, identity, short }: AccountNameProps) {
             {short ? (
               <span className="opacity-50 [mask-image:linear-gradient(to_right,transparent_0%,white_25%,white_100%)]">{address.slice(-12)}</span>
             ) : (
-              <span className="border-b border-b-gray-300/50 group-hover:border-b-current leading-tight">{address}</span>
+              <span className={`border-b border-b-gray-300/50 ${!noLink && "group-hover:border-b-current"} leading-tight`}>{address}</span>
             )}
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 
-  return content;
+  if (noLink) {
+    return nameContent;
+  }
+
+  return (
+    <Link to={`/address/${address}`} className="no-underline group">
+      {nameContent}
+    </Link>
+  );
 }

@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "@remix-run/react";
 import { Tab, Tabs, Icon } from "@blueprintjs/core";
-import { Container } from "app/components/common/Container";
-import { AccountSelector } from "app/components/governance/AccountSelector";
+import { Container } from "../components/common/Container";
+import { AccountSelector } from "../components/governance/AccountSelector";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
 
