@@ -1,4 +1,4 @@
-import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import { Button, Classes, Dialog, Intent, Tag } from "@blueprintjs/core";
 import { useState, useEffect } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { signAndSend } from "../../utils/sign";
@@ -111,6 +111,14 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
           selectedAddress={data.poolToJoin}
           addresses={data.pools.map((pool) => pool.poolId)}
           isLoading={isLoading}
+          metadata={Object.fromEntries(
+            data.pools.map((pool) => [
+              pool.poolId,
+              <Tag minimal round icon="people">
+                {pool.poolMembers?.length || 0} {t("commons.lbl_members")}
+              </Tag>,
+            ])
+          )}
         />
       </div>
       {data.poolToJoin && <div className="font-mono px-4 text-gray-400">$ pass3d-pool run --pool-id {data.poolToJoin} ...</div>}
