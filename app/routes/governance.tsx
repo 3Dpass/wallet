@@ -24,8 +24,8 @@ export default function Governance() {
         <div className="flex justify-between items-center">
           <Tabs id="governance-tabs" selectedTabId={currentTab} onChange={handleTabChange} animate={true} large={true}>
             <Tab id="motions" title={t("governance.motions")} icon={<Icon icon="take-action" className="mr-2" />} />
-            <Tab id="members" title={t("governance.members")} icon={<Icon icon="people" className="mr-2" />} />
             <Tab id="bounties" title={t("governance.bounties")} icon={<Icon icon="dollar" className="mr-2" />} />
+            <Tab id="members" title={t("governance.members")} icon={<Icon icon="people" className="mr-2" />} />
           </Tabs>
           <AccountSelector onAccountChange={setSelectedAddress} selectedAddress={selectedAddress} />
         </div>
