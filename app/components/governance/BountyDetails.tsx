@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { hexToString } from "@polkadot/util";
 import { BountyProgress } from "./BountyProgress";
 import { BountyNextAction } from "./BountyNextAction";
-import { BountyStatus } from "./BountyStatus";
 
 interface BountyDetailsProps {
   bountyId: string;
@@ -128,8 +127,6 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
             <tr>
               <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.bounty_status")}</td>
               <td className="flex gap-2 items-center">
-                <BountyStatus status={bountyData.status.type} />
-                &rarr;
                 <BountyNextAction
                   status={bountyData.status.type}
                   updateDue={bountyData.status.type === "Active" ? bountyData.status.asActive?.updateDue?.toBigInt() : undefined}
