@@ -84,9 +84,9 @@
       "lbl_account_is_password_protected_4": " before use"
     },
     "root_wallet": {
-      "lbl_btn_create_new_address": "Create new address...",
-      "lbl_btn_import_from_seed": "Import from seed phrase...",
-      "lbl_btn_import_from_json": "Import from JSON..."
+      "lbl_btn_create_new_address": "Create new...",
+      "lbl_btn_import_from_seed": "Import seed...",
+      "lbl_btn_import_from_json": "Import JSON..."
     },
     "dlg_identity": {
       "lbl_title": "Identity",

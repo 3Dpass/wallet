@@ -89,10 +89,36 @@ export default function Wallet() {
           </div>
         );
       })}
-      <div className="grid gap-1">
-        <Button icon="new-object" text={t("root_wallet.lbl_btn_create_new_address")} onClick={() => dialogToggle("create")} />
-        <Button icon="add" text={t("root_wallet.lbl_btn_import_from_seed")} onClick={() => dialogToggle("seed_phrase")} />
-        <Button icon="import" text={t("root_wallet.lbl_btn_import_from_json")} onClick={() => dialogToggle("json")} />
+      <div className="flex flex-col justify-center items-center p-4 border-l border-b border-dashed border-gray-600 rounded-none">
+        <div className="grid grid-cols-1 gap-4 w-full max-w-[600px]">
+          <Button
+            icon="new-object"
+            text={t("root_wallet.lbl_btn_create_new_address")}
+            onClick={() => dialogToggle("create")}
+            large
+            intent={accounts.length === 0 ? "primary" : "none"}
+            fill
+            className="h-[48px] text-lg"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              icon="add"
+              text={t("root_wallet.lbl_btn_import_from_seed")}
+              onClick={() => dialogToggle("seed_phrase")}
+              large
+              fill
+              className="h-[48px]"
+            />
+            <Button
+              icon="import"
+              text={t("root_wallet.lbl_btn_import_from_json")}
+              onClick={() => dialogToggle("json")}
+              large
+              fill
+              className="h-[48px]"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
