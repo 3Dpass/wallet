@@ -1,8 +1,5 @@
-import { Button, Classes, Dialog, Intent, MenuItem } from "@blueprintjs/core";
-import type { ItemPredicate, ItemRenderer } from "@blueprintjs/select";
-import { Select } from "@blueprintjs/select";
-import type { MouseEventHandler } from "react";
-import { useEffect, useState } from "react";
+import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import { useState, useEffect } from "react";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { signAndSend } from "../../utils/sign";
 import type { IPool } from "../../utils/pool";
@@ -11,6 +8,7 @@ import useToaster from "../../hooks/useToaster";
 import { useApi } from "../Api";
 import type { ApiPromise } from "@polkadot/api";
 import { useTranslation } from "react-i18next";
+import { AddressSelect } from "../governance/AddressSelect";
 
 type IProps = {
   pair: KeyringPair;
@@ -39,7 +37,12 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
   async function loadPools(api: ApiPromise) {
     const pools = Array.from(await api.query.miningPool.pools.entries());
     const poolsConverted = convertPool(pools);
-    setData((prev) => ({ ...prev, pools: poolsConverted.pools, poolToJoin: poolsConverted.pools[0].poolId }));
+    const sortedPools = [...poolsConverted.pools].sort((a, b) => (b.poolMembers?.length || 0) - (a.poolMembers?.length || 0));
+    setData((prev) => ({
+      ...prev,
+      pools: sortedPools,
+      poolToJoin: sortedPools.length > 0 ? sortedPools[0].poolId : "",
+    }));
   }
 
   function handleOnOpening() {
@@ -89,37 +92,9 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
     }
   }
 
-  function setPool(pool: IPool) {
-    setData((prev) => ({ ...prev, poolToJoin: pool.poolId }));
+  function handlePoolSelect(poolId: string | null) {
+    setData((prev) => ({ ...prev, poolToJoin: poolId || "" }));
   }
-
-  const filterPool: ItemPredicate<IPool> = (query, pool, _index, exactMatch) => {
-    const normalizedId = pool.poolId.toLowerCase();
-    const normalizedQuery = query.toLowerCase();
-    if (exactMatch) {
-      return normalizedId === normalizedQuery;
-    }
-    return normalizedId.indexOf(normalizedQuery) >= 0;
-  };
-
-  const renderPool: ItemRenderer<IPool> = (pool: IPool, { handleClick, handleFocus, modifiers }) => {
-    if (!modifiers.matchesPredicate) {
-      return null;
-    }
-    return (
-      <MenuItem
-        className="font-mono"
-        active={modifiers.active}
-        disabled={modifiers.disabled}
-        key={pool.poolId}
-        text={pool.poolId}
-        label={pool.poolMembers.length.toString()}
-        onClick={handleClick as MouseEventHandler}
-        onFocus={handleFocus}
-        roleStructure="listoption"
-      />
-    );
-  };
 
   return (
     <Dialog
@@ -131,18 +106,12 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
       className="w-[90%] sm:w-[640px]"
     >
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <Select
-          items={data.pools}
-          itemPredicate={filterPool}
-          itemRenderer={renderPool}
-          menuProps={{ className: "max-h-[300px] overflow-auto" }}
-          noResults={<MenuItem disabled text={t("dlg_join_pool.lbl_no_results")} roleStructure="listoption" />}
-          onItemSelect={setPool}
-          popoverProps={{ matchTargetWidth: true }}
-          fill
-        >
-          <Button text={data.poolToJoin} rightIcon="double-caret-vertical" className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono`} />
-        </Select>
+        <AddressSelect
+          onAddressChange={handlePoolSelect}
+          selectedAddress={data.poolToJoin}
+          addresses={data.pools.map((pool) => pool.poolId)}
+          isLoading={isLoading}
+        />
       </div>
       {data.poolToJoin && <div className="font-mono px-4 text-gray-400">$ pass3d-pool run --pool-id {data.poolToJoin} ...</div>}
       <div className={Classes.DIALOG_FOOTER}>
@@ -150,7 +119,7 @@ export default function DialogJoinPool({ isOpen, onClose, pair }: IProps) {
           <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} disabled={isLoading} />
           <Button
             intent={Intent.PRIMARY}
-            disabled={isLoading || !canSubmit}
+            disabled={isLoading || !canSubmit || !data.poolToJoin}
             onClick={handleSubmitClick}
             icon="add"
             loading={isLoading}

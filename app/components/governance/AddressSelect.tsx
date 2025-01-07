@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Spinner, Button, Icon } from "@blueprintjs/core";
+import { Spinner, Button } from "@blueprintjs/core";
 import { Select, ItemRenderer } from "@blueprintjs/select";
 import { AccountName } from "app/components/common/AccountName";
 import { useEffect, useState } from "react";
@@ -40,24 +40,22 @@ export function AddressSelect({ onAddressChange, selectedAddress, addresses, isL
   }, [addresses, selectedAddress, onAddressChange, hasInitialized]);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center gap-2">
-        <div className="font-medium whitespace-nowrap">{t("governance.active_account")}:</div>
-        <Spinner size={16} />
-      </div>
-    );
+    return <Spinner size={16} />;
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="font-medium whitespace-nowrap">{t("governance.active_account")}:</div>
+    <div className="flex items-center">
       <AddressSelectList
         items={addresses}
         activeItem={addresses.find((address) => address === selectedAddress)}
         onItemSelect={(address: string) => onAddressChange(address)}
         itemRenderer={renderAddress}
         filterable={false}
-        popoverProps={{ minimal: true }}
+        popoverProps={{
+          minimal: true,
+          popoverClassName: "max-h-[300px] overflow-auto",
+          className: "max-h-[300px]",
+        }}
         className="w-full"
       >
         <Button className="w-full justify-between items-center bg-gray-700 hover:bg-gray-600" rightIcon="caret-down">

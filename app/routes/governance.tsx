@@ -30,12 +30,15 @@ export default function Governance() {
             <Tab id="bounties" title={t("governance.bounties")} icon={<Icon icon="dollar" className="mr-2" />} />
             <Tab id="members" title={t("governance.members")} icon={<Icon icon="people" className="mr-2" />} />
           </Tabs>
-          <AddressSelect
-            onAddressChange={setSelectedAccount}
-            selectedAddress={selectedAccount}
-            addresses={accounts}
-            isLoading={accounts.length === 0}
-          />
+          <div className="flex items-center gap-2">
+            <div className="font-medium whitespace-nowrap">{t("governance.active_account")}:</div>
+            <AddressSelect
+              onAddressChange={setSelectedAccount}
+              selectedAddress={selectedAccount}
+              addresses={accounts}
+              isLoading={accounts.length === 0}
+            />
+          </div>
         </div>
         <Outlet />
       </div>
