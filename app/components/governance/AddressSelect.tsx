@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Spinner, Button } from "@blueprintjs/core";
+import { Spinner, Button, Icon } from "@blueprintjs/core";
 import { Select, ItemRenderer } from "@blueprintjs/select";
 import { AccountName } from "app/components/common/AccountName";
 import { useEffect, useState } from "react";
@@ -60,7 +60,7 @@ export function AddressSelect({ onAddressChange, selectedAddress, addresses, isL
         popoverProps={{ minimal: true }}
         className="w-full"
       >
-        <Button className="w-full justify-between items-center bg-gray-700 hover:bg-gray-600">
+        <Button className="w-full justify-between items-center bg-gray-700 hover:bg-gray-600" rightIcon="caret-down">
           {selectedAddress ? (
             <AccountName address={selectedAddress} short={true} noLink={true} />
           ) : (
