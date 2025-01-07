@@ -1,4 +1,4 @@
-import { Alert, Button, Classes, Icon, IconSize, Intent, Spinner, SpinnerSize, Text } from "@blueprintjs/core";
+import { Alert, Button, Classes, Icon, IconSize, Intent, Spinner, SpinnerSize, Text, Tooltip } from "@blueprintjs/core";
 import { useCallback, useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { apiAdvancedModeAtom, poolIdsAtom } from "../../atoms";
@@ -269,7 +269,7 @@ export default function Account({ pair }: IProps) {
   const accountLocked: boolean = pair.isLocked && !pair.meta.isInjected;
 
   return (
-    <div className="relative p-3 pt-9 text-sm border-b border-l border-gray-600">
+    <div className="relative p-3 text-sm border-b border-l border-gray-600">
       {dialogElements}
       <AccountName address={pair.address} />
       <div className="grid gap-1">
@@ -388,13 +388,18 @@ export default function Account({ pair }: IProps) {
         )}
       </div>
       {Boolean(pair.meta.isInjected) && (
-        <div className="absolute top-0 right-0 flex gap-1 text-xs px-2 py-1 bg-gray-600 text-gray-400">
-          {Boolean(pair.meta.name) && (
-            <span>
-              <span className="font-bold text-white">{pair.meta.name as string}</span>
-            </span>
-          )}
-          extension
+        <div className="absolute top-2 right-2">
+          <Tooltip
+            position="bottom"
+            content={
+              <div>
+                {pair.meta.name && <div className="font-bold">{pair.meta.name as string}</div>}
+                <div>{t("commons.lbl_loaded_from_extension")}</div>
+              </div>
+            }
+          >
+            <Icon icon="intersection" size={14} className="opacity-50" />
+          </Tooltip>
         </div>
       )}
     </div>

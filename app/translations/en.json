@@ -15,7 +15,8 @@
       "lbl_loading": "Loading...",
       "lbl_block": "Block",
       "lbl_date": "Date",
-      "lbl_members": "members"
+      "lbl_members": "members",
+      "lbl_loaded_from_extension": "Loaded from browser extension"
     },
     "messages": {
       "lbl_account_locked": "Account is locked",
