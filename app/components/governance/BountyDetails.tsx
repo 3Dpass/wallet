@@ -163,7 +163,7 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
               </td>
             </tr>
           )}
-          {type === "curator" && fee !== undefined && (
+          {type === "curator" && fee !== undefined && fee !== BigInt(0) && (
             <tr>
               <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.curator_fee")}</td>
               <td>
@@ -177,7 +177,7 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
               <FormattedAmount value={bountyData.value.toBigInt()} />
             </td>
           </tr>
-          {bountyData.fee && type === "approval" && (
+          {bountyData.fee && type === "approval" && bountyData.fee.toBigInt() !== BigInt(0) && (
             <tr>
               <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.fee")}</td>
               <td>
