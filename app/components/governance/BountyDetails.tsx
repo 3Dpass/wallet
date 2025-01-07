@@ -34,10 +34,6 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
       try {
         const bountyInfo = (await api.query.bounties.bounties(bountyId)) as Option<any>;
         const unwrapped = bountyInfo.unwrapOr(null);
-        console.log(
-          "Bounty data:",
-          JSON.stringify(unwrapped, (_, v) => (typeof v === "bigint" ? v.toString() : v), 2)
-        );
 
         // Fetch description from bounty description storage
         const descriptionHash = (await api.query.bounties.bountyDescriptions(bountyId)) as Option<any>;
