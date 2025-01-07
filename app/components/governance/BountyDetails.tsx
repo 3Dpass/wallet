@@ -96,15 +96,17 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
   const getStatusIntent = (status: { type: string }) => {
     switch (status.type) {
       case "Active":
-        return Intent.SUCCESS;
+        return Intent.PRIMARY;
       case "PendingPayout":
-        return Intent.WARNING;
+        return Intent.PRIMARY;
       case "Proposed":
-        return Intent.PRIMARY;
-      case "CuratorProposed":
-        return Intent.PRIMARY;
-      case "Funded":
+        return Intent.NONE;
+      case "Approved":
         return Intent.SUCCESS;
+      case "CuratorProposed":
+        return Intent.WARNING;
+      case "Funded":
+        return Intent.PRIMARY;
       default:
         return Intent.NONE;
     }
