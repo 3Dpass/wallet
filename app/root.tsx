@@ -113,7 +113,7 @@ export default function App() {
           {() => (
             <ApiCtxRoot apiUrl={apiUrl}>
               <ApolloProvider client={client}>
-                <div className="container mx-auto px-4">
+                <div className="container mx-auto px-4 flex flex-col min-h-screen">
                   <Navbar className="flex justify-between overflow-x-auto overflow-y-hidden mb-4 mt-2">
                     <NavbarGroup align={Alignment.LEFT}>
                       <NavbarHeading className="whitespace-nowrap flex">
@@ -147,8 +147,8 @@ export default function App() {
                     </NavbarGroup>
                   </Navbar>
                   <Outlet />
-                  <footer className="p-4 py-8">
-                    <div className="flex items-center gap-6 justify-end">
+                  <footer className="p-4 py-8 mt-auto">
+                    <div className="flex items-center gap-6 justify-center">
                       <a href="https://swap.3dpscan.io/swap" target="_blank" rel="noopener noreferrer">
                         DEX/Swap
                       </a>
