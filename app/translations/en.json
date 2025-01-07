@@ -14,7 +14,8 @@
       "lbl_no_judgement_requested": "No judgements requests",
       "lbl_loading": "Loading...",
       "lbl_block": "Block",
-      "lbl_date": "Date"
+      "lbl_date": "Date",
+      "lbl_members": "members"
     },
     "messages": {
       "lbl_account_locked": "Account is locked",
