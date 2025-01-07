@@ -8,6 +8,8 @@ import { useApi } from "app/components/Api";
 import { useEffect, useState } from "react";
 import { hexToString } from "@polkadot/util";
 import { BountyProgress } from "./BountyProgress";
+import { BountyNextAction } from "./BountyNextAction";
+import { BountyStatus } from "./BountyStatus";
 
 interface BountyDetailsProps {
   bountyId: string;
@@ -24,6 +26,7 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
   const [bountyData, setBountyData] = useState<any | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [bestNumber, setBestNumber] = useState<bigint | undefined>(undefined);
 
   useEffect(() => {
     if (!api) return;
@@ -59,6 +62,22 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
     };
 
     loadBounty();
+
+    // Subscribe to best number updates
+    let unsubscribe: (() => void) | undefined;
+    api.derive.chain
+      .bestNumber((number) => {
+        setBestNumber(number.toBigInt());
+      })
+      .then((unsub) => {
+        unsubscribe = unsub;
+      });
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [api, bountyId]);
 
   const title = {
@@ -93,25 +112,6 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
     );
   }
 
-  const getStatusIntent = (status: { type: string }) => {
-    switch (status.type) {
-      case "Active":
-        return Intent.PRIMARY;
-      case "PendingPayout":
-        return Intent.PRIMARY;
-      case "Proposed":
-        return Intent.NONE;
-      case "Approved":
-        return Intent.SUCCESS;
-      case "CuratorProposed":
-        return Intent.WARNING;
-      case "Funded":
-        return Intent.PRIMARY;
-      default:
-        return Intent.NONE;
-    }
-  };
-
   return (
     <div className="max-w-4xl w-full">
       {showHeader && (
@@ -127,8 +127,15 @@ export function BountyDetails({ bountyId, motion, type, curator, fee, showHeader
           {bountyData?.status && (
             <tr>
               <td className="text-gray-500 whitespace-nowrap pr-8 w-0">{t("governance.bounty_status")}</td>
-              <td>
-                <Tag intent={getStatusIntent(bountyData.status)}>{bountyData.status.type}</Tag>
+              <td className="flex gap-2 items-center">
+                <BountyStatus status={bountyData.status.type} />
+                &rarr;
+                <BountyNextAction
+                  status={bountyData.status.type}
+                  updateDue={bountyData.status.type === "Active" ? bountyData.status.asActive?.updateDue?.toBigInt() : undefined}
+                  unlockAt={bountyData.status.type === "PendingPayout" ? bountyData.status.asPendingPayout?.unlockAt?.toBigInt() : undefined}
+                  bestNumber={bestNumber}
+                />
               </td>
             </tr>
           )}

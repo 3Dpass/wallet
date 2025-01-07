@@ -250,7 +250,15 @@
       "bounty_step_funded": "Funded",
       "bounty_step_curator_proposed": "Curator Proposed",
       "bounty_step_active": "Active",
-      "bounty_step_payout": "Pending Payout"
+      "bounty_step_payout": "Pending Payout",
+      "bounty_next_action_proposed": "Waiting for bounty approval",
+      "bounty_next_action_approved": "Waiting for bounty funding",
+      "bounty_next_action_funded": "Waiting for curator assignment",
+      "bounty_next_action_curator_proposed": "Waiting for curator to accept role",
+      "bounty_next_action_active": "Waiting for bounty completion",
+      "bounty_next_action_update_overdue": "Update from curator is overdue",
+      "bounty_next_action_pending_payout": "Waiting for payout",
+      "bounty_next_action_claim_payout": "Claim payout"
     }
   }
 }
