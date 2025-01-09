@@ -104,4 +104,4 @@ After completing these steps, the application should be able to load and use the
 ## Copyright
 3DPass web wallet
 
-Copyright (C) 2022-2024  3DPass 3dpass.org
+Copyright (C) 2022-2025  3DPass 3dpass.org
