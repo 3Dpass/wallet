@@ -261,7 +261,10 @@
       "bounty_next_action_update_overdue": "Update from curator is overdue",
       "bounty_next_action_pending_payout": "Waiting for payout",
       "bounty_next_action_claim_payout": "Claim payout",
-      "no_motions": "No motions available."
+      "no_motions": "No motions available.",
+      "term_progress": "Term Progress",
+      "blocks_remaining": "blocks remaining",
+      "remaining": "remaining"
     }
   }
 }

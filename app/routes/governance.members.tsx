@@ -1,11 +1,13 @@
 import { useApi } from "../components/Api";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Card, Elevation, Spinner, Tag, Intent, HTMLTable, Classes } from "@blueprintjs/core";
+import { Spinner, Tag, Intent, HTMLTable, Classes } from "@blueprintjs/core";
 import type { AccountId } from "@polkadot/types/interfaces";
 import type { DeriveElectionsInfo, DeriveCouncilVotes } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
 import { AccountName, extractIdentity } from "app/components/common/AccountName";
+import { formatTimeLeft } from "app/utils/time";
+import { CircularProgress } from "app/components/common/CircularProgress";
 
 interface CouncilMember {
   address: string;
@@ -41,6 +43,12 @@ export default function GovernanceMembers() {
   const [loading, setLoading] = useState(true);
   const [electionsInfo, setElectionsInfo] = useState<DeriveElectionsInfo | null>(null);
   const [allVotes, setAllVotes] = useState<Record<string, AccountId[]>>({});
+  const [termProgress, setTermProgress] = useState<{
+    current: number;
+    total: number;
+    blockNumber: number;
+    mod: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!api) return;
@@ -62,6 +70,38 @@ export default function GovernanceMembers() {
         setAllVotes(transformVotes(votes));
       })
       .catch(console.error);
+  }, [api]);
+
+  useEffect(() => {
+    async function fetchTermProgress() {
+      if (!api) return;
+
+      try {
+        // Try all possible module paths for term duration
+        const termDuration =
+          api.consts.elections?.termDuration || api.consts.phragmenElection?.termDuration || api.consts.electionsPhragmen?.termDuration;
+
+        const blockNumber = await api.derive.chain.bestNumber();
+
+        if (termDuration) {
+          const total = parseInt(termDuration.toString());
+          const current = parseInt(blockNumber.toString());
+          const mod = current % total;
+          const remaining = total - mod;
+
+          setTermProgress({
+            current: remaining,
+            total,
+            blockNumber: current,
+            mod,
+          });
+        }
+      } catch (error) {
+        console.error("Error calculating term progress:", error);
+      }
+    }
+
+    fetchTermProgress();
   }, [api]);
 
   useEffect(() => {
@@ -110,9 +150,31 @@ export default function GovernanceMembers() {
     return <Spinner />;
   }
 
+  const termProgressPercentage = termProgress ? ((termProgress.total - termProgress.current) / termProgress.total) * 100 : 0;
+  const remainingBlocks = termProgress ? termProgress.total - termProgress.mod : 0;
+  const timeLeft = formatTimeLeft(remainingBlocks);
+  const totalTime = termProgress ? formatTimeLeft(termProgress.total) : "";
+
   return (
     <div>
-      <h2 className={`${Classes.HEADING} mb-4`}>{t("governance.council_members")}</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className={Classes.HEADING}>{t("governance.council_members")}</h2>
+        {termProgress && (
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col text-right">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {t("governance.term_progress")} ({termProgressPercentage.toFixed(1)}%)
+              </span>
+              <div className="flex items-center justify-end gap-2">
+                <CircularProgress value={termProgressPercentage / 100} size={20} strokeWidth={3} intent={Intent.PRIMARY} />
+                <span className="text-sm font-medium">
+                  {timeLeft} {t("governance.remaining")} <span className="text-gray-500">/ {totalTime}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
       <HTMLTable className="w-full" striped={true}>
         <thead>
           <tr>

@@ -1,4 +1,4 @@
-import { Card, Classes, Tag, Intent, Button, Icon, ProgressBar } from "@blueprintjs/core";
+import { Card, Tag, Intent, Button, Icon, ProgressBar } from "@blueprintjs/core";
 import { useTranslation } from "react-i18next";
 import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { AccountName } from "app/components/common/AccountName";
@@ -6,12 +6,11 @@ import { formatBalance } from "@polkadot/util";
 import { BountyDetails } from "./BountyDetails";
 import { useApi } from "app/components/Api";
 import { useEffect, useState } from "react";
-import { formatDuration } from "app/utils/time";
+import { formatTimeLeft } from "app/utils/time";
 import { useLocation } from "@remix-run/react";
 import useToaster from "app/hooks/useToaster";
 
 // Constants
-const BLOCK_TIME_SECONDS = 60;
 const DEFAULT_VOTING_PERIOD = 2880; // About 2 days with 60-second blocks
 
 function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
@@ -96,23 +95,7 @@ function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
     return null;
   }
 
-  const formatTimeLeft = (blocks: number) => {
-    const seconds = blocks * BLOCK_TIME_SECONDS;
-    const hours = Math.floor(seconds / 3600);
-    const days = Math.floor(hours / 24);
-    const remainingHours = hours % 24;
-
-    if (days > 0) {
-      return `${days}d ${remainingHours}h left`;
-    }
-    if (hours > 0) {
-      return `${hours}h left`;
-    }
-    const minutes = Math.ceil(seconds / 60);
-    return `${minutes}m left`;
-  };
-
-  const display = timeRemaining > 0 ? formatTimeLeft(timeRemaining) : "(ended)";
+  const display = timeRemaining > 0 ? formatTimeLeft(timeRemaining) + " left" : "(ended)";
 
   return (
     <div className="flex items-center">
