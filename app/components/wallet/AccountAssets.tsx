@@ -92,7 +92,20 @@ export default function AccountAssets({ pair, onSend }: IProps) {
 
 	return (
 		<TitledValue
-			title="Tokens"
+			title={
+				<div>
+					Assets (
+					<a
+						href="https://swap.3dpscan.io/swap"
+						target="_blank"
+						rel="noreferrer"
+						className="text-gray-400 unde"
+					>
+						swap
+					</a>
+					)
+				</div>
+			}
 			fontMono
 			value={
 				<div className="grid grid-cols-3 gap-1">

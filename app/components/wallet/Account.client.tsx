@@ -84,7 +84,7 @@ export default function Account({ pair }: AccountProps) {
 	);
 
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="flex flex-col gap-2 h-full">
 			<div className="relative flex flex-col gap-5 p-4 pb-3 h-full text-sm rounded-lg shadow-lg border border-gray-600">
 				<AccountDialogs
 					pair={pair}
@@ -128,7 +128,6 @@ export default function Account({ pair }: AccountProps) {
 												<div>
 													<FormattedAmount
 														value={state.balances.availableBalance.toBigInt()}
-														withUnit={false}
 													/>
 												</div>
 												<Icon icon="send-to" size={10} className="opacity-50" />
