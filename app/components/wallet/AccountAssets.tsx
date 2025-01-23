@@ -1,4 +1,4 @@
-import { Button, Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Button, Icon, Spinner, SpinnerSize } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import type { Codec } from "@polkadot/types/types";
 import { useEffect, useState } from "react";
@@ -102,7 +102,7 @@ export default function AccountAssets({ pair, onSend }: IProps) {
 							<Button
 								minimal
 								small
-								className="p-0 h-auto font-mono"
+								className="p-0 px-1 -mx-1 h-auto font-mono"
 								onClick={() =>
 									onSend?.({
 										id: asset.assetId,
@@ -110,15 +110,20 @@ export default function AccountAssets({ pair, onSend }: IProps) {
 									})
 								}
 							>
-								<FormattedAmount
-									value={asset.balance}
-									decimals={
-										asset.metadata
-											? Number.parseInt(asset.metadata.decimals)
-											: 0
-									}
-									unit={asset.metadata?.symbol}
-								/>
+								<div className="inline-flex items-center justify-start gap-1">
+									<div>
+										<FormattedAmount
+											value={asset.balance}
+											decimals={
+												asset.metadata
+													? Number.parseInt(asset.metadata.decimals)
+													: 0
+											}
+											unit={asset.metadata?.symbol}
+										/>
+									</div>
+									<Icon icon="send-to" size={10} className="opacity-50" />
+								</div>
 							</Button>
 						</div>
 					))}

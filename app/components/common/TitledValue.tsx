@@ -15,7 +15,7 @@ export default function TitledValue({
 	fontSmall = false,
 	...attrs
 }: TitledValueProps) {
-	let valueClassName = "truncate";
+	let valueClassName = "";
 	if (fontMono) {
 		valueClassName += " font-mono";
 	}
