@@ -11,9 +11,9 @@
     "dev:css": "tailwindcss -w -i ./styles/app.css -o app/styles/app.css"
   },
   "dependencies": {
-    "@apollo/client": "3.12.4",
-    "@blueprintjs/core": "5.16.2",
-    "@blueprintjs/select": "5.3.7",
+    "@apollo/client": "3.12.7",
+    "@blueprintjs/core": "5.16.4",
+    "@blueprintjs/select": "5.3.9",
     "@polkadot/api": "12.3.1",
     "@polkadot/api-derive": "12.3.1",
     "@polkadot/extension-dapp": "0.51.1",
@@ -24,8 +24,8 @@
     "@polkadot/util": "13.0.2",
     "@polkadot/util-crypto": "13.0.2",
     "@polkadot/x-bigint": "^13.0.2",
-    "@react-three/drei": "9.120.5",
-    "@react-three/fiber": "8.17.10",
+    "@react-three/drei": "9.121.3",
+    "@react-three/fiber": "8.17.12",
     "@remix-run/dev": "1.19.1",
     "@remix-run/eslint-config": "1.19.1",
     "@remix-run/node": "1.19.1",
@@ -37,13 +37,13 @@
     "@types/three": "0.172.0",
     "autoprefixer": "10.4.20",
     "concurrently": "9.1.2",
-    "eslint": "9.17.0",
+    "eslint": "9.18.0",
     "graphql": "16.10.0",
     "i18next": "^23.12.2",
     "i18next-browser-languagedetector": "^8.0.2",
-    "jotai": "2.11.0",
+    "jotai": "2.11.1",
     "moment": "2.30.1",
-    "postcss": "8.4.49",
+    "postcss": "8.5.1",
     "prettier": "3.4.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -53,8 +53,8 @@
     "remix-utils": "6.6.0",
     "tailwindcss": "3.4.17",
     "three": "0.172.0",
-    "three-stdlib": "2.35.2",
-    "typescript": "5.7.2"
+    "three-stdlib": "2.35.12",
+    "typescript": "5.7.3"
   },
   "engines": {
     "node": ">=16"
