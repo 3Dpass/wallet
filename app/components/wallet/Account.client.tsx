@@ -1,10 +1,4 @@
-import {
-	Icon,
-	IconSize,
-	Spinner,
-	SpinnerSize,
-	Tooltip,
-} from "@blueprintjs/core";
+import { Button, Icon, Spinner, SpinnerSize, Tooltip } from "@blueprintjs/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAccount } from "../../hooks/useAccount";
@@ -84,9 +78,19 @@ export default function Account({ pair }: AccountProps) {
 									title={t("root.lbl_transferable")}
 									fontMono
 									value={
-										<FormattedAmount
-											value={state.balances.availableBalance.toBigInt()}
-										/>
+										<Button
+											minimal
+											small
+											className="p-0 px-1 -mx-1 h-auto font-mono"
+											onClick={() => handleSend()}
+										>
+											<div className="inline-flex items-center justify-start gap-1 text-lg">
+												<FormattedAmount
+													value={state.balances.availableBalance.toBigInt()}
+												/>
+												<Icon icon="send-to" size={10} className="opacity-50" />
+											</div>
+										</Button>
 									}
 								/>
 								<TitledValue
@@ -150,7 +154,6 @@ export default function Account({ pair }: AccountProps) {
 						pair={pair}
 						balances={state.balances}
 						accountLocked={accountLocked}
-						onSend={() => dialogToggle("send")}
 						onSignVerify={() => dialogToggle("sign_verify")}
 						onUnlockFunds={handleUnlockFunds}
 						onLockFunds={() => dialogToggle("lock_funds")}

@@ -7,7 +7,6 @@ type AccountActionsProps = {
 	pair: KeyringPair;
 	balances: DeriveBalancesAll;
 	accountLocked: boolean;
-	onSend: () => void;
 	onSignVerify: () => void;
 	onUnlockFunds: () => void;
 	onLockFunds: () => void;
@@ -21,7 +20,6 @@ export function AccountActions({
 	pair,
 	balances,
 	accountLocked,
-	onSend,
 	onSignVerify,
 	onUnlockFunds,
 	onLockFunds,
@@ -34,13 +32,6 @@ export function AccountActions({
 
 	return (
 		<div className="grid grid-cols-3 gap-1">
-			<Button
-				className="text-xs"
-				icon="send-to"
-				text={t("root.lbl_btn_send")}
-				onClick={onSend}
-				disabled={accountLocked}
-			/>
 			<Button
 				className="text-xs"
 				icon="endorsed"
@@ -73,7 +64,7 @@ export function AccountActions({
 			{!accountLocked && (
 				<button
 					type="button"
-					className="flex items-center justify-center gap-1 cursor-pointer group bg-transparent border-0 p-0"
+					className="flex min-h-8 items-center justify-center gap-1 cursor-pointer group bg-transparent border-0 p-0"
 					onClick={onIdentity}
 				>
 					{isRegistrar ? (
