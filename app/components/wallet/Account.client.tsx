@@ -168,7 +168,7 @@ export default function Account({ pair }: AccountProps) {
 					</div>
 				)}
 			</div>
-			<div className="absolute top-4 right-4 flex items-center gap-2">
+			<div className="absolute top-5 right-5 flex items-center gap-2">
 				{Boolean(pair.meta.isInjected) && (
 					<Tooltip
 						position="bottom"
