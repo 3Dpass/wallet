@@ -14,10 +14,26 @@ import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 
-type AccountDialogsProps = {
+// Add this type definition at the top of the file
+type DialogNames =
+	| "delete"
+	| "send"
+	| "unlock"
+	| "lock_funds"
+	| "sign_verify"
+	| "close_pool"
+	| "set_pool_interest"
+	| "set_pool_difficulty"
+	| "join_pool"
+	| "leave_pool"
+	| "identity"
+	| "remove_miner"
+	| "add_miner";
+
+interface AccountDialogsProps {
 	pair: KeyringPair;
-	dialogs: Record<string, boolean>;
-	onDialogToggle: (name: string) => void;
+	dialogs: Record<DialogNames, boolean>;
+	onDialogToggle: (name: DialogNames) => void;
 	onDelete: () => void;
 	hasIdentity: boolean;
 	isRegistrar: boolean;
@@ -28,7 +44,7 @@ type AccountDialogsProps = {
 			symbol: string;
 		};
 	};
-};
+}
 
 export function AccountDialogs({
 	pair,

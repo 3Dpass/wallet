@@ -1,4 +1,13 @@
-import { Button, Icon, Spinner, SpinnerSize, Tooltip } from "@blueprintjs/core";
+import {
+	Button,
+	Icon,
+	Menu,
+	Popover,
+	Position,
+	Spinner,
+	SpinnerSize,
+	Tooltip,
+} from "@blueprintjs/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAccount } from "../../hooks/useAccount";
@@ -42,6 +51,36 @@ export default function Account({ pair }: AccountProps) {
 		setSelectedAsset(asset);
 		dialogToggle("send");
 	};
+
+	const actionsMenu = (
+		<Menu>
+			{state.balances && (
+				<AccountActions
+					pair={pair}
+					balances={state.balances}
+					accountLocked={accountLocked}
+					onSignVerify={() => dialogToggle("sign_verify")}
+					onUnlockFunds={handleUnlockFunds}
+					onLockFunds={() => dialogToggle("lock_funds")}
+					onDelete={() => dialogToggle("delete")}
+					onIdentity={() => dialogToggle("identity")}
+					isRegistrar={state.isRegistrar}
+					hasIdentity={state.hasIdentity}
+					asMenuItems
+				/>
+			)}
+			<PoolActions
+				pair={pair}
+				poolAlreadyExist={poolAlreadyExist}
+				accountLocked={accountLocked}
+				isCreatePoolLoading={state.isCreatePoolLoading}
+				onCreatePool={handleCreatePool}
+				onSetPoolMode={handleSetPoolMode}
+				onDialogToggle={dialogToggle}
+				asMenuItems
+			/>
+		</Menu>
+	);
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -148,34 +187,16 @@ export default function Account({ pair }: AccountProps) {
 						onClick={handleCopyAddress}
 						title={t("commons.lbl_btn_copy")}
 					/>
+					<Popover content={actionsMenu} position={Position.BOTTOM_RIGHT}>
+						<Icon
+							icon="more"
+							size={14}
+							className="opacity-50 hover:opacity-100 cursor-pointer"
+							title={t("commons.lbl_account_actions")}
+						/>
+					</Popover>
 				</div>
 			</div>
-
-			{state.balances && (
-				<div className="flex flex-col gap-2">
-					<AccountActions
-						pair={pair}
-						balances={state.balances}
-						accountLocked={accountLocked}
-						onSignVerify={() => dialogToggle("sign_verify")}
-						onUnlockFunds={handleUnlockFunds}
-						onLockFunds={() => dialogToggle("lock_funds")}
-						onDelete={() => dialogToggle("delete")}
-						onIdentity={() => dialogToggle("identity")}
-						isRegistrar={state.isRegistrar}
-						hasIdentity={state.hasIdentity}
-					/>
-					<PoolActions
-						pair={pair}
-						poolAlreadyExist={poolAlreadyExist}
-						accountLocked={accountLocked}
-						isCreatePoolLoading={state.isCreatePoolLoading}
-						onCreatePool={handleCreatePool}
-						onSetPoolMode={handleSetPoolMode}
-						onDialogToggle={dialogToggle}
-					/>
-				</div>
-			)}
 		</div>
 	);
 }
