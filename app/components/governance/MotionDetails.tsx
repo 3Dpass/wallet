@@ -8,7 +8,6 @@ import {
 } from "@blueprintjs/core";
 import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import { formatBalance } from "@polkadot/util";
-import { useLocation } from "@remix-run/react";
 import { useApi } from "app/components/Api";
 import { AccountName } from "app/components/common/AccountName";
 import useToaster from "app/hooks/useToaster";
@@ -222,13 +221,11 @@ export function MotionDetails({
 	highlight = false,
 }: MotionDetailsProps) {
 	const { t } = useTranslation();
-	const location = useLocation();
 	const toaster = useToaster();
 
 	if (!motion?.proposal || !motion?.votes) return null;
 
 	const hash = motion.hash?.toString() || "";
-	const index = motion.votes.index?.toString() || "0";
 	const threshold = motion.votes.threshold?.toNumber() || 0;
 	const ayeVotes = motion.votes.ayes || [];
 	const nayVotes = motion.votes.nays || [];
