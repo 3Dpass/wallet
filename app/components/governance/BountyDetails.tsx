@@ -1,7 +1,7 @@
 import { H4, HTMLTable, Intent, Spinner, Tag } from "@blueprintjs/core";
 import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import type { Bytes, Option } from "@polkadot/types";
-import type { Bounty, BountyStatus } from "@polkadot/types/interfaces";
+import type { Bounty } from "@polkadot/types/interfaces";
 import { hexToString } from "@polkadot/util";
 import { useApi } from "app/components/Api";
 import { AccountName } from "app/components/common/AccountName";
@@ -235,14 +235,15 @@ export function BountyDetails({
 								</td>
 								<td>
 									<AccountName
-										address={(
+										address={
 											(bountyData.status.type === "CuratorProposed" &&
-												bountyData.status.asCuratorProposed?.curator) ||
+												bountyData.status.asCuratorProposed?.curator?.toString()) ||
 											(bountyData.status.type === "Active" &&
-												bountyData.status.asActive?.curator) ||
+												bountyData.status.asActive?.curator?.toString()) ||
 											(bountyData.status.type === "PendingPayout" &&
-												bountyData.status.asPendingPayout?.curator)
-										).toString()}
+												bountyData.status.asPendingPayout?.curator?.toString()) ||
+											""
+										}
 									/>
 								</td>
 							</tr>
