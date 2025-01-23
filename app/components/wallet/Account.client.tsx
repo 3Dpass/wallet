@@ -152,7 +152,7 @@ export default function Account({ pair }: AccountProps) {
 			</div>
 
 			{state.balances && (
-				<div className="flex flex-col gap-2 p-1 rounded-lg bg-gray-800/50">
+				<div className="flex flex-col gap-2">
 					<AccountActions
 						pair={pair}
 						balances={state.balances}
