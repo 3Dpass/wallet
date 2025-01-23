@@ -82,7 +82,7 @@ export function BountyProgress({ currentStatus }: { currentStatus: string }) {
 	return (
 		<div className="flex items-center w-full my-4 relative">
 			<div className="absolute left-0 right-0 top-4 h-0.5 bg-gray-200 dark:bg-gray-700" />
-			{steps.map((step) => (
+			{steps.map((step, index) => (
 				<div
 					key={step.label}
 					className="relative flex-1 flex flex-col items-center"
@@ -107,7 +107,7 @@ export function BountyProgress({ currentStatus }: { currentStatus: string }) {
 								/>
 							</svg>
 						) : (
-							<span className="text-sm">{step.label.charAt(0)}</span>
+							<span className="text-sm">{index + 1}</span>
 						)}
 					</div>
 					<div className="text-xs mt-2 text-center text-gray-600 dark:text-gray-400">
