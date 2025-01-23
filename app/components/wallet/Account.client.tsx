@@ -1,5 +1,7 @@
 import {
 	Button,
+	Card,
+	Elevation,
 	Icon,
 	Menu,
 	Popover,
@@ -84,112 +86,113 @@ export default function Account({ pair }: AccountProps) {
 	);
 
 	return (
-		<div className="flex flex-col gap-2 h-full">
-			<div className="relative flex flex-col gap-5 p-4 pb-3 h-full text-sm rounded-lg shadow-lg border border-gray-600">
-				<AccountDialogs
-					pair={pair}
-					dialogs={dialogs}
-					onDialogToggle={dialogToggle}
-					onDelete={handleAddressDelete}
-					hasIdentity={state.hasIdentity}
-					isRegistrar={state.isRegistrar}
-					selectedAsset={selectedAsset}
-				/>
-				<div className="pr-12">
-					<AccountName address={pair.address} />
-				</div>
-				<div className="grid gap-1">
-					{!state.balances && (
-						<Spinner size={SpinnerSize.SMALL} className="my-5" />
-					)}
-					{state.balances && (
-						<div className="flex flex-col gap-3">
-							<div className="grid grid-cols-3 gap-1">
-								<TitledValue
-									title={t("root.lbl_total_balance")}
-									fontMono
-									value={
-										<FormattedAmount
-											value={state.balances.freeBalance.toBigInt()}
-										/>
-									}
-								/>
-								<TitledValue
-									title={t("root.lbl_transferable")}
-									fontMono
-									value={
-										<Button
-											minimal
-											small
-											className="p-0 px-1 -mx-1 h-auto font-mono"
-											onClick={() => handleSend()}
-										>
-											<div className="inline-flex items-center justify-start gap-1 text-lg">
-												<div>
-													<FormattedAmount
-														value={state.balances.availableBalance.toBigInt()}
-													/>
-												</div>
-												<Icon icon="send-to" size={10} className="opacity-50" />
-											</div>
-										</Button>
-									}
-								/>
-								<TitledValue
-									title={t("root.lbl_locked")}
-									fontMono
-									value={
-										<FormattedAmount
-											value={state.balances.lockedBalance.toBigInt()}
-										/>
-									}
-								/>
-							</div>
-							<AccountAssets pair={pair} onSend={handleSend} />
-							{accountLocked && (
-								<div className="my-2 text-center">
-									{t("root.lbl_account_is_password_protected_1")}{" "}
-									<Icon icon="lock" />{" "}
-									{t("root.lbl_account_is_password_protected_2")}{" "}
-									<button
-										type="button"
-										onClick={() => dialogToggle("unlock")}
-										className="text-white underline underline-offset-4 cursor-pointer bg-transparent border-0 p-0"
-									>
-										{t("root.lbl_account_is_password_protected_3")}
-									</button>{" "}
-									{t("root.lbl_account_is_password_protected_4")}
-								</div>
-							)}
-						</div>
-					)}
-				</div>
-				<div className="absolute top-4 right-4 flex items-center gap-2">
-					{Boolean(pair.meta.isInjected) && (
-						<Tooltip
-							position="bottom"
-							content={
-								<div>
-									{pair.meta.name && (
-										<div className="font-bold">{pair.meta.name as string}</div>
-									)}
-									<div>{t("commons.lbl_loaded_from_extension")}</div>
-								</div>
-							}
-						>
-							<Icon icon="intersection" size={14} className="opacity-50" />
-						</Tooltip>
-					)}
-					<Popover content={actionsMenu} position={Position.BOTTOM_RIGHT}>
-						<Icon
-							icon="more"
-							size={14}
-							className="opacity-50 hover:opacity-100 cursor-pointer"
-							title={t("commons.lbl_account_actions")}
-						/>
-					</Popover>
-				</div>
+		<Card
+			className="relative flex flex-col gap-2 h-full"
+			elevation={Elevation.ZERO}
+		>
+			<AccountDialogs
+				pair={pair}
+				dialogs={dialogs}
+				onDialogToggle={dialogToggle}
+				onDelete={handleAddressDelete}
+				hasIdentity={state.hasIdentity}
+				isRegistrar={state.isRegistrar}
+				selectedAsset={selectedAsset}
+			/>
+			<div className="pr-12">
+				<AccountName address={pair.address} />
 			</div>
-		</div>
+			<div className="grid gap-1">
+				{!state.balances && (
+					<Spinner size={SpinnerSize.SMALL} className="my-5" />
+				)}
+				{state.balances && (
+					<div className="flex flex-col gap-3">
+						<div className="grid grid-cols-3 gap-1">
+							<TitledValue
+								title={t("root.lbl_total_balance")}
+								fontMono
+								value={
+									<FormattedAmount
+										value={state.balances.freeBalance.toBigInt()}
+									/>
+								}
+							/>
+							<TitledValue
+								title={t("root.lbl_transferable")}
+								fontMono
+								value={
+									<Button
+										minimal
+										small
+										className="p-0 px-1 -mx-1 h-auto font-mono"
+										onClick={() => handleSend()}
+									>
+										<div className="inline-flex items-center justify-start gap-1 text-lg">
+											<div>
+												<FormattedAmount
+													value={state.balances.availableBalance.toBigInt()}
+												/>
+											</div>
+											<Icon icon="send-to" size={10} className="opacity-50" />
+										</div>
+									</Button>
+								}
+							/>
+							<TitledValue
+								title={t("root.lbl_locked")}
+								fontMono
+								value={
+									<FormattedAmount
+										value={state.balances.lockedBalance.toBigInt()}
+									/>
+								}
+							/>
+						</div>
+						<AccountAssets pair={pair} onSend={handleSend} />
+						{accountLocked && (
+							<div className="my-2 text-center">
+								{t("root.lbl_account_is_password_protected_1")}{" "}
+								<Icon icon="lock" />{" "}
+								{t("root.lbl_account_is_password_protected_2")}{" "}
+								<button
+									type="button"
+									onClick={() => dialogToggle("unlock")}
+									className="text-white underline underline-offset-4 cursor-pointer bg-transparent border-0 p-0"
+								>
+									{t("root.lbl_account_is_password_protected_3")}
+								</button>{" "}
+								{t("root.lbl_account_is_password_protected_4")}
+							</div>
+						)}
+					</div>
+				)}
+			</div>
+			<div className="absolute top-4 right-4 flex items-center gap-2">
+				{Boolean(pair.meta.isInjected) && (
+					<Tooltip
+						position="bottom"
+						content={
+							<div>
+								{pair.meta.name && (
+									<div className="font-bold">{pair.meta.name as string}</div>
+								)}
+								<div>{t("commons.lbl_loaded_from_extension")}</div>
+							</div>
+						}
+					>
+						<Icon icon="intersection" size={14} className="opacity-50" />
+					</Tooltip>
+				)}
+				<Popover content={actionsMenu} position={Position.BOTTOM_RIGHT}>
+					<Icon
+						icon="more"
+						size={14}
+						className="opacity-50 hover:opacity-100 cursor-pointer"
+						title={t("commons.lbl_account_actions")}
+					/>
+				</Popover>
+			</div>
+		</Card>
 	);
 }

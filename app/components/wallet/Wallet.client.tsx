@@ -79,7 +79,7 @@ export default function Wallet() {
 	}
 
 	return (
-		<div className="mb-4 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+		<div className="mb-4 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
 			<DialogImportAddress
 				isOpen={dialogs.seed_phrase}
 				showPassword={true}
