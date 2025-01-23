@@ -15,12 +15,14 @@ export default function TitledValue({
 	fontSmall = false,
 	...attrs
 }: TitledValueProps) {
-	let valueClassName = "text-lg truncate";
+	let valueClassName = "truncate";
 	if (fontMono) {
 		valueClassName += " font-mono";
 	}
 	if (fontSmall) {
 		valueClassName += " text-sm";
+	} else {
+		valueClassName += " text-lg";
 	}
 
 	return (
