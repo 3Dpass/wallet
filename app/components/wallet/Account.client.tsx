@@ -337,7 +337,7 @@ export default function Account({ pair }: IProps) {
 	const accountLocked: boolean = pair.isLocked && !pair.meta.isInjected;
 
 	return (
-		<div className="relative p-3 text-sm border-b border-l border-gray-600">
+		<div className="relative p-4 h-full text-sm rounded-lg shadow-lg border border-gray-600">
 			{dialogElements}
 			<div className="pr-12">
 				<AccountName address={pair.address} />
@@ -472,7 +472,7 @@ export default function Account({ pair }: IProps) {
 					</>
 				)}
 			</div>
-			<div className="absolute top-2 right-2 flex items-center gap-2">
+			<div className="absolute top-4 right-4 flex items-center gap-2">
 				{Boolean(pair.meta.isInjected) && (
 					<Tooltip
 						position="bottom"
