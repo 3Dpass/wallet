@@ -103,8 +103,8 @@ export default function Wallet() {
 					</div>
 				);
 			})}
-			<div className="flex flex-col justify-center items-center p-4">
-				<div className="grid grid-cols-1 gap-4 w-full max-w-[600px]">
+			<div className="flex flex-col justify-center items-center">
+				<div className="grid grid-cols-1 gap-1 w-full max-w-[600px]">
 					<Button
 						icon="new-object"
 						text={t("root_wallet.lbl_btn_create_new_address")}
@@ -114,7 +114,7 @@ export default function Wallet() {
 						fill
 						className="h-[48px] text-lg"
 					/>
-					<div className="grid grid-cols-2 gap-4">
+					<div className="grid grid-cols-2 gap-1">
 						<Button
 							icon="add"
 							text={t("root_wallet.lbl_btn_import_from_seed")}

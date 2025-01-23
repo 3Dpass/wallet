@@ -85,29 +85,25 @@ export default function AccountAssets({ pair }: IProps) {
 	}
 
 	return (
-		<div className="pb-3">
-			<TitledValue
-				title="Tokens"
-				fontSmall
-				fontMono
-				value={
-					<div className="grid grid-cols-3 gap-1">
-						{assets.map((asset) => (
-							<div key={asset.assetId}>
-								<FormattedAmount
-									value={asset.balance}
-									decimals={
-										asset.metadata
-											? Number.parseInt(asset.metadata.decimals)
-											: 0
-									}
-									unit={asset.metadata?.symbol}
-								/>
-							</div>
-						))}
-					</div>
-				}
-			/>
-		</div>
+		<TitledValue
+			title="Tokens"
+			fontSmall
+			fontMono
+			value={
+				<div className="grid grid-cols-3 gap-1">
+					{assets.map((asset) => (
+						<div key={asset.assetId}>
+							<FormattedAmount
+								value={asset.balance}
+								decimals={
+									asset.metadata ? Number.parseInt(asset.metadata.decimals) : 0
+								}
+								unit={asset.metadata?.symbol}
+							/>
+						</div>
+					))}
+				</div>
+			}
+		/>
 	);
 }

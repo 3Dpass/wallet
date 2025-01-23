@@ -33,7 +33,7 @@ export default function Account({ pair }: AccountProps) {
 	const accountLocked: boolean = pair.isLocked && !pair.meta.isInjected;
 
 	return (
-		<div className="relative p-4 h-full text-sm rounded-lg shadow-lg border border-gray-600">
+		<div className="relative flex flex-col gap-5 p-4 h-full text-sm rounded-lg shadow-lg border border-gray-600 group">
 			<AccountDialogs
 				pair={pair}
 				dialogs={dialogs}
@@ -50,8 +50,8 @@ export default function Account({ pair }: AccountProps) {
 					<Spinner size={SpinnerSize.SMALL} className="my-5" />
 				)}
 				{state.balances && (
-					<>
-						<div className="grid grid-cols-3 gap-1 py-2">
+					<div className="flex flex-col gap-3">
+						<div className="grid grid-cols-3 gap-1">
 							<TitledValue
 								title={t("root.lbl_total_balance")}
 								fontMono
@@ -99,29 +99,31 @@ export default function Account({ pair }: AccountProps) {
 								{t("root.lbl_account_is_password_protected_4")}
 							</div>
 						)}
-						<AccountActions
-							pair={pair}
-							balances={state.balances}
-							accountLocked={accountLocked}
-							onSend={() => dialogToggle("send")}
-							onSignVerify={() => dialogToggle("sign_verify")}
-							onUnlockFunds={handleUnlockFunds}
-							onLockFunds={() => dialogToggle("lock_funds")}
-							onDelete={() => dialogToggle("delete")}
-							onIdentity={() => dialogToggle("identity")}
-							isRegistrar={state.isRegistrar}
-							hasIdentity={state.hasIdentity}
-						/>
-						<PoolActions
-							pair={pair}
-							poolAlreadyExist={poolAlreadyExist}
-							accountLocked={accountLocked}
-							isCreatePoolLoading={state.isCreatePoolLoading}
-							onCreatePool={handleCreatePool}
-							onSetPoolMode={handleSetPoolMode}
-							onDialogToggle={dialogToggle}
-						/>
-					</>
+						<div className="invisible group-hover:visible absolute left-0 right-0 bottom-0 bg-gray-900/90 p-4 rounded-b-lg">
+							<AccountActions
+								pair={pair}
+								balances={state.balances}
+								accountLocked={accountLocked}
+								onSend={() => dialogToggle("send")}
+								onSignVerify={() => dialogToggle("sign_verify")}
+								onUnlockFunds={handleUnlockFunds}
+								onLockFunds={() => dialogToggle("lock_funds")}
+								onDelete={() => dialogToggle("delete")}
+								onIdentity={() => dialogToggle("identity")}
+								isRegistrar={state.isRegistrar}
+								hasIdentity={state.hasIdentity}
+							/>
+							<PoolActions
+								pair={pair}
+								poolAlreadyExist={poolAlreadyExist}
+								accountLocked={accountLocked}
+								isCreatePoolLoading={state.isCreatePoolLoading}
+								onCreatePool={handleCreatePool}
+								onSetPoolMode={handleSetPoolMode}
+								onDialogToggle={dialogToggle}
+							/>
+						</div>
+					</div>
 				)}
 			</div>
 			<div className="absolute top-4 right-4 flex items-center gap-2">
