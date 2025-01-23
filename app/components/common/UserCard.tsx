@@ -1,11 +1,4 @@
-import {
-	Card,
-	Classes,
-	HTMLTable,
-	Icon,
-	IconSize,
-	Tag,
-} from "@blueprintjs/core";
+import { Card, HTMLTable, Icon, IconSize, Tag } from "@blueprintjs/core";
 import { useTranslation } from "react-i18next";
 import { AccountName } from "./AccountName";
 
@@ -38,91 +31,121 @@ type IProps = {
 export default function UserCard({ registrarInfo }: IProps) {
 	const { t } = useTranslation();
 
+	const renderSocialLink = (url: string | undefined, label: string) => {
+		if (!url) return null;
+		return (
+			<tr>
+				<td className="shadow-none font-medium">{label}</td>
+				<td className="shadow-none">
+					<a
+						href={url.startsWith("http") ? url : `https://${url}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-blue-600 hover:text-blue-800"
+					>
+						{url}
+					</a>
+				</td>
+			</tr>
+		);
+	};
+
+	const renderJudgements = () => {
+		if (!registrarInfo.judgements?.length) return null;
+
+		const judgement = registrarInfo.judgements[0][1];
+		if (typeof judgement === "object") {
+			return Object.entries(judgement).map(([key, value]) => (
+				<Tag
+					key={key}
+					round
+					large
+					className="mr-2 mb-2 bg-green-700 text-green-100"
+				>
+					{`${key}: ${value}`}
+				</Tag>
+			));
+		}
+
+		return (
+			<Tag round large className="bg-green-700 text-green-100">
+				{judgement}
+			</Tag>
+		);
+	};
+
 	return (
-		<Card>
-			<div className="block mb-3">
-				<div className="flex items-start gap-3">
+		<Card className="hover:shadow-lg transition-shadow duration-200">
+			<div className="block mb-4">
+				<div className="flex items-start gap-4">
 					{registrarInfo.info?.image?.Raw ? (
 						<img
-							className="h-16 w-16 rounded-full"
+							className="h-20 w-20 rounded-full object-cover border-2 border-gray-200"
 							src={registrarInfo.info.image.Raw as string}
-							alt=""
+							alt={(registrarInfo.info?.display?.Raw as string) || "User"}
 						/>
 					) : (
-						<Icon icon="person" size={IconSize.LARGE * 3} title="No image" />
+						<div className="h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center">
+							<Icon
+								icon="person"
+								size={IconSize.LARGE * 2}
+								className="text-gray-400"
+							/>
+						</div>
 					)}
 					<div>
-						{registrarInfo.info?.display?.Raw ? (
-							<div className="text-lg">
-								{registrarInfo.info?.display?.Raw as string}
-							</div>
-						) : (
-							<div className="text-lg">
-								{t("user_card.lbl_no_display_name")}
-							</div>
-						)}
+						<h2 className="text-xl font-semibold mb-1">
+							{registrarInfo.info?.display?.Raw ||
+								t("user_card.lbl_no_display_name")}
+						</h2>
 						<AccountName address={registrarInfo.account} />
 					</div>
 				</div>
 			</div>
 
-			<div className="grid grid-cols-2 gap-3">
-				<HTMLTable>
+			<div className="grid md:grid-cols-2 gap-6">
+				<HTMLTable className="w-full">
 					<tbody>
-						<tr>
-							<td className="shadow-none">{t("user_card.lbl_email")}</td>
-							<td className="shadow-none">
-								{registrarInfo.info?.email.Raw as string}
-							</td>
-						</tr>
-						<tr>
-							<td>{t("user_card.lbl_website")}</td>
-							<td>{registrarInfo.info?.web.Raw as string}</td>
-						</tr>
-						<tr>
-							<td>{t("user_card.lbl_twitter")}</td>
-							<td>{registrarInfo.info?.twitter.Raw as string}</td>
-						</tr>
-						{registrarInfo.info.additional?.map((addItem, i) => {
-							return (
-								<tr key={`row-${addItem[0]?.Raw}-${i}`}>
-									{addItem?.map((item, j) => {
-										return <td key={`${item.Raw}-${j}`}>{item.Raw}</td>;
-									})}
-								</tr>
-							);
-						})}
+						{registrarInfo.info?.email?.Raw && (
+							<tr>
+								<td className="shadow-none font-medium">
+									{t("user_card.lbl_email")}
+								</td>
+								<td className="shadow-none">
+									<a
+										href={`mailto:${registrarInfo.info.email.Raw}`}
+										className="text-blue-600 hover:text-blue-800"
+									>
+										{registrarInfo.info.email.Raw}
+									</a>
+								</td>
+							</tr>
+						)}
+						{renderSocialLink(
+							registrarInfo.info?.web?.Raw as string,
+							t("user_card.lbl_website"),
+						)}
+						{renderSocialLink(
+							registrarInfo.info?.twitter?.Raw as string,
+							t("user_card.lbl_twitter"),
+						)}
+						{registrarInfo.info.additional?.map((addItem, i) => (
+							<tr key={`row-${addItem[0]?.Raw}-${i}`}>
+								{addItem?.map((item, j) => (
+									<td
+										key={`${item.Raw}-${j}`}
+										className={j === 0 ? "font-medium" : ""}
+									>
+										{item.Raw}
+									</td>
+								))}
+							</tr>
+						))}
 					</tbody>
 				</HTMLTable>
+
 				{registrarInfo.judgements && (
-					<div className="mb-2">
-						<Tag
-							round
-							large
-							className={`${Classes.BREADCRUMB_CURRENT} bg-green-700 text-green-100`}
-						>
-							{typeof registrarInfo.judgements[0][1] === "object"
-								? Object.keys(registrarInfo.judgements[0][1]).map(
-										(key, index): JSX.Element => {
-											if (key in registrarInfo.judgements[0][1]) {
-												return (
-													<span key={key}>
-														{key}:{" "}
-														{(
-															registrarInfo.judgements[0][1] as Record<
-																string,
-																string
-															>
-														)[key].toString()}
-													</span>
-												);
-											}
-											return <span key={key} />;
-										},
-									)
-								: registrarInfo.judgements?.[0]?.[1]}
-						</Tag>
-					</div>
+					<div className="flex flex-wrap items-start">{renderJudgements()}</div>
 				)}
 			</div>
 		</Card>
