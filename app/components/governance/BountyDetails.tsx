@@ -1,6 +1,7 @@
 import { H4, HTMLTable, Intent, Spinner, Tag } from "@blueprintjs/core";
 import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
-import type { Option } from "@polkadot/types";
+import type { Bytes, Option } from "@polkadot/types";
+import type { Bounty, BountyStatus } from "@polkadot/types/interfaces";
 import { hexToString } from "@polkadot/util";
 import { useApi } from "app/components/Api";
 import { AccountName } from "app/components/common/AccountName";
@@ -10,6 +11,27 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BountyNextAction } from "./BountyNextAction";
 import { BountyProgress } from "./BountyProgress";
+
+interface MockBountyData {
+	proposer: { toString: () => string };
+	value: { toBigInt: () => bigint };
+	fee?: { toBigInt: () => bigint | undefined };
+	curator?: { toString: () => string | undefined };
+	status: {
+		type: string;
+		asActive?: {
+			curator: { toString: () => string | undefined };
+			updateDue: { toBigInt: () => bigint };
+		};
+		asPendingPayout?: {
+			curator: { toString: () => string | undefined };
+			unlockAt: { toBigInt: () => bigint };
+		};
+		asCuratorProposed?: {
+			curator: { toString: () => string | undefined };
+		};
+	};
+}
 
 interface BountyDetailsProps {
 	bountyId: string;
@@ -30,7 +52,9 @@ export function BountyDetails({
 }: BountyDetailsProps) {
 	const { t } = useTranslation();
 	const api = useApi();
-	const [bountyData, setBountyData] = useState<any | null>(null);
+	const [bountyData, setBountyData] = useState<Bounty | MockBountyData | null>(
+		null,
+	);
 	const [description, setDescription] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [bestNumber, setBestNumber] = useState<bigint | undefined>(undefined);
@@ -83,13 +107,13 @@ export function BountyDetails({
 				} else {
 					const bountyInfo = (await api.query.bounties.bounties(
 						bountyId,
-					)) as Option<any>;
+					)) as Option<Bounty>;
 					const unwrapped = bountyInfo.unwrapOr(null);
 
 					// Fetch description from bounty description storage
 					const descriptionHash = (await api.query.bounties.bountyDescriptions(
 						bountyId,
-					)) as Option<any>;
+					)) as Option<Bytes>;
 					if (descriptionHash.isSome) {
 						const rawDescription = descriptionHash.unwrap();
 						try {
@@ -269,7 +293,7 @@ export function BountyDetails({
 									{t("governance.fee")}
 								</td>
 								<td>
-									<FormattedAmount value={bountyData.fee.toBigInt()} />
+									<FormattedAmount value={bountyData.fee?.toBigInt() ?? 0} />
 								</td>
 							</tr>
 						)}
