@@ -87,7 +87,6 @@ export default function AccountAssets({ pair }: IProps) {
 	return (
 		<TitledValue
 			title="Tokens"
-			fontSmall
 			fontMono
 			value={
 				<div className="grid grid-cols-3 gap-1">

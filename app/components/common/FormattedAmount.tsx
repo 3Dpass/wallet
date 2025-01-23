@@ -26,7 +26,8 @@ export function FormattedAmount({
 	const [amount, actualUnit] = formattedAmount.split(" ");
 	return (
 		<>
-			{amount} <span className="text-gray-500">{actualUnit}</span>
+			<span className="mr-[2px]">{amount}</span>
+			<span className="text-gray-600">{actualUnit}</span>
 		</>
 	);
 }

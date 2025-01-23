@@ -34,7 +34,7 @@ export default function Account({ pair }: AccountProps) {
 
 	return (
 		<div className="flex flex-col gap-2">
-			<div className="relative flex flex-col gap-5 p-4 h-full text-sm rounded-lg shadow-lg border border-gray-600">
+			<div className="relative flex flex-col gap-5 p-4 pb-3 h-full text-sm rounded-lg shadow-lg border border-gray-600">
 				<AccountDialogs
 					pair={pair}
 					dialogs={dialogs}
@@ -56,7 +56,6 @@ export default function Account({ pair }: AccountProps) {
 								<TitledValue
 									title={t("root.lbl_total_balance")}
 									fontMono
-									fontSmall
 									value={
 										<FormattedAmount
 											value={state.balances.freeBalance.toBigInt()}
@@ -66,7 +65,6 @@ export default function Account({ pair }: AccountProps) {
 								<TitledValue
 									title={t("root.lbl_transferable")}
 									fontMono
-									fontSmall
 									value={
 										<FormattedAmount
 											value={state.balances.availableBalance.toBigInt()}
@@ -76,7 +74,6 @@ export default function Account({ pair }: AccountProps) {
 								<TitledValue
 									title={t("root.lbl_locked")}
 									fontMono
-									fontSmall
 									value={
 										<FormattedAmount
 											value={state.balances.lockedBalance.toBigInt()}
