@@ -7,6 +7,8 @@ import {
 	Tag,
 } from "@blueprintjs/core";
 import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
+import type { Balance } from "@polkadot/types/interfaces";
+import type { Codec } from "@polkadot/types/types";
 import { formatBalance } from "@polkadot/util";
 import { useApi } from "app/components/Api";
 import { AccountName } from "app/components/common/AccountName";
@@ -239,7 +241,7 @@ export function MotionDetails({
 	function getProposalDescription(
 		section: string,
 		method: string,
-		args: any[],
+		args: Codec[],
 	): string | JSX.Element {
 		const formattedArgs = args.map((arg) => arg.toString()).join(", ");
 
@@ -251,8 +253,8 @@ export function MotionDetails({
 			case "treasury.proposeBounty":
 				return (
 					<div>
-						Propose Bounty of {formatBalance(args[0].toBigInt())} with
-						description: {args[1].toString()} for beneficiary:{" "}
+						Propose Bounty of {formatBalance((args[0] as Balance).toBigInt())}{" "}
+						with description: {args[1].toString()} for beneficiary:{" "}
 						<AccountName address={args[2].toString()} />
 					</div>
 				);
@@ -277,7 +279,7 @@ export function MotionDetails({
 					<BountyDetails
 						bountyId={args[0].toString()}
 						curator={args[1].toString()}
-						fee={args[2].toBigInt()}
+						fee={(args[2] as Balance).toBigInt()}
 						motion={motion}
 						type="curator"
 					/>
