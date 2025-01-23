@@ -69,23 +69,25 @@ export default function DialogIdentity({
 		if (!api) {
 			return;
 		}
-		const registrars: Object[] = (
+		const registrars: IPalletIdentityRegistrarInfo[] = (
 			await api.query.identity.registrars()
-		).toHuman() as Object[];
+		).toHuman() as IPalletIdentityRegistrarInfo[];
 		if (!registrars || !Array.isArray(registrars)) {
 			return;
 		}
 		const registrarList: IPalletIdentityRegistrarInfo[] = [];
 		let regIndexCurrent: number | null = null;
-		registrars.forEach((r, i) => {
+		let i = 0;
+		for (const r of registrars) {
 			registrarList.push({
-				...(r as IPalletIdentityRegistrarInfo),
+				...r,
 				regIndex: i,
 			});
-			if ((r as IPalletIdentityRegistrarInfo).account == pair.address) {
+			if (r.account === pair.address) {
 				regIndexCurrent = i;
 			}
-		});
+			i++;
+		}
 		if (regIndexCurrent != null) {
 			const dateMonthAgo = new Date();
 			dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
@@ -109,20 +111,16 @@ export default function DialogIdentity({
 			}));
 		} else {
 			const getIdentityPromiseList: Promise<Codec>[] = [];
-			registrars.forEach((r) => {
-				getIdentityPromiseList.push(
-					api.query.identity.identityOf(
-						(r as IPalletIdentityRegistrarInfo).account,
-					),
-				);
-			});
+			for (const r of registrars) {
+				getIdentityPromiseList.push(api.query.identity.identityOf(r.account));
+			}
 			const results = await Promise.all(getIdentityPromiseList);
-			results.forEach((r, i) => {
+			for (const [i, r] of results.entries()) {
 				registrarList[i] = {
 					...registrarList[i],
 					...(r.toHuman() as IPalletIdentityRegistrarInfo),
 				};
-			});
+			}
 			setData((prev) => ({
 				...prev,
 				candidateInfo: {} as ICandidateInfo,
@@ -144,7 +142,7 @@ export default function DialogIdentity({
 		try {
 			const candidateData = {} as PalletIdentityIdentityInfo;
 			for (const [key, value] of Object.entries(dataState.candidateInfo)) {
-				if (key == "discord") {
+				if (key === "discord") {
 					candidateData.additional = [[{ Raw: "Discord" }, { Raw: value }]];
 				} else {
 					candidateData[key] = { Raw: value };
@@ -160,8 +158,10 @@ export default function DialogIdentity({
 					if (!status.isInBlock) {
 						return;
 					}
-					events.forEach(({ event: { method } }) => {
-						if (method == "ExtrinsicSuccess") {
+					for (const {
+						event: { method },
+					} of events) {
+						if (method === "ExtrinsicSuccess") {
 							const tx = api.tx.identity.requestJudgement(
 								dataState.registrarData?.regIndex,
 								dataState.registrarData?.fee.replace(re, ""),
@@ -179,7 +179,7 @@ export default function DialogIdentity({
 								onClose();
 							});
 						}
-					});
+					}
 					unsub();
 				},
 			);
@@ -189,11 +189,11 @@ export default function DialogIdentity({
 				message: t("messages.lbl_working_on_request"),
 				timeout: 20000,
 			});
-		} catch (e: any) {
+		} catch (e: unknown) {
 			toaster.show({
 				icon: "error",
 				intent: Intent.DANGER,
-				message: e.message,
+				message: e instanceof Error ? e.message : "Unknown error occurred",
 			});
 			setIsIdentityLoading(false);
 			onClose();
@@ -207,11 +207,11 @@ export default function DialogIdentity({
 		const registrarInfo = (
 			await api.query.identity.identityOf(registrarAccount.account)
 		).toHuman();
-		registrarAccount = {
+		const updatedRegistrar = {
 			...registrarAccount,
 			...(registrarInfo as IPalletIdentityRegistrarInfo),
 		};
-		setData((prev) => ({ ...prev, registrarData: registrarAccount }));
+		setData((prev) => ({ ...prev, registrarData: updatedRegistrar }));
 	}
 
 	function handleRegistrarSelect(account: string | null) {
@@ -247,7 +247,10 @@ export default function DialogIdentity({
 							metadata={Object.fromEntries(
 								dataState.registrarList.map((registrar) => [
 									registrar.account,
-									<div className="flex items-center gap-2">
+									<div
+										key={registrar.account}
+										className="flex items-center gap-2"
+									>
 										<span>
 											#{registrar.regIndex}: {registrar.info?.display?.Raw}
 										</span>
@@ -380,7 +383,7 @@ export default function DialogIdentity({
 					)}
 			</div>
 			<div className={Classes.DIALOG_FOOTER}>
-				<div className={Classes.DIALOG_FOOTER_ACTIONS}></div>
+				<div className={Classes.DIALOG_FOOTER_ACTIONS} />
 			</div>
 		</Dialog>
 	);
