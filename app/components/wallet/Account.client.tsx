@@ -69,7 +69,6 @@ export default function Account({ pair }: AccountProps) {
 					onCopyAddress={handleCopyAddress}
 					isRegistrar={state.isRegistrar}
 					hasIdentity={state.hasIdentity}
-					asMenuItems
 				/>
 			)}
 			<PoolActions
