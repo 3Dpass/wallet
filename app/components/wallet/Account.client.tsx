@@ -112,6 +112,7 @@ export default function Account({ pair }: AccountProps) {
 							<TitledValue
 								title={t("root.lbl_total_balance")}
 								fontMono
+								fontSmall
 								value={
 									<FormattedAmount
 										value={state.balances.freeBalance.toBigInt()}
@@ -121,6 +122,7 @@ export default function Account({ pair }: AccountProps) {
 							<TitledValue
 								title={t("root.lbl_transferable")}
 								fontMono
+								fontSmall
 								value={
 									<Button
 										minimal
@@ -128,7 +130,7 @@ export default function Account({ pair }: AccountProps) {
 										className="p-0 px-1 -mx-1 h-auto font-mono"
 										onClick={() => handleSend()}
 									>
-										<div className="inline-flex items-center justify-start gap-1 text-lg">
+										<div className="inline-flex items-center justify-start gap-1">
 											<div>
 												<FormattedAmount
 													value={state.balances.availableBalance.toBigInt()}
@@ -142,6 +144,7 @@ export default function Account({ pair }: AccountProps) {
 							<TitledValue
 								title={t("root.lbl_locked")}
 								fontMono
+								fontSmall
 								value={
 									<FormattedAmount
 										value={state.balances.lockedBalance.toBigInt()}
