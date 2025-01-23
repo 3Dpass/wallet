@@ -78,7 +78,7 @@ export function AccountName({
 			<div className="flex-1">
 				{localIdentity ? (
 					<div
-						className={`flex items-center gap-2 ${localIdentity.isGood ? "text-green-300" : localIdentity.isBad ? "text-red-300" : "text-yellow-300"}`}
+						className={`flex items-center gap-2 font-mono ${localIdentity.isGood ? "text-green-300" : localIdentity.isBad ? "text-red-300" : "text-yellow-300"}`}
 					>
 						{localIdentity.parent && (
 							<>
