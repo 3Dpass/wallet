@@ -1,4 +1,4 @@
-import { Button, MenuItem, Text } from "@blueprintjs/core";
+import { Button, Icon, MenuItem, Text } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
@@ -32,7 +32,6 @@ type IProps = {
 };
 
 export default function PoolActions({
-	pair,
 	poolAlreadyExist,
 	accountLocked,
 	isCreatePoolLoading,
@@ -53,11 +52,10 @@ export default function PoolActions({
 			<>
 				{!poolAlreadyExist && (
 					<MenuItem
-						icon="pool"
+						icon={<Icon icon="many-to-one" />}
 						text={t("root.lbl_btn_create")}
 						onClick={onCreatePool}
 						disabled={accountLocked}
-						loading={isCreatePoolLoading}
 					/>
 				)}
 				{poolAlreadyExist && (
@@ -93,20 +91,20 @@ export default function PoolActions({
 							disabled={accountLocked || !poolAlreadyExist}
 						/>
 						<MenuItem
-							icon="pool"
+							icon={<Icon icon="many-to-one" />}
 							text={t("root.lbl_btn_add_miner")}
 							onClick={() => onDialogToggle("add_miner")}
 							disabled={accountLocked}
 						/>
 						<MenuItem
-							icon="pool"
+							icon={<Icon icon="many-to-one" />}
 							text={t("root.lbl_btn_remove_miner")}
 							onClick={() => onDialogToggle("remove_miner")}
 							disabled={accountLocked}
 						/>
 						{!poolAlreadyExist && (
 							<MenuItem
-								icon="pool"
+								icon={<Icon icon="many-to-one" />}
 								text={t("root.lbl_btn_join")}
 								onClick={() => onDialogToggle("join_pool")}
 								disabled={accountLocked}
@@ -114,7 +112,7 @@ export default function PoolActions({
 						)}
 						{!poolAlreadyExist && (
 							<MenuItem
-								icon="pool"
+								icon={<Icon icon="many-to-one" />}
 								text={t("root.lbl_btn_leave")}
 								onClick={() => onDialogToggle("leave_pool")}
 								disabled={accountLocked}
