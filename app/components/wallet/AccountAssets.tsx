@@ -1,6 +1,5 @@
 import { Button, Icon, Spinner, SpinnerSize } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import type { Codec } from "@polkadot/types/types";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApi } from "../Api";

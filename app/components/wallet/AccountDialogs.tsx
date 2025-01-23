@@ -13,7 +13,6 @@ import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
 import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
-import type { AccountDialogs as IAccountDialogs } from "./types";
 
 type AccountDialogsProps = {
 	pair: KeyringPair;
