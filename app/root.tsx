@@ -110,7 +110,7 @@ export default function App() {
 
 	useEffect(() => {
 		setToaster(toasterRef.current);
-	}, [setToaster, toasterRef]);
+	}, [setToaster]);
 
 	const client = new ApolloClient({
 		uri: apiExplorerEndpoint,
