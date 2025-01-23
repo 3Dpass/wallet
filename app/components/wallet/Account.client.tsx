@@ -85,9 +85,12 @@ export default function Account({ pair }: AccountProps) {
 											onClick={() => handleSend()}
 										>
 											<div className="inline-flex items-center justify-start gap-1 text-lg">
-												<FormattedAmount
-													value={state.balances.availableBalance.toBigInt()}
-												/>
+												<div>
+													<FormattedAmount
+														value={state.balances.availableBalance.toBigInt()}
+														withUnit={false}
+													/>
+												</div>
 												<Icon icon="send-to" size={10} className="opacity-50" />
 											</div>
 										</Button>

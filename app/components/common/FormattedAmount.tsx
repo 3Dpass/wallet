@@ -6,19 +6,21 @@ type FormattedAmountProps = {
 	value: number | bigint;
 	decimals?: number;
 	unit?: string;
+	withUnit?: boolean;
 };
 
 export function FormattedAmount({
 	value,
 	decimals,
 	unit,
+	withUnit = true,
 }: FormattedAmountProps) {
 	const formatOptions = useAtomValue(formatOptionsAtom);
 	if (!formatOptions) {
 		return null;
 	}
 	const options = {
-		withUnit: unit || formatOptions.unit,
+		withUnit: withUnit && (unit || formatOptions.unit),
 		decimals: decimals ?? formatOptions.decimals,
 		withZero: false,
 	};
@@ -27,7 +29,7 @@ export function FormattedAmount({
 	return (
 		<>
 			<span className="mr-[3px]">{amount}</span>
-			<span className="text-gray-500">{actualUnit}</span>
+			<span className="text-gray-400">{actualUnit}</span>
 		</>
 	);
 }
