@@ -93,14 +93,17 @@ export default function AccountAssets({ pair }: IProps) {
 				value={
 					<div className="grid grid-cols-3 gap-1">
 						{assets.map((asset) => (
-							<FormattedAmount
-								key={asset.assetId}
-								value={asset.balance}
-								decimals={
-									asset.metadata ? Number.parseInt(asset.metadata.decimals) : 0
-								}
-								unit={asset.metadata?.symbol}
-							/>
+							<div key={asset.assetId}>
+								<FormattedAmount
+									value={asset.balance}
+									decimals={
+										asset.metadata
+											? Number.parseInt(asset.metadata.decimals)
+											: 0
+									}
+									unit={asset.metadata?.symbol}
+								/>
+							</div>
 						))}
 					</div>
 				}
