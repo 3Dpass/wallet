@@ -23,5 +23,10 @@ export function FormattedAmount({
 		withZero: false,
 	};
 	const formattedAmount = formatBalance(BigInt(value), options);
-	return <>{formattedAmount}</>;
+	const [amount, actualUnit] = formattedAmount.split(" ");
+	return (
+		<>
+			{amount} <span className="text-xs text-gray-500">{actualUnit}</span>
+		</>
+	);
 }
