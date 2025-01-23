@@ -150,6 +150,7 @@
       "lbl_member_added_to_pool": "The member was added to the mining pool"
     },
     "dlg_send": {
+      "title": "Send {{unit}}",
       "lbl_address": "Enter address to send to",
       "lbl_amount": "Amount",
       "lbl_tip": "Enter optional tips to increase transaction priority",

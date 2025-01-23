@@ -17,11 +17,18 @@ import type { AccountDialogs as IAccountDialogs } from "./types";
 
 type AccountDialogsProps = {
 	pair: KeyringPair;
-	dialogs: IAccountDialogs;
-	onDialogToggle: (name: keyof IAccountDialogs) => void;
+	dialogs: Record<string, boolean>;
+	onDialogToggle: (name: string) => void;
 	onDelete: () => void;
 	hasIdentity: boolean;
 	isRegistrar: boolean;
+	selectedAsset?: {
+		id: string;
+		metadata?: {
+			decimals: string;
+			symbol: string;
+		};
+	};
 };
 
 export function AccountDialogs({
@@ -31,6 +38,7 @@ export function AccountDialogs({
 	onDelete,
 	hasIdentity,
 	isRegistrar,
+	selectedAsset,
 }: AccountDialogsProps) {
 	const { t } = useTranslation();
 
@@ -58,6 +66,8 @@ export function AccountDialogs({
 				isOpen={dialogs.send}
 				onAfterSubmit={() => onDialogToggle("send")}
 				onClose={() => onDialogToggle("send")}
+				assetId={selectedAsset?.id}
+				assetMetadata={selectedAsset?.metadata}
 			/>
 			<DialogUnlockAccount
 				pair={pair}

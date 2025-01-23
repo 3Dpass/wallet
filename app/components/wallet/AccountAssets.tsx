@@ -1,4 +1,4 @@
-import { Spinner, SpinnerSize } from "@blueprintjs/core";
+import { Button, Spinner, SpinnerSize } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import type { Codec } from "@polkadot/types/types";
 import { useEffect, useState } from "react";
@@ -18,9 +18,16 @@ type AssetBalance = {
 
 type IProps = {
 	pair: KeyringPair;
+	onSend?: (asset?: {
+		id: string;
+		metadata?: {
+			decimals: string;
+			symbol: string;
+		};
+	}) => void;
 };
 
-export default function AccountAssets({ pair }: IProps) {
+export default function AccountAssets({ pair, onSend }: IProps) {
 	const { t } = useTranslation();
 	const api = useApi();
 	const [assets, setAssets] = useState<AssetBalance[]>([]);
@@ -92,13 +99,27 @@ export default function AccountAssets({ pair }: IProps) {
 				<div className="grid grid-cols-3 gap-1">
 					{assets.map((asset) => (
 						<div key={asset.assetId}>
-							<FormattedAmount
-								value={asset.balance}
-								decimals={
-									asset.metadata ? Number.parseInt(asset.metadata.decimals) : 0
+							<Button
+								minimal
+								small
+								className="p-0 h-auto font-mono"
+								onClick={() =>
+									onSend?.({
+										id: asset.assetId,
+										metadata: asset.metadata,
+									})
 								}
-								unit={asset.metadata?.symbol}
-							/>
+							>
+								<FormattedAmount
+									value={asset.balance}
+									decimals={
+										asset.metadata
+											? Number.parseInt(asset.metadata.decimals)
+											: 0
+									}
+									unit={asset.metadata?.symbol}
+								/>
+							</Button>
 						</div>
 					))}
 				</div>

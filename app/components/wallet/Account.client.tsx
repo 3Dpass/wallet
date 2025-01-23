@@ -5,6 +5,7 @@ import {
 	SpinnerSize,
 	Tooltip,
 } from "@blueprintjs/core";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAccount } from "../../hooks/useAccount";
 import { AccountName } from "../common/AccountName";
@@ -15,6 +16,16 @@ import AccountAssets from "./AccountAssets";
 import { AccountDialogs } from "./AccountDialogs";
 import PoolActions from "./PoolActions";
 import type { AccountProps } from "./types";
+
+type SelectedAsset =
+	| {
+			id: string;
+			metadata?: {
+				decimals: string;
+				symbol: string;
+			};
+	  }
+	| undefined;
 
 export default function Account({ pair }: AccountProps) {
 	const { t } = useTranslation();
@@ -30,7 +41,13 @@ export default function Account({ pair }: AccountProps) {
 		poolAlreadyExist,
 	} = useAccount(pair);
 
+	const [selectedAsset, setSelectedAsset] = useState<SelectedAsset>();
 	const accountLocked: boolean = pair.isLocked && !pair.meta.isInjected;
+
+	const handleSend = (asset?: SelectedAsset) => {
+		setSelectedAsset(asset);
+		dialogToggle("send");
+	};
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -42,6 +59,7 @@ export default function Account({ pair }: AccountProps) {
 					onDelete={handleAddressDelete}
 					hasIdentity={state.hasIdentity}
 					isRegistrar={state.isRegistrar}
+					selectedAsset={selectedAsset}
 				/>
 				<div className="pr-12">
 					<AccountName address={pair.address} />
@@ -81,7 +99,7 @@ export default function Account({ pair }: AccountProps) {
 									}
 								/>
 							</div>
-							<AccountAssets pair={pair} />
+							<AccountAssets pair={pair} onSend={handleSend} />
 							{accountLocked && (
 								<div className="my-2 text-center">
 									{t("root.lbl_account_is_password_protected_1")}{" "}
