@@ -99,7 +99,7 @@ export default function Account({ pair }: AccountProps) {
 				isRegistrar={state.isRegistrar}
 				selectedAsset={selectedAsset}
 			/>
-			<div className="pr-12">
+			<div className="pr-12 mb-3">
 				<AccountName address={pair.address} />
 			</div>
 			<div className="grid gap-1">
@@ -109,16 +109,6 @@ export default function Account({ pair }: AccountProps) {
 				{state.balances && (
 					<div className="flex flex-col gap-3">
 						<div className="grid grid-cols-3 gap-1">
-							<TitledValue
-								title={t("root.lbl_total_balance")}
-								fontMono
-								fontSmall
-								value={
-									<FormattedAmount
-										value={state.balances.freeBalance.toBigInt()}
-									/>
-								}
-							/>
 							<TitledValue
 								title={t("root.lbl_transferable")}
 								fontMono
@@ -142,13 +132,27 @@ export default function Account({ pair }: AccountProps) {
 								}
 							/>
 							<TitledValue
+								title={t("root.lbl_total_balance")}
+								fontMono
+								fontSmall
+								value={
+									<div className="opacity-50">
+										<FormattedAmount
+											value={state.balances.freeBalance.toBigInt()}
+										/>
+									</div>
+								}
+							/>
+							<TitledValue
 								title={t("root.lbl_locked")}
 								fontMono
 								fontSmall
 								value={
-									<FormattedAmount
-										value={state.balances.lockedBalance.toBigInt()}
-									/>
+									<div className="opacity-50">
+										<FormattedAmount
+											value={state.balances.lockedBalance.toBigInt()}
+										/>
+									</div>
 								}
 							/>
 						</div>
