@@ -12,6 +12,7 @@ type AccountActionsProps = {
 	onLockFunds: () => void;
 	onDelete: () => void;
 	onIdentity: () => void;
+	onCopyAddress: () => void;
 	isRegistrar: boolean;
 	hasIdentity: boolean;
 	asMenuItems?: boolean;
@@ -26,6 +27,7 @@ export function AccountActions({
 	onLockFunds,
 	onDelete,
 	onIdentity,
+	onCopyAddress,
 	isRegistrar,
 	hasIdentity,
 	asMenuItems,
@@ -35,6 +37,11 @@ export function AccountActions({
 	if (asMenuItems) {
 		return (
 			<>
+				<MenuItem
+					icon="duplicate"
+					text={t("commons.lbl_btn_copy")}
+					onClick={onCopyAddress}
+				/>
 				<MenuItem
 					icon="endorsed"
 					text={t("root.lbl_btn_sign_verify")}
@@ -78,6 +85,12 @@ export function AccountActions({
 
 	return (
 		<div className="grid grid-cols-3 gap-1">
+			<Button
+				className="text-xs"
+				icon="duplicate"
+				text={t("commons.lbl_btn_copy")}
+				onClick={onCopyAddress}
+			/>
 			<Button
 				className="text-xs"
 				icon="endorsed"

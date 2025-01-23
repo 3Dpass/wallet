@@ -64,6 +64,7 @@ export default function Account({ pair }: AccountProps) {
 					onLockFunds={() => dialogToggle("lock_funds")}
 					onDelete={() => dialogToggle("delete")}
 					onIdentity={() => dialogToggle("identity")}
+					onCopyAddress={handleCopyAddress}
 					isRegistrar={state.isRegistrar}
 					hasIdentity={state.hasIdentity}
 					asMenuItems
@@ -180,13 +181,6 @@ export default function Account({ pair }: AccountProps) {
 							<Icon icon="intersection" size={14} className="opacity-50" />
 						</Tooltip>
 					)}
-					<Icon
-						icon="duplicate"
-						size={14}
-						className="opacity-50 hover:opacity-100 cursor-pointer"
-						onClick={handleCopyAddress}
-						title={t("commons.lbl_btn_copy")}
-					/>
 					<Popover content={actionsMenu} position={Position.BOTTOM_RIGHT}>
 						<Icon
 							icon="more"
