@@ -1,10 +1,13 @@
-import { OBJLoader } from "three-stdlib";
 import type { ApiPromise } from "@polkadot/api";
-import type { IBlock } from "../components/types";
-import type { Mesh } from "three";
 import type { Text } from "@polkadot/types";
+import type { Mesh } from "three";
+import { OBJLoader } from "three-stdlib";
+import type { IBlock } from "../components/types";
 
-export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock> => {
+export const loadBlock = async (
+  api: ApiPromise,
+  hash?: string
+): Promise<IBlock> => {
   let signedBlock;
 
   const algoNameLength = 32;
@@ -18,13 +21,17 @@ export const loadBlock = async (api: ApiPromise, hash?: string): Promise<IBlock>
   const block = signedBlock.block;
   const blockHash = block.header.hash.toHex();
 
-  const objectHashesString = block.header.digest.logs[2].asOther.toString().substring(2);
+  const objectHashesString = block.header.digest.logs[2].asOther
+    .toString()
+    .substring(2);
   const objectHashAlgo = objectHashesString.substring(0, algoNameLength);
 
   const objectHashes = [];
   let offset = algoNameLength;
   while (offset < objectHashesString.length) {
-    objectHashes.push(objectHashesString.substring(offset, offset + objectHashLength));
+    objectHashes.push(
+      objectHashesString.substring(offset, offset + objectHashLength)
+    );
     offset += objectHashLength;
   }
 

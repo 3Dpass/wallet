@@ -1,5 +1,5 @@
-import { ClientOnly } from "remix-utils";
 import { Card, Elevation, Spinner } from "@blueprintjs/core";
+import { ClientOnly } from "remix-utils";
 
 export default function GovernanceMotionsWrapper() {
   return (
@@ -11,7 +11,8 @@ export default function GovernanceMotionsWrapper() {
       }
     >
       {() => {
-        const GovernanceMotions = require("./governance.motions.client").default;
+        const GovernanceMotions =
+          require("./governance.motions.client").default;
         return <GovernanceMotions />;
       }}
     </ClientOnly>

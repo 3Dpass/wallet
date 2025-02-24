@@ -1,6 +1,6 @@
-import Block from "./block/Block.client";
 import { useAtomValue } from "jotai";
 import { blocksAtom } from "../atoms";
+import Block from "./block/Block.client";
 
 export default function Blocks() {
   const blocks = useAtomValue(blocksAtom);

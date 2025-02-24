@@ -1,5 +1,5 @@
 import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
-import { Hash } from "@polkadot/types/interfaces";
+import type { Hash } from "@polkadot/types/interfaces";
 
 // Mock storage for votes
 export const mockVotes = new Map<string, { ayes: string[]; nays: string[] }>();
@@ -111,7 +111,9 @@ export const createMockApi = () => {
               proposer: createMockAddress(bounty?.proposer || ""),
               value: { toBigInt: () => bounty?.value || BigInt(0) },
               fee: bounty?.fee ? { toBigInt: () => bounty.fee } : undefined,
-              curator: bounty?.curator ? createMockAddress(bounty.curator) : undefined,
+              curator: bounty?.curator
+                ? createMockAddress(bounty.curator)
+                : undefined,
               status:
                 bounty?.status === "Active"
                   ? {
@@ -146,7 +148,9 @@ export const createMockApi = () => {
                 proposer: createMockAddress(bounty.proposer),
                 value: { toBigInt: () => bounty.value },
                 fee: bounty.fee ? { toBigInt: () => bounty.fee } : undefined,
-                curator: bounty.curator ? createMockAddress(bounty.curator) : undefined,
+                curator: bounty.curator
+                  ? createMockAddress(bounty.curator)
+                  : undefined,
                 status:
                   bounty.status === "Active"
                     ? {
@@ -195,19 +199,23 @@ export const createMockApi = () => {
         },
         entries: async () => {
           console.log("Mock API - bounties.entries called");
-          const entries = Array.from(mockBounties.entries()).map(([id, bounty]) => [
-            { args: [{ toString: () => id }] },
-            {
-              isSome: true,
-              unwrap: () => ({
-                proposer: { toString: () => bounty.proposer },
-                value: { toBigInt: () => bounty.value },
-                fee: bounty.fee ? { toBigInt: () => bounty.fee } : undefined,
-                curator: bounty.curator ? { toString: () => bounty.curator } : undefined,
-                status: { type: bounty.status },
-              }),
-            },
-          ]);
+          const entries = Array.from(mockBounties.entries()).map(
+            ([id, bounty]) => [
+              { args: [{ toString: () => id }] },
+              {
+                isSome: true,
+                unwrap: () => ({
+                  proposer: { toString: () => bounty.proposer },
+                  value: { toBigInt: () => bounty.value },
+                  fee: bounty.fee ? { toBigInt: () => bounty.fee } : undefined,
+                  curator: bounty.curator
+                    ? { toString: () => bounty.curator }
+                    : undefined,
+                  status: { type: bounty.status },
+                }),
+              },
+            ]
+          );
           console.log("Mock API - bounties.entries returning:", entries);
           return entries;
         },
@@ -225,7 +233,8 @@ export const createMockApi = () => {
               // Convert string addresses to mock address objects
               ayes: votes.ayes.map(createMockAddress),
               nays: votes.nays.map(createMockAddress),
-              toString: () => `ayes: ${votes.ayes.length}, nays: ${votes.nays.length}`,
+              toString: () =>
+                `ayes: ${votes.ayes.length}, nays: ${votes.nays.length}`,
               [Symbol.toStringTag]: "Votes",
             },
             proposal: {

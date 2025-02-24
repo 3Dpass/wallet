@@ -1,10 +1,10 @@
 import {
-	Button,
-	Classes,
-	Dialog,
-	Icon,
-	InputGroup,
-	Intent,
+  Button,
+  Classes,
+  Dialog,
+  Icon,
+  InputGroup,
+  Intent,
 } from "@blueprintjs/core";
 import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
@@ -17,105 +17,105 @@ import { useApi } from "../Api";
 import { AddressIcon } from "../common/AddressIcon";
 
 type IProps = {
-	pair: KeyringPair;
-	isOpen: boolean;
-	onClose: () => void;
+  pair: KeyringPair;
+  isOpen: boolean;
+  onClose: () => void;
 };
 
 export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
-	const { t } = useTranslation();
-	const api = useApi();
-	const toaster = useToaster();
-	const [canSubmit, setCanSubmit] = useState(false);
-	const [isLoading, setIsLoading] = useState(false);
-	const [data, setData] = useState("");
+  const { t } = useTranslation();
+  const api = useApi();
+  const toaster = useToaster();
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState("");
 
-	function handleOnOpening() {
-		setIsLoading(false);
-	}
+  function handleOnOpening() {
+    setIsLoading(false);
+  }
 
-	useEffect(() => {
-		setCanSubmit(api !== undefined && isValidPolkadotAddress(data));
-	}, [api, data]);
+  useEffect(() => {
+    setCanSubmit(api !== undefined && isValidPolkadotAddress(data));
+  }, [api, data]);
 
-	async function handleSubmitClick() {
-		if (!api) {
-			return;
-		}
-		const isLocked = pair.isLocked && !pair.meta.isInjected;
-		if (isLocked) {
-			toaster.show({
-				icon: "error",
-				intent: Intent.DANGER,
-				message: t("commons.lbl_account_locked"),
-			});
-			return;
-		}
-		setIsLoading(true);
-		try {
-			const tx = api.tx.miningPool.addMember(data);
-			const options: Partial<SignerOptions> = {};
-			await signAndSend(tx, pair, options);
-			toaster.show({
-				icon: "endorsed",
-				intent: Intent.SUCCESS,
-				message: t("dlg_miner.lbl_member_added_to_pool"),
-			});
-		} catch (e: unknown) {
-			toaster.show({
-				icon: "error",
-				intent: Intent.DANGER,
-				message: e instanceof Error ? e.message : "Unknown error occurred",
-			});
-		} finally {
-			setIsLoading(false);
-			onClose();
-		}
-	}
+  async function handleSubmitClick() {
+    if (!api) {
+      return;
+    }
+    const isLocked = pair.isLocked && !pair.meta.isInjected;
+    if (isLocked) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("commons.lbl_account_locked"),
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const tx = api.tx.miningPool.addMember(data);
+      const options: Partial<SignerOptions> = {};
+      await signAndSend(tx, pair, options);
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: t("dlg_miner.lbl_member_added_to_pool"),
+      });
+    } catch (e: unknown) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e instanceof Error ? e.message : "Unknown error occurred",
+      });
+    } finally {
+      setIsLoading(false);
+      onClose();
+    }
+  }
 
-	const addressIcon = isValidPolkadotAddress(data) ? (
-		<AddressIcon address={data} className="m-2" />
-	) : (
-		<Icon icon="asterisk" />
-	);
+  const addressIcon = isValidPolkadotAddress(data) ? (
+    <AddressIcon address={data} className="m-2" />
+  ) : (
+    <Icon icon="asterisk" />
+  );
 
-	return (
-		<Dialog
-			isOpen={isOpen}
-			usePortal
-			onOpening={handleOnOpening}
-			onClose={onClose}
-			className="w-[90%] sm:w-[640px]"
-		>
-			<div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-				<InputGroup
-					disabled={isLoading}
-					large
-					className="font-mono"
-					spellCheck={false}
-					placeholder={t("dlg_miner.lbl_miner_address")}
-					onChange={(e) => setData(e.target.value)}
-					value={data}
-					leftElement={addressIcon}
-				/>
-			</div>
-			<div className={Classes.DIALOG_FOOTER}>
-				<div className={Classes.DIALOG_FOOTER_ACTIONS}>
-					<Button
-						onClick={onClose}
-						text={t("commons.lbl_btn_cancel")}
-						disabled={isLoading}
-					/>
-					<Button
-						intent={Intent.PRIMARY}
-						disabled={isLoading || !canSubmit}
-						onClick={handleSubmitClick}
-						icon="send-message"
-						loading={isLoading}
-						text={t("dlg_miner.lbl_btn_add_miner")}
-					/>
-				</div>
-			</div>
-		</Dialog>
-	);
+  return (
+    <Dialog
+      isOpen={isOpen}
+      usePortal
+      onOpening={handleOnOpening}
+      onClose={onClose}
+      className="w-[90%] sm:w-[640px]"
+    >
+      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
+        <InputGroup
+          disabled={isLoading}
+          large
+          className="font-mono"
+          spellCheck={false}
+          placeholder={t("dlg_miner.lbl_miner_address")}
+          onChange={(e) => setData(e.target.value)}
+          value={data}
+          leftElement={addressIcon}
+        />
+      </div>
+      <div className={Classes.DIALOG_FOOTER}>
+        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+          <Button
+            onClick={onClose}
+            text={t("commons.lbl_btn_cancel")}
+            disabled={isLoading}
+          />
+          <Button
+            intent={Intent.PRIMARY}
+            disabled={isLoading || !canSubmit}
+            onClick={handleSubmitClick}
+            icon="send-message"
+            loading={isLoading}
+            text={t("dlg_miner.lbl_btn_add_miner")}
+          />
+        </div>
+      </div>
+    </Dialog>
+  );
 }

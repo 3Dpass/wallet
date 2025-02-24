@@ -1,15 +1,23 @@
-import { useTranslation } from "react-i18next";
-import { Card, Spinner, Tag, Intent, Classes, Button, Icon, Switch } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useEffect, useState } from "react";
-import { hexToString } from "@polkadot/util";
-import { BountyDetails } from "app/components/governance/BountyDetails";
+import {
+  Card,
+  Classes,
+  Icon,
+  Intent,
+  Spinner,
+  Switch,
+  Tag,
+} from "@blueprintjs/core";
+import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import type { Option } from "@polkadot/types";
 import type { Codec } from "@polkadot/types/types";
-import { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
+import { hexToString } from "@polkadot/util";
 import { Link } from "@remix-run/react";
-import { enableMockMode, disableMockMode } from "app/utils/sign";
-import { mockBounties, initializeMockBounties } from "app/utils/mock";
+import { useApi } from "app/components/Api";
+import { BountyDetails } from "app/components/governance/BountyDetails";
+import { initializeMockBounties, mockBounties } from "app/utils/mock";
+import { disableMockMode, enableMockMode } from "app/utils/sign";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Bounty {
   id: string;
@@ -44,11 +52,15 @@ export default function BountiesClient() {
       try {
         if (isMockMode) {
           // Load mock bounties
-          const loadedBounties = Array.from(mockBounties.entries()).map(([id, bounty]) => ({
-            id,
-            ...bounty,
-          }));
-          setBounties(loadedBounties.sort((a, b) => Number(b.id) - Number(a.id)));
+          const loadedBounties = Array.from(mockBounties.entries()).map(
+            ([id, bounty]) => ({
+              id,
+              ...bounty,
+            })
+          );
+          setBounties(
+            loadedBounties.sort((a, b) => Number(b.id) - Number(a.id))
+          );
           setLoading(false);
           return;
         }
@@ -69,7 +81,9 @@ export default function BountiesClient() {
           const bounty = bountyOption.unwrap();
 
           // Get bounty description
-          const descriptionHash = (await api.query.bounties.bountyDescriptions(id)) as Option<Codec>;
+          const descriptionHash = (await api.query.bounties.bountyDescriptions(
+            id
+          )) as Option<Codec>;
           let description = "";
 
           if (descriptionHash.isSome) {
@@ -100,11 +114,14 @@ export default function BountiesClient() {
             fee: bounty.fee?.toBigInt(),
             curator: bounty.curator?.toString(),
             status: bounty.status.type,
-            relatedMotions: relatedMotions.length > 0 ? relatedMotions : undefined,
+            relatedMotions:
+              relatedMotions.length > 0 ? relatedMotions : undefined,
           } as Bounty;
         });
 
-        const loadedBounties = (await Promise.all(bountyPromises)).filter((b): b is Bounty => b !== null);
+        const loadedBounties = (await Promise.all(bountyPromises)).filter(
+          (b): b is Bounty => b !== null
+        );
         // Sort bounties by ID in descending order
         setBounties(loadedBounties.sort((a, b) => Number(b.id) - Number(a.id)));
       } catch (error) {
@@ -137,12 +154,20 @@ export default function BountiesClient() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className={Classes.HEADING}>{t("governance.bounties")}</h2>
-        {process.env.NODE_ENV === "development" && <Switch checked={isMockMode} label={t("governance.mock_mode")} onChange={handleMockModeToggle} />}
+        {process.env.NODE_ENV === "development" && (
+          <Switch
+            checked={isMockMode}
+            label={t("governance.mock_mode")}
+            onChange={handleMockModeToggle}
+          />
+        )}
       </div>
       <div className="space-y-3">
         {bounties.length === 0 ? (
           <Card>
-            <Tag intent={Intent.WARNING}>{t("governance.no_active_bounties")}</Tag>
+            <Tag intent={Intent.WARNING}>
+              {t("governance.no_active_bounties")}
+            </Tag>
           </Card>
         ) : (
           bounties.map((bounty) => (
@@ -155,42 +180,57 @@ export default function BountiesClient() {
                     </Tag>
                   </div>
                   <div className="mt-6">
-                    <BountyDetails bountyId={bounty.id} type="approval" motion={null as any} showHeader={false} />
+                    <BountyDetails
+                      bountyId={bounty.id}
+                      type="approval"
+                      motion={null as any}
+                      showHeader={false}
+                    />
                   </div>
-                  {bounty.relatedMotions && bounty.relatedMotions.length > 0 && (
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t("governance.related_motions")}</h4>
-                      <div className="space-y-2">
-                        {bounty.relatedMotions.map((motion) => {
-                          const hash = motion.hash?.toString();
-                          if (!hash) return null;
+                  {bounty.relatedMotions &&
+                    bounty.relatedMotions.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {t("governance.related_motions")}
+                        </h4>
+                        <div className="space-y-2">
+                          {bounty.relatedMotions.map((motion) => {
+                            const hash = motion.hash?.toString();
+                            if (!hash) return null;
 
-                          const section = motion.proposal?.section;
-                          const method = motion.proposal?.method;
+                            const section = motion.proposal?.section;
+                            const method = motion.proposal?.method;
 
-                          return (
-                            <div key={hash} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded p-2">
-                              <div className="flex items-center gap-2">
-                                <Tag minimal intent={Intent.PRIMARY} className="whitespace-nowrap">
-                                  #{motion.votes?.index.toString()}
-                                </Tag>
-                                <span className="text-sm text-gray-600 dark:text-gray-400">
-                                  {section}.{method}
-                                </span>
-                              </div>
-                              <Link
-                                to={`/governance/motions?highlight=${hash}`}
-                                className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                            return (
+                              <div
+                                key={hash}
+                                className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded p-2"
                               >
-                                {t("governance.view_motion")}
-                                <Icon icon="arrow-right" size={12} />
-                              </Link>
-                            </div>
-                          );
-                        })}
+                                <div className="flex items-center gap-2">
+                                  <Tag
+                                    minimal
+                                    intent={Intent.PRIMARY}
+                                    className="whitespace-nowrap"
+                                  >
+                                    #{motion.votes?.index.toString()}
+                                  </Tag>
+                                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                                    {section}.{method}
+                                  </span>
+                                </div>
+                                <Link
+                                  to={`/governance/motions?highlight=${hash}`}
+                                  className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                                >
+                                  {t("governance.view_motion")}
+                                  <Icon icon="arrow-right" size={12} />
+                                </Link>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             </Card>

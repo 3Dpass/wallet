@@ -1,7 +1,7 @@
-import { useAtomValue } from "jotai";
-import { toasterAtom } from "../atoms";
 import type { ToasterInstance } from "@blueprintjs/core";
+import { useAtomValue } from "jotai";
 import { useTranslation } from "react-i18next";
+import { toasterAtom } from "../atoms";
 
 export default function useToaster(): ToasterInstance {
   const { t } = useTranslation();

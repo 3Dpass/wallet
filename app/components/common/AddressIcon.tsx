@@ -6,6 +6,17 @@ type AddressIconProps = {
   className?: string;
 };
 
-export function AddressIcon({ address, size = 24, className }: AddressIconProps) {
-  return <Polkadot address={address} size={size} className={className} publicKey={address} />;
+export function AddressIcon({
+  address,
+  size = 24,
+  className,
+}: AddressIconProps) {
+  return (
+    <Polkadot
+      address={address}
+      size={size}
+      className={className}
+      publicKey={address}
+    />
+  );
 }
