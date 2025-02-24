@@ -1,7 +1,7 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import type { AccountData } from "@polkadot/types/interfaces";
 import type { AccountInfo } from "@polkadot/types/interfaces/system/types";
-import { BigInt } from "@polkadot/x-bigint";
+import { BigInt as PolkaBigInt } from "@polkadot/x-bigint";
 import { json } from "@remix-run/node";
 import { RPC_CONFIG, RPC_TYPES } from "../api.config";
 import { defaultEndpoint } from "../atoms";
@@ -16,8 +16,11 @@ async function loadNetworkState() {
   });
 
   const totalIssuance = await api.query.balances.totalIssuance();
-  const totalIssuanceNumber = BigInt(totalIssuance.toPrimitive() as number);
-  const totalSupply = BigInt(1_000_000_000) * BigInt(1_000_000_000_000);
+  const totalIssuanceNumber = PolkaBigInt(
+    totalIssuance.toPrimitive() as number
+  );
+  const totalSupply =
+    PolkaBigInt(1_000_000_000) * PolkaBigInt(1_000_000_000_000);
 
   const budgets = [
     "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
@@ -26,20 +29,20 @@ async function loadNetworkState() {
   ];
   const budgetBalances =
     await api.query.system.account.multi<AccountInfo>(budgets);
-  let budgetBalancesSum = BigInt(0);
+  let budgetBalancesSum = PolkaBigInt(0);
   for (const balance of budgetBalances) {
     const { free, miscFrozen, feeFrozen } = balance.data as AccountData;
-    const frozenValue = BigInt(
+    const frozenValue = PolkaBigInt(
       Math.max(Number(miscFrozen.toBigInt()), Number(feeFrozen.toBigInt()))
     );
     budgetBalancesSum += free.toBigInt() - frozenValue;
   }
 
-  let circulating = BigInt(0);
+  let circulating = PolkaBigInt(0);
   const accounts = await api.query.system.account.entries<AccountInfo>();
   for (const [, account] of accounts) {
     const { free, miscFrozen, feeFrozen } = account.data as AccountData;
-    const frozenValue = BigInt(
+    const frozenValue = PolkaBigInt(
       Math.max(Number(miscFrozen.toBigInt()), Number(feeFrozen.toBigInt()))
     );
     circulating += free.toBigInt() - frozenValue;
