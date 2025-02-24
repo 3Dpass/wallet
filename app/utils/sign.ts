@@ -3,12 +3,65 @@ import type { SubmittableExtrinsic } from "@polkadot/api/promise/types";
 import type { Signer } from "@polkadot/api/types";
 import { web3FromAddress } from "@polkadot/extension-dapp/bundle";
 import type { KeyringPair } from "@polkadot/keyring/types";
+import type { EventRecord } from "@polkadot/types/interfaces";
 import type { Callback } from "@polkadot/types/types";
 import { mockVotes } from "./mock";
 
 type Options = {
   signer?: Signer;
 };
+
+// Mock type for SubmittableResult
+type MockSubmittableResult = {
+  readonly events: EventRecord[];
+  readonly status: {
+    isInBlock: boolean;
+    isFinalized: boolean;
+    isInvalid: boolean;
+    isUsurped: boolean;
+    isReady: boolean;
+    isBroadcast: boolean;
+    isFuture: boolean;
+    isDropped: boolean;
+  };
+  readonly isCompleted: boolean;
+  readonly isError: boolean;
+  readonly isFinalized: boolean;
+  readonly isInBlock: boolean;
+  readonly isWarning: boolean;
+  readonly txHash: string;
+  readonly txIndex: number;
+  filterRecords: <T = EventRecord>() => T[];
+  findRecord: <T = EventRecord>() => T | undefined;
+  toHuman: () => Record<string, unknown>;
+};
+
+// Create mock result with default values
+const createMockResult = (isFinalized = false): SubmittableResult =>
+  ({
+    events: [],
+    status: {
+      isInBlock: true,
+      isFinalized,
+      isInvalid: false,
+      isUsurped: false,
+      isReady: false,
+      isBroadcast: false,
+      isFuture: false,
+      isDropped: false,
+    },
+    isCompleted: isFinalized,
+    isError: false,
+    isFinalized,
+    isInBlock: true,
+    isWarning: false,
+    txHash:
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+    txIndex: 0,
+    filterRecords: <T = EventRecord>() => [] as T[],
+    findRecord: <T = EventRecord>() => undefined,
+    toHuman: () => ({}),
+  }) as unknown as SubmittableResult;
 
 // Flag to enable/disable mock mode
 let isMockMode = false;
@@ -51,19 +104,13 @@ export async function signAndSend(
         // First update - transaction is in block
         setTimeout(() => {
           if (statusCb) {
-            statusCb({
-              status: { isInBlock: true, isFinalized: false },
-              events: [],
-            } as any);
+            statusCb(createMockResult(false));
           }
 
           // Second update - transaction is finalized
           setTimeout(() => {
             if (statusCb) {
-              statusCb({
-                status: { isInBlock: true, isFinalized: true },
-                events: [{ event: { method: "ExtrinsicSuccess" } }],
-              } as any);
+              statusCb(createMockResult(true));
             }
             resolve(() => {});
           }, 500);
@@ -75,24 +122,21 @@ export async function signAndSend(
     return new Promise<() => void>((resolve) => {
       setTimeout(() => {
         if (statusCb) {
-          statusCb({
-            status: { isInBlock: true, isFinalized: true },
-            events: [{ event: { method: "ExtrinsicSuccess" } }],
-          } as any);
+          statusCb(createMockResult(true));
         }
         resolve(() => {});
       }, 1000);
     });
   }
 
-  options = options || {};
+  const finalOptions = options || {};
   if (pair.meta.isInjected) {
     const injected = await web3FromAddress(pair.address);
-    options.signer = injected.signer;
+    finalOptions.signer = injected.signer;
   }
   return tx.signAndSend(
-    options.signer ? pair.address : pair,
-    options,
+    finalOptions.signer ? pair.address : pair,
+    finalOptions,
     statusCb
   );
 }
