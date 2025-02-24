@@ -1,4 +1,4 @@
-import { Button, Checkbox, Classes, Dialog, Intent } from "@blueprintjs/core";
+import { Checkbox, Intent } from "@blueprintjs/core";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ import {
   apiExplorerEndpointAtom,
 } from "../../atoms";
 import TitledValue from "../common/TitledValue";
+import BaseDialog from "./BaseDialog";
 
 type IProps = {
   isOpen: boolean;
@@ -40,70 +41,61 @@ export default function DialogSettings({ isOpen, onClose }: IProps) {
   }
 
   return (
-    <>
-      <Dialog
-        isOpen={isOpen}
-        usePortal
-        onOpening={handleOnOpening}
-        onClose={onClose}
-        className="w-[90%] sm:w-[640px]"
-      >
-        <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-          <TitledValue
-            title={t("dlg_settings.lbl_api_address")}
-            value={
-              <input
-                className="border border-gray-600 p-1 px-2 mt-2 w-full"
-                value={data.api_endpoint}
-                onChange={(e) =>
-                  setData((prev) => ({ ...prev, api_endpoint: e.target.value }))
-                }
-              />
+    <BaseDialog
+      isOpen={isOpen}
+      onOpening={handleOnOpening}
+      onClose={onClose}
+      primaryButton={{
+        intent: Intent.PRIMARY,
+        onClick: handleSaveClick,
+        icon: "tick",
+        text: t("dlg_settings.lbl_btn_save"),
+      }}
+      footerContent={
+        <Checkbox
+          checked={data.api_advanced_mode}
+          large={false}
+          className="bp4-control absolute"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setData((prev) => ({
+              ...prev,
+              api_advanced_mode: e.target.checked,
+            }))
+          }
+        >
+          {t("dlg_settings.lbl_advanced_mode")}
+        </Checkbox>
+      }
+    >
+      <TitledValue
+        title={t("dlg_settings.lbl_api_address")}
+        value={
+          <input
+            className="border border-gray-600 p-1 px-2 mt-2 w-full"
+            value={data.api_endpoint}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, api_endpoint: e.target.value }))
             }
-            fontMono
           />
-          <TitledValue
-            title={t("dlg_settings.lbl_explorer_graphql")}
-            value={
-              <input
-                className="border border-gray-600 p-1 px-2 mt-2 w-full"
-                value={data.api_explorer_endpoint}
-                onChange={(e) =>
-                  setData((prev) => ({
-                    ...prev,
-                    api_explorer_endpoint: e.target.value,
-                  }))
-                }
-              />
-            }
-            fontMono
-          />
-        </div>
-        <div className={Classes.DIALOG_FOOTER}>
-          <Checkbox
-            checked={data.api_advanced_mode}
-            large={false}
-            className="bp4-control absolute"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+        }
+        fontMono
+      />
+      <TitledValue
+        title={t("dlg_settings.lbl_explorer_graphql")}
+        value={
+          <input
+            className="border border-gray-600 p-1 px-2 mt-2 w-full"
+            value={data.api_explorer_endpoint}
+            onChange={(e) =>
               setData((prev) => ({
                 ...prev,
-                api_advanced_mode: e.target.checked,
+                api_explorer_endpoint: e.target.value,
               }))
             }
-          >
-            {t("dlg_settings.lbl_advanced_mode")}
-          </Checkbox>
-          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} />
-            <Button
-              intent={Intent.PRIMARY}
-              onClick={handleSaveClick}
-              icon="tick"
-              text={t("dlg_settings.lbl_btn_save")}
-            />
-          </div>
-        </div>
-      </Dialog>
-    </>
+          />
+        }
+        fontMono
+      />
+    </BaseDialog>
   );
 }

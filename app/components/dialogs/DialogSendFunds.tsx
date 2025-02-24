@@ -1,7 +1,4 @@
 import {
-  Button,
-  Classes,
-  Dialog,
   Icon,
   InputGroup,
   Intent,
@@ -16,6 +13,7 @@ import { signAndSend } from "../../utils/sign";
 import { useApi } from "../Api";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
+import BaseDialog from "./BaseDialog";
 
 type IProps = {
   pair: KeyringPair;
@@ -137,59 +135,46 @@ export default function DialogSendFunds({
   );
 
   return (
-    <Dialog
+    <BaseDialog
       isOpen={isOpen}
-      usePortal
-      onOpening={handleOnOpening}
       onClose={onClose}
-      className="w-[90%] sm:w-[640px]"
+      onOpening={handleOnOpening}
       title={t("dlg_send.title", {
         unit: assetMetadata?.symbol || "P3D",
       })}
+      primaryButton={{
+        intent: Intent.PRIMARY,
+        disabled: isLoading || !canSubmit,
+        onClick: handleSubmitClick,
+        icon: "send-message",
+        loading: isLoading,
+        text: t("dlg_send.lbl_btn_send"),
+      }}
     >
-      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <InputGroup
-          disabled={isLoading}
-          large
-          className="font-mono"
-          spellCheck={false}
-          placeholder={t("dlg_send.lbl_address")}
-          onChange={(e) =>
-            setData((prev) => ({ ...prev, address: e.target.value }))
-          }
-          value={data.address}
-          leftElement={addressIcon}
-        />
-        <AmountInput
-          disabled={isLoading}
-          onValueChange={handleAmountChange}
-          placeholder={t("commons.lbl_amount")}
-          unit={assetMetadata?.symbol || "P3D"}
-        />
-        <AmountInput
-          disabled={isLoading}
-          onValueChange={handleTipsChange}
-          placeholder={t("dlg_send.lbl_tip")}
-          unit="P3D"
-        />
-      </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button
-            onClick={onClose}
-            text={t("commons.lbl_btn_cancel")}
-            disabled={isLoading}
-          />
-          <Button
-            intent={Intent.PRIMARY}
-            disabled={isLoading || !canSubmit}
-            onClick={handleSubmitClick}
-            icon="send-message"
-            loading={isLoading}
-            text={t("dlg_send.lbl_btn_send")}
-          />
-        </div>
-      </div>
-    </Dialog>
+      <InputGroup
+        disabled={isLoading}
+        large
+        className="font-mono"
+        spellCheck={false}
+        placeholder={t("dlg_send.lbl_address")}
+        onChange={(e) =>
+          setData((prev) => ({ ...prev, address: e.target.value }))
+        }
+        value={data.address}
+        leftElement={addressIcon}
+      />
+      <AmountInput
+        disabled={isLoading}
+        onValueChange={handleAmountChange}
+        placeholder={t("commons.lbl_amount")}
+        unit={assetMetadata?.symbol || "P3D"}
+      />
+      <AmountInput
+        disabled={isLoading}
+        onValueChange={handleTipsChange}
+        placeholder={t("dlg_send.lbl_tip")}
+        unit="P3D"
+      />
+    </BaseDialog>
   );
 }
