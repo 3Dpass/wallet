@@ -3,8 +3,10 @@ The wallet is a WEB3 UI for ["The Ledger of Things" (LoT)](https://github.com/3D
 
 The wallet page: https://wallet.3dpass.org/
 
+[![DeepSource](https://app.deepsource.com/gh/3Dpass/wallet.svg/?label=resolved+issues&show_trend=true&token=z_DO8FXnvAQwY3HBOodOfScB)](https://app.deepsource.com/gh/3Dpass/wallet/)
+
 ## Interaction
-The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) available via the RPC API websocket endpoint directly from your web browser. You can change the RPC API endpoint in Settings. Explore these ["How To" tips](https://3dpass.org/mainnet#wallet) for more detail.  
+The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) available via the RPC API websocket endpoint directly from your web browser. You can change the RPC API endpoint in Settings. Explore these ["How To" tips](https://3dpass.org/mainnet#wallet) for more detail.
 
 ### The LoT RPC API Endpoints:
 - Mainnet `wss://rpc.3dpscan.io`
