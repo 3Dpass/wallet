@@ -2,6 +2,9 @@ TAG := $(shell git describe --abbrev=0 --tags)
 TAG_NUM := $(shell echo $(TAG) | sed 's/v//')
 NEXT_TAG := v$(shell echo $$(( $(TAG_NUM) + 1 )))
 
+lint:
+	biome check --write .
+
 update:
 	pnpm self-update
 	pnpm update --interactive --latest
