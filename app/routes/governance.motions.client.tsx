@@ -231,11 +231,11 @@ export default function GovernanceMotions() {
           }));
         }
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       toaster.show({
         icon: "error",
         intent: "danger",
-        message: e.message,
+        message: e instanceof Error ? e.message : String(e),
       });
       setVotingLoading((prev) => ({
         ...prev,
@@ -305,11 +305,11 @@ export default function GovernanceMotions() {
           setCloseMotionLoading((prev) => ({ ...prev, [hash]: false }));
         }
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       toaster.show({
         icon: "error",
         intent: "danger",
-        message: e.message,
+        message: e instanceof Error ? e.message : String(e),
       });
       setCloseMotionLoading((prev) => ({ ...prev, [hash]: false }));
     }

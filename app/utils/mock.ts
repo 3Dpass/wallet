@@ -142,7 +142,13 @@ export const createMockApi = () => {
                           type: bounty?.status || "Unknown",
                         },
             }),
-            unwrapOr: (defaultValue: any) => {
+            unwrapOr: (defaultValue: {
+              proposer: ReturnType<typeof createMockAddress>;
+              value: { toBigInt: () => bigint };
+              fee?: { toBigInt: () => bigint };
+              curator?: ReturnType<typeof createMockAddress>;
+              status: { type: string };
+            }) => {
               if (!bounty) return defaultValue;
               return {
                 proposer: createMockAddress(bounty.proposer),
