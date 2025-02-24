@@ -1,15 +1,8 @@
-import {
-  Button,
-  Classes,
-  Dialog,
-  Icon,
-  InputGroup,
-  Intent,
-  TextArea,
-} from "@blueprintjs/core";
+import { Button, Icon, InputGroup, Intent, TextArea } from "@blueprintjs/core";
 import type React from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import BaseDialog from "./BaseDialog";
 
 interface Props {
   isOpen: boolean;
@@ -48,57 +41,46 @@ export default function DialogImportAddress({
   }
 
   return (
-    <>
-      <Dialog
-        isOpen={isOpen}
-        usePortal
-        onOpening={handleOnOpening}
-        onClose={onClose}
-        className="w-[90%] sm:w-[640px]"
-      >
-        <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-          <TextArea
-            className="w-full font-mono"
-            rows={5}
-            onChange={handleSeedPhraseChange}
-            value={data.seed_phrase}
+    <BaseDialog
+      isOpen={isOpen}
+      onOpening={handleOnOpening}
+      onClose={onClose}
+      primaryButton={{
+        intent: Intent.PRIMARY,
+        onClick: () => onImport(data.seed_phrase, data.passphrase),
+        icon: "add",
+        text: t("dlg_import_address.lbl_btn_import"),
+      }}
+    >
+      <TextArea
+        className="w-full font-mono"
+        rows={5}
+        onChange={handleSeedPhraseChange}
+        value={data.seed_phrase}
+      />
+      {canPaste && (
+        <div className="text-center">
+          <Button
+            icon="clipboard"
+            text={t("dlg_import_address.lbl_btn_paste")}
+            onClick={handlePaste}
           />
-          {canPaste && (
-            <div className="text-center">
-              <Button
-                icon="clipboard"
-                text={t("dlg_import_address.lbl_btn_paste")}
-                onClick={handlePaste}
-              />
-            </div>
-          )}
-          {showPassword && (
-            <InputGroup
-              type="password"
-              large
-              className="font-mono"
-              spellCheck={false}
-              placeholder={t("dlg_import_address.lbl_passphrase")}
-              onChange={(e) =>
-                setData((prev) => ({ ...prev, passphrase: e.target.value }))
-              }
-              value={data.passphrase}
-              leftElement={<Icon icon="lock" />}
-            />
-          )}
         </div>
-        <div className={Classes.DIALOG_FOOTER}>
-          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} />
-            <Button
-              intent={Intent.PRIMARY}
-              onClick={() => onImport(data.seed_phrase, data.passphrase)}
-              icon="add"
-              text={t("dlg_import_address.lbl_btn_import")}
-            />
-          </div>
-        </div>
-      </Dialog>
-    </>
+      )}
+      {showPassword && (
+        <InputGroup
+          type="password"
+          large
+          className="font-mono"
+          spellCheck={false}
+          placeholder={t("dlg_import_address.lbl_passphrase")}
+          onChange={(e) =>
+            setData((prev) => ({ ...prev, passphrase: e.target.value }))
+          }
+          value={data.passphrase}
+          leftElement={<Icon icon="lock" />}
+        />
+      )}
+    </BaseDialog>
   );
 }

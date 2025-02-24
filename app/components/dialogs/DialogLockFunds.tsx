@@ -1,12 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Classes,
-  Dialog,
-  Intent,
-  NumericInput,
-  Tag,
-} from "@blueprintjs/core";
+import { Checkbox, Intent, NumericInput, Tag } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +6,7 @@ import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
 import { useApi } from "../Api";
 import AmountInput from "../common/AmountInput";
+import BaseDialog from "./BaseDialog";
 
 type IProps = {
   pair: KeyringPair;
@@ -147,58 +140,43 @@ export default function DialogLockFunds({
   }, [api, data, onAfterSubmit, pair, toaster, t]);
 
   return (
-    <Dialog
+    <BaseDialog
       isOpen={isOpen}
-      usePortal
       onClose={onClose}
       onOpening={handleOnOpening}
-      className="w-[90%] sm:w-[640px]"
+      primaryButton={{
+        intent: Intent.PRIMARY,
+        icon: "lock",
+        text: t("dlg_lock_funds.lbl_btn_lock_funds"),
+        disabled: !canSubmit,
+        loading: isLoading,
+        onClick: handleSubmitClick,
+      }}
     >
-      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <AmountInput
-          disabled={isLoading}
-          onValueChange={handleAmountChange}
-          placeholder={t("commons.lbl_amount")}
-        />
-        <NumericInput
-          disabled={isLoading}
-          buttonPosition={"none"}
-          large
-          fill
-          placeholder={t("dlg_lock_funds.lbl_release_lock_after")}
-          leftIcon="cube"
-          onValueChange={handleBlockChange}
-          value={data.block}
-          rightElement={
-            <Tag minimal>{t("dlg_lock_funds.lbl_block_number")}</Tag>
-          }
-        />
-        <Checkbox
-          checked={data.auto_extend}
-          large
-          onChange={handleAutoExtendChange}
-        >
-          {t("dlg_lock_funds.lbl_chk_extended")} {autoExtendPeriod}{" "}
-          {t("dlg_lock_funds.lbl_chk_extended_1")}
-        </Checkbox>
-      </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button
-            onClick={onClose}
-            text={t("commons.lbl_btn_cancel")}
-            disabled={isLoading}
-          />
-          <Button
-            intent={Intent.PRIMARY}
-            icon="lock"
-            text={t("dlg_lock_funds.lbl_btn_lock_funds")}
-            disabled={isLoading || !canSubmit}
-            loading={isLoading}
-            onClick={handleSubmitClick}
-          />
-        </div>
-      </div>
-    </Dialog>
+      <AmountInput
+        disabled={isLoading}
+        onValueChange={handleAmountChange}
+        placeholder={t("commons.lbl_amount")}
+      />
+      <NumericInput
+        disabled={isLoading}
+        buttonPosition={"none"}
+        large
+        fill
+        placeholder={t("dlg_lock_funds.lbl_release_lock_after")}
+        leftIcon="cube"
+        onValueChange={handleBlockChange}
+        value={data.block}
+        rightElement={<Tag minimal>{t("dlg_lock_funds.lbl_block_number")}</Tag>}
+      />
+      <Checkbox
+        checked={data.auto_extend}
+        large
+        onChange={handleAutoExtendChange}
+      >
+        {t("dlg_lock_funds.lbl_chk_extended")} {autoExtendPeriod}{" "}
+        {t("dlg_lock_funds.lbl_chk_extended_1")}
+      </Checkbox>
+    </BaseDialog>
   );
 }

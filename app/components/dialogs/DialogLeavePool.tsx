@@ -1,18 +1,18 @@
-import { Button, Classes, Dialog, Intent, MenuItem } from "@blueprintjs/core";
+import { Button, Intent, MenuItem } from "@blueprintjs/core";
 import {
   type ItemPredicate,
   type ItemRenderer,
   Select2,
 } from "@blueprintjs/select";
+import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { type MouseEventHandler, useEffect, useState } from "react";
-
-import type { SignerOptions } from "@polkadot/api/types";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
 import { type IPool, convertPool, poolsWithMember } from "../../utils/pool";
 import { signAndSend } from "../../utils/sign";
 import { useApi } from "../Api";
+import BaseDialog from "./BaseDialog";
 
 type IProps = {
   pair: KeyringPair;
@@ -57,7 +57,7 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
   function handleOnOpening() {
     setIsLoading(false);
     setData(dataInitial);
-    loadPools().then(() => {});
+    void loadPools();
   }
 
   useEffect(() => {
@@ -139,54 +139,41 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
   };
 
   return (
-    <Dialog
+    <BaseDialog
       isOpen={isOpen}
-      usePortal
       onOpening={handleOnOpening}
       title={t("dlg_leave_pool.lbl_title")}
       onClose={onClose}
-      className="w-[90%] sm:w-[640px]"
+      primaryButton={{
+        intent: Intent.PRIMARY,
+        disabled: isLoading || !canSubmit,
+        onClick: handleSubmitClick,
+        icon: "log-out",
+        loading: isLoading,
+        text: t("dlg_leave_pool.lbl_btn_leave_pool"),
+      }}
     >
-      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <Select2
-          items={data.poolIds}
-          itemPredicate={filterPool}
-          itemRenderer={renderPoolId}
-          noResults={
-            <MenuItem
-              disabled
-              text={t("dlg_leave_pool.lbl_no_results")}
-              roleStructure="listoption"
-            />
-          }
-          onItemSelect={setPool}
-          popoverProps={{ matchTargetWidth: true }}
-          fill
-        >
-          <Button
-            text={data.poolToLeave}
-            rightIcon="double-caret-vertical"
-            className={`${Classes.CONTEXT_MENU} ${Classes.FILL} font-mono text-lg`}
+      <Select2
+        items={data.poolIds}
+        itemPredicate={filterPool}
+        itemRenderer={renderPoolId}
+        noResults={
+          <MenuItem
+            disabled
+            text={t("dlg_leave_pool.lbl_no_results")}
+            roleStructure="listoption"
           />
-        </Select2>
-      </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button
-            onClick={onClose}
-            text={t("commons.lbl_btn_cancel")}
-            disabled={isLoading}
-          />
-          <Button
-            intent={Intent.PRIMARY}
-            disabled={isLoading || !canSubmit}
-            onClick={handleSubmitClick}
-            icon="add"
-            loading={isLoading}
-            text={t("dlg_leave_pool.lbl_btn_leave_pool")}
-          />
-        </div>
-      </div>
-    </Dialog>
+        }
+        onItemSelect={setPool}
+        popoverProps={{ matchTargetWidth: true }}
+        fill
+      >
+        <Button
+          text={data.poolToLeave}
+          rightIcon="double-caret-vertical"
+          className="bp4-context-menu bp4-fill font-mono text-lg"
+        />
+      </Select2>
+    </BaseDialog>
   );
 }

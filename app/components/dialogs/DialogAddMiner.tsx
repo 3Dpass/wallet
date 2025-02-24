@@ -1,11 +1,4 @@
-import {
-  Button,
-  Classes,
-  Dialog,
-  Icon,
-  InputGroup,
-  Intent,
-} from "@blueprintjs/core";
+import { Icon, InputGroup, Intent } from "@blueprintjs/core";
 import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
@@ -15,6 +8,7 @@ import { isValidPolkadotAddress } from "../../utils/address";
 import { signAndSend } from "../../utils/sign";
 import { useApi } from "../Api";
 import { AddressIcon } from "../common/AddressIcon";
+import BaseDialog from "./BaseDialog";
 
 type IProps = {
   pair: KeyringPair;
@@ -32,6 +26,7 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
 
   function handleOnOpening() {
     setIsLoading(false);
+    setData("");
   }
 
   useEffect(() => {
@@ -80,42 +75,29 @@ export default function DialogAddMiner({ pair, isOpen, onClose }: IProps) {
   );
 
   return (
-    <Dialog
+    <BaseDialog
       isOpen={isOpen}
-      usePortal
       onOpening={handleOnOpening}
       onClose={onClose}
-      className="w-[90%] sm:w-[640px]"
+      primaryButton={{
+        intent: Intent.PRIMARY,
+        disabled: !canSubmit,
+        onClick: handleSubmitClick,
+        icon: "send-message",
+        loading: isLoading,
+        text: t("dlg_miner.lbl_btn_add_miner"),
+      }}
     >
-      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
-        <InputGroup
-          disabled={isLoading}
-          large
-          className="font-mono"
-          spellCheck={false}
-          placeholder={t("dlg_miner.lbl_miner_address")}
-          onChange={(e) => setData(e.target.value)}
-          value={data}
-          leftElement={addressIcon}
-        />
-      </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button
-            onClick={onClose}
-            text={t("commons.lbl_btn_cancel")}
-            disabled={isLoading}
-          />
-          <Button
-            intent={Intent.PRIMARY}
-            disabled={isLoading || !canSubmit}
-            onClick={handleSubmitClick}
-            icon="send-message"
-            loading={isLoading}
-            text={t("dlg_miner.lbl_btn_add_miner")}
-          />
-        </div>
-      </div>
-    </Dialog>
+      <InputGroup
+        disabled={isLoading}
+        large
+        className="font-mono"
+        spellCheck={false}
+        placeholder={t("dlg_miner.lbl_miner_address")}
+        onChange={(e) => setData(e.target.value)}
+        value={data}
+        leftElement={addressIcon}
+      />
+    </BaseDialog>
   );
 }

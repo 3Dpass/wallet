@@ -1,8 +1,7 @@
 import {
   Button,
-  Classes,
-  Dialog,
   Icon,
+  type IconName,
   InputGroup,
   Intent,
   Label,
@@ -19,6 +18,7 @@ import type React from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
+import BaseDialog from "./BaseDialog";
 
 type IProps = {
   pair: KeyringPair;
@@ -194,120 +194,118 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
     setMessageAndVerify(text);
   }
 
+  // Custom footer content for the verification mode
+  const verificationFooterContent = data.messageType === DIALOG_VERIFY && (
+    <div className="text-lg">
+      {data.showValidationResults && data.isSignatureValid && (
+        <div className="flex items-center gap-2">
+          <Icon icon="endorsed" intent={Intent.SUCCESS} />
+          {t("dlg_sign_verify.lbl_verified")}
+        </div>
+      )}
+      {data.showValidationResults && !data.isSignatureValid && (
+        <div className="flex items-center gap-2">
+          <Icon icon="warning-sign" intent={Intent.DANGER} />
+          {t("dlg_sign_verify.lbl_invalid_signature")}
+        </div>
+      )}
+    </div>
+  );
+
+  // Configure dialog buttons based on the current mode
+  const dialogButtons = {
+    primaryButton:
+      data.messageType === DIALOG_SIGN
+        ? {
+            intent: Intent.PRIMARY,
+            onClick: handleSignClick,
+            icon: "edit" as IconName,
+            text: t("dlg_sign_verify.lbl_btn_sign"),
+          }
+        : undefined,
+    cancelButtonText:
+      data.messageType === DIALOG_SIGN
+        ? t("commons.lbl_btn_cancel")
+        : t("commons.lbl_btn_close"),
+  };
+
   return (
-    <Dialog
+    <BaseDialog
       isOpen={isOpen}
       onClose={onClose}
       onOpening={handleOnOpening}
       title={t("dlg_sign_verify.lbl_title")}
-      style={{ width: "550px" }}
+      className="w-[550px]"
+      footerContent={verificationFooterContent}
+      {...dialogButtons}
     >
-      <div className={`${Classes.DIALOG_BODY} flex flex-col gap-2`}>
-        <div className="flex justify-center mt-2 text-lg">
-          <RadioGroup
-            inline
-            onChange={(event: React.FormEvent<HTMLInputElement>) => {
-              const inputElement = event.target as HTMLInputElement;
-              setData((prevState) => ({
-                ...prevState,
-                messageType: inputElement.value as DialogType,
-              }));
-            }}
-            selectedValue={data.messageType}
-          >
-            <Radio
-              label={t("dlg_sign_verify.lbl_rd_sign")}
-              value={DIALOG_SIGN}
-            />
-            <Radio
-              label={t("dlg_sign_verify.lbl_rd_verify")}
-              value={DIALOG_VERIFY}
-            />
-          </RadioGroup>
-        </div>
-        {data.messageType === DIALOG_SIGN && (
-          <>
-            <Label>
-              {t("dlg_sign_verify.lbl_placeholder_message")}
-              <InputGroup
-                large
-                spellCheck={false}
-                placeholder={t("dlg_sign_verify.lbl_placeholder_message")}
-                onChange={handleMessageChange}
-                value={data.message}
-                leftElement={<Icon icon="edit" />}
-                disabled={false}
-              />
-            </Label>
-            <Label>
-              {t("dlg_sign_verify.lbl_signed_message")}
-              <div className="relative">
-                <TextArea
-                  className="font-mono h-80 w-full p-2 text-left"
-                  value={signatureTemplate}
-                />
-                {canCopyToClipboard && (
-                  <Button
-                    className="bp3-dark absolute bottom-2 right-2"
-                    onClick={handleCopyClick}
-                    text={t("commons.lbl_btn_copy")}
-                  />
-                )}
-              </div>
-            </Label>
-          </>
-        )}
-        {data.messageType === DIALOG_VERIFY && (
-          <div className="relative">
-            <TextArea
-              className="font-mono h-80 w-full p-2 text-left"
-              value={data.messageToVerify}
-              onChange={handleVerifyMessageChange}
-            />
-            {canPasteFromClipboard && (
-              <Button
-                className="bp3-dark absolute bottom-2 right-2"
-                onClick={handlePasteClick}
-                text={t("commons.lbl_btn_paste")}
-              />
-            )}
-          </div>
-        )}
+      <div className="flex justify-center mt-2 text-lg">
+        <RadioGroup
+          inline
+          onChange={(event: React.FormEvent<HTMLInputElement>) => {
+            const inputElement = event.target as HTMLInputElement;
+            setData((prevState) => ({
+              ...prevState,
+              messageType: inputElement.value as DialogType,
+            }));
+          }}
+          selectedValue={data.messageType}
+        >
+          <Radio label={t("dlg_sign_verify.lbl_rd_sign")} value={DIALOG_SIGN} />
+          <Radio
+            label={t("dlg_sign_verify.lbl_rd_verify")}
+            value={DIALOG_VERIFY}
+          />
+        </RadioGroup>
       </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        {data.messageType === DIALOG_SIGN && (
-          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button onClick={onClose} text={t("commons.lbl_btn_cancel")} />
-            <Button
-              icon="edit"
-              intent={Intent.PRIMARY}
-              onClick={handleSignClick}
-              text={t("dlg_sign_verify.lbl_btn_sign")}
+      {data.messageType === DIALOG_SIGN && (
+        <>
+          <Label>
+            {t("dlg_sign_verify.lbl_placeholder_message")}
+            <InputGroup
+              large
+              spellCheck={false}
+              placeholder={t("dlg_sign_verify.lbl_placeholder_message")}
+              onChange={handleMessageChange}
+              value={data.message}
+              leftElement={<Icon icon="edit" />}
+              disabled={false}
             />
-          </div>
-        )}
-        {data.messageType === DIALOG_VERIFY && (
-          <div
-            className={`${Classes.DIALOG_FOOTER_ACTIONS} flex justify-between`}
-          >
-            <div className="text-lg">
-              {data.showValidationResults && data.isSignatureValid && (
-                <div className="flex items-center gap-2">
-                  <Icon icon="endorsed" intent={Intent.SUCCESS} />
-                  {t("dlg_sign_verify.lbl_verified")}
-                </div>
-              )}
-              {data.showValidationResults && !data.isSignatureValid && (
-                <div className="flex items-center gap-2">
-                  <Icon icon="warning-sign" intent={Intent.DANGER} />
-                  {t("dlg_sign_verify.lbl_invalid_signature")}
-                </div>
+          </Label>
+          <Label>
+            {t("dlg_sign_verify.lbl_signed_message")}
+            <div className="relative">
+              <TextArea
+                className="font-mono h-80 w-full p-2 text-left"
+                value={signatureTemplate}
+              />
+              {canCopyToClipboard && (
+                <Button
+                  className="bp3-dark absolute bottom-2 right-2"
+                  onClick={handleCopyClick}
+                  text={t("commons.lbl_btn_copy")}
+                />
               )}
             </div>
-            <Button onClick={onClose} text={t("commons.lbl_btn_close")} />
-          </div>
-        )}
-      </div>
-    </Dialog>
+          </Label>
+        </>
+      )}
+      {data.messageType === DIALOG_VERIFY && (
+        <div className="relative">
+          <TextArea
+            className="font-mono h-80 w-full p-2 text-left"
+            value={data.messageToVerify}
+            onChange={handleVerifyMessageChange}
+          />
+          {canPasteFromClipboard && (
+            <Button
+              className="bp3-dark absolute bottom-2 right-2"
+              onClick={handlePasteClick}
+              text={t("commons.lbl_btn_paste")}
+            />
+          )}
+        </div>
+      )}
+    </BaseDialog>
   );
 }

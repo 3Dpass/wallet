@@ -1,10 +1,4 @@
-import {
-  Card,
-  Icon,
-  InputGroup,
-  Intent,
-  Button,
-} from "@blueprintjs/core";
+import { Button, Card, Icon, InputGroup, Intent } from "@blueprintjs/core";
 import keyring from "@polkadot/ui-keyring";
 import { mnemonicGenerate } from "@polkadot/util-crypto";
 import { useState } from "react";

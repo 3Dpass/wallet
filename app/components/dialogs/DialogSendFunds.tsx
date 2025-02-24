@@ -1,8 +1,4 @@
-import {
-  Icon,
-  InputGroup,
-  Intent,
-} from "@blueprintjs/core";
+import { Icon, InputGroup, Intent } from "@blueprintjs/core";
 import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
