@@ -15,18 +15,18 @@ export async function getIdentityJudgementRequests(
   registrarIndex: number | undefined,
   queryEvents: QueryResult<EventsData, EventsVars>
 ): Promise<IPalletIdentityRegistrarInfo[]> {
-  if (queryEvents.data == undefined || registrarIndex == undefined || !api) {
+  if (queryEvents.data === undefined || registrarIndex === undefined || !api) {
     return [];
   }
   const candidateInfoArray: IPalletIdentityRegistrarInfo[] = [];
   let candidateAddress: string;
   let candidateInfo: IPalletIdentityRegistrarInfo;
-  let addressAndRegIndex;
+  let addressAndRegIndex: string[];
   for (const item of queryEvents.data.getEvents.objects) {
-    addressAndRegIndex = JSON.parse(item.attributes);
+    addressAndRegIndex = JSON.parse(item.attributes) as string[];
     if (
       addressAndRegIndex.length > 1 &&
-      addressAndRegIndex[1] == registrarIndex
+      addressAndRegIndex[1] === registrarIndex.toString()
     ) {
       candidateAddress = encodeAddress(
         addressAndRegIndex[0],
@@ -39,14 +39,14 @@ export async function getIdentityJudgementRequests(
       let candidateHasIdentity = false;
       if (candidateInfo?.judgements) {
         for (let i = 0; i < candidateInfo.judgements.length; i++) {
-          if (candidateInfo.judgements[i][1].toString() == "Reasonable") {
+          if (candidateInfo.judgements[i][1].toString() === "Reasonable") {
             candidateHasIdentity = true;
           }
         }
       }
       if (!candidateHasIdentity && candidateInfo && candidateInfo.judgements) {
         for (let i = 0; i < candidateInfo.judgements.length; i++) {
-          if ((candidateInfo.judgements[i][1] as IJudgementInfo)["FeePaid"]) {
+          if ((candidateInfo.judgements[i][1] as IJudgementInfo).FeePaid) {
             candidateInfo.account = candidateAddress;
             candidateInfoArray.push(candidateInfo);
           }
