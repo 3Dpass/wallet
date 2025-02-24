@@ -41,7 +41,14 @@ const renderAddressWithMetadata = (
       <div
         key={address}
         onClick={handleClick}
-        className={`px-3 py-2 cursor-pointer hover:bg-gray-600 ${modifiers.active ? "bg-gray-600" : ""}`}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleClick(e as unknown as React.MouseEvent<HTMLElement>);
+          }
+        }}
+        aria-selected={modifiers.active}
+        className={`w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-600 ${modifiers.active ? "bg-gray-600" : ""}`}
       >
         {renderAddressContent(address, metadata)}
       </div>
