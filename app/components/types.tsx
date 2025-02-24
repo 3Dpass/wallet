@@ -1,7 +1,8 @@
+import type { SignedBlock } from "@polkadot/types/interfaces";
 import type { Mesh } from "three";
 
 export interface IBlock {
-  block: any;
+  block: SignedBlock;
   blockHash: string;
   objectHashAlgo: string;
   objectHashes: string[];
