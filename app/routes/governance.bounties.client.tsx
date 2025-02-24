@@ -183,7 +183,7 @@ export default function BountiesClient() {
                     <BountyDetails
                       bountyId={bounty.id}
                       type="approval"
-                      motion={null as any}
+                      motion={null as unknown as DeriveCollectiveProposal}
                       showHeader={false}
                     />
                   </div>

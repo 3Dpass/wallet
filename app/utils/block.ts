@@ -1,5 +1,6 @@
 import type { ApiPromise } from "@polkadot/api";
 import type { Text } from "@polkadot/types";
+import type { SignedBlock } from "@polkadot/types/interfaces";
 import type { Mesh } from "three";
 import { OBJLoader } from "three-stdlib";
 import type { IBlock } from "../components/types";
@@ -8,7 +9,7 @@ export const loadBlock = async (
   api: ApiPromise,
   hash?: string
 ): Promise<IBlock> => {
-  let signedBlock;
+  let signedBlock: SignedBlock;
 
   const algoNameLength = 32;
   const objectHashLength = 64;
@@ -44,7 +45,7 @@ export const loadBlock = async (
   const object3d: Mesh = loader.parse(objectObj).children[0];
 
   return {
-    block,
+    block: signedBlock.block,
     blockHash,
     objectHashAlgo,
     objectHashes,
