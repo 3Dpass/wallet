@@ -124,6 +124,96 @@ function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
   );
 }
 
+// Add a custom hook to reuse the time remaining logic
+function useTimeRemaining(motion: DeriveCollectiveProposal): number | null {
+  const api = useApi();
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!api) return;
+
+    let unsubscribe: () => void;
+
+    const updateTime = async () => {
+      try {
+        // Try both council and collective modules
+        const councilInstance = api.registry.getModuleInstances?.(
+          api.runtimeVersion.specName.toString(),
+          "council"
+        ) || ["council"];
+        const collectiveInstance = api.registry.getModuleInstances?.(
+          api.runtimeVersion.specName.toString(),
+          "collective"
+        ) || ["collective"];
+
+        // Try to get voting period from various sources
+        let votingPeriod = DEFAULT_VOTING_PERIOD;
+
+        // Try runtime constants first
+        const runtimeVotingPeriod =
+          api.consts.democracy?.votingPeriod ||
+          api.consts.council?.votingPeriod;
+
+        // Then try module instances
+        const configuredPeriod =
+          runtimeVotingPeriod ||
+          api.consts[councilInstance[0]]?.votingPeriod ||
+          api.consts[collectiveInstance[0]]?.votingPeriod ||
+          api.consts.collective?.votingPeriod;
+
+        if (configuredPeriod) {
+          try {
+            votingPeriod = (
+              configuredPeriod as unknown as { toNumber: () => number }
+            ).toNumber();
+          } catch (e) {
+            // Fallback to default voting period
+          }
+        }
+
+        // Get the end block from the motion itself if available
+        const endBlock = motion.votes?.end?.toNumber();
+
+        const bestNumber = await api.derive.chain.bestNumber();
+        const current = bestNumber.toNumber();
+
+        const startBlock = motion.votes?.index.toNumber() || 0;
+        const finalEndBlock = endBlock || startBlock + votingPeriod;
+
+        if (current <= finalEndBlock) {
+          const remaining = finalEndBlock - current;
+          setTimeRemaining(remaining);
+        } else {
+          setTimeRemaining(0);
+        }
+      } catch (error) {
+        console.error("Error updating time:", error);
+      }
+    };
+
+    // Initial update
+    updateTime();
+
+    // Subscribe to new blocks
+    api.rpc.chain
+      .subscribeNewHeads(() => {
+        updateTime();
+      })
+      .then((u) => {
+        unsubscribe = u;
+      })
+      .catch((error) => {
+        console.error("Failed to subscribe to new blocks:", error);
+      });
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, [api, motion]);
+
+  return timeRemaining;
+}
+
 interface MotionDetailsProps {
   motion: DeriveCollectiveProposal;
   isCouncilMember: boolean;
@@ -224,6 +314,7 @@ export function MotionDetails({
 }: MotionDetailsProps) {
   const { t } = useTranslation();
   const toaster = useToaster();
+  const timeRemaining = useTimeRemaining(motion);
 
   if (!motion?.proposal || !motion?.votes) return null;
 
@@ -374,7 +465,17 @@ export function MotionDetails({
 
         {isCouncilMember && onVote && onClose && (
           <div className="flex justify-center">
-            {!isThresholdReached ? (
+            {isThresholdReached || timeRemaining === 0 ? (
+              <Button
+                intent={Intent.PRIMARY}
+                icon="tick-circle"
+                loading={closeMotionLoading[hash]}
+                onClick={() => onClose(motion)}
+                className="min-w-[140px] !h-10"
+              >
+                {t("governance.close_motion")}
+              </Button>
+            ) : (
               <div className="flex gap-3">
                 <Button
                   intent={Intent.SUCCESS}
@@ -411,16 +512,6 @@ export function MotionDetails({
                     .includes(selectedAddress || "")}
                 />
               </div>
-            ) : (
-              <Button
-                intent={Intent.PRIMARY}
-                icon="tick-circle"
-                loading={closeMotionLoading[hash]}
-                onClick={() => onClose(motion)}
-                className="min-w-[140px] !h-10"
-              >
-                {t("governance.close_motion")}
-              </Button>
             )}
           </div>
         )}
