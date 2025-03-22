@@ -151,15 +151,37 @@ function ProposalDescription({
 
   switch (`${section}.${method}`) {
     case "treasury.approveProposal":
-      return <span>Approve Treasury Proposal #{args[0].toString()}</span>;
+      return (
+        <span className="flex items-center gap-2">
+          <Icon
+            icon="tick-circle"
+            className="text-green-600 dark:text-green-400"
+          />
+          <span>Approve Treasury Proposal #{args[0].toString()}</span>
+        </span>
+      );
     case "treasury.rejectProposal":
-      return <span>Reject Treasury Proposal #{args[0].toString()}</span>;
+      return (
+        <span className="flex items-center gap-2">
+          <Icon
+            icon="cross-circle"
+            className="text-red-600 dark:text-red-400"
+          />
+          <span>Reject Treasury Proposal #{args[0].toString()}</span>
+        </span>
+      );
     case "treasury.proposeBounty":
       return (
-        <div>
-          Propose Bounty of {formatBalance((args[0] as Balance).toBigInt())}{" "}
-          with description: {args[1].toString()} for beneficiary:{" "}
-          <AccountName address={args[2].toString()} />
+        <div className="flex items-center gap-2">
+          <Icon
+            icon="new-object"
+            className="text-blue-600 dark:text-blue-400"
+          />
+          <div>
+            Propose Bounty of {formatBalance((args[0] as Balance).toBigInt())}{" "}
+            with description: {args[1].toString()} for beneficiary:{" "}
+            <AccountName address={args[2].toString()} />
+          </div>
         </div>
       );
     case "bounties.approveBounty":
@@ -190,13 +212,24 @@ function ProposalDescription({
       );
     case "council.close":
       return (
-        <span>
-          Close proposal with hash {args[0].toString().slice(0, 8)}... at index
-          #{args[1].toString()}
+        <span className="flex items-center gap-2">
+          <Icon icon="archive" className="text-gray-600 dark:text-gray-400" />
+          <span>
+            Close proposal with hash {args[0].toString().slice(0, 8)}... at
+            index #{args[1].toString()}
+          </span>
         </span>
       );
     default:
-      return <span>{`${section}.${method}(${formattedArgs})`}</span>;
+      return (
+        <span className="flex items-center gap-2">
+          <Icon
+            icon="code-block"
+            className="text-gray-600 dark:text-gray-400"
+          />
+          <span>{`${section}.${method}(${formattedArgs})`}</span>
+        </span>
+      );
   }
 }
 

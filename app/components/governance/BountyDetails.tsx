@@ -1,4 +1,4 @@
-import { H4, HTMLTable, Intent, Spinner, Tag } from "@blueprintjs/core";
+import { H4, HTMLTable, Icon, Intent, Spinner, Tag } from "@blueprintjs/core";
 import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import type { Bytes, Option } from "@polkadot/types";
 import type { Bounty } from "@polkadot/types/interfaces";
@@ -40,6 +40,27 @@ interface BountyDetailsProps {
   curator?: string;
   fee?: bigint;
   showHeader?: boolean;
+}
+
+// Helper function to get icon props based on bounty type
+function getBountyIcon(type: "approval" | "curator" | "close") {
+  switch (type) {
+    case "approval":
+      return {
+        icon: "endorsed" as const,
+        className: "text-green-600 dark:text-green-400",
+      };
+    case "curator":
+      return {
+        icon: "user" as const,
+        className: "text-blue-600 dark:text-blue-400",
+      };
+    case "close":
+      return {
+        icon: "disable" as const,
+        className: "text-red-600 dark:text-red-400",
+      };
+  }
 }
 
 export function BountyDetails({
@@ -162,7 +183,8 @@ export function BountyDetails({
   if (loading) {
     return (
       <div>
-        <H4>
+        <H4 className="flex items-center gap-2">
+          <Icon {...getBountyIcon(type)} />
           {title} #{bountyId}
         </H4>
         <div className="flex items-center gap-2 mt-2">
@@ -175,7 +197,8 @@ export function BountyDetails({
   if (!bountyData) {
     return (
       <div>
-        <H4>
+        <H4 className="flex items-center gap-2">
+          <Icon {...getBountyIcon(type)} />
           {title} #{bountyId}
         </H4>
         <Tag intent={Intent.DANGER} className="mt-2">
@@ -189,7 +212,8 @@ export function BountyDetails({
     <div className="max-w-4xl w-full">
       {showHeader && (
         <div className="mb-3">
-          <H4>
+          <H4 className="flex items-center gap-2">
+            <Icon {...getBountyIcon(type)} />
             {title} #{bountyId}
           </H4>
         </div>
