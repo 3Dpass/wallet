@@ -64,5 +64,8 @@
       "deasync",
       "esbuild"
     ]
+  },
+  "devDependencies": {
+    "react-scan": "^0.3.3"
   }
 }

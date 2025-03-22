@@ -1,3 +1,5 @@
+import { scan } from "react-scan";
+
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import type { Toaster } from "@blueprintjs/core";
 import {
@@ -107,6 +109,12 @@ export default function App() {
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const apiExplorerEndpoint = useAtomValue(apiExplorerEndpointAtom);
+
+  useEffect(() => {
+    scan({
+      enabled: process.env.NODE_ENV === "development",
+    });
+  }, []);
 
   useEffect(() => {
     setToaster(toasterRef.current);
