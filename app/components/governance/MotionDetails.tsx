@@ -21,7 +21,11 @@ import { BountyDetails } from "./BountyDetails";
 // Constants
 const DEFAULT_VOTING_PERIOD = 2880; // About 2 days with 60-second blocks
 
-function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
+// Custom hook to calculate time remaining for a motion
+function useTimeRemaining(motion: DeriveCollectiveProposal): {
+  timeRemaining: number | null;
+  currentBlock: number | null;
+} {
   const api = useApi();
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [currentBlock, setCurrentBlock] = useState<number | null>(null);
@@ -109,7 +113,14 @@ function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
     };
   }, [api, motion]);
 
-  if (timeRemaining === null || currentBlock === null) {
+  return { timeRemaining, currentBlock };
+}
+
+// Component to display time remaining
+function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
+  const { timeRemaining } = useTimeRemaining(motion);
+
+  if (timeRemaining === null) {
     return null;
   }
 
@@ -124,107 +135,178 @@ function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
   );
 }
 
-// Add a custom hook to reuse the time remaining logic
-function useTimeRemaining(motion: DeriveCollectiveProposal): number | null {
-  const api = useApi();
-  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!api) return;
-
-    let unsubscribe: () => void;
-
-    const updateTime = async () => {
-      try {
-        // Try both council and collective modules
-        const councilInstance = api.registry.getModuleInstances?.(
-          api.runtimeVersion.specName.toString(),
-          "council"
-        ) || ["council"];
-        const collectiveInstance = api.registry.getModuleInstances?.(
-          api.runtimeVersion.specName.toString(),
-          "collective"
-        ) || ["collective"];
-
-        // Try to get voting period from various sources
-        let votingPeriod = DEFAULT_VOTING_PERIOD;
-
-        // Try runtime constants first
-        const runtimeVotingPeriod =
-          api.consts.democracy?.votingPeriod ||
-          api.consts.council?.votingPeriod;
-
-        // Then try module instances
-        const configuredPeriod =
-          runtimeVotingPeriod ||
-          api.consts[councilInstance[0]]?.votingPeriod ||
-          api.consts[collectiveInstance[0]]?.votingPeriod ||
-          api.consts.collective?.votingPeriod;
-
-        if (configuredPeriod) {
-          try {
-            votingPeriod = (
-              configuredPeriod as unknown as { toNumber: () => number }
-            ).toNumber();
-          } catch (e) {
-            // Fallback to default voting period
-          }
-        }
-
-        // Get the end block from the motion itself if available
-        const endBlock = motion.votes?.end?.toNumber();
-
-        const bestNumber = await api.derive.chain.bestNumber();
-        const current = bestNumber.toNumber();
-
-        const startBlock = motion.votes?.index.toNumber() || 0;
-        const finalEndBlock = endBlock || startBlock + votingPeriod;
-
-        if (current <= finalEndBlock) {
-          const remaining = finalEndBlock - current;
-          setTimeRemaining(remaining);
-        } else {
-          setTimeRemaining(0);
-        }
-      } catch (error) {
-        console.error("Error updating time:", error);
-      }
-    };
-
-    // Initial update
-    updateTime();
-
-    // Subscribe to new blocks
-    api.rpc.chain
-      .subscribeNewHeads(() => {
-        updateTime();
-      })
-      .then((u) => {
-        unsubscribe = u;
-      })
-      .catch((error) => {
-        console.error("Failed to subscribe to new blocks:", error);
-      });
-
-    return () => {
-      unsubscribe?.();
-    };
-  }, [api, motion]);
-
-  return timeRemaining;
-}
-
-interface MotionDetailsProps {
+// Component to render proposal description
+function ProposalDescription({
+  section,
+  method,
+  args,
+  motion,
+}: {
+  section: string;
+  method: string;
+  args: Codec[];
   motion: DeriveCollectiveProposal;
-  isCouncilMember: boolean;
-  selectedAddress?: string | null;
-  onVote?: (motion: DeriveCollectiveProposal, approve: boolean) => void;
-  onClose?: (motion: DeriveCollectiveProposal) => void;
-  votingLoading?: { [key: string]: boolean };
-  closeMotionLoading?: { [key: string]: boolean };
-  highlight?: boolean;
+}): JSX.Element {
+  const formattedArgs = args.map((arg) => arg.toString()).join(", ");
+
+  switch (`${section}.${method}`) {
+    case "treasury.approveProposal":
+      return <span>Approve Treasury Proposal #{args[0].toString()}</span>;
+    case "treasury.rejectProposal":
+      return <span>Reject Treasury Proposal #{args[0].toString()}</span>;
+    case "treasury.proposeBounty":
+      return (
+        <div>
+          Propose Bounty of {formatBalance((args[0] as Balance).toBigInt())}{" "}
+          with description: {args[1].toString()} for beneficiary:{" "}
+          <AccountName address={args[2].toString()} />
+        </div>
+      );
+    case "bounties.approveBounty":
+      return (
+        <BountyDetails
+          bountyId={args[0].toString()}
+          motion={motion}
+          type="approval"
+        />
+      );
+    case "bounties.closeBounty":
+      return (
+        <BountyDetails
+          bountyId={args[0].toString()}
+          motion={motion}
+          type="close"
+        />
+      );
+    case "bounties.proposeCurator":
+      return (
+        <BountyDetails
+          bountyId={args[0].toString()}
+          curator={args[1].toString()}
+          fee={(args[2] as Balance).toBigInt()}
+          motion={motion}
+          type="curator"
+        />
+      );
+    case "council.close":
+      return (
+        <span>
+          Close proposal with hash {args[0].toString().slice(0, 8)}... at index
+          #{args[1].toString()}
+        </span>
+      );
+    default:
+      return <span>{`${section}.${method}(${formattedArgs})`}</span>;
+  }
 }
 
+// Component to display voters list
+function VotersList({
+  ayeVotes,
+  nayVotes,
+  selectedAddress,
+}: {
+  ayeVotes: string[];
+  nayVotes: string[];
+  selectedAddress?: string | null;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1">
+      {ayeVotes.map((address) => (
+        <div
+          key={address}
+          className={`inline-flex items-center rounded px-2 py-1.5 text-sm bg-green-50 text-green-700 dark:bg-green-900/50 dark:text-green-300 ${
+            address === selectedAddress
+              ? "!bg-green-100 dark:!bg-green-900 !ring-1 !ring-green-600 dark:!ring-green-300"
+              : ""
+          }`}
+        >
+          <AccountName address={address} />
+        </div>
+      ))}
+      {nayVotes.map((address) => (
+        <div
+          key={address}
+          className={`inline-flex items-center rounded px-2 py-1.5 text-sm bg-red-50 text-red-700 dark:bg-red-900/50 dark:text-red-300 ${
+            address === selectedAddress
+              ? "!bg-red-100 dark:!bg-red-900 !ring-1 !ring-red-600 dark:!ring-red-300"
+              : ""
+          }`}
+        >
+          <AccountName address={address} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Component for voting buttons
+function VotingButtons({
+  motion,
+  onVote,
+  onClose,
+  timeRemaining,
+  isThresholdReached,
+  hash,
+  selectedAddress,
+  ayeVotes,
+  nayVotes,
+  votingLoading,
+  closeMotionLoading,
+}: {
+  motion: DeriveCollectiveProposal;
+  onVote: (motion: DeriveCollectiveProposal, approve: boolean) => void;
+  onClose: (motion: DeriveCollectiveProposal) => void;
+  timeRemaining: number | null;
+  isThresholdReached: boolean;
+  hash: string;
+  selectedAddress?: string | null;
+  ayeVotes: string[];
+  nayVotes: string[];
+  votingLoading: { [key: string]: boolean };
+  closeMotionLoading: { [key: string]: boolean };
+}) {
+  const { t } = useTranslation();
+
+  if (isThresholdReached || timeRemaining === 0) {
+    return (
+      <Button
+        intent={Intent.PRIMARY}
+        icon="tick-circle"
+        loading={closeMotionLoading[hash]}
+        onClick={() => onClose(motion)}
+        className="min-w-[140px] !h-10"
+      >
+        {t("governance.close_motion")}
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex gap-3">
+      <Button
+        intent={Intent.SUCCESS}
+        loading={votingLoading[`${hash}-true`]}
+        onClick={() => onVote(motion, true)}
+        className="min-w-[140px] !h-10"
+        text={t("governance.ayes")}
+        icon={ayeVotes.includes(selectedAddress || "") ? "tick" : undefined}
+        disabled={ayeVotes.includes(selectedAddress || "")}
+      />
+      <Button
+        intent={Intent.DANGER}
+        loading={votingLoading[`${hash}-false`]}
+        onClick={() => onVote(motion, false)}
+        className="min-w-[140px] !h-10"
+        text={t("governance.nays")}
+        icon={nayVotes.includes(selectedAddress || "") ? "tick" : undefined}
+        disabled={nayVotes.includes(selectedAddress || "")}
+      />
+    </div>
+  );
+}
+
+// Status bar component
 function StatusBar({
   motion,
   totalVotes,
@@ -302,6 +384,19 @@ function StatusBar({
   );
 }
 
+// Types for props
+interface MotionDetailsProps {
+  motion: DeriveCollectiveProposal;
+  isCouncilMember: boolean;
+  selectedAddress?: string | null;
+  onVote?: (motion: DeriveCollectiveProposal, approve: boolean) => void;
+  onClose?: (motion: DeriveCollectiveProposal) => void;
+  votingLoading?: { [key: string]: boolean };
+  closeMotionLoading?: { [key: string]: boolean };
+  highlight?: boolean;
+}
+
+// Main component
 export function MotionDetails({
   motion,
   isCouncilMember,
@@ -314,75 +409,20 @@ export function MotionDetails({
 }: MotionDetailsProps) {
   const { t } = useTranslation();
   const toaster = useToaster();
-  const timeRemaining = useTimeRemaining(motion);
+  const { timeRemaining } = useTimeRemaining(motion);
 
   if (!motion?.proposal || !motion?.votes) return null;
 
   const hash = motion.hash?.toString() || "";
   const threshold = motion.votes.threshold?.toNumber() || 0;
-  const ayeVotes = motion.votes.ayes || [];
-  const nayVotes = motion.votes.nays || [];
+  const ayeVotes = motion.votes.ayes.map((a) => a.toString()) || [];
+  const nayVotes = motion.votes.nays.map((a) => a.toString()) || [];
   const section = motion.proposal.section || "mock";
   const method = motion.proposal.method || "proposal";
   const args = motion.proposal.args || [];
 
   const totalVotes = ayeVotes.length + nayVotes.length;
   const isThresholdReached = totalVotes >= threshold;
-
-  function getProposalDescription(
-    section: string,
-    method: string,
-    args: Codec[]
-  ): string | JSX.Element {
-    const formattedArgs = args.map((arg) => arg.toString()).join(", ");
-
-    switch (`${section}.${method}`) {
-      case "treasury.approveProposal":
-        return `Approve Treasury Proposal #${args[0].toString()}`;
-      case "treasury.rejectProposal":
-        return `Reject Treasury Proposal #${args[0].toString()}`;
-      case "treasury.proposeBounty":
-        return (
-          <div>
-            Propose Bounty of {formatBalance((args[0] as Balance).toBigInt())}{" "}
-            with description: {args[1].toString()} for beneficiary:{" "}
-            <AccountName address={args[2].toString()} />
-          </div>
-        );
-      case "bounties.approveBounty":
-        return (
-          <BountyDetails
-            bountyId={args[0].toString()}
-            motion={motion}
-            type="approval"
-          />
-        );
-      case "bounties.closeBounty":
-        return (
-          <BountyDetails
-            bountyId={args[0].toString()}
-            motion={motion}
-            type="close"
-          />
-        );
-      case "bounties.proposeCurator":
-        return (
-          <BountyDetails
-            bountyId={args[0].toString()}
-            curator={args[1].toString()}
-            fee={(args[2] as Balance).toBigInt()}
-            motion={motion}
-            type="curator"
-          />
-        );
-      case "council.close":
-        return `Close proposal with hash ${args[0].toString().slice(0, 8)}... at index #${args[1].toString()}`;
-      default:
-        return `${section}.${method}(${formattedArgs})`;
-    }
-  }
-
-  const proposalDescription = getProposalDescription(section, method, args);
 
   const handleShare = () => {
     const url = new URL(window.location.href);
@@ -410,7 +450,12 @@ export function MotionDetails({
             onShare={handleShare}
           />
           <div className="text-sm text-gray-600 dark:text-gray-300 mt-6">
-            {proposalDescription}
+            <ProposalDescription
+              section={section}
+              method={method}
+              args={args}
+              motion={motion}
+            />
           </div>
         </div>
       </div>
@@ -435,84 +480,28 @@ export function MotionDetails({
               </Tag>
             </div>
           </div>
-          <div className="flex flex-wrap gap-1">
-            {ayeVotes.map((address) => (
-              <div
-                key={address.toString()}
-                className={`inline-flex items-center rounded px-2 py-1.5 text-sm bg-green-50 text-green-700 dark:bg-green-900/50 dark:text-green-300 ${
-                  address.toString() === selectedAddress
-                    ? "!bg-green-100 dark:!bg-green-900 !ring-1 !ring-green-600 dark:!ring-green-300"
-                    : ""
-                }`}
-              >
-                <AccountName address={address.toString()} />
-              </div>
-            ))}
-            {nayVotes.map((address) => (
-              <div
-                key={address.toString()}
-                className={`inline-flex items-center rounded px-2 py-1.5 text-sm bg-red-50 text-red-700 dark:bg-red-900/50 dark:text-red-300 ${
-                  address.toString() === selectedAddress
-                    ? "!bg-red-100 dark:!bg-red-900 !ring-1 !ring-red-600 dark:!ring-red-300"
-                    : ""
-                }`}
-              >
-                <AccountName address={address.toString()} />
-              </div>
-            ))}
-          </div>
+          <VotersList
+            ayeVotes={ayeVotes}
+            nayVotes={nayVotes}
+            selectedAddress={selectedAddress}
+          />
         </div>
 
         {isCouncilMember && onVote && onClose && (
           <div className="flex justify-center">
-            {isThresholdReached || timeRemaining === 0 ? (
-              <Button
-                intent={Intent.PRIMARY}
-                icon="tick-circle"
-                loading={closeMotionLoading[hash]}
-                onClick={() => onClose(motion)}
-                className="min-w-[140px] !h-10"
-              >
-                {t("governance.close_motion")}
-              </Button>
-            ) : (
-              <div className="flex gap-3">
-                <Button
-                  intent={Intent.SUCCESS}
-                  loading={votingLoading[`${hash}-true`]}
-                  onClick={() => onVote(motion, true)}
-                  className="min-w-[140px] !h-10"
-                  text={t("governance.ayes")}
-                  icon={
-                    ayeVotes
-                      .map((a) => a.toString())
-                      .includes(selectedAddress || "")
-                      ? "tick"
-                      : undefined
-                  }
-                  disabled={ayeVotes
-                    .map((a) => a.toString())
-                    .includes(selectedAddress || "")}
-                />
-                <Button
-                  intent={Intent.DANGER}
-                  loading={votingLoading[`${hash}-false`]}
-                  onClick={() => onVote(motion, false)}
-                  className="min-w-[140px] !h-10"
-                  text={t("governance.nays")}
-                  icon={
-                    nayVotes
-                      .map((a) => a.toString())
-                      .includes(selectedAddress || "")
-                      ? "tick"
-                      : undefined
-                  }
-                  disabled={nayVotes
-                    .map((a) => a.toString())
-                    .includes(selectedAddress || "")}
-                />
-              </div>
-            )}
+            <VotingButtons
+              motion={motion}
+              onVote={onVote}
+              onClose={onClose}
+              timeRemaining={timeRemaining}
+              isThresholdReached={isThresholdReached}
+              hash={hash}
+              selectedAddress={selectedAddress}
+              ayeVotes={ayeVotes}
+              nayVotes={nayVotes}
+              votingLoading={votingLoading}
+              closeMotionLoading={closeMotionLoading}
+            />
           </div>
         )}
       </div>
