@@ -101,11 +101,12 @@ export function ApiCtxRoot({
     };
   }, [api, keyringLoaded, setFormatOptions]);
 
-  return (
-    <ApiCtx.Provider value={{ api, keyringLoaded, accounts }}>
-      {children}
-    </ApiCtx.Provider>
+  const contextValue = React.useMemo(
+    () => ({ api, keyringLoaded, accounts }),
+    [api, keyringLoaded, accounts]
   );
+
+  return <ApiCtx.Provider value={contextValue}>{children}</ApiCtx.Provider>;
 }
 
 export function useApi(): ApiPromise | undefined {
