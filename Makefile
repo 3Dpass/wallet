@@ -9,7 +9,7 @@ update:
 	pnpm self-update
 	pnpm update --interactive --latest
 
-deploy:
+deploy: lint
 	@if [ -n "$(git status --porcelain)" ]; then \
 		echo "Error: Git working directory is not clean. Please commit or stash changes first."; \
 		exit 1; \
