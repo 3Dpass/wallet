@@ -10,8 +10,13 @@ update:
 	pnpm update --interactive --latest
 
 deploy:
-	@if [ -n "$$(git status --porcelain)" ]; then \
+	@if [ -n "$(git status --porcelain)" ]; then \
 		echo "Error: Git working directory is not clean. Please commit or stash changes first."; \
+		exit 1; \
+	fi
+	@git fetch origin
+	@if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then \
+		echo "Error: Local branch is not up-to-date with remote. Please pull the latest changes."; \
 		exit 1; \
 	fi
 	@echo "Creating and pushing tag $(NEXT_TAG)"
