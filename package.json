@@ -60,10 +60,7 @@
     "node": ">=22"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "deasync",
-      "esbuild"
-    ]
+    "onlyBuiltDependencies": ["deasync", "esbuild"]
   },
   "devDependencies": {
     "react-scan": "^0.3.3"
