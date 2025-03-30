@@ -15,17 +15,21 @@ async function loadNetworkState() {
     types: RPC_TYPES,
   });
 
-  const totalIssuance = await api.query.balances.totalIssuance();
-  const totalIssuanceNumber = PolkaBigInt(
-    totalIssuance.toPrimitive() as number
-  );
   const budgets = [
     "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
     "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
     "d1EjCsWUVnKTG3dysQC2MWDfZKngtiwV2ZLegWRfFMbUR5d6c",
   ];
-  const budgetBalances =
-    await api.query.system.account.multi<AccountInfo>(budgets);
+
+  const [totalIssuance, budgetBalances, accounts] = await Promise.all([
+    api.query.balances.totalIssuance(),
+    api.query.system.account.multi<AccountInfo>(budgets),
+    api.query.system.account.entries<AccountInfo>(),
+  ]);
+
+  const totalIssuanceNumber = PolkaBigInt(
+    totalIssuance.toPrimitive() as number
+  );
   let budgetBalancesSum = PolkaBigInt(0);
   for (const balance of budgetBalances) {
     const { free, miscFrozen, feeFrozen } = balance.data as AccountData;
@@ -36,7 +40,6 @@ async function loadNetworkState() {
   }
 
   let circulating = PolkaBigInt(0);
-  const accounts = await api.query.system.account.entries<AccountInfo>();
   for (const [, account] of accounts) {
     const { free, miscFrozen, feeFrozen } = account.data as AccountData;
     const frozenValue = PolkaBigInt(
