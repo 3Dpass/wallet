@@ -46,8 +46,11 @@ async function loadNetworkState() {
   }
 
   return {
-    totalIssuance: totalIssuanceNumber.toString(),
-    circulatingSupply: (circulating - budgetBalancesSum).toString(),
+    totalIssuance: (totalIssuanceNumber / PolkaBigInt(10 ** 12)).toString(),
+    circulatingSupply: (
+      (circulating - budgetBalancesSum) /
+      PolkaBigInt(10 ** 12)
+    ).toString(),
   };
 }
 
