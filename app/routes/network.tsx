@@ -19,9 +19,6 @@ async function loadNetworkState() {
   const totalIssuanceNumber = PolkaBigInt(
     totalIssuance.toPrimitive() as number
   );
-  const totalSupply =
-    PolkaBigInt(1_000_000_000) * PolkaBigInt(1_000_000_000_000);
-
   const budgets = [
     "d1EVSxVDFMMDa79NzV2EvW66PpdD1uLW9aQXjhWZefUfp8Mhf",
     "d1ESJKwsk6zP8tBNJABUnf8mtKcqo1U2UVG7iEZ7uytGbWKAL",
@@ -51,7 +48,6 @@ async function loadNetworkState() {
   return {
     totalIssuance: totalIssuanceNumber.toString(),
     circulatingSupply: (circulating - budgetBalancesSum).toString(),
-    totalSupply: totalSupply.toString(),
   };
 }
 
