@@ -9,7 +9,7 @@ The wallet page: https://wallet.3dpass.org/
 The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) available via the RPC API websocket endpoint directly from your web browser. You can change the RPC API endpoint in Settings. Explore these ["How To" tips](https://3dpass.org/mainnet#wallet) for more detail.
 
 ### The LoT RPC API Endpoints:
-- Mainnet `wss://rpc.3dpscan.io`
+- Mainnet: `wss://rpc.3dpass.org`
 - Testnet `wss://test-rpc.3dpass.org`
 - Local Node `wss://127.0.0.1:9944`
 
