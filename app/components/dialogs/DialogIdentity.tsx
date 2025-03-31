@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
 import { useApi } from "../Api";
-import CandidateCards from "../common/CandidateCards";
 import { FormattedAmount } from "../common/FormattedAmount";
 import type { IPalletIdentityRegistrarInfo } from "../common/UserCard";
 import UserCard from "../common/UserCard";
@@ -371,16 +370,6 @@ export default function DialogIdentity({
         {!isRegistrar && hasIdentity && dataState.identityData && (
           <UserCard registrarInfo={dataState.identityData} />
         )}
-        {isRegistrar &&
-          dataState.registrarData?.regIndex &&
-          dataState.dateMonthAgo != null && (
-            <CandidateCards
-              regIndex={dataState.registrarData.regIndex}
-              pair={pair}
-              dateMonthAgo={dataState.dateMonthAgo}
-              onClose={onClose}
-            />
-          )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS} />
