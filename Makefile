@@ -3,7 +3,7 @@ TAG_NUM := $(shell echo $(TAG) | sed 's/v//')
 NEXT_TAG := v$(shell echo $$(( $(TAG_NUM) + 1 )))
 
 lint:
-	biome check --write .
+	biome check --write . && pnpm knip
 
 update:
 	pnpm self-update

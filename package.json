@@ -63,6 +63,7 @@
     "onlyBuiltDependencies": ["deasync", "esbuild"]
   },
   "devDependencies": {
+    "knip": "^5.46.4",
     "react-scan": "^0.3.3"
   }
 }
