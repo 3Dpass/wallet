@@ -1,11 +1,10 @@
 import { Intent, Tag } from "@blueprintjs/core";
 import type { u32 } from "@polkadot/types";
 import { useApi } from "app/components/Api";
+import { BLOCK_TIME_SECONDS } from "app/utils/time";
 import { useEffect, useState } from "react";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
-
-const BLOCK_TIME_SECONDS = 60;
 
 function TimeUntilFunding() {
   const api = useApi();

@@ -4,7 +4,6 @@
 module.exports = {
   ignoredRouteFiles: ["**/.*"],
   serverDependenciesToBundle: [
-    "@apollo/client",
     "@wry/equality",
     "@wry/trie",
     "ts-invariant",

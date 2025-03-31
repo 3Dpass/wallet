@@ -6,7 +6,7 @@ export type IPool = {
   poolMembers: string[];
 };
 
-export type IPoolBox = {
+type IPoolBox = {
   pools: IPool[];
   poolIds: string[];
 };

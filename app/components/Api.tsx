@@ -28,7 +28,7 @@ interface Context {
   accounts: KeyringPair[];
 }
 
-export const ApiCtx = React.createContext<Context>({
+const ApiCtx = React.createContext<Context>({
   api: undefined,
   keyringLoaded: false,
   accounts: [],

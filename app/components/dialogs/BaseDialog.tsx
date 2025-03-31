@@ -9,7 +9,7 @@ import {
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
-export interface BaseDialogProps {
+interface BaseDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onOpening?: () => void;
