@@ -13,9 +13,6 @@ The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) a
 - Testnet `wss://test-rpc.3dpass.org`
 - Local Node `wss://127.0.0.1:9944`
 
-### Transaction history
-The wallet fetches transaction history available for finalized blocks via the [Block Explorer graphql server](https://explorer-api.3dpscan.io/graphql/) API.
-
 ## Installation
 
 ```sh
