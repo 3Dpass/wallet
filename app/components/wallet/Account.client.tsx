@@ -99,7 +99,7 @@ export default function Account({ pair }: AccountProps) {
         selectedAsset={selectedAsset}
       />
       <div className="pr-12 mb-3">
-        <AccountName address={pair.address} noLink />
+        <AccountName address={pair.address} />
       </div>
       <div className="grid gap-1">
         {!state.balances && (

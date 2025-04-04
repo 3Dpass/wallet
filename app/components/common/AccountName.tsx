@@ -1,6 +1,5 @@
 import { Icon, Intent } from "@blueprintjs/core";
 import type { DeriveAccountRegistration } from "@polkadot/api-derive/types";
-import { Link } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { useApi } from "../Api";
 
@@ -131,8 +130,13 @@ export function AccountName({
   }
 
   return (
-    <Link to={`/address/${address}`} className="no-underline group">
+    <a
+      href={`https://3dpscan.xyz/#/accounts/${address}`}
+      className="no-underline group"
+      target="_blank"
+      rel="noreferrer"
+    >
       {nameContent}
-    </Link>
+    </a>
   );
 }
