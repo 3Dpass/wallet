@@ -112,8 +112,8 @@ export default function AccountAssets({ pair, onSend }: IProps) {
           {assets.map((asset) => (
             <div key={asset.assetId}>
               <Button
-                minimal
-                small
+                variant="minimal"
+                size="small"
                 className="p-0 px-1 -mx-1 h-auto font-mono"
                 onClick={() =>
                   onSend?.({

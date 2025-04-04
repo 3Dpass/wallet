@@ -114,8 +114,8 @@ export default function Account({ pair }: AccountProps) {
                 fontSmall
                 value={
                   <Button
-                    minimal
-                    small
+                    variant="minimal"
+                    size="small"
                     className="p-0 px-1 -mx-1 h-auto font-mono"
                     onClick={() => handleSend()}
                   >
