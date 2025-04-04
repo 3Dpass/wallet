@@ -5,7 +5,6 @@ import {
   Alignment,
   Button,
   Classes,
-  InputGroup,
   Navbar,
   NavbarGroup,
   NavbarHeading,
@@ -146,7 +145,7 @@ export default function App() {
             <ApiCtxRoot apiUrl={apiUrl}>
               <div className="container mx-auto px-4 flex flex-col min-h-screen">
                 <Navbar className="flex justify-between overflow-x-auto overflow-y-hidden mb-4 mt-2">
-                  <NavbarGroup align={Alignment.LEFT}>
+                  <NavbarGroup align={Alignment.START}>
                     <NavbarHeading className="whitespace-nowrap flex">
                       <Link
                         to=""
@@ -173,10 +172,18 @@ export default function App() {
                           {t("governance.title")}
                         </span>
                       </Link>
+                      <a
+                        href="https://3dpscan.xyz/"
+                        className="text-white hover:no-underline px-1 ms-3 flex items-center gap-2"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <span className="mb-[-3px]">Explorer</span>
+                      </a>
                       <Button
                         className="ml-2"
                         icon="cog"
-                        minimal
+                        variant="minimal"
                         onClick={() => setIsSettingsDialogOpen(true)}
                       />
                       <DialogSettings
@@ -184,21 +191,6 @@ export default function App() {
                         onClose={() => setIsSettingsDialogOpen(false)}
                       />
                     </NavbarHeading>
-                  </NavbarGroup>
-                  <NavbarGroup align={Alignment.RIGHT}>
-                    <form
-                      onSubmit={handleSearchSubmit}
-                      className="w-full sm:w-auto"
-                    >
-                      <InputGroup
-                        leftIcon="search"
-                        onChange={(e) => setSearchValue(e.target.value)}
-                        placeholder={t("root.lbl_search_box")}
-                        value={searchValue}
-                        className="w-full sm:min-w-[300px]"
-                        type="search"
-                      />
-                    </form>
                   </NavbarGroup>
                 </Navbar>
                 <Outlet />
