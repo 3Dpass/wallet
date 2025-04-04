@@ -109,7 +109,6 @@ export default function Wallet() {
             icon="new-object"
             text={t("root_wallet.lbl_btn_create_new_address")}
             onClick={() => dialogToggle("create")}
-            large
             intent={accounts.length === 0 ? "primary" : "none"}
             fill
             className="h-[48px] text-lg"
@@ -119,7 +118,6 @@ export default function Wallet() {
               icon="add"
               text={t("root_wallet.lbl_btn_import_from_seed")}
               onClick={() => dialogToggle("seed_phrase")}
-              large
               fill
               className="h-[48px]"
             />
@@ -127,7 +125,6 @@ export default function Wallet() {
               icon="import"
               text={t("root_wallet.lbl_btn_import_from_json")}
               onClick={() => dialogToggle("json")}
-              large
               fill
               className="h-[48px]"
             />
