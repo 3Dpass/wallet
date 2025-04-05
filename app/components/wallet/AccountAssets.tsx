@@ -96,7 +96,7 @@ export default function AccountAssets({ pair, onSend }: IProps) {
         <div>
           Assets (
           <a
-            href="https://swap.3dpscan.io/swap"
+            href="https://3dpswap.online/"
             target="_blank"
             rel="noreferrer"
             className="text-gray-400 unde"

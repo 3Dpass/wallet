@@ -197,7 +197,7 @@ export default function App() {
                 <footer className="p-4 py-8 mt-auto">
                   <div className="flex items-center gap-6 justify-center">
                     <a
-                      href="https://swap.3dpscan.io/swap"
+                      href="https://3dpswap.online/"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
