@@ -180,6 +180,14 @@ export default function App() {
                       >
                         <span className="mb-[-3px]">Explorer</span>
                       </a>
+                      <a
+                        href="https://3dpswap.online/"
+                        className="text-white hover:no-underline px-1 ms-3 flex items-center gap-2"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <span className="mb-[-3px]">Swap</span>
+                      </a>
                       <Button
                         className="ml-2"
                         icon="cog"
@@ -197,22 +205,11 @@ export default function App() {
                 <footer className="p-4 py-8 mt-auto">
                   <div className="flex items-center gap-6 justify-center">
                     <a
-                      href="https://3dpswap.online/"
+                      href="https://3dpass.org/mainnet#wallet"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      DEX/Swap
-                    </a>
-                    <a
-                      href="https://play.google.com/store/apps/details?id=com.threedpass.wallet"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <img
-                        src="/google-play.png"
-                        alt="Google Play"
-                        className="h-8"
-                      />
+                      How to
                     </a>
                     <a
                       href="https://github.com/3Dpass/wallet"

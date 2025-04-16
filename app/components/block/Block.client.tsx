@@ -41,7 +41,7 @@ export default function Block({ block }: IProps) {
             blockNumber <= bestNumberFinalized ? (
               <>
                 <Link
-                  to={`/block/${blockNumber}`}
+                  to={`https://3dpscan.xyz/#/blocks/${blockNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
