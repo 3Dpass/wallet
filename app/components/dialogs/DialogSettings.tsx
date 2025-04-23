@@ -70,7 +70,6 @@ export default function DialogSettings({isOpen, onClose}: IProps) {
             />
             <Button
               icon="reset"
-              intent="primary"
               style={{marginTop: 8, minWidth: 130, fontWeight: 500}}
               onClick={() => {
                 setData((prev) => ({...prev, api_endpoint: defaultEndpoint}));
@@ -78,6 +77,7 @@ export default function DialogSettings({isOpen, onClose}: IProps) {
               }}
               size="small"
               title="Reset RPC endpoint to default"
+              disabled={data.api_endpoint === defaultEndpoint}
             >
               Reset
             </Button>
