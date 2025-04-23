@@ -1,13 +1,6 @@
-import {
-  Button,
-  Classes,
-  Dialog,
-  type DialogProps,
-  type IconName,
-  Intent,
-} from "@blueprintjs/core";
-import type { ReactNode } from "react";
-import { useTranslation } from "react-i18next";
+import {Button, Classes, Dialog, type DialogProps, type IconName, Intent,} from "@blueprintjs/core";
+import type {ReactNode} from "react";
+import {useTranslation} from "react-i18next";
 
 interface BaseDialogProps {
   isOpen: boolean;
@@ -36,18 +29,18 @@ interface BaseDialogProps {
 }
 
 export default function BaseDialog({
-  isOpen,
-  onClose,
-  onOpening,
-  title,
-  className = "w-[90%] sm:w-[640px]",
-  children,
-  footerContent,
-  cancelButtonText,
-  primaryButton,
-  secondaryButton,
-}: BaseDialogProps) {
-  const { t } = useTranslation();
+                                     isOpen,
+                                     onClose,
+                                     onOpening,
+                                     title,
+                                     className = "w-[90%] sm:w-[640px]",
+                                     children,
+                                     footerContent,
+                                     cancelButtonText,
+                                     primaryButton,
+                                     secondaryButton,
+                                   }: BaseDialogProps) {
+  const {t} = useTranslation();
   const defaultCancelText = t("commons.lbl_btn_cancel");
 
   const dialogProps: Partial<DialogProps> = {
@@ -74,6 +67,7 @@ export default function BaseDialog({
             intent={Intent.NONE}
             onClick={onClose}
             icon="cross"
+            size="large"
             text={cancelButtonText || defaultCancelText}
             disabled={primaryButton?.loading}
           />
@@ -82,6 +76,7 @@ export default function BaseDialog({
               intent={secondaryButton.intent || Intent.NONE}
               onClick={secondaryButton.onClick}
               icon={secondaryButton.icon}
+              size="large"
               text={secondaryButton.text}
               disabled={secondaryButton.disabled || primaryButton?.loading}
             />
@@ -91,6 +86,7 @@ export default function BaseDialog({
               intent={primaryButton.intent || Intent.PRIMARY}
               onClick={primaryButton.onClick}
               icon={primaryButton.icon}
+              size="large"
               text={primaryButton.text}
               disabled={primaryButton.disabled}
               loading={primaryButton.loading}
