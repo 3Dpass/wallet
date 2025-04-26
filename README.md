@@ -100,7 +100,7 @@ Save the root.tsx file.
 
 After completing these steps, the application should be able to load and use the translations for the newly added language.
 
-## Copyright
-3DPass web wallet
+### Responsibility disclaimer
+This is an open source free p2p software. Use it at your own risk. 3dpass platform is non-profit and community-supported.
 
-Copyright (C) 2022-2025  3DPass 3dpass.org
+Copyright (C) 2022-2025 3DPass
