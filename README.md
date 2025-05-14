@@ -13,6 +13,19 @@ The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) a
 - Testnet `wss://test-rpc.3dpass.org`
 - Local Node `wss://127.0.0.1:9944`
 
+### Supply API
+#### P3D Total Supply (current total issuance)
+```
+https://wallet.3dpass.org/network/totalIssuance
+```
+#### P3D Circulating Supply (total issuance - total locked)
+```
+https://wallet.3dpass.org/network/circulatingsupply
+```
+Responce: 
+ - format: plain text
+ - accuracy: rounded to 1 P3D
+
 ## Installation
 
 ```sh
