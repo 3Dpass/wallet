@@ -61,6 +61,7 @@
       "lbl_total_issuance": "Total de emissão",
       "lbl_block": "Bloco",
       "lbl_block_not_finalized": "Não finalizado",
+      "lbl_3d_object_not_available": "Objeto 3D não disponível",
       "lbl_object_hash_algo": "Algoritmo de Hash de Objeto:",
       "lbl_btn_kyc": "KYC",
       "lbl_btn_no_kyc": "sem KYC",

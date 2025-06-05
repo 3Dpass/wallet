@@ -61,6 +61,7 @@
       "lbl_total_issuance": "总发行量",
       "lbl_block": "区块",
       "lbl_block_not_finalized": "未确认",
+      "lbl_3d_object_not_available": "3D对象不可用",
       "lbl_object_hash_algo": "对象哈希算法：",
       "lbl_btn_kyc": "KYC认证",
       "lbl_btn_no_kyc": "无KYC认证",

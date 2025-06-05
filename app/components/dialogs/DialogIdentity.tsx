@@ -3,7 +3,6 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { useState } from "react";
 
 import type { SignerOptions } from "@polkadot/api/types";
-import type { PalletIdentityIdentityInfo } from "@polkadot/types/lookup";
 import type { Codec } from "@polkadot/types/types";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
@@ -32,6 +31,10 @@ type ICandidateInfo = {
   pgpFingerprint: string | null;
   image: string | null;
   twitter: string | null;
+};
+
+type IdentityInfo = {
+  [key: string]: { Raw: string } | [[{ Raw: string }, { Raw: string }]];
 };
 
 type IIdentityData = {
@@ -139,12 +142,14 @@ export default function DialogIdentity({
     }
     setIsIdentityLoading(true);
     try {
-      const candidateData = {} as PalletIdentityIdentityInfo;
+      const candidateData = {} as IdentityInfo;
       for (const [key, value] of Object.entries(dataState.candidateInfo)) {
-        if (key === "discord") {
-          candidateData.additional = [[{ Raw: "Discord" }, { Raw: value }]];
-        } else {
-          candidateData[key] = { Raw: value };
+        if (value !== null) {
+          if (key === "discord") {
+            candidateData.additional = [[{ Raw: "Discord" }, { Raw: value }]];
+          } else {
+            candidateData[key] = { Raw: value };
+          }
         }
       }
       const tx0 = api.tx.identity.setIdentity(candidateData);
