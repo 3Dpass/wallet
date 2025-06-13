@@ -173,20 +173,28 @@ export default function App() {
                         </span>
                       </Link>
                       <a
-                        href="https://3dpscan.xyz/"
-                        className="text-white hover:no-underline px-1 ms-3 flex items-center gap-2"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <span className="mb-[-3px]">Explorer</span>
-                      </a>
-                      <a
                         href="https://3dpswap.online/"
                         className="text-white hover:no-underline px-1 ms-3 flex items-center gap-2"
                         target="_blank"
                         rel="noreferrer"
                       >
                         <span className="mb-[-3px]">Swap</span>
+                      </a>
+                       <a
+                        href="https://mining.3dpscan.xyz/"
+                        className="text-white hover:no-underline px-1 ms-3 flex items-center gap-2"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <span className="mb-[-3px]">Mining</span>
+                      </a>
+                      <a
+                        href="https://3dpscan.xyz/"
+                        className="text-white hover:no-underline px-1 ms-3 flex items-center gap-2"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <span className="mb-[-3px]">Explorer</span>
                       </a>
                       <Button
                         className="ml-2"
