@@ -40,6 +40,13 @@ export function AccountActions({
         onClick={onCopyAddress}
       />
       <MenuItem
+        icon="new-link"
+        text={t("commons.lbl_convert")}
+        href="https://converter.3dpass.org"
+        target="_blank"
+        rel="noopener noreferrer"
+      />
+      <MenuItem
         icon="endorsed"
         text={t("root.lbl_btn_sign_verify")}
         onClick={onSignVerify}

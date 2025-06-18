@@ -13,7 +13,8 @@
       "lbl_no_judgement_requested": "No hay solicitudes de juicio",
       "lbl_loading": "Cargando...",
       "lbl_block": "Bloque",
-      "lbl_date": "Fecha"
+      "lbl_date": "Fecha",
+      "lbl_convert": "Convertir"
     },
     "messages": {
       "lbl_account_locked": "Cuenta bloqueada",
