@@ -13,7 +13,8 @@
       "lbl_no_judgement_requested": "无判断请求",
       "lbl_loading": "加载中...",
       "lbl_block": "区块",
-      "lbl_date": "日期"
+      "lbl_date": "日期",
+      "lbl_convert": "转换"
     },
     "messages": {
       "lbl_account_locked": "账户已锁定",
