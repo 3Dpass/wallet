@@ -1,6 +1,7 @@
 import { Card, HTMLTable, Icon, IconSize, Tag } from "@blueprintjs/core";
 import { useTranslation } from "react-i18next";
 import { AccountName } from "./AccountName";
+import { FormattedAmount } from "./FormattedAmount";
 
 type IRegistrarInfoItem = {
   Raw: string;
@@ -62,7 +63,12 @@ export default function UserCard({ registrarInfo }: IProps) {
           large
           className="mr-2 mb-2 bg-green-700 text-green-100"
         >
-          {`${key}: ${value}`}
+          {key === "FeePaid"
+            ? `${key}: `
+            : `${key}: ${value}`}
+          {key === "FeePaid" && (
+            <FormattedAmount value={20000000000000} />
+          )}
         </Tag>
       ));
     }

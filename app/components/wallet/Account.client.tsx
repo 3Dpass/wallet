@@ -65,7 +65,7 @@ export default function Account({ pair }: AccountProps) {
           onUnlockFunds={handleUnlockFunds}
           onLockFunds={() => dialogToggle("lock_funds")}
           onDelete={() => dialogToggle("delete")}
-          onIdentity={() => dialogToggle("identity")}
+          onIdentity={(type?: string) => type === "judgement_requests" ? dialogToggle("judgement_requests") : dialogToggle("identity")}
           onCopyAddress={handleCopyAddress}
           isRegistrar={state.isRegistrar}
           hasIdentity={state.hasIdentity}

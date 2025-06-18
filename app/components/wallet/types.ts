@@ -20,6 +20,7 @@ export type AccountDialogs = {
   identity: boolean;
   add_miner: boolean;
   remove_miner: boolean;
+  judgement_requests: boolean;
 };
 
 export type AccountState = {
