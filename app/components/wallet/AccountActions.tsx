@@ -11,7 +11,7 @@ type AccountActionsProps = {
   onUnlockFunds: () => void;
   onLockFunds: () => void;
   onDelete: () => void;
-  onIdentity: () => void;
+  onIdentity: (type?: string) => void;
   onCopyAddress: () => void;
   isRegistrar: boolean;
   hasIdentity: boolean;
@@ -73,15 +73,19 @@ export function AccountActions({
         />
       )}
       {!accountLocked && (
-        <MenuItem
-          icon={hasIdentity ? "endorsed" : "id-number"}
-          text={
-            isRegistrar
-              ? t("root.lbl_judgements_requests")
-              : t("root.lbl_identity")
-          }
-          onClick={onIdentity}
-        />
+        isRegistrar ? (
+          <MenuItem
+            icon="endorsed"
+            text={t("root.lbl_judgements_requests")}
+            onClick={() => onIdentity("judgement_requests")}
+          />
+        ) : (
+          <MenuItem
+            icon={hasIdentity ? "endorsed" : "id-number"}
+            text={t("root.lbl_identity")}
+            onClick={() => onIdentity()}
+          />
+        )
       )}
     </>
   );
