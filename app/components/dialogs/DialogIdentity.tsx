@@ -61,6 +61,8 @@ export default function DialogIdentity({
   const api = useApi();
   const toaster = useToaster();
   const [isIdentityLoading, setIsIdentityLoading] = useState(false);
+  const [isCancelRequestLoading, setIsCancelRequestLoading] = useState(false);
+  const [isClearIdentityLoading, setIsClearIdentityLoading] = useState(false);
   const re = /,/gi;
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
@@ -192,7 +194,7 @@ export default function DialogIdentity({
               message: t("messages.lbl_judgement_requested"),
             });
             setIsIdentityLoading(false);
-            onClose();
+            handleClose();
           } else {
             toaster.show({
               icon: "error",
@@ -200,7 +202,7 @@ export default function DialogIdentity({
               message: t("messages.lbl_working_on_request"),
             });
             setIsIdentityLoading(false);
-            onClose();
+            handleClose();
           }
           unsub();
         }
@@ -218,7 +220,7 @@ export default function DialogIdentity({
         message: e instanceof Error ? e.message : "Unknown error occurred",
       });
       setIsIdentityLoading(false);
-      onClose();
+      handleClose();
     }
   }
 
@@ -246,13 +248,20 @@ export default function DialogIdentity({
     }
   }
 
+  const handleClose = () => {
+    setIsIdentityLoading(false);
+    setIsCancelRequestLoading(false);
+    setIsClearIdentityLoading(false);
+    onClose();
+  };
+
   return (
     <Dialog
       isOpen={isOpen}
       usePortal
       onOpening={handleOnOpening}
       title={t("dlg_identity.lbl_title")}
-      onClose={onClose}
+      onClose={handleClose}
       className="w-[90%] sm:w-[640px]"
     >
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
@@ -479,45 +488,92 @@ export default function DialogIdentity({
           </>
         )}
         {!isRegistrar && hasIdentity && dataState.identityData && !showUpdateForm && (
-          <>
-            <UserCard registrarInfo={dataState.identityData} />
-            <Button
-              intent={Intent.PRIMARY}
-              className="mt-4"
-              onClick={() => setShowUpdateForm(true)}
-            >
-              {t("Update")}
-            </Button>
-            <Button
-              intent={Intent.DANGER}
-              className="mt-2"
-              onClick={async () => {
-                if (!api) return;
-                setIsIdentityLoading(true);
-                try {
-                  const tx = api.tx.identity.clearIdentity();
-                  await signAndSend(tx, pair);
-                  toaster.show({
-                    icon: "trash",
-                    intent: Intent.SUCCESS,
-                    message: t("Identity cleared!"),
-                  });
-                  setIsIdentityLoading(false);
-                  onClose();
-                } catch (e) {
-                  toaster.show({
-                    icon: "error",
-                    intent: Intent.DANGER,
-                    message: e instanceof Error ? e.message : String(e),
-                  });
-                  setIsIdentityLoading(false);
+          (() => {
+            // Only check for FeePaid status for Cancel Request button
+            let showCancelRequest = false;
+            let registrarIndex = null;
+            if (dataState.identityData && Array.isArray(dataState.identityData.judgements)) {
+              for (const [regIdx, judgement] of dataState.identityData.judgements) {
+                // regIdx can be string or number
+                const idx = typeof regIdx === 'string' ? parseInt(regIdx) : regIdx;
+                if (judgement && typeof judgement === 'object' && 'FeePaid' in judgement) {
+                  showCancelRequest = true;
+                  registrarIndex = idx;
                 }
-              }}
-              loading={isIdentityLoading}
-            >
-              {t("Clear")}
-            </Button>
-          </>
+              }
+            }
+            // Always show UserCard if hasIdentity is true
+            return <>
+              <UserCard registrarInfo={dataState.identityData} />
+              <Button
+                intent={Intent.PRIMARY}
+                className="mt-4"
+                onClick={() => setShowUpdateForm(true)}
+              >
+                {t("Update")}
+              </Button>
+              {showCancelRequest && (
+                <Button
+                  intent={Intent.DANGER}
+                  className="mt-2"
+                  onClick={async () => {
+                    if (!api || registrarIndex === null) return;
+                    setIsCancelRequestLoading(true);
+                    try {
+                      const tx = api.tx.identity.cancelRequest(registrarIndex);
+                      await signAndSend(tx, pair);
+                      toaster.show({
+                        icon: "trash",
+                        intent: Intent.SUCCESS,
+                        message: t("Request cancelled!"),
+                      });
+                      setIsCancelRequestLoading(false);
+                      handleClose();
+                    } catch (e) {
+                      toaster.show({
+                        icon: "error",
+                        intent: Intent.DANGER,
+                        message: e instanceof Error ? e.message : String(e),
+                      });
+                      setIsCancelRequestLoading(false);
+                    }
+                  }}
+                  loading={isCancelRequestLoading}
+                >
+                  {t("Cancel Request")}
+                </Button>
+              )}
+              <Button
+                intent={Intent.DANGER}
+                className="mt-2"
+                onClick={async () => {
+                  if (!api) return;
+                  setIsClearIdentityLoading(true);
+                  try {
+                    const tx = api.tx.identity.clearIdentity();
+                    await signAndSend(tx, pair);
+                    toaster.show({
+                      icon: "trash",
+                      intent: Intent.SUCCESS,
+                      message: t("Identity cleared!"),
+                    });
+                    setIsClearIdentityLoading(false);
+                    handleClose();
+                  } catch (e) {
+                    toaster.show({
+                      icon: "error",
+                      intent: Intent.DANGER,
+                      message: e instanceof Error ? e.message : String(e),
+                    });
+                    setIsClearIdentityLoading(false);
+                  }
+                }}
+                loading={isClearIdentityLoading}
+              >
+                {t("Clear")}
+              </Button>
+            </>;
+          })()
         )}
         {!isRegistrar && hasIdentity && dataState.identityData && showUpdateForm && (
           <>
@@ -734,7 +790,14 @@ export default function DialogIdentity({
             />
             <Button
               className="mt-2"
-              onClick={() => setShowUpdateForm(false)}
+              onClick={() => {
+                setShowUpdateForm(false);
+                // Clear registrar data when canceling update
+                setData(prev => ({
+                  ...prev,
+                  registrarData: null
+                }));
+              }}
             >
               {t("Cancel")}
             </Button>

@@ -121,23 +121,6 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
     }
   };
 
-  const handleRejectRequest = async (address: string) => {
-    if (!api || registrarIndex === null) {
-      toaster.show({ intent: "danger", message: t("Registrar index not found or API unavailable.") });
-      return;
-    }
-    setSubmitting((prev) => ({ ...prev, [address]: "reject" }));
-    try {
-      const tx = api.tx.identity.cancelRequest(registrarIndex);
-      await signAndSend(tx, registrarPair);
-      toaster.show({ intent: "success", message: t("Request cancelled!") });
-    } catch (err: any) {
-      toaster.show({ intent: "danger", message: t("Failed to cancel request: ") + (err?.message || err) });
-    } finally {
-      setSubmitting((prev) => ({ ...prev, [address]: null }));
-    }
-  };
-
   // Filter identities by search
   const filteredIdentities = identities.filter(({ address, identity }) => {
     const query = search.toLowerCase();
@@ -210,15 +193,6 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
                     onClick={() => handleSubmitJudgement(address)}
                   >
                     {t("Provide")}
-                  </Button>
-                  <Button
-                    intent={Intent.DANGER}
-                    large
-                    style={{ minWidth: 120, height: 40, fontSize: 16 }}
-                    loading={submitting[address] === "reject"}
-                    onClick={() => handleRejectRequest(address)}
-                  >
-                    {t("Reject")}
                   </Button>
                 </div>
               </div>

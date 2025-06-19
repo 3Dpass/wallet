@@ -32,7 +32,7 @@ export function useAccount(pair: KeyringPair) {
     isCreatePoolLoading: false,
   });
 
-  const dialogsInitial: AccountDialogs = {
+  const [dialogs, setDialogs] = useState<AccountDialogs>({
     send: false,
     delete: false,
     unlock: false,
@@ -47,11 +47,10 @@ export function useAccount(pair: KeyringPair) {
     identity: false,
     add_miner: false,
     remove_miner: false,
-  };
+    judgement_requests: false,
+  });
 
-  const [dialogs, setDialogs] = useState(dialogsInitial);
-
-  const dialogToggle = useCallback((name: keyof typeof dialogsInitial) => {
+  const dialogToggle = useCallback((name: keyof typeof dialogs) => {
     setDialogs((prev) => ({ ...prev, [name]: !prev[name] }));
   }, []);
 
@@ -183,7 +182,11 @@ export function useAccount(pair: KeyringPair) {
         if (identity?.judgements) {
           let hasIdentity = false;
           for (const [, judgement] of identity.judgements) {
-            if (judgement.toString() === "Reasonable") {
+            const judgementStr = judgement.toString();
+            // Consider any non-Unknown judgement as having an identity
+            if (judgementStr === "Reasonable" || judgementStr === "KnownGood" || 
+                judgementStr === "Erroneous" || judgementStr === "OutOfDate" || 
+                judgementStr === "LowQuality" || "FeePaid" in judgement) {
               hasIdentity = true;
               break;
             }
