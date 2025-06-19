@@ -61,6 +61,8 @@ export default function DialogIdentity({
   const api = useApi();
   const toaster = useToaster();
   const [isIdentityLoading, setIsIdentityLoading] = useState(false);
+  const [isCancelRequestLoading, setIsCancelRequestLoading] = useState(false);
+  const [isClearIdentityLoading, setIsClearIdentityLoading] = useState(false);
   const re = /,/gi;
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
@@ -92,44 +94,29 @@ export default function DialogIdentity({
         ...r,
         regIndex: i,
       });
-      if (r.account === pair.address) {
-        regIndexCurrent = i;
-      }
       i++;
     }
-    if (regIndexCurrent != null) {
-      const dateMonthAgo = new Date();
-      dateMonthAgo.setMonth(dateMonthAgo.getMonth() - 1);
-      const registrarInfo = (
-        await api.query.identity.identityOf(pair.address)
-      ).toHuman() as IPalletIdentityRegistrarInfo;
-      registrarInfo.regIndex = regIndexCurrent;
-      setData((prev) => ({
-        ...prev,
-        registrarData: registrarInfo,
-        dateMonthAgo: dateMonthAgo,
-      }));
-    } else if (hasIdentity) {
+    if (hasIdentity) {
+      // User has identity, try to pre-select their current registrar
       const identityInfo = (
         await api.query.identity.identityOf(pair.address)
-      ).toHuman();
-      (identityInfo as IPalletIdentityRegistrarInfo).account = pair.address;
+      ).toHuman() as any;
+      let registrarData: IPalletIdentityRegistrarInfo | null = null;
+      if (identityInfo && identityInfo.judgements && Array.isArray(identityInfo.judgements)) {
+        // Find the first registrar with a judgement (if any)
+        const firstJudgement = identityInfo.judgements.find((j: any) => Array.isArray(j) && typeof j[0] === 'number');
+        if (firstJudgement) {
+          const regIndex = firstJudgement[0];
+          registrarData = registrarList[regIndex] || null;
+        }
+      }
       setData((prev) => ({
         ...prev,
+        registrarList,
+        registrarData,
         identityData: identityInfo as IPalletIdentityRegistrarInfo,
       }));
     } else {
-      const getIdentityPromiseList: Promise<Codec>[] = [];
-      for (const r of registrars) {
-        getIdentityPromiseList.push(api.query.identity.identityOf(r.account));
-      }
-      const results = await Promise.all(getIdentityPromiseList);
-      for (const [i, r] of results.entries()) {
-        registrarList[i] = {
-          ...registrarList[i],
-          ...(r.toHuman() as IPalletIdentityRegistrarInfo),
-        };
-      }
       setData((prev) => ({
         ...prev,
         candidateInfo: {} as ICandidateInfo,
@@ -151,7 +138,6 @@ export default function DialogIdentity({
     try {
       const candidateData = {} as IdentityInfo;
       const additionalFields: [[{ Raw: string }, { Raw: string }]] = [] as any;
-      
       for (const [key, value] of Object.entries(dataState.candidateInfo)) {
         if (value !== null) {
           if (key === "discord") {
@@ -173,41 +159,50 @@ export default function DialogIdentity({
           }
         }
       }
-      
       if (additionalFields.length > 0) {
         candidateData.additional = additionalFields;
       }
-      const tx0 = api.tx.identity.setIdentity(candidateData);
+      const txSetIdentity = api.tx.identity.setIdentity(candidateData);
+      const txRequestJudgement = api.tx.identity.requestJudgement(
+        dataState.registrarData?.regIndex,
+        dataState.registrarData?.fee.replace(re, "")
+      );
+      const batchTx = api.tx.utility.batch([txSetIdentity, txRequestJudgement]);
       const options: Partial<SignerOptions> = {};
       const unsub = await signAndSend(
-        tx0,
+        batchTx,
         pair,
         options,
         ({ events = [], status }) => {
           if (!status.isInBlock) {
             return;
           }
-          for (const {
-            event: { method },
-          } of events) {
-            if (method === "ExtrinsicSuccess") {
-              const tx = api.tx.identity.requestJudgement(
-                dataState.registrarData?.regIndex,
-                dataState.registrarData?.fee.replace(re, "")
-              );
-              signAndSend(tx, pair, options, ({ status }) => {
-                if (!status.isInBlock) {
-                  return;
-                }
-                toaster.show({
-                  icon: "endorsed",
-                  intent: Intent.SUCCESS,
-                  message: t("messages.lbl_judgement_requested"),
-                });
-                setIsIdentityLoading(false);
-                onClose();
-              });
+          let success = false;
+          for (const { event: { method, section } } of events) {
+            if (section === "system" && method === "ExtrinsicSuccess") {
+              success = true;
             }
+            if (section === "system" && method === "ExtrinsicFailed") {
+              success = false;
+              break;
+            }
+          }
+          if (success) {
+            toaster.show({
+              icon: "endorsed",
+              intent: Intent.SUCCESS,
+              message: t("messages.lbl_judgement_requested"),
+            });
+            setIsIdentityLoading(false);
+            handleClose();
+          } else {
+            toaster.show({
+              icon: "error",
+              intent: Intent.DANGER,
+              message: t("messages.lbl_working_on_request"),
+            });
+            setIsIdentityLoading(false);
+            handleClose();
           }
           unsub();
         }
@@ -225,7 +220,7 @@ export default function DialogIdentity({
         message: e instanceof Error ? e.message : "Unknown error occurred",
       });
       setIsIdentityLoading(false);
-      onClose();
+      handleClose();
     }
   }
 
@@ -253,13 +248,20 @@ export default function DialogIdentity({
     }
   }
 
+  const handleClose = () => {
+    setIsIdentityLoading(false);
+    setIsCancelRequestLoading(false);
+    setIsClearIdentityLoading(false);
+    onClose();
+  };
+
   return (
     <Dialog
       isOpen={isOpen}
       usePortal
       onOpening={handleOnOpening}
       title={t("dlg_identity.lbl_title")}
-      onClose={onClose}
+      onClose={handleClose}
       className="w-[90%] sm:w-[640px]"
     >
       <div className={`${Classes.DIALOG_BODY} flex flex-col gap-3`}>
@@ -481,25 +483,124 @@ export default function DialogIdentity({
                   loading={isIdentityLoading}
                   text={t("dlg_identity.lbl_placeholder_request_judgement")}
                 />
-                <UserCard registrarInfo={dataState.registrarData} />
               </>
             )}
           </>
         )}
         {!isRegistrar && hasIdentity && dataState.identityData && !showUpdateForm && (
-          <>
-            <UserCard registrarInfo={dataState.identityData} />
-            <Button
-              intent={Intent.PRIMARY}
-              className="mt-4"
-              onClick={() => setShowUpdateForm(true)}
-            >
-              {t("Update")}
-            </Button>
-          </>
+          (() => {
+            // Only check for FeePaid status for Cancel Request button
+            let showCancelRequest = false;
+            let registrarIndex = null;
+            if (dataState.identityData && Array.isArray(dataState.identityData.judgements)) {
+              for (const [regIdx, judgement] of dataState.identityData.judgements) {
+                // regIdx can be string or number
+                const idx = typeof regIdx === 'string' ? parseInt(regIdx) : regIdx;
+                if (judgement && typeof judgement === 'object' && 'FeePaid' in judgement) {
+                  showCancelRequest = true;
+                  registrarIndex = idx;
+                }
+              }
+            }
+            // Always show UserCard if hasIdentity is true
+            return <>
+              <UserCard registrarInfo={dataState.identityData} />
+              <Button
+                intent={Intent.PRIMARY}
+                className="mt-4"
+                onClick={() => setShowUpdateForm(true)}
+              >
+                {t("Update")}
+              </Button>
+              {showCancelRequest && (
+                <Button
+                  intent={Intent.DANGER}
+                  className="mt-2"
+                  onClick={async () => {
+                    if (!api || registrarIndex === null) return;
+                    setIsCancelRequestLoading(true);
+                    try {
+                      const tx = api.tx.identity.cancelRequest(registrarIndex);
+                      await signAndSend(tx, pair);
+                      toaster.show({
+                        icon: "trash",
+                        intent: Intent.SUCCESS,
+                        message: t("Request cancelled!"),
+                      });
+                      setIsCancelRequestLoading(false);
+                      handleClose();
+                    } catch (e) {
+                      toaster.show({
+                        icon: "error",
+                        intent: Intent.DANGER,
+                        message: e instanceof Error ? e.message : String(e),
+                      });
+                      setIsCancelRequestLoading(false);
+                    }
+                  }}
+                  loading={isCancelRequestLoading}
+                >
+                  {t("Cancel Request")}
+                </Button>
+              )}
+              <Button
+                intent={Intent.DANGER}
+                className="mt-2"
+                onClick={async () => {
+                  if (!api) return;
+                  setIsClearIdentityLoading(true);
+                  try {
+                    const tx = api.tx.identity.clearIdentity();
+                    await signAndSend(tx, pair);
+                    toaster.show({
+                      icon: "trash",
+                      intent: Intent.SUCCESS,
+                      message: t("Identity cleared!"),
+                    });
+                    setIsClearIdentityLoading(false);
+                    handleClose();
+                  } catch (e) {
+                    toaster.show({
+                      icon: "error",
+                      intent: Intent.DANGER,
+                      message: e instanceof Error ? e.message : String(e),
+                    });
+                    setIsClearIdentityLoading(false);
+                  }
+                }}
+                loading={isClearIdentityLoading}
+              >
+                {t("Clear")}
+              </Button>
+            </>;
+          })()
         )}
         {!isRegistrar && hasIdentity && dataState.identityData && showUpdateForm && (
           <>
+            <AddressSelect
+              onAddressChange={handleRegistrarSelect}
+              selectedAddress={dataState.registrarData?.account || ""}
+              addresses={dataState.registrarList.map((r) => r.account)}
+              isLoading={isIdentityLoading}
+              metadata={Object.fromEntries(
+                dataState.registrarList.map((registrar) => [
+                  registrar.account,
+                  <div
+                    key={registrar.account}
+                    className="flex items-center gap-2"
+                  >
+                    <span>
+                      #{registrar.regIndex}: {registrar.info?.display?.Raw}
+                    </span>
+                    <FormattedAmount
+                      value={Number.parseInt(
+                        registrar.fee?.replace(re, "") || "0"
+                      )}
+                    />
+                  </div>,
+                ])
+              )}
+            />
             <InputGroup
               disabled={isIdentityLoading}
               large
@@ -689,7 +790,14 @@ export default function DialogIdentity({
             />
             <Button
               className="mt-2"
-              onClick={() => setShowUpdateForm(false)}
+              onClick={() => {
+                setShowUpdateForm(false);
+                // Clear registrar data when canceling update
+                setData(prev => ({
+                  ...prev,
+                  registrarData: null
+                }));
+              }}
             >
               {t("Cancel")}
             </Button>
@@ -699,6 +807,12 @@ export default function DialogIdentity({
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS} />
       </div>
+      {/* Show selected registrar's identity card at the bottom */}
+      {dataState.registrarData && (
+        <div className="mt-4">
+          <UserCard registrarInfo={dataState.registrarData} />
+        </div>
+      )}
     </Dialog>
   );
 }
