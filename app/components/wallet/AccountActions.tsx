@@ -74,11 +74,18 @@ export function AccountActions({
       )}
       {!accountLocked && (
         isRegistrar ? (
-          <MenuItem
-            icon="endorsed"
-            text={t("root.lbl_judgements_requests")}
-            onClick={() => onIdentity("judgement_requests")}
-          />
+          <>
+            <MenuItem
+              icon="endorsed"
+              text={t("root.lbl_judgements_requests")}
+              onClick={() => onIdentity("judgement_requests")}
+            />
+            <MenuItem
+              icon="dollar"
+              text={t("root.lbl_set_fee")}
+              onClick={() => onIdentity("set_registrar_fee")}
+            />
+          </>
         ) : (
           <MenuItem
             icon={hasIdentity ? "endorsed" : "id-number"}

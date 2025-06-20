@@ -76,6 +76,7 @@
       "lbl_btn_remove_miner": "Remover minerador",
       "lbl_pool_actions": "Ações da piscina",
       "lbl_judgements_requests": "Solicitações de julgamento",
+      "lbl_set_fee": "Configurar taxa",
       "lbl_account_is_password_protected_1": "A conta está protegida por ",
       "lbl_account_is_password_protected_2": ", você precisa ",
       "lbl_account_is_password_protected_3": "desbloqueá-la",

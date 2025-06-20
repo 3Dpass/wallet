@@ -157,7 +157,7 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
   };
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title={t("root.lbl_judgements_requests") || "Judgements requests"} className="w-[90%] sm:w-[732px]">
+    <Dialog isOpen={isOpen} onClose={onClose} title={t("root.lbl_judgements_requests") || "Judgement requests"} className="w-[90%] sm:w-[732px]">
       <div className={Classes.DIALOG_BODY}>
         <InputGroup
           leftIcon="search"
@@ -186,7 +186,7 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
                     ))}
                   </select>
                   <Button
-                    intent={Intent.SUCCESS}
+                    intent={Intent.PRIMARY}
                     large
                     style={{ minWidth: 120, height: 40, fontSize: 16 }}
                     loading={submitting[address] === "provide"}

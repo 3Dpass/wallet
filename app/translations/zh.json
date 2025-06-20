@@ -76,6 +76,7 @@
       "lbl_btn_remove_miner": "移除矿工",
       "lbl_pool_actions": "矿池操作",
       "lbl_judgements_requests": "判断请求",
+      "lbl_set_fee": "设置费用",
       "lbl_account_is_password_protected_1": "账户已",
       "lbl_account_is_password_protected_2": "密码保护，您需要",
       "lbl_account_is_password_protected_3": "解锁",

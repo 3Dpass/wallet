@@ -76,6 +76,7 @@
       "lbl_btn_remove_miner": "Supprimer un mineur",
       "lbl_pool_actions": "Actions de la piscine",
       "lbl_judgements_requests": "Demandes de jugements",
+      "lbl_set_fee": "Définir les frais",
       "lbl_account_is_password_protected_1": "Le compte est protégé par ",
       "lbl_account_is_password_protected_2": ", vous devez le ",
       "lbl_account_is_password_protected_3": "déverrouiller",

@@ -76,6 +76,7 @@
       "lbl_btn_remove_miner": "Eliminar minero",
       "lbl_pool_actions": "Acciones del pool de minería",
       "lbl_judgements_requests": "Solicitudes de juicio",
+      "lbl_set_fee": "Establecer tarifa",
       "lbl_account_is_password_protected_1": "La cuenta está protegida con ",
       "lbl_account_is_password_protected_2": "contraseña, debes ",
       "lbl_account_is_password_protected_3": "desbloquearla",
