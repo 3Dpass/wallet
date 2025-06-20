@@ -80,6 +80,7 @@
       "lbl_btn_remove_miner": "Remove miner",
       "lbl_pool_actions": "Pool actions",
       "lbl_judgements_requests": "Judgements requests",
+      "lbl_set_fee": "Set fee",
       "lbl_account_is_password_protected_1": "Account is ",
       "lbl_account_is_password_protected_2": " password protected, you need to ",
       "lbl_account_is_password_protected_3": "unlock it",

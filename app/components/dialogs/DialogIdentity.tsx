@@ -64,9 +64,6 @@ export default function DialogIdentity({
   const [isCancelRequestLoading, setIsCancelRequestLoading] = useState(false);
   const [isClearIdentityLoading, setIsClearIdentityLoading] = useState(false);
   const re = /,/gi;
-  const [showUpdateForm, setShowUpdateForm] = useState(false);
-  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
-
   const dataInitial: IIdentityData = {
     registrarList: [],
     registrarData: null,
@@ -74,22 +71,37 @@ export default function DialogIdentity({
     candidateInfo: {} as ICandidateInfo,
     dateMonthAgo: null,
   };
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [dataState, setData] = useState(dataInitial);
+  const [isLoadingRegistrars, setIsLoadingRegistrars] = useState(false);
 
   async function loadRegistrars() {
+    setIsLoadingRegistrars(true);
     if (!api) {
       return;
     }
+    // Fetch suspended registrar indices
+    const suspendedIndicesRaw = await api.query.identity.suspendedRegistrars();
+    // Convert to array of numbers (Vec<u32> -> number[])
+    const suspendedIndices = (suspendedIndicesRaw.toJSON() as number[]) || [];
+
     const registrars: IPalletIdentityRegistrarInfo[] = (
       await api.query.identity.registrars()
     ).toHuman() as IPalletIdentityRegistrarInfo[];
     if (!registrars || !Array.isArray(registrars)) {
+      setIsLoadingRegistrars(false);
       return;
     }
     const registrarList: IPalletIdentityRegistrarInfo[] = [];
     let regIndexCurrent: number | null = null;
     let i = 0;
     for (const r of registrars) {
+      // Skip suspended registrars
+      if (suspendedIndices.includes(i)) {
+        i++;
+        continue;
+      }
       registrarList.push({
         ...r,
         regIndex: i,
@@ -107,7 +119,7 @@ export default function DialogIdentity({
         const firstJudgement = identityInfo.judgements.find((j: any) => Array.isArray(j) && typeof j[0] === 'number');
         if (firstJudgement) {
           const regIndex = firstJudgement[0];
-          registrarData = registrarList[regIndex] || null;
+          registrarData = registrarList.find(r => r.regIndex === regIndex) || null;
         }
       }
       setData((prev) => ({
@@ -123,6 +135,7 @@ export default function DialogIdentity({
         registrarList: registrarList,
       }));
     }
+    setIsLoadingRegistrars(false);
   }
 
   async function handleOnOpening() {
@@ -282,13 +295,12 @@ export default function DialogIdentity({
                     key={registrar.account}
                     className="flex items-center gap-2"
                   >
-                    <span>
-                      #{registrar.regIndex}: {registrar.info?.display?.Raw}
+                    <span className="flex items-right gap-2 pl-8">
+                      #{registrar.regIndex} Fee:{registrar.info?.display?.Raw}
                     </span>
                     <FormattedAmount
-                      value={Number.parseInt(
-                        registrar.fee?.replace(re, "") || "0"
-                      )}
+                      value={Number.parseInt(registrar.fee?.replace(re, "") || "0")}
+                      unit="P3D"
                     />
                   </div>,
                 ])
@@ -488,7 +500,7 @@ export default function DialogIdentity({
           </>
         )}
         {!isRegistrar && hasIdentity && dataState.identityData && !showUpdateForm && (
-          (() => {
+          (function() {
             // Only check for FeePaid status for Cancel Request button
             let showCancelRequest = false;
             let registrarIndex = null;
@@ -508,7 +520,24 @@ export default function DialogIdentity({
               <Button
                 intent={Intent.PRIMARY}
                 className="mt-4"
-                onClick={() => setShowUpdateForm(true)}
+                onClick={() => {
+                  if (!dataState.registrarData) {
+                    let registrarData = null;
+                    if (dataState.identityData && Array.isArray(dataState.identityData.judgements)) {
+                      const firstJudgement = dataState.identityData.judgements.find((j) => Array.isArray(j));
+                      if (firstJudgement) {
+                        const regIdx = firstJudgement[0];
+                        const regIndex = typeof regIdx === 'string' ? parseInt(regIdx) : regIdx;
+                        registrarData = dataState.registrarList.find(r => r.regIndex === regIndex) || null;
+                      }
+                    }
+                    if (!registrarData && dataState.registrarList.length > 0) {
+                      registrarData = dataState.registrarList[0];
+                    }
+                    setData(prev => ({ ...prev, registrarData }));
+                  }
+                  setShowUpdateForm(true);
+                }}
               >
                 {t("Update")}
               </Button>
@@ -555,7 +584,7 @@ export default function DialogIdentity({
                     toaster.show({
                       icon: "trash",
                       intent: Intent.SUCCESS,
-                      message: t("Identity cleared!"),
+                      message: t("Identity clear request sent!"),
                     });
                     setIsClearIdentityLoading(false);
                     handleClose();
@@ -589,13 +618,12 @@ export default function DialogIdentity({
                     key={registrar.account}
                     className="flex items-center gap-2"
                   >
-                    <span>
-                      #{registrar.regIndex}: {registrar.info?.display?.Raw}
+                    <span className="flex items-right gap-2 pl-8">
+                      #{registrar.regIndex} Fee:{registrar.info?.display?.Raw}
                     </span>
                     <FormattedAmount
-                      value={Number.parseInt(
-                        registrar.fee?.replace(re, "") || "0"
-                      )}
+                      value={Number.parseInt(registrar.fee?.replace(re, "") || "0")}
+                      unit="P3D"
                     />
                   </div>,
                 ])
@@ -807,12 +835,26 @@ export default function DialogIdentity({
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS} />
       </div>
-      {/* Show selected registrar's identity card at the bottom */}
-      {dataState.registrarData && (
-        <div className="mt-4">
-          <UserCard registrarInfo={dataState.registrarData} />
-        </div>
-      )}
+      {(function() {
+        const r = dataState.registrarData;
+        // Check for all required fields
+        const isValid = r && typeof r === 'object' && r.account && r.info && r.regIndex !== undefined;
+        if (isValid) {
+          try {
+            return (
+              <div className="mt-4">
+                <UserCard registrarInfo={r} />
+              </div>
+            );
+          } catch (e) {
+            return <div className="mt-4 text-red-500">Failed to render registrar card.</div>;
+          }
+        } else if (!isLoadingRegistrars && dataState.registrarList.length === 0) {
+          return <div className="mt-4 text-red-500">No available registrar to display.</div>;
+        } else {
+          return null;
+        }
+      })()}
     </Dialog>
   );
 }

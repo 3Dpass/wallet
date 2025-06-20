@@ -21,6 +21,7 @@ export type AccountDialogs = {
   add_miner: boolean;
   remove_miner: boolean;
   judgement_requests: boolean;
+  set_registrar_fee: boolean;
 };
 
 export type AccountState = {

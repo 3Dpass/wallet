@@ -14,6 +14,7 @@ import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogJudgementRequests from "../dialogs/DialogJudgementRequests";
+import DialogSetRegistrarFee from "../dialogs/DialogSetRegistrarFee";
 
 // Add this type definition at the top of the file
 type DialogNames =
@@ -30,7 +31,8 @@ type DialogNames =
   | "identity"
   | "remove_miner"
   | "add_miner"
-  | "judgement_requests";
+  | "judgement_requests"
+  | "set_registrar_fee";
 
 interface AccountDialogsProps {
   pair: KeyringPair;
@@ -138,6 +140,13 @@ export function AccountDialogs({
         <DialogJudgementRequests
           isOpen={dialogs.judgement_requests}
           onClose={() => onDialogToggle("judgement_requests")}
+          registrarPair={pair}
+        />
+      )}
+      {isRegistrar && (
+        <DialogSetRegistrarFee
+          isOpen={dialogs.set_registrar_fee}
+          onClose={() => onDialogToggle("set_registrar_fee")}
           registrarPair={pair}
         />
       )}
