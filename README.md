@@ -13,12 +13,20 @@ The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) a
 - Testnet `wss://test-rpc.3dpass.org`
 - Local Node `wss://127.0.0.1:9944`
 
+### Features:
+- Address management (create/import/inject)
+- P3D transfers
+- Assets transfers
+- Open Governance user interface
+- On-chain Identity module user interface (for both regular users and registrars) 
+- Sign/Verify message to prove address ownership
+
 ### Supply API
-#### P3D Total Supply (current total issuance)
+#### P3D Total Supply (current total issuance):
 ```
 https://wallet.3dpass.org/network/totalIssuance
 ```
-#### P3D Circulating Supply (total issuance - total locked)
+#### P3D Circulating Supply (total issuance - total locked):
 ```
 https://wallet.3dpass.org/network/circulatingsupply
 ```
