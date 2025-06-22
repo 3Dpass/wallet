@@ -184,6 +184,14 @@
       "lbl_title": "解锁账户",
       "lbl_btn_unlock": "解锁"
     },
+    "dlg_evm_withdraw": {
+      "lbl_title": "EVM提现",
+      "lbl_description": "从EVM提取P3D到您的账户",
+      "lbl_address": "地址",
+      "lbl_h160": "H160",
+      "lbl_placeholder_amount": "输入要提取的金额",
+      "lbl_btn_withdraw": "提取"
+    },
     "user_card": {
       "lbl_no_display_name": "无显示名称",
       "lbl_email": "电子邮件",

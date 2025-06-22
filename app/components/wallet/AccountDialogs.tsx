@@ -15,6 +15,7 @@ import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
 import DialogJudgementRequests from "../dialogs/DialogJudgementRequests";
 import DialogSetRegistrarFee from "../dialogs/DialogSetRegistrarFee";
+import DialogEvmWithdraw from "../dialogs/DialogEvmWithdraw";
 
 // Add this type definition at the top of the file
 type DialogNames =
@@ -32,7 +33,8 @@ type DialogNames =
   | "remove_miner"
   | "add_miner"
   | "judgement_requests"
-  | "set_registrar_fee";
+  | "set_registrar_fee"
+  | "evm_withdraw";
 
 interface AccountDialogsProps {
   pair: KeyringPair;
@@ -158,6 +160,11 @@ export function AccountDialogs({
       <DialogAddMiner
         isOpen={dialogs.add_miner}
         onClose={() => onDialogToggle("add_miner")}
+        pair={pair}
+      />
+      <DialogEvmWithdraw
+        isOpen={dialogs.evm_withdraw}
+        onClose={() => onDialogToggle("evm_withdraw")}
         pair={pair}
       />
     </>

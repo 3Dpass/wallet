@@ -48,6 +48,8 @@ export function useAccount(pair: KeyringPair) {
     add_miner: false,
     remove_miner: false,
     judgement_requests: false,
+    set_registrar_fee: false,
+    evm_withdraw: false,
   });
 
   const dialogToggle = useCallback((name: keyof typeof dialogs) => {
