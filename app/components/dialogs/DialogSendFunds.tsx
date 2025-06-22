@@ -1,7 +1,7 @@
 import { Icon, InputGroup, Intent, Checkbox } from "@blueprintjs/core";
 import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
 import { isValidPolkadotAddress } from "../../utils/address";
@@ -70,6 +70,14 @@ export default function DialogSendFunds({
       tips_number: valueAsNumber,
     }));
   }
+
+  const handleAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setData((prev) => ({ ...prev, address: e.target.value }));
+  }, []);
+
+  const handleEvmCheckboxChange = useCallback(() => {
+    setSendToEvm((prev) => !prev);
+  }, []);
 
   useEffect(() => {
     let finalAddress = data.address;
@@ -165,7 +173,7 @@ export default function DialogSendFunds({
         <Checkbox
           checked={sendToEvm}
           label={t("dlg_send.lbl_send_to_evm")}
-          onChange={() => setSendToEvm(!sendToEvm)}
+          onChange={handleEvmCheckboxChange}
           disabled={isLoading}
         />
       }
@@ -176,9 +184,7 @@ export default function DialogSendFunds({
         className="font-mono"
         spellCheck={false}
         placeholder={t("dlg_send.lbl_address")}
-        onChange={(e) =>
-          setData((prev) => ({ ...prev, address: e.target.value }))
-        }
+        onChange={handleAddressChange}
         value={data.address}
         leftElement={addressIcon}
       />

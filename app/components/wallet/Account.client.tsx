@@ -10,7 +10,7 @@ import {
   SpinnerSize,
   Tooltip,
 } from "@blueprintjs/core";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useAccount } from "../../hooks/useAccount";
 import { AccountName } from "../common/AccountName";
@@ -54,6 +54,23 @@ export default function Account({ pair }: AccountProps) {
     dialogToggle("send");
   };
 
+  const handleSignVerify = useCallback(() => dialogToggle("sign_verify"), [dialogToggle]);
+  const handleLockFunds = useCallback(() => dialogToggle("lock_funds"), [dialogToggle]);
+  const handleEvmWithdraw = useCallback(() => dialogToggle("evm_withdraw"), [dialogToggle]);
+  const handleDelete = useCallback(() => dialogToggle("delete"), [dialogToggle]);
+  const handleIdentity = useCallback(
+    (type?: string) => {
+      if (type === "judgement_requests") {
+        dialogToggle("judgement_requests");
+      } else if (type === "set_registrar_fee") {
+        dialogToggle("set_registrar_fee");
+      } else {
+        dialogToggle("identity");
+      }
+    },
+    [dialogToggle]
+  );
+
   const actionsMenu = (
     <Menu>
       {state.balances && (
@@ -61,20 +78,12 @@ export default function Account({ pair }: AccountProps) {
           pair={pair}
           balances={state.balances}
           accountLocked={accountLocked}
-          onSignVerify={() => dialogToggle("sign_verify")}
+          onSignVerify={handleSignVerify}
           onUnlockFunds={handleUnlockFunds}
-          onLockFunds={() => dialogToggle("lock_funds")}
-          onEvmWithdraw={() => dialogToggle("evm_withdraw")}
-          onDelete={() => dialogToggle("delete")}
-          onIdentity={(type?: string) => {
-            if (type === "judgement_requests") {
-              dialogToggle("judgement_requests");
-            } else if (type === "set_registrar_fee") {
-              dialogToggle("set_registrar_fee");
-            } else {
-              dialogToggle("identity");
-            }
-          }}
+          onLockFunds={handleLockFunds}
+          onEvmWithdraw={handleEvmWithdraw}
+          onDelete={handleDelete}
+          onIdentity={handleIdentity}
           onCopyAddress={handleCopyAddress}
           isRegistrar={state.isRegistrar}
           hasIdentity={state.hasIdentity}

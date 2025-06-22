@@ -1,6 +1,7 @@
 import { Alert, Intent } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useTranslation } from "react-i18next";
+import { useCallback } from "react";
 import DialogAddMiner from "../dialogs/DialogAddMiner";
 import DialogClosePool from "../dialogs/DialogClosePool";
 import DialogIdentity from "../dialogs/DialogIdentity";
@@ -63,6 +64,30 @@ export function AccountDialogs({
 }: AccountDialogsProps) {
   const { t } = useTranslation();
 
+  const createToggleHandler = useCallback(
+    (name: DialogNames) => () => onDialogToggle(name),
+    [onDialogToggle]
+  );
+
+  const handleToggleDelete = createToggleHandler("delete");
+  const handleToggleSend = createToggleHandler("send");
+  const handleToggleUnlock = createToggleHandler("unlock");
+  const handleToggleLockFunds = createToggleHandler("lock_funds");
+  const handleToggleSignVerify = createToggleHandler("sign_verify");
+  const handleToggleClosePool = createToggleHandler("close_pool");
+  const handleToggleSetPoolInterest = createToggleHandler("set_pool_interest");
+  const handleToggleSetPoolDifficulty =
+    createToggleHandler("set_pool_difficulty");
+  const handleToggleJoinPool = createToggleHandler("join_pool");
+  const handleToggleLeavePool = createToggleHandler("leave_pool");
+  const handleToggleIdentity = createToggleHandler("identity");
+  const handleToggleJudgementRequests =
+    createToggleHandler("judgement_requests");
+  const handleToggleSetRegistrarFee = createToggleHandler("set_registrar_fee");
+  const handleToggleRemoveMiner = createToggleHandler("remove_miner");
+  const handleToggleAddMiner = createToggleHandler("add_miner");
+  const handleToggleEvmWithdraw = createToggleHandler("evm_withdraw");
+
   return (
     <>
       <Alert
@@ -73,7 +98,7 @@ export function AccountDialogs({
         isOpen={dialogs.delete}
         canEscapeKeyCancel
         canOutsideClickCancel
-        onCancel={() => onDialogToggle("delete")}
+        onCancel={handleToggleDelete}
         onConfirm={onDelete}
       >
         <p>
@@ -85,55 +110,55 @@ export function AccountDialogs({
       <DialogSendFunds
         pair={pair}
         isOpen={dialogs.send}
-        onAfterSubmit={() => onDialogToggle("send")}
-        onClose={() => onDialogToggle("send")}
+        onAfterSubmit={handleToggleSend}
+        onClose={handleToggleSend}
         assetId={selectedAsset?.id}
         assetMetadata={selectedAsset?.metadata}
       />
       <DialogUnlockAccount
         pair={pair}
         isOpen={dialogs.unlock}
-        onClose={() => onDialogToggle("unlock")}
+        onClose={handleToggleUnlock}
       />
       <DialogLockFunds
         pair={pair}
         isOpen={dialogs.lock_funds}
-        onAfterSubmit={() => onDialogToggle("lock_funds")}
-        onClose={() => onDialogToggle("lock_funds")}
+        onAfterSubmit={handleToggleLockFunds}
+        onClose={handleToggleLockFunds}
       />
       <DialogSignAndVerify
         isOpen={dialogs.sign_verify}
-        onClose={() => onDialogToggle("sign_verify")}
+        onClose={handleToggleSignVerify}
         pair={pair}
       />
       <DialogClosePool
         isOpen={dialogs.close_pool}
-        onClose={() => onDialogToggle("close_pool")}
+        onClose={handleToggleClosePool}
         pair={pair}
       />
       <DialogSetPoolInterest
         isOpen={dialogs.set_pool_interest}
-        onClose={() => onDialogToggle("set_pool_interest")}
+        onClose={handleToggleSetPoolInterest}
         pair={pair}
       />
       <DialogSetPoolDifficulty
         isOpen={dialogs.set_pool_difficulty}
-        onClose={() => onDialogToggle("set_pool_difficulty")}
+        onClose={handleToggleSetPoolDifficulty}
         pair={pair}
       />
       <DialogJoinPool
         isOpen={dialogs.join_pool}
-        onClose={() => onDialogToggle("join_pool")}
+        onClose={handleToggleJoinPool}
         pair={pair}
       />
       <DialogLeavePool
         isOpen={dialogs.leave_pool}
-        onClose={() => onDialogToggle("leave_pool")}
+        onClose={handleToggleLeavePool}
         pair={pair}
       />
       <DialogIdentity
         isOpen={dialogs.identity}
-        onClose={() => onDialogToggle("identity")}
+        onClose={handleToggleIdentity}
         pair={pair}
         hasIdentity={hasIdentity}
         isRegistrar={isRegistrar}
@@ -141,30 +166,30 @@ export function AccountDialogs({
       {isRegistrar && (
         <DialogJudgementRequests
           isOpen={dialogs.judgement_requests}
-          onClose={() => onDialogToggle("judgement_requests")}
+          onClose={handleToggleJudgementRequests}
           registrarPair={pair}
         />
       )}
       {isRegistrar && (
         <DialogSetRegistrarFee
           isOpen={dialogs.set_registrar_fee}
-          onClose={() => onDialogToggle("set_registrar_fee")}
+          onClose={handleToggleSetRegistrarFee}
           registrarPair={pair}
         />
       )}
       <DialogRemoveMiner
         isOpen={dialogs.remove_miner}
-        onClose={() => onDialogToggle("remove_miner")}
+        onClose={handleToggleRemoveMiner}
         pair={pair}
       />
       <DialogAddMiner
         isOpen={dialogs.add_miner}
-        onClose={() => onDialogToggle("add_miner")}
+        onClose={handleToggleAddMiner}
         pair={pair}
       />
       <DialogEvmWithdraw
         isOpen={dialogs.evm_withdraw}
-        onClose={() => onDialogToggle("evm_withdraw")}
+        onClose={handleToggleEvmWithdraw}
         pair={pair}
       />
     </>
