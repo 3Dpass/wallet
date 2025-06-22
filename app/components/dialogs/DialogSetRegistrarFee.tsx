@@ -57,8 +57,14 @@ export default function DialogSetRegistrarFee({ isOpen, onClose, registrarPair }
       toaster.show({ intent: "success", message: t("Fee updated!") });
       setLoading(false);
       onClose();
-    } catch (err: any) {
-      toaster.show({ intent: "danger", message: t("Failed to set fee: ") + (err?.message || err) });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      toaster.show({
+        intent: "danger",
+        message: t("dlg_set_registrar_fee.msg_error", {
+          error: message,
+        }),
+      });
       setLoading(false);
     }
   };

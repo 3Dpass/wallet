@@ -13,7 +13,7 @@ type IRegistrarInfo = {
   web: IRegistrarInfoItem;
   twitter: IRegistrarInfoItem;
   image: IRegistrarInfoItem;
-  additional: IRegistrarInfoItem[][];
+  additional: [IRegistrarInfoItem, IRegistrarInfoItem][];
 };
 
 export type IPalletIdentityRegistrarInfo = {
@@ -32,23 +32,66 @@ type IProps = {
 export default function UserCard({ registrarInfo }: IProps) {
   const { t } = useTranslation();
 
-  const renderSocialLink = (url: string | undefined, label: string) => {
+  const renderSocialLink = (
+    url: string | undefined,
+    label: string,
+    prefix = ""
+  ) => {
     if (!url) return null;
+    const fullUrl =
+      prefix && !url.startsWith("http") ? `${prefix}${url}` : url;
     return (
       <tr>
-        <td className="shadow-none font-medium">{label}</td>
+        <td className="shadow-none font-medium pr-4">{label}</td>
         <td className="shadow-none">
           <a
-            href={url.startsWith("http") ? url : `https://${url}`}
+            href={fullUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800"
+            className="text-blue-400 hover:text-blue-300 break-all"
           >
             {url}
           </a>
         </td>
       </tr>
     );
+  };
+
+  const renderAdditional = (
+    additional: [IRegistrarInfoItem, IRegistrarInfoItem][]
+  ) => {
+    return additional.map(([key, value]) => {
+      const keyString = key.Raw.toLowerCase();
+      const valueString = value.Raw;
+      switch (keyString) {
+        case "github":
+          return renderSocialLink(
+            valueString,
+            "GitHub",
+            "https://github.com/"
+          );
+        case "telegram":
+          return renderSocialLink(
+            valueString,
+            "Telegram",
+            "https://t.me/"
+          );
+        case "discord":
+          return (
+            <tr>
+              <td className="shadow-none font-medium pr-4">Discord</td>
+              <td className="shadow-none break-all">{valueString}</td>
+            </tr>
+          );
+        default:
+          return (
+            <tr>
+              <td className="shadow-none font-medium pr-4">{key.Raw}</td>
+              <td className="shadow-none break-all">{valueString}</td>
+            </tr>
+          );
+      }
+    });
   };
 
   const renderJudgements = () => {
@@ -114,13 +157,13 @@ export default function UserCard({ registrarInfo }: IProps) {
           <tbody>
             {registrarInfo.info?.email?.Raw && (
               <tr>
-                <td className="shadow-none font-medium">
+                <td className="shadow-none font-medium pr-4">
                   {t("user_card.lbl_email")}
                 </td>
                 <td className="shadow-none">
                   <a
                     href={`mailto:${registrarInfo.info.email.Raw}`}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-400 hover:text-blue-300 break-all"
                   >
                     {registrarInfo.info.email.Raw}
                   </a>
@@ -128,25 +171,17 @@ export default function UserCard({ registrarInfo }: IProps) {
               </tr>
             )}
             {renderSocialLink(
-              registrarInfo.info?.web?.Raw as string,
-              t("user_card.lbl_website")
+              registrarInfo.info?.web?.Raw,
+              t("user_card.lbl_website"),
+              "https://"
             )}
             {renderSocialLink(
-              registrarInfo.info?.twitter?.Raw as string,
-              t("user_card.lbl_twitter")
+              registrarInfo.info?.twitter?.Raw,
+              t("user_card.lbl_twitter"),
+              "https://twitter.com/"
             )}
-            {registrarInfo.info.additional?.map((addItem, i) => (
-              <tr key={`row-${addItem[0]?.Raw}-${i}`}>
-                {addItem?.map((item, j) => (
-                  <td
-                    key={`${item.Raw}-${j}`}
-                    className={j === 0 ? "font-medium" : ""}
-                  >
-                    {item.Raw}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {registrarInfo.info.additional &&
+              renderAdditional(registrarInfo.info.additional)}
           </tbody>
         </HTMLTable>
 
