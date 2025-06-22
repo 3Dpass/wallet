@@ -8,7 +8,6 @@ import type { AnyJson } from "@polkadot/types/types";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
 import { FormattedAmount } from "../common/FormattedAmount";
-import { SubmittableResult } from "@polkadot/api";
 
 interface DialogJudgementRequestsProps {
   isOpen: boolean;
