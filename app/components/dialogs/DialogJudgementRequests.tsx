@@ -113,7 +113,7 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
     setSubmitting((prev) => ({ ...prev, [address]: "provide" }));
     try {
       const tx = api.tx.identity.provideJudgement(registrarIndex, address, judgement);
-      await signAndSend(tx, registrarPair);
+      await signAndSend(tx, registrarPair, {}, onStatusChange);
       toaster.show({ intent: "success", message: t("Judgement submitted!") });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
@@ -158,7 +158,9 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
         web: { Raw: identity.info?.web?.Raw || "" },
         twitter: { Raw: identity.info?.twitter?.Raw || "" },
         image: { Raw: "" },
-        additional: identity.info?.additional || []
+        additional: (identity.info?.additional || []).map(
+          (item) => [item[0] || { Raw: '' }, item[1] || { Raw: '' }]
+        )
       },
       judgements: identity.judgements.map(([regIdx, judgement]) => [regIdx.toString(), judgement]) as object[][]
     };

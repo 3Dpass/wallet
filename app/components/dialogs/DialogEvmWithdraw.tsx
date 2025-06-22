@@ -1,5 +1,5 @@
 import { Dialog, Classes, Button, Intent } from "@blueprintjs/core";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useApi } from "../Api";
 import useToaster from "../../hooks/useToaster";
@@ -78,6 +78,10 @@ export default function DialogEvmWithdraw({ isOpen, onClose, pair }: DialogEvmWi
     return ss58ToH160(pair.address, ss58Format);
   }, [pair.address, api]);
 
+  const handleAmountChange = useCallback((_valueAsNumber: number, valueAsString: string) => {
+    setAmount(valueAsString);
+  }, []);
+
   const handleSubmit = async () => {
     if (!api) {
       toaster.show({ intent: "danger", message: t("API unavailable.") });
@@ -109,9 +113,7 @@ export default function DialogEvmWithdraw({ isOpen, onClose, pair }: DialogEvmWi
         <WithdrawDescription pair={pair} h160Address={h160Address} />
         <AmountInput
           disabled={loading}
-          onValueChange={(_valueAsNumber, valueAsString) => {
-            setAmount(valueAsString);
-          }}
+          onValueChange={handleAmountChange}
           placeholder={t("dlg_evm_withdraw.lbl_placeholder_amount")}
           unit="P3D"
         />
