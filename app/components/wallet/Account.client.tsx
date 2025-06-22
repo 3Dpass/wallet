@@ -64,6 +64,7 @@ export default function Account({ pair }: AccountProps) {
           onSignVerify={() => dialogToggle("sign_verify")}
           onUnlockFunds={handleUnlockFunds}
           onLockFunds={() => dialogToggle("lock_funds")}
+          onEvmWithdraw={() => dialogToggle("evm_withdraw")}
           onDelete={() => dialogToggle("delete")}
           onIdentity={(type?: string) => {
             if (type === "judgement_requests") {

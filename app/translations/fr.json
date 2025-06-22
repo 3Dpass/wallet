@@ -184,6 +184,14 @@
       "lbl_title": "Déverrouiller le compte",
       "lbl_btn_unlock": "Déverrouiller"
     },
+    "dlg_evm_withdraw": {
+      "lbl_title": "Retrait EVM",
+      "lbl_description": "Retirer P3D d'EVM vers votre compte",
+      "lbl_address": "Adresse",
+      "lbl_h160": "H160",
+      "lbl_placeholder_amount": "Entrez le montant à retirer",
+      "lbl_btn_withdraw": "Retirer"
+    },
     "user_card": {
       "lbl_no_display_name": "PAS DE NOM D'AFFICHAGE",
       "lbl_email": "E-mail",

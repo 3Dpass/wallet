@@ -10,6 +10,7 @@ type AccountActionsProps = {
   onSignVerify: () => void;
   onUnlockFunds: () => void;
   onLockFunds: () => void;
+  onEvmWithdraw: () => void;
   onDelete: () => void;
   onIdentity: (type?: string) => void;
   onCopyAddress: () => void;
@@ -24,6 +25,7 @@ export function AccountActions({
   onSignVerify,
   onUnlockFunds,
   onLockFunds,
+  onEvmWithdraw,
   onDelete,
   onIdentity,
   onCopyAddress,
@@ -62,6 +64,12 @@ export function AccountActions({
         icon="lock"
         text={t("root.lbl_btn_lock")}
         onClick={onLockFunds}
+        disabled={accountLocked}
+      />
+      <MenuItem
+        icon="export"
+        text={t("dlg_evm_withdraw.lbl_title")}
+        onClick={onEvmWithdraw}
         disabled={accountLocked}
       />
       {!pair.meta.isInjected && (

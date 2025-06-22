@@ -189,6 +189,14 @@
       "lbl_title": "Unlock account",
       "lbl_btn_unlock": "Unlock"
     },
+    "dlg_evm_withdraw": {
+      "lbl_title": "EVM Withdraw",
+      "lbl_description": "Withdraw P3D from EVM to your account",
+      "lbl_address": "Address",
+      "lbl_h160": "H160",
+      "lbl_placeholder_amount": "Enter amount to withdraw",
+      "lbl_btn_withdraw": "Withdraw"
+    },
     "user_card": {
       "lbl_no_display_name": "NO DISPLAY NAME",
       "lbl_email": "Email",
