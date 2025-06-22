@@ -157,7 +157,8 @@
       "lbl_address": "Enter address to send to",
       "lbl_amount": "Amount",
       "lbl_tip": "Enter optional tips to increase transaction priority",
-      "lbl_btn_send": "Send"
+      "lbl_btn_send": "Send",
+      "lbl_send_to_evm": "Send to EVM address (H160)"
     },
     "dlg_pool_difficulty": {
       "lbl_title": "Set pool difficulty",
@@ -173,7 +174,9 @@
       "lbl_api_address": "RPC API",
       "lbl_explorer_graphql": "Explorer GraphQL",
       "lbl_advanced_mode": "Advanced mode",
-      "lbl_btn_save": "Save"
+      "lbl_btn_save": "Save",
+      "title": "Settings",
+      "section_ui": "UI Settings"
     },
     "dlg_sign_verify": {
       "lbl_title": "Sign and Verify Message",
@@ -198,10 +201,13 @@
       "lbl_btn_withdraw": "Withdraw"
     },
     "user_card": {
-      "lbl_no_display_name": "NO DISPLAY NAME",
+      "lbl_no_display_name": "No display name",
       "lbl_email": "Email",
       "lbl_website": "Website",
-      "lbl_twitter": "Twitter"
+      "lbl_twitter": "Twitter",
+      "lbl_github": "Github",
+      "lbl_telegram": "Telegram",
+      "lbl_discord": "Discord"
     },
     "screen_address": {
       "lbl_title": "Address",
@@ -276,7 +282,23 @@
       "no_motions": "No motions available.",
       "term_progress": "Term Progress",
       "blocks_remaining": "blocks remaining",
-      "remaining": "remaining"
+      "remaining": "remaining",
+      "nav_bounties": "Bounties"
+    },
+    "dlg_set_registrar_fee": {
+      "title": "Set Registrar Fee"
+    },
+    "dlg_set_registrar_fee.msg_error": "Failed to set fee: {{error}}",
+    "dlg_judgement_requests": {
+      "title": "Judgement Requests",
+      "btn_provide_judgement": "Provide Judgement",
+      "lbl_judgement": "Judgement",
+      "lbl_fee": "Fee",
+      "msg_error": "Failed to submit judgement: {{error}}"
+    },
+    "judgement": {
+      "Unknown": "Unknown",
+      "FeePaid": "Fee Paid"
     }
   }
 }

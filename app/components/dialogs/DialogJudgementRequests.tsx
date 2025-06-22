@@ -8,6 +8,7 @@ import type { AnyJson } from "@polkadot/types/types";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
 import { FormattedAmount } from "../common/FormattedAmount";
+import { SubmittableResult } from "@polkadot/api";
 
 interface DialogJudgementRequestsProps {
   isOpen: boolean;
@@ -114,8 +115,15 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
       const tx = api.tx.identity.provideJudgement(registrarIndex, address, judgement);
       await signAndSend(tx, registrarPair);
       toaster.show({ intent: "success", message: t("Judgement submitted!") });
-    } catch (err: any) {
-      toaster.show({ intent: "danger", message: t("Failed to submit judgement: ") + (err?.message || err) });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      toaster.show({
+        intent: "danger",
+        message: t("dlg_judgement_requests.msg_error", {
+          error: message,
+        }),
+      });
+      setLoading(false);
     } finally {
       setSubmitting((prev) => ({ ...prev, [address]: null }));
     }
@@ -154,6 +162,14 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
       },
       judgements: identity.judgements.map(([regIdx, judgement]) => [regIdx.toString(), judgement]) as object[][]
     };
+  };
+
+  const onStatusChange = ({ status }: SubmittableResult) => {
+    if (status.isInBlock) {
+      setLoading(false);
+    } else {
+      // ... existing code ...
+    }
   };
 
   return (
