@@ -113,8 +113,17 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
     setSubmitting((prev) => ({ ...prev, [address]: "provide" }));
     try {
       const tx = api.tx.identity.provideJudgement(registrarIndex, address, judgement);
-      await signAndSend(tx, registrarPair, {}, onStatusChange);
-      toaster.show({ intent: "success", message: t("Judgement submitted!") });
+      await signAndSend(tx, registrarPair, {}, ({ status, isError }) => {
+        if (isError) {
+          setSubmitting((prev) => ({ ...prev, [address]: null }));
+          return;
+        }
+
+        if (status.isInBlock) {
+          toaster.show({ intent: "success", message: t("Judgement submitted!") });
+          setSubmitting((prev) => ({ ...prev, [address]: null }));
+        }
+      });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       toaster.show({
@@ -123,8 +132,6 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
           error: message,
         }),
       });
-      setLoading(false);
-    } finally {
       setSubmitting((prev) => ({ ...prev, [address]: null }));
     }
   };
@@ -164,14 +171,6 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
       },
       judgements: identity.judgements.map(([regIdx, judgement]) => [regIdx.toString(), judgement]) as object[][]
     };
-  };
-
-  const onStatusChange = ({ status }: SubmittableResult) => {
-    if (status.isInBlock) {
-      setLoading(false);
-    } else {
-      // ... existing code ...
-    }
   };
 
   return (

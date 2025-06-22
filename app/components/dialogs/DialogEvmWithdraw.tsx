@@ -82,7 +82,7 @@ export default function DialogEvmWithdraw({ isOpen, onClose, pair }: DialogEvmWi
     setAmount(valueAsString);
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!api) {
       toaster.show({ intent: "danger", message: t("API unavailable.") });
       return;
@@ -105,7 +105,7 @@ export default function DialogEvmWithdraw({ isOpen, onClose, pair }: DialogEvmWi
       toaster.show({ intent: "danger", message: t("Failed to withdraw from EVM: ") + message });
       setLoading(false);
     }
-  };
+  }, [api, amount, decimals, h160Address, onClose, pair, t, toaster]);
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose} title={t("dlg_evm_withdraw.lbl_title")} className="w-[90%] sm:w-[400px]">
