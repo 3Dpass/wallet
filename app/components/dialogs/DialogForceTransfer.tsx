@@ -38,7 +38,7 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
     setAmount(Number(value));
   }, []);
 
-  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
+  const handleSignAndSendCallback = useCallback(({ status }: { status: { isInBlock: boolean } }) => {
     if (!status.isInBlock) return;
     toaster.show({
       icon: "endorsed",

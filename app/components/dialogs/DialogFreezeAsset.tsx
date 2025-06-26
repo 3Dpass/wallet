@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import BaseDialog from "./BaseDialog";
 import { InputGroup, Intent, Switch } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
@@ -23,6 +23,27 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
   const [who, setWho] = useState("");
   const [loading, setLoading] = useState(false);
   const [freezeAsset, setFreezeAsset] = useState(false);
+
+  // Memoized callbacks for JSX props
+  const handleFreezeAssetToggle = useCallback(() => {
+    setFreezeAsset(prev => !prev);
+  }, []);
+
+  const handleWhoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setWho(e.target.value);
+  }, []);
+
+  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
+    if (!status.isInBlock) return;
+    toaster.show({
+      icon: "endorsed",
+      intent: Intent.SUCCESS,
+      message: freezeAsset
+        ? t("dlg_asset.freeze_asset_success") || "Asset frozen successfully!"
+        : t("dlg_asset.freeze_success") || "Tokens frozen successfully!"
+    });
+    onClose();
+  }, [toaster, t, freezeAsset, onClose]);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
@@ -79,17 +100,7 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       } else {
         tx = api.tx.poscanAssets.freeze(assetId, who);
       }
-      await signAndSend(tx, pair, {}, ({ status }) => {
-        if (!status.isInBlock) return;
-        toaster.show({
-          icon: "endorsed",
-          intent: Intent.SUCCESS,
-          message: freezeAsset
-            ? t("dlg_asset.freeze_asset_success") || "Asset frozen successfully!"
-            : t("dlg_asset.freeze_success") || "Tokens frozen successfully!"
-        });
-        onClose();
-      });
+      await signAndSend(tx, pair, {}, handleSignAndSendCallback);
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
       toaster.show({
@@ -120,14 +131,14 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
         <Switch
           checked={freezeAsset}
           label={t("dlg_asset.freeze_asset_switch") || "Freeze entire asset"}
-          onChange={() => setFreezeAsset(v => !v)}
+          onChange={handleFreezeAssetToggle}
         />
         {!freezeAsset && (
           <InputGroup
             fill
             placeholder={t("dlg_asset.freeze_who") || "Address to freeze"}
             value={who}
-            onChange={e => setWho(e.target.value)}
+            onChange={handleWhoChange}
             required
           />
         )}

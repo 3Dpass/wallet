@@ -91,8 +91,7 @@ function getOptionValue<T>(option: PolkadotOption<T>): T | Record<string, unknow
 
 // Helper function to safely check if an object has metadata properties
 function hasMetadataProperties(obj: unknown): obj is { name?: string; symbol?: string; decimals?: string | number; isFrozen?: boolean } {
-  if (!obj || typeof obj !== 'object') return false;
-  return true; // We'll check properties individually when accessing
+  return Boolean(obj && typeof obj === 'object');
 }
 
 // Constants

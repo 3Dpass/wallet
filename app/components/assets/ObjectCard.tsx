@@ -13,7 +13,6 @@ import DialogCreateAsset from "../dialogs/DialogCreateAsset";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
 import { P3D_DECIMALS_FACTOR } from "app/utils/converter";
-import type { Codec } from '@polkadot/types/types';
 
 // Constants
 const FETCH_DEBOUNCE_MS = 300; // 300ms debounce delay
@@ -155,21 +154,44 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentObjectIndexRef = useRef<number | null>(null);
 
-  // Debounced fetch function
-  const debouncedFetchObj = useCallback((targetObjectIndex: number) => {
-    // Clear existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
+  // Memoized callbacks for JSX props
+  const handleToggleExpanded = useCallback(() => {
+    setIsExpanded(!isExpanded);
+  }, [isExpanded]);
 
-    // Set new timeout
-    debounceTimeoutRef.current = setTimeout(() => {
-      // Only fetch if this is still the current object index
-      if (currentObjectIndexRef.current === targetObjectIndex) {
-        fetchObj(targetObjectIndex);
-      }
-    }, FETCH_DEBOUNCE_MS);
+  const handleToggleEstimators = useCallback(() => {
+    setShowEstimators((v) => !v);
   }, []);
+
+  const handleToggleApprovers = useCallback(() => {
+    setShowApprovers((v) => !v);
+  }, []);
+
+  const handleToggleOutliers = useCallback(() => {
+    setShowOutliers((v) => !v);
+  }, []);
+
+  const handleSetSelectedAssetId = useCallback((assetId: number) => {
+    setSelectedAssetId(assetId);
+  }, []);
+
+  const handleCloseSelectedAsset = useCallback(() => {
+    setSelectedAssetId(null);
+  }, []);
+
+  const handleCloseCreateAssetDialog = useCallback(() => {
+    setShowCreateAssetDialog(false);
+    setSelectedPropertyForTokenization(null);
+  }, []);
+
+  const handleTokenizeProperty = useCallback((objIdx: number, propIdx: number) => {
+    setSelectedPropertyForTokenization({ objIdx, propIdx });
+    setShowCreateAssetDialog(true);
+  }, []);
+
+  const createAssetClickHandler = useCallback((assetId: number) => {
+    return () => handleSetSelectedAssetId(assetId);
+  }, [handleSetSelectedAssetId]);
 
   // Main fetch function with cancellation
   const fetchObj = useCallback(async (targetObjectIndex: number) => {
@@ -241,6 +263,22 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
       }
     }
   }, [api]);
+
+  // Debounced fetch function
+  const debouncedFetchObj = useCallback((targetObjectIndex: number) => {
+    // Clear existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    // Set new timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      // Only fetch if this is still the current object index
+      if (currentObjectIndexRef.current === targetObjectIndex) {
+        fetchObj(targetObjectIndex);
+      }
+    }, FETCH_DEBOUNCE_MS);
+  }, [fetchObj]);
 
   // Effect to handle object index changes
   useEffect(() => {
@@ -385,9 +423,12 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         results.forEach((opt, i) => {
           let name = '';
           let maxValue = 1;
-          if (opt && typeof opt === 'object' && 'isSome' in opt && opt.isSome) {
-            const unwrapped = (opt as any).unwrap();
-            const prop = unwrapped.toJSON() as Record<string, unknown>;
+          if (opt && typeof opt === 'object' && 'isSome' in opt && opt.isSome && 'unwrap' in opt) {
+            const option = opt as { unwrap: () => unknown };
+            const unwrapped = option.unwrap();
+            const prop = unwrapped && typeof unwrapped === 'object' && 'toJSON' in unwrapped 
+              ? (unwrapped as { toJSON: () => Record<string, unknown> }).toJSON()
+              : (unwrapped as Record<string, unknown>);
             if (typeof prop.name === 'string') {
               name = prop.name;
             } else if (prop.name && typeof prop.name === 'object' && (prop.name as Record<string, unknown>)['Raw']) {
@@ -452,7 +493,9 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
           if (opt.toHuman) {
             details = toRecord(opt.toHuman()) as AssetDetails;
           } else if (isOption(opt) && opt.isSome) {
-            details = toRecord(getOptionValue(opt)) as AssetDetails;
+            const unwrapped = getOptionValue(opt);
+            const prop = toRecord(unwrapped);
+            details = prop as AssetDetails;
           } else {
             details = toRecord(opt.toJSON()) as AssetDetails;
           }
@@ -545,13 +588,13 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   Object {objectIndex}
                   {stateInfo.icon && stateInfo.icon !== 'help' && (
-                    <Icon icon={stateInfo.icon as any} intent={stateInfo.intent} title={stateInfo.label} className="ml-2" />
+                    <Icon icon={stateInfo.icon as BlueprintIcon} intent={stateInfo.intent} title={stateInfo.label} className="ml-2" />
                   )}
                 </h2>
                 <Button
                   minimal
                   icon={isExpanded ? "chevron-up" : "chevron-down"}
-                  onClick={() => setIsExpanded(!isExpanded)}
+                  onClick={handleToggleExpanded}
                   text={isExpanded ? "Hide Details" : "Show Details"}
                 />
               </div>
@@ -599,13 +642,13 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                     <td className="font-medium">
                       {rpcData && rpcData.prop && rpcData.prop.length > 0 ? (
                         <div className="space-y-2">
-                          {rpcData.prop.map((p, idx) => {
+                          {rpcData.prop.map((p) => {
                             const def = propertyDefs[Number(p.propIdx)];
                             const name = def?.name || `Property ${p.propIdx}`;
                             const max = def?.maxValue ?? 1;
                             // Check if this property has a linked asset
                             const hasLinkedAsset = linkedAssets.some(asset => {
-                              const objDetails = asset.details.objDetails as any;
+                              const objDetails = asset.details.objDetails as AssetDetails['objDetails'];
                               if (!objDetails) return false;
                               const assetObjIdx = typeof objDetails.objIdx === 'string' 
                                 ? parseInt(objDetails.objIdx, 10) 
@@ -630,10 +673,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                                     icon="dollar"
                                     text="Tokenize"
                                     className={Classes.BUTTON}
-                                    onClick={() => {
-                                      setSelectedPropertyForTokenization({ objIdx: objectIndex, propIdx: Number(p.propIdx) });
-                                      setShowCreateAssetDialog(true);
-                                    }}
+                                    onClick={() => handleTokenizeProperty(objectIndex, Number(p.propIdx))}
                                   />
                                 )}
                               </div>
@@ -671,7 +711,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                     <Button
                       minimal
                       icon={showEstimators ? "chevron-up" : "chevron-down"}
-                      onClick={() => setShowEstimators((v) => !v)}
+                      onClick={handleToggleEstimators}
                       text={showEstimators ? `Hide Estimators (${rpcData.estimators.length})` : `Show Estimators (${rpcData.estimators.length})`}
                       className="mb-2"
                     />
@@ -679,7 +719,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                       <div className="space-y-1 mt-2">
                         {rpcData.estimators
                           .sort(([, a], [, b]) => a - b) // Sort by numeric value (ascending)
-                          .map(([account, value], idx) => (
+                          .map(([account, value]) => (
                           <div key={`estimator-${account}-${value}`} className="text-sm flex items-center gap-2 font-mono text-xs">
                             <AccountName address={account} />
                             <span className="ml-2 text-gray-600">({value} ms)</span>
@@ -694,7 +734,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                   <Button
                     minimal
                     icon={showEstimators ? "chevron-up" : "chevron-down"}
-                    onClick={() => setShowEstimators((v) => !v)}
+                    onClick={handleToggleEstimators}
                     text={showEstimators ? `Hide Estimators (${rpcData.estimators.length})` : `Show Estimators (${rpcData.estimators.length})`}
                     className="mb-2"
                   />
@@ -717,13 +757,13 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                   <Button
                     minimal
                     icon={showApprovers ? "chevron-up" : "chevron-down"}
-                    onClick={() => setShowApprovers((v) => !v)}
+                    onClick={handleToggleApprovers}
                     text={showApprovers ? `Hide Approvers (${rpcData.approvers.length})` : `Show Approvers (${rpcData.approvers.length})`}
                     className="mb-2"
                   />
                   {showApprovers && (
                     <div className="space-y-1">
-                      {rpcData.approvers.map((approver, idx) => (
+                      {rpcData.approvers.map((approver) => (
                         <div key={`approver-${approver.account_id}-${approver.when}`} className="text-sm flex items-center gap-2 font-mono text-xs">
                           <AccountName address={approver.account_id} />
                           <span className="ml-2 text-gray-600">(when: {approver.when ? (
@@ -748,13 +788,13 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                   <Button
                     minimal
                     icon={showOutliers ? "chevron-up" : "chevron-down"}
-                    onClick={() => setShowOutliers((v) => !v)}
+                    onClick={handleToggleOutliers}
                     text={showOutliers ? `Hide Outliers (${rpcData.est_outliers.length})` : `Show Outliers (${rpcData.est_outliers.length})`}
                     className="mb-2"
                   />
                   {showOutliers && (
                     <div className="space-y-1">
-                      {rpcData.est_outliers.map((address, idx) => (
+                      {rpcData.est_outliers.map((address) => (
                         <div key={`outlier-${address}`} className="text-sm font-mono text-xs text-red-700 break-all">
                           <AccountName address={address} />
                         </div>
@@ -777,7 +817,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
               key={asset.assetId}
               icon="dollar"
               className="mb-2"
-              onClick={() => setSelectedAssetId(asset.assetId)}
+              onClick={createAssetClickHandler(asset.assetId)}
             >
               View Asset #{asset.assetId}
             </Button>
@@ -789,17 +829,14 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
       {selectedAssetId !== null && (
         <DialogAssetCard
           isOpen={selectedAssetId !== null}
-          onClose={() => setSelectedAssetId(null)}
+          onClose={handleCloseSelectedAsset}
           assetId={selectedAssetId}
         />
       )}
       {showCreateAssetDialog && selectedPropertyForTokenization && (
         <DialogCreateAsset
           isOpen={showCreateAssetDialog}
-          onClose={() => {
-            setShowCreateAssetDialog(false);
-            setSelectedPropertyForTokenization(null);
-          }}
+          onClose={handleCloseCreateAssetDialog}
           prefillObjIdx={selectedPropertyForTokenization.objIdx}
           prefillPropIdx={selectedPropertyForTokenization.propIdx}
           objectProperties={rpcData?.prop}

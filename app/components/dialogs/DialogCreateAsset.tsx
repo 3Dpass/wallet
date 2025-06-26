@@ -76,7 +76,7 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
     setMaxSupply(newValue);
   }, [propertyOptions, propIdx]);
 
-  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
+  const handleSignAndSendCallback = useCallback(({ status }: { status: { isInBlock: boolean } }) => {
     if (!status.isInBlock) return;
     toaster.show({
       icon: "endorsed",

@@ -338,10 +338,13 @@ export default function AssetsTokens() {
     }
   }, [accounts.length, showAll, userToggledShowAll, myAssetIds.length]);
 
+  // Function to toggle showAll state
+  const toggleShowAll = useCallback((prevShowAll: boolean) => !prevShowAll, []);
+
   const handleShowAllToggle = useCallback(() => {
-    setShowAll((v) => !v);
+    setShowAll(toggleShowAll);
     setUserToggledShowAll(true);
-  }, []);
+  }, [toggleShowAll]);
 
   // Determine which asset IDs to show
   const visibleAssetIds = showAll ? assetIds : myAssetIds;

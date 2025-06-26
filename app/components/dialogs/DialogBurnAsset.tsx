@@ -33,7 +33,7 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
     setAmount(Number(v));
   }, []);
 
-  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
+  const handleSignAndSendCallback = useCallback(({ status }: { status: { isInBlock: boolean } }) => {
     if (!status.isInBlock) return;
     toaster.show({
       icon: "endorsed",

@@ -50,6 +50,82 @@ export default function AssetsObjects() {
     setVisibleCount((c) => c + 10);
   }, []);
 
+  // Function to fetch a specific object by index
+  const fetchObjectByIndex = async (index: number) => {
+    if (!api) return;
+    
+    setIsFetchingSpecificObject(true);
+    setLoadingObjects(true);
+    setError(null);
+    
+    try {
+      // Fetch the specific object
+      const objectResult = await api.query.poScan.objects(index);
+      if (!objectResult || typeof objectResult !== 'object' || !('isSome' in objectResult) || !('unwrap' in objectResult)) {
+        setError(t('assets_objects.object_not_found', { index }));
+        setLoadingObjects(false);
+        setIsFetchingSpecificObject(false);
+        return;
+      }
+      
+      const option = objectResult as { isSome: boolean; unwrap: () => unknown };
+      if (!option.isSome) {
+        setError(t('assets_objects.object_not_found', { index }));
+        setLoadingObjects(false);
+        setIsFetchingSpecificObject(false);
+        return;
+      }
+      
+      const unwrapped = option.unwrap();
+      if (!unwrapped || typeof unwrapped !== 'object' || !('toJSON' in unwrapped)) {
+        setError(t('assets_objects.object_not_found', { index }));
+        setLoadingObjects(false);
+        setIsFetchingSpecificObject(false);
+        return;
+      }
+      
+      const objectData = (unwrapped as { toJSON: () => Record<string, unknown> }).toJSON();
+      
+      // Fetch owner data for this object
+      setLoadingOwners(true);
+      let ownerData = null;
+      if (objectData?.owner && typeof objectData.owner === 'string') {
+        try {
+          const accountInfo = await api.derive.accounts.info(objectData.owner);
+          if (accountInfo.identity?.display) {
+            ownerData = { ...objectData, identity: accountInfo.identity.display };
+          } else {
+            ownerData = objectData;
+          }
+        } catch (error) {
+          console.warn(t('assets_objects.failed_fetch_identity', { owner: objectData.owner }), error);
+          ownerData = objectData;
+        }
+      } else {
+        ownerData = objectData;
+      }
+      setLoadingOwners(false);
+      
+      // Set the object data and update the view
+      setObjectIndexes([index]);
+      setObjects([objectData]);
+      setObjectsWithOwners([ownerData]);
+      setObjectsWithIdentities([ownerData]);
+      setObjCount(1);
+      setShowAll(true); // Switch to "All objects" view to show the result
+      setUserToggledShowAll(true); // Prevent auto-switching from interfering
+      setVisibleCount(1); // Show only this object
+      
+    } catch (e) {
+      setError(t('assets_objects.failed_fetch_object', { index }));
+      console.error('Failed to fetch object by index', e);
+    } finally {
+      setLoadingObjects(false);
+      setLoadingOwners(false);
+      // Don't reset isFetchingSpecificObject here - let it stay true until user resets
+    }
+  };
+
   // Memoized callback for handling search suggestion clicks
   const handleSuggestionClick = useCallback((suggestion: string) => {
     // Extract the search term from the suggestion
@@ -79,6 +155,16 @@ export default function AssetsObjects() {
       setSearchSuggestions([]); // Clear suggestions
     }
   }, [t]);
+
+  // Function to handle suggestion click without arrow function
+  const handleSuggestionClickWrapper = useCallback((suggestion: string) => {
+    handleSuggestionClick(suggestion);
+  }, [handleSuggestionClick]);
+
+  // Function to create click handler for each suggestion
+  const createSuggestionClickHandler = useCallback((suggestion: string) => {
+    return () => handleSuggestionClick(suggestion);
+  }, [handleSuggestionClick]);
 
   // Auto-switch between "My objects" and "All objects" based on account presence, unless user toggled manually
   useEffect(() => {
@@ -208,66 +294,6 @@ export default function AssetsObjects() {
     // Force a refresh by incrementing the refresh trigger
     setRefreshTrigger(prev => prev + 1);
   }, []);
-
-  // Function to fetch a specific object by index
-  const fetchObjectByIndex = async (index: number) => {
-    if (!api) return;
-    
-    setIsFetchingSpecificObject(true);
-    setLoadingObjects(true);
-    setError(null);
-    
-    try {
-      // Fetch the specific object
-      const objectResult = await api.query.poScan.objects(index) as any;
-      if (!objectResult.isSome) {
-        setError(t('assets_objects.object_not_found', { index }));
-        setLoadingObjects(false);
-        setIsFetchingSpecificObject(false);
-        return;
-      }
-      
-      const objectData = objectResult.unwrap().toJSON();
-      
-      // Fetch owner data for this object
-      setLoadingOwners(true);
-      let ownerData = null;
-      if (objectData?.owner) {
-        try {
-          const accountInfo = await api.derive.accounts.info(objectData.owner);
-          if (accountInfo.identity?.display) {
-            ownerData = { ...objectData, identity: accountInfo.identity.display };
-          } else {
-            ownerData = objectData;
-          }
-        } catch (error) {
-          console.warn(t('assets_objects.failed_fetch_identity', { owner: objectData.owner }), error);
-          ownerData = objectData;
-        }
-      } else {
-        ownerData = objectData;
-      }
-      setLoadingOwners(false);
-      
-      // Set the object data and update the view
-      setObjectIndexes([index]);
-      setObjects([objectData]);
-      setObjectsWithOwners([ownerData]);
-      setObjectsWithIdentities([ownerData]);
-      setObjCount(1);
-      setShowAll(true); // Switch to "All objects" view to show the result
-      setUserToggledShowAll(true); // Prevent auto-switching from interfering
-      setVisibleCount(1); // Show only this object
-      
-    } catch (e) {
-      setError(t('assets_objects.failed_fetch_object', { index }));
-      console.error('Failed to fetch object by index', e);
-    } finally {
-      setLoadingObjects(false);
-      setLoadingOwners(false);
-      // Don't reset isFetchingSpecificObject here - let it stay true until user resets
-    }
-  };
 
   // Update search suggestions when search term changes
   useEffect(() => {
@@ -579,9 +605,7 @@ export default function AssetsObjects() {
                 <div
                   key={suggestion}
                   className="px-3 py-2 hover:bg-gray-700 cursor-pointer text-sm border-b border-gray-600 last:border-b-0 text-gray-200"
-                  onClick={() => {
-                    handleSuggestionClick(suggestion);
-                  }}
+                  onClick={createSuggestionClickHandler(suggestion)}
                 >
                   {suggestion}
                 </div>
@@ -595,9 +619,7 @@ export default function AssetsObjects() {
             <Button 
               icon="list" 
               minimal 
-              onClick={() => {
-                resetToAllObjects();
-              }}
+              onClick={resetToAllObjects}
             >
               {t('assets_objects.show_all_objects')}
             </Button>
@@ -640,36 +662,34 @@ export default function AssetsObjects() {
                     }
                   }
                   
-                  // Index
-                  if (String(objectIndexes[originalIndex]).includes(s)) return true;
-                  // Created block
-                  if (obj.whenCreated && String(obj.whenCreated).includes(s)) return true;
-                  // Public/Private
-                  if (s === 'public' && obj.isPrivate === false) return true;
-                  if (s === 'private' && obj.isPrivate === true) return true;
-                  // Properties (by name or value)
-                  if (Array.isArray(obj.prop) && obj.prop.some(p => 
-                    p && typeof p === 'object' && (
-                      (p.name && String(p.name).toLowerCase().includes(s)) ||
-                      (p.maxValue !== undefined && String(p.maxValue).includes(s))
-                    )
-                  )) return true;
-                  // Non-Fungible (by property name or value)
-                  if (s === 'non-fungible' && Array.isArray(obj.prop) && obj.prop.some(p => 
-                    p && typeof p === 'object' && p.name && String(p.name).toLowerCase().includes('non-fungible')
-                  )) return true;
-                  // State search
-                  if (obj.state && Object.keys(obj.state as Record<string, unknown>).some(stateKey => 
-                    stateKey.toLowerCase().includes(s)
-                  )) return true;
-                  
-                  // Owner search
-                  if (obj.owner && String(obj.owner).toLowerCase().includes(s)) return true;
-                  
-                  // Identity search
-                  if (obj.identity && String(obj.identity).toLowerCase().includes(s)) return true;
-                  
-                  return false;
+                  return (
+                    // Index
+                    String(objectIndexes[originalIndex]).includes(s) ||
+                    // Created block
+                    (obj.whenCreated && String(obj.whenCreated).includes(s)) ||
+                    // Public/Private
+                    (s === 'public' && obj.isPrivate === false) ||
+                    (s === 'private' && obj.isPrivate === true) ||
+                    // Properties (by name or value)
+                    (Array.isArray(obj.prop) && obj.prop.some(p => 
+                      p && typeof p === 'object' && (
+                        (p.name && String(p.name).toLowerCase().includes(s)) ||
+                        (p.maxValue !== undefined && String(p.maxValue).includes(s))
+                      )
+                    )) ||
+                    // Non-Fungible (by property name or value)
+                    (s === 'non-fungible' && Array.isArray(obj.prop) && obj.prop.some(p => 
+                      p && typeof p === 'object' && p.name && String(p.name).toLowerCase().includes('non-fungible')
+                    )) ||
+                    // State search
+                    (obj.state && Object.keys(obj.state as Record<string, unknown>).some(stateKey => 
+                      stateKey.toLowerCase().includes(s)
+                    )) ||
+                    // Owner search
+                    (obj.owner && String(obj.owner).toLowerCase().includes(s)) ||
+                    // Identity search
+                    (obj.identity && String(obj.identity).toLowerCase().includes(s))
+                  );
                 })
                 .slice(0, visibleCount)
                 .map(({ obj, originalIndex }) =>
@@ -690,9 +710,7 @@ export default function AssetsObjects() {
               <div className="flex justify-center mt-4">
                 <button
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  onClick={() => {
-                    handleLoadMore();
-                  }}
+                  onClick={handleLoadMore}
                 >
                   {t('assets_objects.load_more')}
                 </button>

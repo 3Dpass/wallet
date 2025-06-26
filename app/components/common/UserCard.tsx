@@ -62,7 +62,7 @@ export default function UserCard({ registrarInfo }: IProps) {
   ) => {
     if (!additional || !Array.isArray(additional)) return null;
     
-    return additional.map(([key, value], index) => {
+    return additional.map(([key, value]) => {
       if (!key?.Raw || !value?.Raw) {
         return null;
       }
