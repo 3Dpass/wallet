@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import BaseDialog from "./BaseDialog";
 import ObjectCard from "../assets/ObjectCard";
 import { useApi } from "app/components/Api";
@@ -9,15 +9,24 @@ interface DialogObjectCardProps {
   objectIndex: number;
 }
 
+type ObjectData = {
+  whenCreated?: number;
+  when_created?: number;
+  numApprovals?: number;
+  num_approvals?: number;
+  [key: string]: unknown;
+};
+
 export default function DialogObjectCard({ isOpen, onClose, objectIndex }: DialogObjectCardProps) {
   const api = useApi();
-  const [objectData, setObjectData] = useState<any>(null);
+  const [objectData, setObjectData] = useState<ObjectData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     if (!isOpen) return;
-    let mounted = true;
+    mountedRef.current = true;
     async function fetchObject() {
       setLoading(true);
       setError(null);
@@ -34,15 +43,15 @@ export default function DialogObjectCard({ isOpen, onClose, objectIndex }: Dialo
             numApprovals: result.numApprovals ?? result.num_approvals,
           };
         }
-        if (mounted) setObjectData(patchedResult);
-      } catch (e: any) {
-        if (mounted) setError(e.message || String(e));
+        if (mountedRef.current) setObjectData(patchedResult);
+      } catch (e: unknown) {
+        if (mountedRef.current) setError(e instanceof Error ? e.message : String(e));
       } finally {
-        if (mounted) setLoading(false);
+        if (mountedRef.current) setLoading(false);
       }
     }
     fetchObject();
-    return () => { mounted = false; };
+    return () => { mountedRef.current = false; };
   }, [api, isOpen, objectIndex]);
 
   return (

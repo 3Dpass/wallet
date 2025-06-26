@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import BaseDialog from "./BaseDialog";
 import { InputGroup, Intent } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
@@ -24,7 +24,19 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
   const [admin, setAdmin] = useState("");
   const [freezer, setFreezer] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  // Memoized callbacks for JSX props
+  const handleIssuerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setIssuer(e.target.value);
+  }, []);
+
+  const handleAdminChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setAdmin(e.target.value);
+  }, []);
+
+  const handleFreezerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setFreezer(e.target.value);
+  }, []);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
@@ -39,15 +51,29 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
     }
   })();
 
-  const handleSubmit = async () => {
-    setError(null);
-    if (!api) return setError("API not ready");
+  const handleSubmit = () => {
+    if (!api) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "API not ready"
+      });
+      return;
+    }
     if (!selectedAccount || !issuer || !admin || !freezer) {
-      setError(t("messages.lbl_fill_required_fields") || "Please fill all required fields.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
       return;
     }
     if (!pair) {
-      setError(t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+      });
       return;
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
@@ -68,7 +94,7 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
         admin,
         freezer
       );
-      await signAndSend(tx, pair, {}, ({ status }) => {
+      signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
         toaster.show({
           icon: "endorsed",
@@ -77,9 +103,8 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
         });
         onClose();
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      setError(errorMessage);
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
@@ -109,21 +134,21 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
           fill
           placeholder={t("dlg_asset.issuer") || "Issuer address"}
           value={issuer}
-          onChange={e => setIssuer(e.target.value)}
+          onChange={handleIssuerChange}
           required
         />
         <InputGroup
           fill
           placeholder={t("dlg_asset.admin") || "Admin address"}
           value={admin}
-          onChange={e => setAdmin(e.target.value)}
+          onChange={handleAdminChange}
           required
         />
         <InputGroup
           fill
           placeholder={t("dlg_asset.freezer") || "Freezer address"}
           value={freezer}
-          onChange={e => setFreezer(e.target.value)}
+          onChange={handleFreezerChange}
           required
         />
         {/* No inline error or success messages, notifications only */}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import BaseDialog from "./BaseDialog";
 import { NumericInput, InputGroup, Intent } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
@@ -24,7 +24,19 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
   const [symbol, setSymbol] = useState("");
   const [decimals, setDecimals] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  // Memoized callbacks for JSX props
+  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  }, []);
+
+  const handleSymbolChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSymbol(e.target.value);
+  }, []);
+
+  const handleDecimalsChange = useCallback((v: number) => {
+    setDecimals(Number(v));
+  }, []);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
@@ -39,19 +51,37 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
     }
   })();
 
-  const handleSubmit = async () => {
-    setError(null);
-    if (!api) return setError("API not ready");
+  const handleSubmit = () => {
+    if (!api) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "API not ready"
+      });
+      return;
+    }
     if (!selectedAccount || !name || !symbol || decimals === undefined) {
-      setError(t("messages.lbl_fill_required_fields") || "Please fill all required fields.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
       return;
     }
     if (!pair) {
-      setError(t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+      });
       return;
     }
     if (decimals < 0 || decimals > 18) {
-      setError(t("dlg_asset.invalid_decimals") || "Decimals must be between 0 and 18.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("dlg_asset.invalid_decimals") || "Decimals must be between 0 and 18."
+      });
       return;
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
@@ -72,7 +102,7 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
         symbol,
         decimals
       );
-      await signAndSend(tx, pair, {}, ({ status }) => {
+      signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
         toaster.show({
           icon: "endorsed",
@@ -81,9 +111,8 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
         });
         onClose();
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      setError(errorMessage);
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
@@ -113,14 +142,14 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
           fill
           placeholder={t("dlg_asset.asset_name") || "Asset Name"}
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={handleNameChange}
           required
         />
         <InputGroup
           fill
           placeholder={t("dlg_asset.asset_symbol") || "Symbol"}
           value={symbol}
-          onChange={e => setSymbol(e.target.value)}
+          onChange={handleSymbolChange}
           required
         />
         <NumericInput
@@ -129,7 +158,7 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
           max={18}
           placeholder={t("dlg_asset.asset_decimals") || "Decimals (0-18)"}
           value={decimals}
-          onValueChange={v => setDecimals(Number(v))}
+          onValueChange={handleDecimalsChange}
           required
         />
         {/* No inline error or success messages, notifications only */}

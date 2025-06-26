@@ -27,7 +27,7 @@ const ObjectMaterial = ({ envMap }: ObjectMaterialProps) => (
 
 function Controls() {
   const { camera, gl } = useThree();
-  const controls = useRef<any>();
+  const controls = useRef<OrbitControls>();
   useEffect(() => {
     if (controls.current) {
       controls.current.enableDamping = true;
@@ -37,7 +37,7 @@ function Controls() {
       controls.current.autoRotate = false;
     }
   }, []);
-  // @ts-ignore
+  // @ts-ignore - orbitControls is a custom component extended from OrbitControls via extend()
   return <orbitControls ref={controls} args={[camera, gl.domElement]} />;
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import BaseDialog from "./BaseDialog";
 import { NumericInput, InputGroup, Intent } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
@@ -23,7 +23,25 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
   const [who, setWho] = useState("");
   const [amount, setAmount] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  // Memoized callbacks for event handlers
+  const handleWhoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setWho(e.target.value);
+  }, []);
+
+  const handleAmountChange = useCallback((v: number | string) => {
+    setAmount(Number(v));
+  }, []);
+
+  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
+    if (!status.isInBlock) return;
+    toaster.show({
+      icon: "endorsed",
+      intent: Intent.SUCCESS,
+      message: t("dlg_asset.burn_success") || "Tokens burned successfully!"
+    });
+    onClose();
+  }, [toaster, t, onClose]);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
@@ -38,15 +56,29 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
     }
   })();
 
-  const handleSubmit = async () => {
-    setError(null);
-    if (!api) return setError("API not ready");
+  const handleSubmit = () => {
+    if (!api) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "API not ready"
+      });
+      return;
+    }
     if (!selectedAccount || !who || amount === undefined || isNaN(amount) || amount <= 0) {
-      setError(t("messages.lbl_fill_required_fields") || "Please fill all required fields.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
       return;
     }
     if (!pair) {
-      setError(t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+      });
       return;
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
@@ -66,18 +98,9 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
         who,
         amount
       );
-      await signAndSend(tx, pair, {}, ({ status }) => {
-        if (!status.isInBlock) return;
-        toaster.show({
-          icon: "endorsed",
-          intent: Intent.SUCCESS,
-          message: t("dlg_asset.burn_success") || "Tokens burned successfully!"
-        });
-        onClose();
-      });
-    } catch (e: any) {
+      signAndSend(tx, pair, {}, handleSignAndSendCallback);
+    } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      setError(errorMessage);
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
@@ -107,7 +130,7 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
           fill
           placeholder={t("dlg_asset.burn_who") || "Address to burn from"}
           value={who}
-          onChange={e => setWho(e.target.value)}
+          onChange={handleWhoChange}
           required
         />
         <NumericInput
@@ -115,7 +138,7 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
           min={0}
           placeholder={t("dlg_asset.amount") || "Amount (min units)"}
           value={amount}
-          onValueChange={v => setAmount(Number(v))}
+          onValueChange={handleAmountChange}
           required
         />
         {/* No inline error or success messages, notifications only */}

@@ -1,4 +1,4 @@
-import { Card, HTMLTable, Button, Collapse, Spinner, Icon, Classes, Popover } from "@blueprintjs/core";
+import { Card, HTMLTable, Button, Collapse, Spinner, Icon, Classes, Popover, Intent } from "@blueprintjs/core";
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useMemo, useRef, useCallback } from "react";
 import * as THREE from "three";
@@ -13,26 +13,78 @@ import DialogCreateAsset from "../dialogs/DialogCreateAsset";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
 import { P3D_DECIMALS_FACTOR } from "app/utils/converter";
+import type { Codec } from '@polkadot/types/types';
 
 // Constants
 const FETCH_DEBOUNCE_MS = 300; // 300ms debounce delay
 
+// Type for objects that can be converted to human-readable format
+type HumanReadable = {
+  toHuman?: () => Record<string, unknown>;
+  toJSON?: () => Record<string, unknown>;
+};
+
+// Type for Polkadot Option objects
+type PolkadotOption<T = HumanReadable> = {
+  isSome: boolean;
+  unwrap: () => T;
+  toHuman?: () => Record<string, unknown>;
+  toJSON?: () => Record<string, unknown>;
+};
+
+// Type for property objects with various naming conventions
+type PropertyObject = {
+  propIdx?: string | number;
+  prop_idx?: string | number;
+  PropIdx?: string | number;
+  maxValue?: string | number;
+  max_value?: string | number;
+  MaxValue?: string | number;
+};
+
+// Type for linked assets
+type LinkedAsset = {
+  assetId: number;
+  details: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+};
+
+// Type for object state
+type ObjectState = Record<string, number | string>;
+
+// Type for object data as returned from api.query.poScan.objects(u32)
+interface ObjectData {
+  state?: ObjectState;
+  isPrivate?: boolean;
+  whenCreated?: number;
+  numApprovals?: number;
+}
+
+// Type for asset details with objDetails
+interface AssetDetails {
+  objDetails?: {
+    objIdx: number | string;
+    propIdx: number | string;
+  };
+  [key: string]: unknown;
+}
+
 interface ObjectCardProps {
   objectIndex: number;
-  objectData: any; // as returned from api.query.poScan.objects(u32)
+  objectData: ObjectData;
 }
 
 interface RpcObjectData {
-  state: any;
+  state: ObjectState;
   obj: number[];
   compressed_with: string | null;
-  category: any;
+  category: Record<string, unknown>;
   hashes: string[];
   when_created: number;
   when_approved: number;
   owner: string;
   estimators: [string, number][];
-  est_outliers: any[];
+  est_outliers: string[];
   approvers: Array<{
     account_id: string;
     when: number;
@@ -47,8 +99,39 @@ interface RpcObjectData {
   }>;
 }
 
-function isOption(obj: any): obj is { isSome: boolean; unwrap: () => any; toHuman?: () => any; toJSON?: () => any } {
-  return obj && typeof obj.isSome === "boolean" && typeof obj.unwrap === "function";
+// Type for state info return value
+type StateInfo = {
+  label: string;
+  icon: string;
+  intent: Intent;
+};
+
+// Type for Blueprint icons
+type BlueprintIcon = 'help' | 'confirm' | 'error' | 'time' | 'chart' | 'refresh' | 'plus' | 'info-sign';
+
+function isOption(obj: unknown): obj is PolkadotOption {
+  if (!obj || typeof obj !== 'object') return false;
+  const option = obj as Record<string, unknown>;
+  return typeof option.isSome === "boolean" && typeof option.unwrap === "function";
+}
+
+// Helper function to safely get human-readable data from an Option
+function getOptionValue<T>(option: PolkadotOption<T>): T | Record<string, unknown> {
+  if (option.toHuman && typeof option.toHuman === 'function') {
+    return option.toHuman();
+  }
+  if (option.toJSON && typeof option.toJSON === 'function') {
+    return option.toJSON();
+  }
+  return option.unwrap();
+}
+
+// Helper function to safely convert AnyJson to Record<string, unknown>
+function toRecord(value: unknown): Record<string, unknown> {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return {};
 }
 
 export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps) {
@@ -60,7 +143,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
   const [showApprovers, setShowApprovers] = useState(false);
   const [showOutliers, setShowOutliers] = useState(false);
   const [propertyDefs, setPropertyDefs] = useState<Record<number, { name: string; maxValue: number }>>({});
-  const [linkedAssets, setLinkedAssets] = useState<any[]>([]);
+  const [linkedAssets, setLinkedAssets] = useState<LinkedAsset[]>([]);
   const [linkedAssetsLoading, setLinkedAssetsLoading] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState<number | null>(null);
   const [showCreateAssetDialog, setShowCreateAssetDialog] = useState(false);
@@ -122,7 +205,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         patchedResult = { ...patchedResult, prop: patchedResult.props };
       }
       if (patchedResult && patchedResult.prop && Array.isArray(patchedResult.prop)) {
-        let normalizedProps = patchedResult.prop.map((p: any) => {
+        let normalizedProps = patchedResult.prop.map((p: PropertyObject) => {
           if (p && typeof p === 'object') {
             return {
               propIdx: p.propIdx ?? p.prop_idx ?? p.PropIdx ?? '',
@@ -131,7 +214,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
           }
           return p;
         });
-        if (!normalizedProps.some((p: any) => Number(p.propIdx) === 1)) {
+        if (!normalizedProps.some((p: { propIdx: string | number }) => Number(p.propIdx) === 1)) {
           normalizedProps.push({ propIdx: 1, maxValue: 0 });
         }
         patchedResult = {
@@ -247,36 +330,36 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
     : "-";
 
   // Helper function to get state info
-  const getStateInfo = () => {
-    if (!objectData?.state) return { label: 'Unknown', icon: 'help' as const, intent: 'none' as any };
+  const getStateInfo = (): StateInfo => {
+    if (!objectData?.state) return { label: 'Unknown', icon: 'help' as BlueprintIcon, intent: 'none' };
     
     const stateKeys = Object.keys(objectData.state);
-    if (stateKeys.length === 0) return { label: 'Unknown', icon: 'help' as const, intent: 'none' as any };
+    if (stateKeys.length === 0) return { label: 'Unknown', icon: 'help' as BlueprintIcon, intent: 'none' };
     
     if (stateKeys.includes('approved')) {
-      return { label: 'Approved', icon: 'confirm' as const, intent: 'success' as any };
+      return { label: 'Approved', icon: 'confirm' as BlueprintIcon, intent: 'success' };
     }
     if (stateKeys.includes('notApproved')) {
-      return { label: 'Disapproved', icon: 'error' as const, intent: 'danger' as any };
+      return { label: 'Disapproved', icon: 'error' as BlueprintIcon, intent: 'danger' };
     }
     if (stateKeys.includes('approving')) {
-      return { label: 'Approving', icon: 'time' as const, intent: 'warning' as any };
+      return { label: 'Approving', icon: 'time' as BlueprintIcon, intent: 'warning' };
     }
     if (stateKeys.includes('estimated')) {
-      return { label: 'Estimated', icon: 'chart' as const, intent: 'primary' as any };
+      return { label: 'Estimated', icon: 'chart' as BlueprintIcon, intent: 'primary' };
     }
     if (stateKeys.includes('estimating')) {
-      return { label: 'Estimating', icon: 'refresh' as const, intent: 'warning' as any };
+      return { label: 'Estimating', icon: 'refresh' as BlueprintIcon, intent: 'warning' };
     }
     if (stateKeys.includes('created')) {
-      return { label: 'Created', icon: 'plus' as const, intent: 'none' as any };
+      return { label: 'Created', icon: 'plus' as BlueprintIcon, intent: 'none' };
     }
     
     const firstState = stateKeys[0];
     return { 
       label: firstState.charAt(0).toUpperCase() + firstState.slice(1), 
-      icon: 'info-sign' as const, 
-      intent: 'none' as any 
+      icon: 'info-sign' as BlueprintIcon, 
+      intent: 'none' 
     };
   };
 
@@ -296,18 +379,19 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
       }
       try {
         const propIdxs = rpcData.prop.map((p) => Number(p.propIdx));
-        const queries = propIdxs.map((idx) => api.query.poScan.properties(idx) as Promise<any>);
+        const queries = propIdxs.map((idx) => api.query.poScan.properties(idx));
         const results = await Promise.all(queries);
         const defs: Record<number, { name: string; maxValue: number }> = {};
         results.forEach((opt, i) => {
           let name = '';
           let maxValue = 1;
-          if (opt && opt.isSome) {
-            const prop = opt.unwrap().toJSON();
+          if (opt && typeof opt === 'object' && 'isSome' in opt && opt.isSome) {
+            const unwrapped = (opt as any).unwrap();
+            const prop = unwrapped.toJSON() as Record<string, unknown>;
             if (typeof prop.name === 'string') {
               name = prop.name;
-            } else if (prop.name && typeof prop.name === 'object' && prop.name['Raw']) {
-              name = prop.name['Raw'];
+            } else if (prop.name && typeof prop.name === 'object' && (prop.name as Record<string, unknown>)['Raw']) {
+              name = (prop.name as Record<string, unknown>)['Raw'] as string;
             }
             if (typeof name === 'string' && name.startsWith('0x')) {
               try {
@@ -319,7 +403,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                 name = str;
               } catch (e) {}
             }
-            maxValue = prop.maxValue ?? prop.max_value ?? 1;
+            maxValue = (prop.maxValue ?? prop.max_value ?? 1) as number;
           } else {
             name = `Property ${propIdxs[i]}`;
             maxValue = 1;
@@ -358,19 +442,19 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         // Check if request was cancelled
         if (signal.aborted || !mounted) return;
         
-        const linked = [];
+        const linked: LinkedAsset[] = [];
         for (const [key, opt] of entries) {
           // Check if request was cancelled during iteration
           if (signal.aborted || !mounted) return;
           
           const assetId = Number(key.args[0]?.toString());
-          let details;
+          let details: AssetDetails;
           if (opt.toHuman) {
-            details = opt.toHuman();
+            details = toRecord(opt.toHuman()) as AssetDetails;
           } else if (isOption(opt) && opt.isSome) {
-            details = opt.unwrap().toJSON();
+            details = toRecord(getOptionValue(opt)) as AssetDetails;
           } else {
-            details = opt.toJSON();
+            details = toRecord(opt.toJSON()) as AssetDetails;
           }
           if (details?.objDetails?.objIdx != null) {
             const objIdxNum = typeof details.objDetails.objIdx === 'string' ? parseInt(details.objDetails.objIdx, 10) : details.objDetails.objIdx;
@@ -435,8 +519,8 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                             <>
                               <div className="font-mono mb-2">Hash ID Objects3D: Grid2dLow</div>
                               <code className="block text-xs">
-                                {rpcData.hashes.map((hash, idx) => (
-                                  <div key={idx}>{hash}</div>
+                                {rpcData.hashes.map((hash) => (
+                                  <div key={hash}>{hash}</div>
                                 ))}
                               </code>
                             </>
@@ -461,7 +545,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   Object {objectIndex}
                   {stateInfo.icon && stateInfo.icon !== 'help' && (
-                    <Icon icon={stateInfo.icon} intent={stateInfo.intent} title={stateInfo.label} className="ml-2" />
+                    <Icon icon={stateInfo.icon as any} intent={stateInfo.intent} title={stateInfo.label} className="ml-2" />
                   )}
                 </h2>
                 <Button
@@ -521,13 +605,14 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                             const max = def?.maxValue ?? 1;
                             // Check if this property has a linked asset
                             const hasLinkedAsset = linkedAssets.some(asset => {
-                              if (!asset.details.objDetails) return false;
-                              const assetObjIdx = typeof asset.details.objDetails.objIdx === 'string' 
-                                ? parseInt(asset.details.objDetails.objIdx, 10) 
-                                : asset.details.objDetails.objIdx;
-                              const assetPropIdx = typeof asset.details.objDetails.propIdx === 'string' 
-                                ? parseInt(asset.details.objDetails.propIdx, 10) 
-                                : asset.details.objDetails.propIdx;
+                              const objDetails = asset.details.objDetails as any;
+                              if (!objDetails) return false;
+                              const assetObjIdx = typeof objDetails.objIdx === 'string' 
+                                ? parseInt(objDetails.objIdx, 10) 
+                                : objDetails.objIdx;
+                              const assetPropIdx = typeof objDetails.propIdx === 'string' 
+                                ? parseInt(objDetails.propIdx, 10) 
+                                : objDetails.propIdx;
                               const currentPropIdx = Number(p.propIdx);
                               
                               return assetObjIdx === objectIndex && assetPropIdx === currentPropIdx;
@@ -595,7 +680,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                         {rpcData.estimators
                           .sort(([, a], [, b]) => a - b) // Sort by numeric value (ascending)
                           .map(([account, value], idx) => (
-                          <div key={idx} className="text-sm flex items-center gap-2 font-mono text-xs">
+                          <div key={`estimator-${account}-${value}`} className="text-sm flex items-center gap-2 font-mono text-xs">
                             <AccountName address={account} />
                             <span className="ml-2 text-gray-600">({value} ms)</span>
                           </div>
@@ -604,33 +689,29 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                     )}
                   </div>
                 </div>
-              ) : (
-                <>
-                  {rpcData.estimators.length > 0 && (
-                    <div>
-                      <Button
-                        minimal
-                        icon={showEstimators ? "chevron-up" : "chevron-down"}
-                        onClick={() => setShowEstimators((v) => !v)}
-                        text={showEstimators ? `Hide Estimators (${rpcData.estimators.length})` : `Show Estimators (${rpcData.estimators.length})`}
-                        className="mb-2"
-                      />
-                      {showEstimators && (
-                        <div className="space-y-1 mt-2">
-                          {rpcData.estimators
-                            .sort(([, a], [, b]) => a - b) // Sort by numeric value (ascending)
-                            .map(([account, value], idx) => (
-                            <div key={idx} className="text-sm flex items-center gap-2 font-mono text-xs">
-                              <AccountName address={account} />
-                              <span className="ml-2 text-gray-600">({value} ms)</span>
-                            </div>
-                          ))}
+              ) : rpcData.estimators.length > 0 ? (
+                <div>
+                  <Button
+                    minimal
+                    icon={showEstimators ? "chevron-up" : "chevron-down"}
+                    onClick={() => setShowEstimators((v) => !v)}
+                    text={showEstimators ? `Hide Estimators (${rpcData.estimators.length})` : `Show Estimators (${rpcData.estimators.length})`}
+                    className="mb-2"
+                  />
+                  {showEstimators && (
+                    <div className="space-y-1 mt-2">
+                      {rpcData.estimators
+                        .sort(([, a], [, b]) => a - b) // Sort by numeric value (ascending)
+                        .map(([account, value]) => (
+                        <div key={`estimator-${account}-${value}`} className="text-sm flex items-center gap-2 font-mono text-xs">
+                          <AccountName address={account} />
+                          <span className="ml-2 text-gray-600">({value} ms)</span>
                         </div>
-                      )}
+                      ))}
                     </div>
                   )}
-                </>
-              )}
+                </div>
+              ) : null}
               {rpcData.approvers.length > 0 && (
                 <div>
                   <Button
@@ -643,7 +724,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                   {showApprovers && (
                     <div className="space-y-1">
                       {rpcData.approvers.map((approver, idx) => (
-                        <div key={idx} className="text-sm flex items-center gap-2 font-mono text-xs">
+                        <div key={`approver-${approver.account_id}-${approver.when}`} className="text-sm flex items-center gap-2 font-mono text-xs">
                           <AccountName address={approver.account_id} />
                           <span className="ml-2 text-gray-600">(when: {approver.when ? (
                             <a
@@ -674,7 +755,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                   {showOutliers && (
                     <div className="space-y-1">
                       {rpcData.est_outliers.map((address, idx) => (
-                        <div key={idx} className="text-sm font-mono text-xs text-red-700 break-all">
+                        <div key={`outlier-${address}`} className="text-sm font-mono text-xs text-red-700 break-all">
                           <AccountName address={address} />
                         </div>
                       ))}

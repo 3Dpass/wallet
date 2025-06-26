@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import BaseDialog from "./BaseDialog";
 import { useApi } from "app/components/Api";
 import { FormattedAmount } from "app/components/common/FormattedAmount";
@@ -14,17 +14,42 @@ interface DialogAssetDistributionProps {
   symbol: string;
 }
 
+type Holder = {
+  accountId: string;
+  balance: number;
+  identityName: string | null;
+};
+
+// Type for Polkadot Option objects
+type PolkadotOption = {
+  isSome: boolean;
+  unwrap: () => { toJSON: () => Record<string, unknown> };
+  toHuman?: () => Record<string, unknown>;
+  toJSON?: () => Record<string, unknown>;
+};
+
+function isOption(obj: unknown): obj is PolkadotOption {
+  if (!obj || typeof obj !== 'object') return false;
+  const option = obj as Record<string, unknown>;
+  return typeof option.isSome === "boolean" && typeof option.unwrap === "function";
+}
+
 export default function DialogAssetDistribution({ isOpen, onClose, assetId, decimals, symbol }: DialogAssetDistributionProps) {
   const api = useApi();
-  const [holders, setHolders] = useState<any[]>([]);
+  const [holders, setHolders] = useState<Holder[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState<number>(0);
   const [search, setSearch] = useState("");
+  const mountedRef = useRef(true);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
-    let mounted = true;
+    mountedRef.current = true;
     async function fetchHolders() {
       setLoading(true);
       setError(null);
@@ -34,10 +59,12 @@ export default function DialogAssetDistribution({ isOpen, onClose, assetId, deci
         const entries = await api.query.poscanAssets.account.entries(assetId);
         let list = entries.map(([storageKey, opt]) => {
           const accountId = storageKey.args[1]?.toString();
-          const data = opt.toHuman ? opt.toHuman() : ((opt as any).unwrap ? (opt as any).unwrap().toJSON() : opt.toJSON());
+          const data = opt.toHuman ? opt.toHuman() : (isOption(opt) ? opt.unwrap().toJSON() : opt.toJSON());
+          const balanceData = typeof data === 'object' && data !== null ? data as Record<string, unknown> : {};
           return {
             accountId,
-            balance: Number(data?.balance?.toString().replace(/,/g, "")) || 0,
+            balance: Number(balanceData?.balance?.toString().replace(/,/g, "")) || 0,
+            identityName: null as string | null,
           };
         }).filter(h => h.balance > 0);
         // Fetch identities in parallel
@@ -53,18 +80,18 @@ export default function DialogAssetDistribution({ isOpen, onClose, assetId, deci
         );
         list = list.map((h, i) => ({ ...h, identityName: identities[i] }));
         const totalBalance = list.reduce((sum, h) => sum + h.balance, 0);
-        if (mounted) {
+        if (mountedRef.current) {
           setHolders(list);
           setTotal(totalBalance);
         }
-      } catch (e: any) {
-        if (mounted) setError(e.message || String(e));
+      } catch (e: unknown) {
+        if (mountedRef.current) setError(e instanceof Error ? e.message : String(e));
       } finally {
-        if (mounted) setLoading(false);
+        if (mountedRef.current) setLoading(false);
       }
     }
     fetchHolders();
-    return () => { mounted = false; };
+    return () => { mountedRef.current = false; };
   }, [api, isOpen, assetId]);
 
   // Filter holders by search (address or identity name)
@@ -87,12 +114,12 @@ export default function DialogAssetDistribution({ isOpen, onClose, assetId, deci
             leftIcon="search"
             placeholder="Search by address or name..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={handleSearchChange}
             className="mb-4"
             fill
             autoFocus
           />
-          <TokenHoldersPieChart holders={filteredHolders} total={total} symbol={symbol} />
+          <TokenHoldersPieChart holders={filteredHolders} total={total} />
           <HTMLTable className="w-full" striped>
             <thead>
               <tr>
@@ -104,7 +131,7 @@ export default function DialogAssetDistribution({ isOpen, onClose, assetId, deci
             <tbody>
               {filteredHolders.length === 0 ? (
                 <tr><td colSpan={3} className="text-center text-gray-500">No holders found</td></tr>
-              ) : filteredHolders.map((h, i) => (
+              ) : filteredHolders.map((h) => (
                 <tr key={h.accountId}>
                   <td><AccountName address={h.accountId} /></td>
                   <td><FormattedAmount value={h.balance} decimals={decimals} unit={symbol} /></td>

@@ -58,8 +58,41 @@ interface PropertyDetails {
   maxValue: number;
 }
 
-function isOption(obj: any): obj is { isSome: boolean; unwrap: () => any; toHuman?: () => any; toJSON?: () => any } {
-  return obj && typeof obj.isSome === "boolean" && typeof obj.unwrap === "function";
+// Type for objects that can be converted to human-readable format
+type HumanReadable = {
+  toHuman?: () => Record<string, unknown>;
+  toJSON?: () => Record<string, unknown>;
+};
+
+// Type for Polkadot Option objects
+type PolkadotOption<T = HumanReadable> = {
+  isSome: boolean;
+  unwrap: () => T;
+  toHuman?: () => Record<string, unknown>;
+  toJSON?: () => Record<string, unknown>;
+};
+
+function isOption(obj: unknown): obj is PolkadotOption {
+  if (!obj || typeof obj !== 'object') return false;
+  const option = obj as Record<string, unknown>;
+  return typeof option.isSome === "boolean" && typeof option.unwrap === "function";
+}
+
+// Helper function to safely get human-readable data from an Option
+function getOptionValue<T>(option: PolkadotOption<T>): T | Record<string, unknown> {
+  if (option.toHuman && typeof option.toHuman === 'function') {
+    return option.toHuman();
+  }
+  if (option.toJSON && typeof option.toJSON === 'function') {
+    return option.toJSON();
+  }
+  return option.unwrap();
+}
+
+// Helper function to safely check if an object has metadata properties
+function hasMetadataProperties(obj: unknown): obj is { name?: string; symbol?: string; decimals?: string | number; isFrozen?: boolean } {
+  if (!obj || typeof obj !== 'object') return false;
+  return true; // We'll check properties individually when accessing
 }
 
 // Constants
@@ -92,21 +125,97 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentAssetIdRef = useRef<number | null>(null);
 
-  // Debounced fetch function
-  const debouncedFetchData = useCallback((targetAssetId: number) => {
-    // Clear existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
+  // Calculate EVM contract address early
+  const evmContractAddress = generateEvmContractAddress(assetId);
 
-    // Set new timeout
-    debounceTimeoutRef.current = setTimeout(() => {
-      // Only fetch if this is still the current asset ID
-      if (currentAssetIdRef.current === targetAssetId) {
-        fetchData(targetAssetId);
-      }
-    }, FETCH_DEBOUNCE_MS);
+  // Memoized callbacks for dialog handlers
+  const handleOpenObjectDialog = useCallback(() => {
+    setShowObjectDialog(true);
   }, []);
+
+  const handleCloseObjectDialog = useCallback(() => {
+    setShowObjectDialog(false);
+  }, []);
+
+  const handleOpenDistributionDialog = useCallback(() => {
+    setShowDistributionDialog(true);
+  }, []);
+
+  const handleCloseDistributionDialog = useCallback(() => {
+    setShowDistributionDialog(false);
+  }, []);
+
+  const handleOpenSetMetadataDialog = useCallback(() => {
+    setShowSetMetadataDialog(true);
+  }, []);
+
+  const handleCloseSetMetadataDialog = useCallback(() => {
+    setShowSetMetadataDialog(false);
+  }, []);
+
+  const handleOpenSetTeamDialog = useCallback(() => {
+    setShowSetTeamDialog(true);
+  }, []);
+
+  const handleCloseSetTeamDialog = useCallback(() => {
+    setShowSetTeamDialog(false);
+  }, []);
+
+  const handleOpenMintDialog = useCallback(() => {
+    setShowMintDialog(true);
+  }, []);
+
+  const handleCloseMintDialog = useCallback(() => {
+    setShowMintDialog(false);
+  }, []);
+
+  const handleOpenBurnDialog = useCallback(() => {
+    setShowBurnDialog(true);
+  }, []);
+
+  const handleCloseBurnDialog = useCallback(() => {
+    setShowBurnDialog(false);
+  }, []);
+
+  const handleOpenFreezeDialog = useCallback(() => {
+    setShowFreezeDialog(true);
+  }, []);
+
+  const handleCloseFreezeDialog = useCallback(() => {
+    setShowFreezeDialog(false);
+  }, []);
+
+  const handleOpenThawDialog = useCallback(() => {
+    setShowThawDialog(true);
+  }, []);
+
+  const handleCloseThawDialog = useCallback(() => {
+    setShowThawDialog(false);
+  }, []);
+
+  const handleOpenTransferOwnershipDialog = useCallback(() => {
+    setShowTransferOwnershipDialog(true);
+  }, []);
+
+  const handleCloseTransferOwnershipDialog = useCallback(() => {
+    setShowTransferOwnershipDialog(false);
+  }, []);
+
+  const handleOpenForceTransferDialog = useCallback(() => {
+    setShowForceTransferDialog(true);
+  }, []);
+
+  const handleCloseForceTransferDialog = useCallback(() => {
+    setShowForceTransferDialog(false);
+  }, []);
+
+  const handleToggleTeam = useCallback(() => {
+    setShowTeam((v) => !v);
+  }, []);
+
+  const handleCopyAddress = useCallback(() => {
+    navigator.clipboard.writeText(evmContractAddress);
+  }, [evmContractAddress]);
 
   // Main fetch function with cancellation
   const fetchData = useCallback(async (targetAssetId: number) => {
@@ -139,7 +248,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
       }
 
       // Use toHuman for easier field access
-      const assetHuman = assetOpt.toHuman ? assetOpt.toHuman() : assetOpt.unwrap().toJSON();
+      const assetHuman = getOptionValue(assetOpt);
       const asset = assetHuman as AssetDetails;
       
       // Check if request was cancelled
@@ -154,11 +263,12 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
       const metaHuman = metaOpt.toHuman ? metaOpt.toHuman() : metaOpt.toJSON();
       let meta: AssetMetadata;
       if (metaHuman && typeof metaHuman === 'object' && !Array.isArray(metaHuman)) {
+        const metaObj = metaHuman as Record<string, unknown>;
         meta = {
-          name: (metaHuman as any).name || "",
-          symbol: (metaHuman as any).symbol || "",
-          decimals: Number((metaHuman as any).decimals) || 0,
-          isFrozen: Boolean((metaHuman as any).isFrozen),
+          name: (metaObj.name as string) || "",
+          symbol: (metaObj.symbol as string) || "",
+          decimals: Number(metaObj.decimals) || 0,
+          isFrozen: Boolean(metaObj.isFrozen),
         };
       } else {
         meta = { name: "", symbol: "", decimals: 0, isFrozen: false };
@@ -178,8 +288,8 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
           if (signal.aborted) return;
 
           if (isOption(propOpt) && propOpt.isSome) {
-            const propHuman = propOpt.toHuman ? propOpt.toHuman() : propOpt.unwrap().toJSON();
-            prop = propHuman;
+            const propHuman = getOptionValue(propOpt);
+            prop = propHuman as PropertyDetails;
           }
         }
       }
@@ -205,14 +315,30 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
         setMaxSupply(localMaxSupply);
         setLoading(false);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Don't update state if request was cancelled
       if (!signal.aborted && currentAssetIdRef.current === targetAssetId) {
-        setError(err.message || String(err));
+        setError(err instanceof Error ? err.message : String(err));
         setLoading(false);
       }
     }
   }, [api]);
+
+  // Debounced fetch function
+  const debouncedFetchData = useCallback((targetAssetId: number) => {
+    // Clear existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    // Set new timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      // Only fetch if this is still the current asset ID
+      if (currentAssetIdRef.current === targetAssetId) {
+        fetchData(targetAssetId);
+      }
+    }, FETCH_DEBOUNCE_MS);
+  }, [fetchData]);
 
   // Effect to handle asset ID changes
   useEffect(() => {
@@ -317,9 +443,6 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
     ? (typeof details.objDetails.objIdx === 'string' ? parseInt(details.objDetails.objIdx, 10) : details.objDetails.objIdx)
     : null;
 
-  // Calculate EVM contract address
-  const evmContractAddress = generateEvmContractAddress(assetId);
-
   // Determine user role for this asset
   let userRole: "owner" | "admin" | "issuer" | "freezer" | null = null;
   if (selectedAccount && details) {
@@ -350,14 +473,11 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
               content={
                 <Menu>
                   <AssetActions
-                    assetId={assetId}
-                    metadata={metadata}
-                    evmContractAddress={evmContractAddress}
-                    onFreeze={() => setShowFreezeDialog(true)}
-                    onThaw={() => setShowThawDialog(true)}
-                    onBurn={() => setShowBurnDialog(true)}
-                    onTransferOwnership={() => setShowTransferOwnershipDialog(true)}
-                    onForceTransfer={() => setShowForceTransferDialog(true)}
+                    onFreeze={handleOpenFreezeDialog}
+                    onThaw={handleOpenThawDialog}
+                    onBurn={handleOpenBurnDialog}
+                    onTransferOwnership={handleOpenTransferOwnershipDialog}
+                    onForceTransfer={handleOpenForceTransferDialog}
                     role={userRole}
                   />
                 </Menu>
@@ -384,7 +504,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
                       {title}
                     </h2>
                     {!inDialog && linkedObjIdx !== null && !isNaN(linkedObjIdx) && (
-                      <Button icon="cube" onClick={() => setShowObjectDialog(true)} className="ml-4">
+                      <Button icon="cube" onClick={handleOpenObjectDialog} className="ml-4">
                         {t("asset_card.view_object")}{linkedObjIdx}
                       </Button>
                     )}
@@ -437,7 +557,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
                           minimal
                           small
                           icon={showTeam ? "chevron-up" : "chevron-down"}
-                          onClick={() => setShowTeam((v) => !v)}
+                          onClick={handleToggleTeam}
                           className="ml-2"
                         >
                           {showTeam ? t("asset_card.hide_team") : t("asset_card.show_team")}
@@ -469,7 +589,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
                       <td className="font-medium">
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-xs select-all">{evmContractAddress}</span>
-                          <Button icon="duplicate" minimal small onClick={() => navigator.clipboard.writeText(evmContractAddress)} title={t("asset_card.copy_address")} />
+                          <Button icon="duplicate" minimal small onClick={handleCopyAddress} title={t("asset_card.copy_address")} />
                         </div>
                       </td>
                     </tr>
@@ -478,32 +598,32 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
                 {!inDialog && linkedObjIdx !== null && !isNaN(linkedObjIdx) && (
                   <DialogObjectCard
                     isOpen={showObjectDialog}
-                    onClose={() => setShowObjectDialog(false)}
+                    onClose={handleCloseObjectDialog}
                     objectIndex={linkedObjIdx}
                   />
                 )}
                 <div className="mt-6 flex justify-end gap-2">
-                  <Button icon="pie-chart" onClick={() => setShowDistributionDialog(true)}>
+                  <Button icon="pie-chart" onClick={handleOpenDistributionDialog}>
                     {t("asset_card.tokens_distribution")}
                   </Button>
                   {userRole === "owner" && (
-                    <Button icon="edit" onClick={() => setShowSetMetadataDialog(true)}>
+                    <Button icon="edit" onClick={handleOpenSetMetadataDialog}>
                       {t("asset_card.set_metadata")}
                     </Button>
                   )}
                   {userRole === "owner" && (
-                    <Button icon="people" onClick={() => setShowSetTeamDialog(true)}>
+                    <Button icon="people" onClick={handleOpenSetTeamDialog}>
                       {t("asset_card.set_team")}
                     </Button>
                   )}
                   {userRole && (userRole === "owner" || userRole === "issuer") && (
-                    <Button icon="add" onClick={() => setShowMintDialog(true)}>
+                    <Button icon="add" onClick={handleOpenMintDialog}>
                       {t("asset_card.mint")}
                     </Button>
                   )}
                   <DialogAssetDistribution
                     isOpen={showDistributionDialog}
-                    onClose={() => setShowDistributionDialog(false)}
+                    onClose={handleCloseDistributionDialog}
                     assetId={assetId}
                     decimals={metadata.decimals}
                     symbol={metadata.symbol}
@@ -516,42 +636,42 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
       </Card>
       <DialogSetAssetMetadata
         isOpen={showSetMetadataDialog}
-        onClose={() => setShowSetMetadataDialog(false)}
+        onClose={handleCloseSetMetadataDialog}
         assetId={assetId}
       />
       <DialogSetAssetTeam
         isOpen={showSetTeamDialog}
-        onClose={() => setShowSetTeamDialog(false)}
+        onClose={handleCloseSetTeamDialog}
         assetId={assetId}
       />
       <DialogMintAsset
         isOpen={showMintDialog}
-        onClose={() => setShowMintDialog(false)}
+        onClose={handleCloseMintDialog}
         assetId={assetId}
       />
       <DialogBurnAsset
         isOpen={showBurnDialog}
-        onClose={() => setShowBurnDialog(false)}
+        onClose={handleCloseBurnDialog}
         assetId={assetId}
       />
       <DialogFreezeAsset
         isOpen={showFreezeDialog}
-        onClose={() => setShowFreezeDialog(false)}
+        onClose={handleCloseFreezeDialog}
         assetId={assetId}
       />
       <DialogThawAsset
         isOpen={showThawDialog}
-        onClose={() => setShowThawDialog(false)}
+        onClose={handleCloseThawDialog}
         assetId={assetId}
       />
       <DialogTransferOwnership
         isOpen={showTransferOwnershipDialog}
-        onClose={() => setShowTransferOwnershipDialog(false)}
+        onClose={handleCloseTransferOwnershipDialog}
         assetId={assetId}
       />
       <DialogForceTransfer
         isOpen={showForceTransferDialog}
-        onClose={() => setShowForceTransferDialog(false)}
+        onClose={handleCloseForceTransferDialog}
         assetId={assetId}
       />
     </div>

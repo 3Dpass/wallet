@@ -69,6 +69,8 @@ export default function UserCard({ registrarInfo }: IProps) {
       
       const keyString = key.Raw.toLowerCase();
       const valueString = value.Raw;
+      const uniqueKey = `additional-${key.Raw}-${value.Raw}`;
+      
       switch (keyString) {
         case "github":
           return renderSocialLink(
@@ -84,14 +86,14 @@ export default function UserCard({ registrarInfo }: IProps) {
           );
         case "discord":
           return (
-            <tr key={index}>
+            <tr key={uniqueKey}>
               <td className="shadow-none font-medium pr-4">Discord</td>
               <td className="shadow-none break-all">{valueString}</td>
             </tr>
           );
         default:
           return (
-            <tr key={index}>
+            <tr key={uniqueKey}>
               <td className="shadow-none font-medium pr-4">{key.Raw}</td>
               <td className="shadow-none break-all">{valueString}</td>
             </tr>

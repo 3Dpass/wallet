@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useLocation, useNavigate } from '@remix-run/react';
 import { Tabs, Tab, Icon } from '@blueprintjs/core';
 
@@ -10,9 +10,9 @@ export default function AssetsMenu() {
   if (location.pathname.includes('/assets/tokens')) currentTab = 'tokens';
   else if (location.pathname.includes('/assets/objects')) currentTab = 'objects';
 
-  const handleTabChange = (newTabId: string) => {
+  const handleTabChange = useCallback((newTabId: string) => {
     navigate(`/assets/${newTabId}`);
-  };
+  }, [navigate]);
 
   return (
     <Tabs

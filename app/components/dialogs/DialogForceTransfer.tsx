@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import BaseDialog from "./BaseDialog";
 import { InputGroup, NumericInput, Intent } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
@@ -24,7 +24,29 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
   const [dest, setDest] = useState("");
   const [amount, setAmount] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  // Memoized callbacks for event handlers
+  const handleSourceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSource(e.target.value);
+  }, []);
+
+  const handleDestChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setDest(e.target.value);
+  }, []);
+
+  const handleAmountChange = useCallback((value: number | string) => {
+    setAmount(Number(value));
+  }, []);
+
+  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
+    if (!status.isInBlock) return;
+    toaster.show({
+      icon: "endorsed",
+      intent: Intent.SUCCESS,
+      message: t("dlg_asset.force_transfer_success") || "Force transfer successful!"
+    });
+    onClose();
+  }, [toaster, t, onClose]);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
@@ -39,15 +61,29 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
     }
   })();
 
-  const handleSubmit = async () => {
-    setError(null);
-    if (!api) return setError("API not ready");
+  const handleSubmit = () => {
+    if (!api) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "API not ready"
+      });
+      return;
+    }
     if (!selectedAccount || !source || !dest || amount === undefined || isNaN(amount) || amount <= 0) {
-      setError(t("messages.lbl_fill_required_fields") || "Please fill all required fields.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
       return;
     }
     if (!pair) {
-      setError(t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+      });
       return;
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
@@ -68,18 +104,9 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
         dest,
         amount
       );
-      await signAndSend(tx, pair, {}, ({ status }) => {
-        if (!status.isInBlock) return;
-        toaster.show({
-          icon: "endorsed",
-          intent: Intent.SUCCESS,
-          message: t("dlg_asset.force_transfer_success") || "Force transfer successful!"
-        });
-        onClose();
-      });
-    } catch (e: any) {
+      signAndSend(tx, pair, {}, handleSignAndSendCallback);
+    } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      setError(errorMessage);
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
@@ -109,14 +136,14 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
           fill
           placeholder={t("dlg_asset.force_transfer_source") || "Source address"}
           value={source}
-          onChange={e => setSource(e.target.value)}
+          onChange={handleSourceChange}
           required
         />
         <InputGroup
           fill
           placeholder={t("dlg_asset.force_transfer_dest") || "Destination address"}
           value={dest}
-          onChange={e => setDest(e.target.value)}
+          onChange={handleDestChange}
           required
         />
         <NumericInput
@@ -124,7 +151,7 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
           min={0}
           placeholder={t("dlg_asset.amount") || "Amount (min units)"}
           value={amount}
-          onValueChange={v => setAmount(Number(v))}
+          onValueChange={handleAmountChange}
           required
         />
         {/* No inline error or success messages, notifications only */}

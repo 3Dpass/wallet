@@ -2,9 +2,6 @@ import { MenuItem } from "@blueprintjs/core";
 import { useTranslation } from "react-i18next";
 
 interface AssetActionsProps {
-  assetId: number;
-  metadata: { name: string; symbol: string; decimals: number; isFrozen: boolean } | null;
-  evmContractAddress: string;
   onFreeze: () => void;
   onThaw: () => void;
   onBurn: () => void;
@@ -13,7 +10,7 @@ interface AssetActionsProps {
   role: "owner" | "admin" | "issuer" | "freezer";
 }
 
-export default function AssetActions({ assetId, metadata, evmContractAddress, onFreeze, onThaw, onBurn, onTransferOwnership, onForceTransfer, role }: AssetActionsProps) {
+export default function AssetActions({ onFreeze, onThaw, onBurn, onTransferOwnership, onForceTransfer, role }: AssetActionsProps) {
   const { t } = useTranslation();
 
   // Role-based permissions

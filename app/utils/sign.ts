@@ -6,8 +6,11 @@ import type { EventRecord } from "@polkadot/types/interfaces";
 import type { Callback } from "@polkadot/types/types";
 import { mockVotes } from "./mock";
 
+// Type for the web3FromAddress function
+type Web3FromAddress = (address: string) => Promise<{ signer: Signer }>;
+
 // Conditional import to avoid SSR issues
-let web3FromAddress: any = null;
+let web3FromAddress: Web3FromAddress | null = null;
 if (typeof window !== 'undefined') {
   // Only import in browser environment
   import("@polkadot/extension-dapp/bundle").then(module => {

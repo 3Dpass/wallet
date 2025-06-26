@@ -22,7 +22,6 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
   const [selectedAccount] = useAtom(lastSelectedAccountAtom);
   const [who, setWho] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [freezeAsset, setFreezeAsset] = useState(false);
 
   // Get the KeyringPair for the selected account
@@ -39,14 +38,28 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
   })();
 
   const handleSubmit = async () => {
-    setError(null);
-    if (!api) return setError("API not ready");
+    if (!api) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "API not ready"
+      });
+      return;
+    }
     if (!selectedAccount || (!freezeAsset && !who)) {
-      setError(t("messages.lbl_fill_required_fields") || "Please fill all required fields.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
       return;
     }
     if (!pair) {
-      setError(t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+      });
       return;
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
@@ -77,9 +90,8 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
         });
         onClose();
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      setError(errorMessage);
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,

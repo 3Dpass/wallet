@@ -1,7 +1,7 @@
 import { Card, Elevation, Spinner, Switch, InputGroup, Button, Icon } from "@blueprintjs/core";
 import AssetsSection from "../components/assets/AssetsSection";
 import { useApi, useAccounts } from "app/components/Api";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAtom } from 'jotai';
 import { lastSelectedAccountAtom } from 'app/atoms';
 import ObjectCard from '../components/assets/ObjectCard';
@@ -22,16 +22,63 @@ export default function AssetsObjects() {
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const [objectIndexes, setObjectIndexes] = useState<number[]>([]);
-  const [objects, setObjects] = useState<any[]>([]);
+  const [objects, setObjects] = useState<(Record<string, unknown> | null)[]>([]);
   const [visibleCount, setVisibleCount] = useState(10);
   const [search, setSearch] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
-  const [objectsWithOwners, setObjectsWithOwners] = useState<any[]>([]);
-  const [objectsWithIdentities, setObjectsWithIdentities] = useState<any[]>([]);
+  const [objectsWithOwners, setObjectsWithOwners] = useState<(Record<string, unknown> | null)[]>([]);
+  const [objectsWithIdentities, setObjectsWithIdentities] = useState<(Record<string, unknown> | null)[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [userToggledShowAll, setUserToggledShowAll] = useState(false);
   const [isFetchingSpecificObject, setIsFetchingSpecificObject] = useState(false);
+
+  // Memoized callbacks for JSX props
+  const handleOpenDialog = useCallback(() => {
+    setIsDialogOpen(true);
+  }, []);
+
+  const handleCloseDialog = useCallback(() => {
+    setIsDialogOpen(false);
+  }, []);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  }, []);
+
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount((c) => c + 10);
+  }, []);
+
+  // Memoized callback for handling search suggestion clicks
+  const handleSuggestionClick = useCallback((suggestion: string) => {
+    // Extract the search term from the suggestion
+    if (suggestion.includes(t('assets_objects.search_suggestions.find_object', { index: '' }).replace('{{index}}', ''))) {
+      const index = parseInt(suggestion.split(t('assets_objects.search_suggestions.find_object', { index: '' }).replace('{{index}}', ''))[1]);
+      fetchObjectByIndex(index);
+      setSearch(''); // Clear the search input
+      setSearchSuggestions([]); // Clear suggestions
+    } else if (suggestion.includes(t('assets_objects.search_suggestions.public_objects'))) {
+      setSearch('public');
+      setSearchSuggestions([]); // Clear suggestions
+    } else if (suggestion.includes(t('assets_objects.search_suggestions.private_objects'))) {
+      setSearch('private');
+      setSearchSuggestions([]); // Clear suggestions
+    } else if (suggestion.endsWith(' objects')) {
+      // Handle state-based suggestions like "Created objects", "Approved objects"
+      setSearch(suggestion);
+      setSearchSuggestions([]); // Clear suggestions
+    } else if (suggestion.includes(t('assets_objects.search_suggestions.identity', { identity: '' }).replace('{{identity}}', ''))) {
+      setSearch(suggestion.split(t('assets_objects.search_suggestions.identity', { identity: '' }).replace('{{identity}}', ''))[1]);
+      setSearchSuggestions([]); // Clear suggestions
+    } else if (suggestion.includes(': ')) {
+      setSearch(suggestion.split(': ')[1]);
+      setSearchSuggestions([]); // Clear suggestions
+    } else {
+      setSearch(suggestion);
+      setSearchSuggestions([]); // Clear suggestions
+    }
+  }, [t]);
 
   // Auto-switch between "My objects" and "All objects" based on account presence, unless user toggled manually
   useEffect(() => {
@@ -48,10 +95,10 @@ export default function AssetsObjects() {
   }, [accounts.length, showAll, userToggledShowAll, isFetchingSpecificObject]);
 
   // When user toggles the switch, set the manual flag
-  const handleShowAllToggle = () => {
+  const handleShowAllToggle = useCallback(() => {
     setShowAll((v) => !v);
     setUserToggledShowAll(true);
-  };
+  }, []);
 
   // Helper function to get state display name
   const getStateDisplayName = (stateKey: string) => {
@@ -122,7 +169,7 @@ export default function AssetsObjects() {
 
       // Property suggestions
       if (Array.isArray(obj.prop)) {
-        obj.prop.forEach((p: any) => {
+        obj.prop.forEach((p: Record<string, unknown>) => {
           if (p && typeof p === 'object') {
             if (p.name && String(p.name).toLowerCase().includes(term)) {
               suggestions.push(t('assets_objects.search_suggestions.property', { name: p.name }));
@@ -151,7 +198,7 @@ export default function AssetsObjects() {
   };
 
   // Function to reset view to show all objects
-  const resetToAllObjects = () => {
+  const resetToAllObjects = useCallback(() => {
     setShowAll(true);
     setVisibleCount(10);
     setSearch('');
@@ -160,7 +207,7 @@ export default function AssetsObjects() {
     setIsFetchingSpecificObject(false); // Reset the specific object flag
     // Force a refresh by incrementing the refresh trigger
     setRefreshTrigger(prev => prev + 1);
-  };
+  }, []);
 
   // Function to fetch a specific object by index
   const fetchObjectByIndex = async (index: number) => {
@@ -306,9 +353,21 @@ export default function AssetsObjects() {
       }
       setLoadingObjects(true);
       try {
-        const queries = objectIndexes.map(idx => api.query.poScan.objects(idx) as Promise<any>);
+        const queries = objectIndexes.map(idx => api.query.poScan.objects(idx));
         const results = await Promise.all(queries);
-        const parsed = results.map((opt: any) => (opt.isSome ? opt.unwrap().toJSON() : null));
+        const parsed = results.map((opt) => {
+          if (opt && typeof opt === 'object' && 'isSome' in opt && 'unwrap' in opt) {
+            const option = opt as { isSome: boolean; unwrap: () => unknown };
+            if (option.isSome) {
+              const unwrapped = option.unwrap();
+              if (unwrapped && typeof unwrapped === 'object' && 'toJSON' in unwrapped) {
+                return (unwrapped as { toJSON: () => Record<string, unknown> }).toJSON();
+              }
+            }
+            return null;
+          }
+          return null;
+        });
         if (mounted) setObjects(parsed);
       } catch (e) {
         if (mounted) setObjects([]);
@@ -443,12 +502,14 @@ export default function AssetsObjects() {
             
             try {
               // Fetch identity information for the owner
-              const accountInfo = await api.derive.accounts.info(obj.owner);
+              const owner = obj.owner as string;
+              const accountInfo = await api.derive.accounts.info(owner);
               if (accountInfo.identity?.display) {
                 return { ...obj, identity: accountInfo.identity.display };
               }
             } catch (error) {
-              console.warn(t('assets_objects.failed_fetch_identity', { owner: obj.owner }), error);
+              const owner = obj.owner as string;
+              console.warn(t('assets_objects.failed_fetch_identity', { owner }), error);
             }
             return obj;
           })
@@ -493,7 +554,7 @@ export default function AssetsObjects() {
           )}
         </h2>
         <div className="flex items-center gap-6">
-          <Button icon="plus" intent="primary" className="mr-4" onClick={() => setIsDialogOpen(true)}>
+          <Button icon="plus" intent="primary" className="mr-4" onClick={handleOpenDialog}>
             {t('assets_objects.new_object')}
           </Button>
           <Switch
@@ -509,42 +570,17 @@ export default function AssetsObjects() {
             leftIcon="search"
             placeholder={t('assets_objects.search_placeholder')}
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={handleSearchChange}
             fill
           />
           {searchSuggestions.length > 0 && (
             <div className="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-b shadow-lg z-10 max-h-48 overflow-y-auto">
-              {searchSuggestions.map((suggestion, index) => (
+              {searchSuggestions.map((suggestion) => (
                 <div
-                  key={index}
+                  key={suggestion}
                   className="px-3 py-2 hover:bg-gray-700 cursor-pointer text-sm border-b border-gray-600 last:border-b-0 text-gray-200"
                   onClick={() => {
-                    // Extract the search term from the suggestion
-                    if (suggestion.includes(t('assets_objects.search_suggestions.find_object', { index: '' }).replace('{{index}}', ''))) {
-                      const index = parseInt(suggestion.split(t('assets_objects.search_suggestions.find_object', { index: '' }).replace('{{index}}', ''))[1]);
-                      fetchObjectByIndex(index);
-                      setSearch(''); // Clear the search input
-                      setSearchSuggestions([]); // Clear suggestions
-                    } else if (suggestion.includes(t('assets_objects.search_suggestions.public_objects'))) {
-                      setSearch('public');
-                      setSearchSuggestions([]); // Clear suggestions
-                    } else if (suggestion.includes(t('assets_objects.search_suggestions.private_objects'))) {
-                      setSearch('private');
-                      setSearchSuggestions([]); // Clear suggestions
-                    } else if (suggestion.endsWith(' objects')) {
-                      // Handle state-based suggestions like "Created objects", "Approved objects"
-                      setSearch(suggestion);
-                      setSearchSuggestions([]); // Clear suggestions
-                    } else if (suggestion.includes(t('assets_objects.search_suggestions.identity', { identity: '' }).replace('{{identity}}', ''))) {
-                      setSearch(suggestion.split(t('assets_objects.search_suggestions.identity', { identity: '' }).replace('{{identity}}', ''))[1]);
-                      setSearchSuggestions([]); // Clear suggestions
-                    } else if (suggestion.includes(': ')) {
-                      setSearch(suggestion.split(': ')[1]);
-                      setSearchSuggestions([]); // Clear suggestions
-                    } else {
-                      setSearch(suggestion);
-                      setSearchSuggestions([]); // Clear suggestions
-                    }
+                    handleSuggestionClick(suggestion);
                   }}
                 >
                   {suggestion}
@@ -559,7 +595,9 @@ export default function AssetsObjects() {
             <Button 
               icon="list" 
               minimal 
-              onClick={resetToAllObjects}
+              onClick={() => {
+                resetToAllObjects();
+              }}
             >
               {t('assets_objects.show_all_objects')}
             </Button>
@@ -597,7 +635,7 @@ export default function AssetsObjects() {
                     const matchingState = allStates.find(state => 
                       getStateDisplayName(state).toLowerCase() === stateSearch
                     );
-                    if (matchingState && obj.state && obj.state[matchingState] !== undefined) {
+                    if (matchingState && obj.state && (obj.state as Record<string, unknown>)[matchingState] !== undefined) {
                       return true;
                     }
                   }
@@ -610,29 +648,20 @@ export default function AssetsObjects() {
                   if (s === 'public' && obj.isPrivate === false) return true;
                   if (s === 'private' && obj.isPrivate === true) return true;
                   // Properties (by name or value)
-                  if (Array.isArray(obj.prop)) {
-                    for (const p of obj.prop) {
-                      if (p && typeof p === 'object') {
-                        // Check property name (case-insensitive, partial)
-                        if (p.name && String(p.name).toLowerCase().includes(s)) return true;
-                        // Check property value
-                        if (p.maxValue !== undefined && String(p.maxValue).includes(s)) return true;
-                      }
-                    }
-                  }
+                  if (Array.isArray(obj.prop) && obj.prop.some(p => 
+                    p && typeof p === 'object' && (
+                      (p.name && String(p.name).toLowerCase().includes(s)) ||
+                      (p.maxValue !== undefined && String(p.maxValue).includes(s))
+                    )
+                  )) return true;
                   // Non-Fungible (by property name or value)
-                  if (s === 'non-fungible' && Array.isArray(obj.prop)) {
-                    for (const p of obj.prop) {
-                      if (p && typeof p === 'object' && p.name && String(p.name).toLowerCase().includes('non-fungible')) return true;
-                    }
-                  }
+                  if (s === 'non-fungible' && Array.isArray(obj.prop) && obj.prop.some(p => 
+                    p && typeof p === 'object' && p.name && String(p.name).toLowerCase().includes('non-fungible')
+                  )) return true;
                   // State search
-                  if (obj.state) {
-                    const stateKeys = Object.keys(obj.state);
-                    for (const stateKey of stateKeys) {
-                      if (stateKey.toLowerCase().includes(s)) return true;
-                    }
-                  }
+                  if (obj.state && Object.keys(obj.state as Record<string, unknown>).some(stateKey => 
+                    stateKey.toLowerCase().includes(s)
+                  )) return true;
                   
                   // Owner search
                   if (obj.owner && String(obj.owner).toLowerCase().includes(s)) return true;
@@ -661,13 +690,15 @@ export default function AssetsObjects() {
               <div className="flex justify-center mt-4">
                 <button
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  onClick={() => setVisibleCount((c) => c + 10)}
+                  onClick={() => {
+                    handleLoadMore();
+                  }}
                 >
                   {t('assets_objects.load_more')}
                 </button>
               </div>
             )}
-            <DialogSubmitObject isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+            <DialogSubmitObject isOpen={isDialogOpen} onClose={handleCloseDialog} />
           </>
         )}
       </Card>

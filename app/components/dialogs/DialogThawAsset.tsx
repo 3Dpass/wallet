@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import BaseDialog from "./BaseDialog";
 import { InputGroup, Intent, Switch } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
@@ -22,8 +22,16 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
   const [selectedAccount] = useAtom(lastSelectedAccountAtom);
   const [who, setWho] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [thawAsset, setThawAsset] = useState(false);
+
+  // Memoized callbacks for JSX props
+  const handleThawAssetToggle = useCallback(() => {
+    setThawAsset(v => !v);
+  }, []);
+
+  const handleWhoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setWho(e.target.value);
+  }, []);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
@@ -38,15 +46,29 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
     }
   })();
 
-  const handleSubmit = async () => {
-    setError(null);
-    if (!api) return setError("API not ready");
+  const handleSubmit = () => {
+    if (!api) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "API not ready"
+      });
+      return;
+    }
     if (!selectedAccount || (!thawAsset && !who)) {
-      setError(t("messages.lbl_fill_required_fields") || "Please fill all required fields.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
       return;
     }
     if (!pair) {
-      setError(t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+      });
       return;
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
@@ -66,7 +88,7 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
       } else {
         tx = api.tx.poscanAssets.thaw(assetId, who);
       }
-      await signAndSend(tx, pair, {}, ({ status }) => {
+      signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
         toaster.show({
           icon: "endorsed",
@@ -77,9 +99,8 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
         });
         onClose();
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      setError(errorMessage);
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
@@ -108,14 +129,14 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
         <Switch
           checked={thawAsset}
           label={t("dlg_asset.thaw_asset_switch") || "Thaw entire asset"}
-          onChange={() => setThawAsset(v => !v)}
+          onChange={handleThawAssetToggle}
         />
         {!thawAsset && (
           <InputGroup
             fill
             placeholder={t("dlg_asset.thaw_who") || "Address to thaw"}
             value={who}
-            onChange={e => setWho(e.target.value)}
+            onChange={handleWhoChange}
             required
           />
         )}

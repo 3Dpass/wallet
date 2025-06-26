@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import BaseDialog from "./BaseDialog";
 import { useApi } from "app/components/Api";
-import { Button, NumericInput, Spinner, Switch, Intent, HTMLSelect, FormGroup } from "@blueprintjs/core";
+import { NumericInput, Spinner, Switch, Intent, HTMLSelect, FormGroup } from "@blueprintjs/core";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
 import keyring from "@polkadot/ui-keyring";
@@ -33,9 +33,59 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
   const [propIdx, setPropIdx] = useState<number | undefined>();
   const [maxSupply, setMaxSupply] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [propertyOptions, setPropertyOptions] = useState<{ label: string; value: number; maxValue: number }[]>([]);
   const [propertyOptionsLoading, setPropertyOptionsLoading] = useState(false);
+
+  // Memoized callbacks for event handlers
+  const handleAssetIdChange = useCallback((v: number | string) => {
+    setAssetId(Number(v));
+  }, []);
+
+  const handleMinBalanceChange = useCallback((v: number | string) => {
+    setMinBalance(Number(v));
+  }, []);
+
+  const handleWithObjChange = useCallback(() => {
+    setWithObj(v => !v);
+  }, []);
+
+  const handleObjIdxChange = useCallback((v: number | string) => {
+    setObjIdx(Number(v));
+  }, []);
+
+  const handlePropIdxChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPropIdx = Number(e.target.value);
+    setPropIdx(newPropIdx);
+    // Update maxSupply to the property's default maxValue
+    const selectedProperty = propertyOptions.find(opt => opt.value === newPropIdx);
+    if (selectedProperty) {
+      setMaxSupply(selectedProperty.maxValue);
+    }
+  }, [propertyOptions]);
+
+  const handleMaxSupplyChange = useCallback((v: number | string) => {
+    const selectedProperty = propertyOptions.find(opt => opt.value === propIdx);
+    const newValue = Number(v);
+    
+    // Prevent setting values greater than the property's max value
+    if (selectedProperty && newValue > selectedProperty.maxValue) {
+      setMaxSupply(selectedProperty.maxValue); // Cap at max value
+      return;
+    }
+    
+    setMaxSupply(newValue);
+  }, [propertyOptions, propIdx]);
+
+  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
+    if (!status.isInBlock) return;
+    toaster.show({
+      icon: "endorsed",
+      intent: Intent.SUCCESS,
+      message: t("messages.lbl_asset_created_success") || "Asset created successfully!"
+    });
+    if (onCreated) onCreated();
+    onClose();
+  }, [toaster, t, onCreated, onClose]);
 
   // Helper function to decode hex string to readable text
   const decodeHexString = (hexString: string): string => {
@@ -82,56 +132,58 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
           allPropIdxs = Array.from({ length: 21 }, (_, i) => i);
         }
         
-        const queries = allPropIdxs.map((idx) => api.query.poScan.properties(idx) as Promise<any>);
+        const queries = allPropIdxs.map((idx) => api.query.poScan.properties(idx) as Promise<unknown>);
         const results = await Promise.all(queries);
         const options: { label: string; value: number; maxValue: number }[] = [];
         
         results.forEach((result, index) => {
           const propIdx = allPropIdxs[index];
           // Type assertion to handle Option type
-          const optionResult = result as unknown as { isSome: boolean; unwrap: () => any };
-          if (optionResult?.isSome) {
-            const property = optionResult.unwrap().toJSON() as any;
-            const rawName = property?.name || `Property ${propIdx}`;
-            const name = decodeHexString(rawName);
-            
-            // Only include properties that have a meaningful name (not just "Property X")
-            // Skip properties that don't have a proper name or are empty
-            if (name && name.trim() !== '' && name !== `Property ${propIdx}`) {
-              // Determine maxValue based on context
-              let maxValue: number;
-              if (objectProperties && objectProperties.length > 0) {
-                // If object properties provided, use object's maxValue or default
-                if (propIdx === 1) {
-                  maxValue = DEFAULT_MAX_VALUE; // Default for Share
-                } else {
-                  const objectProp = objectProperties.find(p => Number(p.propIdx) === propIdx);
-                  maxValue = objectProp?.maxValue || DEFAULT_MAX_VALUE;
-                }
-              } else {
-                // If no object properties, use property definition's maxValue or default
-                maxValue = property?.maxValue || DEFAULT_MAX_VALUE;
-              }
+          if (result && typeof result === 'object' && 'isSome' in result && 'unwrap' in result) {
+            const optionResult = result as { isSome: boolean; unwrap: () => { toJSON: () => Record<string, unknown> } };
+            if (optionResult?.isSome) {
+              const property = optionResult.unwrap().toJSON() as Record<string, unknown>;
+              const rawName = (property?.name as string) || `Property ${propIdx}`;
+              const name = decodeHexString(rawName);
               
-              options.push({
-                label: name,
-                value: propIdx,
-                maxValue: maxValue
-              });
+              // Only include properties that have a meaningful name (not just "Property X")
+              // Skip properties that don't have a proper name or are empty
+              if (name && name.trim() !== '' && name !== `Property ${propIdx}`) {
+                // Determine maxValue based on context
+                let maxValue: number;
+                if (objectProperties && objectProperties.length > 0) {
+                  // If object properties provided, use object's maxValue or default
+                  if (propIdx === 1) {
+                    maxValue = DEFAULT_MAX_VALUE; // Default for Share
+                  } else {
+                    const objectProp = objectProperties.find(p => Number(p.propIdx) === propIdx);
+                    maxValue = objectProp?.maxValue || DEFAULT_MAX_VALUE;
+                  }
+                } else {
+                  // If no object properties, use property definition's maxValue or default
+                  maxValue = (property?.maxValue as number) || DEFAULT_MAX_VALUE;
+                }
+                
+                options.push({
+                  label: name,
+                  value: propIdx,
+                  maxValue: maxValue
+                });
+              }
+            } else if (objectProperties && objectProperties.length > 0) {
+              // For object properties, include them even if property definition not found
+              // (they might be custom properties for this object)
+              const objectProp = objectProperties.find(p => Number(p.propIdx) === propIdx);
+              if (objectProp) {
+                options.push({
+                  label: `Property ${propIdx}`,
+                  value: propIdx,
+                  maxValue: objectProp.maxValue
+                });
+              }
             }
-          } else if (objectProperties && objectProperties.length > 0) {
-            // For object properties, include them even if property definition not found
-            // (they might be custom properties for this object)
-            const objectProp = objectProperties.find(p => Number(p.propIdx) === propIdx);
-            if (objectProp) {
-              options.push({
-                label: `Property ${propIdx}`,
-                value: propIdx,
-                maxValue: objectProp.maxValue
-              });
-            }
+            // Skip properties that don't exist and aren't part of object properties
           }
-          // Skip properties that don't exist and aren't part of object properties
         });
         
         // Sort by name for better UX
@@ -139,7 +191,11 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
         setPropertyOptions(options);
       } catch (error) {
         console.error('Failed to fetch property options:', error);
-        setError('Failed to load property options');
+        toaster.show({
+          icon: "error",
+          intent: Intent.DANGER,
+          message: 'Failed to load property options'
+        });
       } finally {
         setPropertyOptionsLoading(false);
       }
@@ -180,15 +236,29 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
     }
   })();
 
-  const handleSubmit = async () => {
-    setError(null);
-    if (!api) return setError("API not ready");
+  const handleSubmit = () => {
+    if (!api) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: "API not ready"
+      });
+      return;
+    }
     if (assetId === undefined || !selectedAccount || minBalance === undefined) {
-      setError(t("messages.lbl_fill_required_fields") || "Please fill all required fields.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
       return;
     }
     if (!pair) {
-      setError(t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair.");
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+      });
       return;
     }
     const isLocked = pair.isLocked && !pair.meta.isInjected;
@@ -214,19 +284,9 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
         objDetails ? objDetails : null
       );
       // Use signAndSend for transaction signing
-      await signAndSend(tx, pair, {}, ({ status }) => {
-        if (!status.isInBlock) return;
-        toaster.show({
-          icon: "endorsed",
-          intent: Intent.SUCCESS,
-          message: t("messages.lbl_asset_created_success") || "Asset created successfully!"
-        });
-        if (onCreated) onCreated();
-        onClose();
-      });
-    } catch (e: any) {
+      signAndSend(tx, pair, {}, handleSignAndSendCallback);
+    } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
-      setError(errorMessage);
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
@@ -257,7 +317,7 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
           min={0}
           placeholder={t("dlg_asset.asset_id") || "Asset ID"}
           value={assetId}
-          onValueChange={v => setAssetId(Number(v))}
+          onValueChange={handleAssetIdChange}
           required
         />
         <NumericInput
@@ -265,13 +325,13 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
           min={0}
           placeholder={t("dlg_asset.min_balance") || "Min balance"}
           value={minBalance}
-          onValueChange={v => setMinBalance(Number(v))}
+          onValueChange={handleMinBalanceChange}
           required
         />
         <Switch
           checked={withObj}
           label={t("dlg_asset.link_object") || "Link to an Object"}
-          onChange={() => setWithObj(v => !v)}
+          onChange={handleWithObjChange}
         />
         {withObj && (
           <div className="flex flex-col gap-2">
@@ -280,7 +340,7 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
               min={0}
               placeholder={t("dlg_asset.obj_idx") || "Object Index (objIdx)"}
               value={objIdx}
-              onValueChange={v => setObjIdx(Number(v))}
+              onValueChange={handleObjIdxChange}
               required
             />
             <FormGroup label="Property">
@@ -294,15 +354,7 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
                   <HTMLSelect
                     options={propertyOptions}
                     value={propIdx}
-                    onChange={e => {
-                      const newPropIdx = Number(e.target.value);
-                      setPropIdx(newPropIdx);
-                      // Update maxSupply to the property's default maxValue
-                      const selectedProperty = propertyOptions.find(opt => opt.value === newPropIdx);
-                      if (selectedProperty) {
-                        setMaxSupply(selectedProperty.maxValue);
-                      }
-                    }}
+                    onChange={handlePropIdxChange}
                     placeholder="Select Property"
                     style={{ minWidth: '200px' }}
                   />
@@ -331,18 +383,7 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
                     })()}
                     placeholder={t("dlg_asset.max_supply") || "Max Supply"}
                     value={maxSupply}
-                    onValueChange={v => {
-                      const selectedProperty = propertyOptions.find(opt => opt.value === propIdx);
-                      const newValue = Number(v);
-                      
-                      // Prevent setting values greater than the property's max value
-                      if (selectedProperty && newValue > selectedProperty.maxValue) {
-                        setMaxSupply(selectedProperty.maxValue); // Cap at max value
-                        return;
-                      }
-                      
-                      setMaxSupply(newValue);
-                    }}
+                    onValueChange={handleMaxSupplyChange}
                     disabled={(() => {
                       const selectedProperty = propertyOptions.find(opt => opt.value === propIdx);
                       return selectedProperty && selectedProperty.maxValue === 1;

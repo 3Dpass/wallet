@@ -3,7 +3,6 @@ import React from "react";
 interface TokenHoldersPieChartProps {
   holders: { accountId: string; balance: number }[];
   total: number;
-  symbol: string;
 }
 
 const COLORS = [
@@ -11,7 +10,7 @@ const COLORS = [
   "#F76E6E", "#6E9AF7", "#B1F76E", "#F7A26E", "#6EF7F7"
 ];
 
-export default function TokenHoldersPieChart({ holders, total, symbol }: TokenHoldersPieChartProps) {
+export default function TokenHoldersPieChart({ holders, total }: TokenHoldersPieChartProps) {
   if (!holders.length || total === 0) {
     return <div className="text-center text-gray-500 py-4">No distribution data</div>;
   }

@@ -16,7 +16,7 @@ interface DialogJudgementRequestsProps {
 }
 
 interface Identity {
-  judgements: [string | number, { [key: string]: any }][];
+  judgements: [string | number, { [key: string]: unknown }][];
   info?: {
     display?: { Raw: string };
     legal?: { Raw: string };
@@ -35,7 +35,7 @@ interface IdentityWithAddress {
 
 interface Registrar {
   account: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export default function DialogJudgementRequests({ isOpen, onClose, registrarPair }: DialogJudgementRequestsProps) {

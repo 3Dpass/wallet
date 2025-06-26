@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Suspense } from "react";
 import {
   Button,
@@ -11,7 +11,6 @@ import {
   HTMLSelect,
   Intent,
   Callout,
-  Tag,
   Spinner,
   RadioGroup,
   Radio,
@@ -19,6 +18,7 @@ import {
 import { useDropzone } from "react-dropzone";
 import { OBJLoader } from "three-stdlib";
 import { Canvas } from "@react-three/fiber";
+import { Object3D } from "three";
 import ThreeDObject from "../block/ThreeDObject.client";
 import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
@@ -29,7 +29,6 @@ import { signAndSend } from "../../utils/sign";
 import keyring from "@polkadot/ui-keyring";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import type { SignerOptions } from "@polkadot/api/types";
-import { AccountName } from "../common/AccountName";
 
 // Constants
 const DEFAULT_MAX_VALUE = 100000000;
@@ -61,7 +60,7 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
   const [isPrivate, setIsPrivate] = useState(false);
   const [objFile, setObjFile] = useState<File | null>(null);
   const [objString, setObjString] = useState<string | null>(null);
-  const [mesh, setMesh] = useState<any>(null);
+  const [mesh, setMesh] = useState<Object3D & { geometry?: unknown } | null>(null);
   const [numApprovals, setNumApprovals] = useState(1);
   const [hashesEnabled, setHashesEnabled] = useState(false);
   const [hashes, setHashes] = useState<string[]>([]);
@@ -69,6 +68,53 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
   const [error, setError] = useState<string | null>(null);
   const [propertyOptions, setPropertyOptions] = useState<{ label: string; value: number; maxValue: number }[]>([]);
   const [propertyOptionsLoading, setPropertyOptionsLoading] = useState(false);
+
+  // Memoized callbacks for JSX props
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCategory(e.target.value);
+  }, []);
+
+  const handleIsPrivateChange = useCallback((e: React.FormEvent<HTMLInputElement>) => {
+    setIsPrivate(e.currentTarget.value === "private");
+  }, []);
+
+  const handleNumApprovalsChange = useCallback((v: number) => {
+    setNumApprovals(Number(v));
+  }, []);
+
+  const handleHashesEnabledToggle = useCallback(() => {
+    setHashesEnabled(v => !v);
+  }, []);
+
+  const handleHashInputChange = useCallback((idx: number, value: string) => {
+    handleHashChange(idx, value);
+  }, []);
+
+  const handlePropertySelectChange = useCallback((idx: number, value: number) => {
+    handlePropChange(idx, "propIdx", value);
+  }, []);
+
+  const handlePropertyValueChange = useCallback((idx: number, value: number) => {
+    handlePropChange(idx, "maxValue", value);
+  }, []);
+
+  // Create memoized callbacks for remove functions with index parameters
+  const createRemoveHashCallback = useCallback((idx: number) => () => {
+    removeHash(idx);
+  }, []);
+
+  const createRemovePropertyCallback = useCallback((idx: number) => () => {
+    removeProperty(idx);
+  }, []);
+
+  // Create memoized callbacks for input changes with index parameters
+  const createHashInputChangeCallback = useCallback((idx: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleHashInputChange(idx, e.target.value);
+  }, []);
+
+  const createPropertySelectChangeCallback = useCallback((idx: number) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    handlePropertySelectChange(idx, Number(e.target.value));
+  }, []);
 
   // Get the KeyringPair for the selected account
   const pair: KeyringPair | null = (() => {
@@ -134,18 +180,20 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
         
         propertyResults.forEach((result, index) => {
           // Type assertion to handle Option type
-          const optionResult = result as unknown as { isSome: boolean; unwrap: () => any };
-          if (optionResult?.isSome) {
-            const property = optionResult.unwrap().toJSON() as any;
-            const rawName = property?.name || `Property ${index}`;
-            const name = decodeHexString(rawName);
-            const maxValue = property?.maxValue || DEFAULT_MAX_VALUE;
-            
-            options.push({
-              label: name,
-              value: index,
-              maxValue: maxValue
-            });
+          if (result && typeof result === 'object' && 'isSome' in result && 'unwrap' in result) {
+            const optionResult = result as { isSome: boolean; unwrap: () => Record<string, unknown> };
+            if (optionResult?.isSome) {
+              const property = optionResult.unwrap().toJSON() as Record<string, unknown>;
+              const rawName = (property?.name as string) || `Property ${index}`;
+              const name = decodeHexString(rawName);
+              const maxValue = (property?.maxValue as number) || DEFAULT_MAX_VALUE;
+              
+              options.push({
+                label: name,
+                value: index,
+                maxValue: maxValue
+              });
+            }
           }
         });
         
@@ -174,7 +222,7 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
         setObjString(text);
         try {
           const loader = new OBJLoader();
-          const parsed = loader.parse(text);
+          const parsed = loader.parse(text) as { children: Object3D[] };
           setMesh(parsed.children[0]);
         } catch (e) {
           setError("Failed to parse OBJ file");
@@ -325,14 +373,14 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
           <HTMLSelect 
             options={CATEGORY_OPTIONS} 
             value={category} 
-            onChange={e => setCategory(e.target.value)} 
+            onChange={handleCategoryChange} 
           />
         </FormGroup>
         <FormGroup label="Rights">
           <RadioGroup
             inline
             selectedValue={isPrivate ? "private" : "public"}
-            onChange={e => setIsPrivate(e.currentTarget.value === "private")}
+            onChange={handleIsPrivateChange}
           >
             <Radio label="Public" value="public" />
             <Radio label="Private" value="private" />
@@ -354,16 +402,16 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
           )}
         </FormGroup>
         <FormGroup label="Approvals">
-          <NumericInput min={1} max={255} value={numApprovals} onValueChange={v => setNumApprovals(Number(v))} />
+          <NumericInput min={1} max={255} value={numApprovals} onValueChange={handleNumApprovalsChange} />
         </FormGroup>
         <FormGroup label="Hash ID">
-          <Switch checked={hashesEnabled} label="Add Hashes Manually" onChange={() => setHashesEnabled(v => !v)} />
+          <Switch checked={hashesEnabled} label="Add Hashes Manually" onChange={handleHashesEnabledToggle} />
           {hashesEnabled && (
             <div className="space-y-2 mt-2">
               {hashes.map((h, i) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <InputGroup value={h} onChange={e => handleHashChange(i, e.target.value)} placeholder="Hash (H256)" />
-                  <Button icon="cross" minimal onClick={() => removeHash(i)} />
+                <div key={`hash-${i}-${h}`} className="flex gap-2 items-center">
+                  <InputGroup value={h} onChange={createHashInputChangeCallback(i)} placeholder="Hash (H256)" />
+                  <Button icon="cross" minimal onClick={createRemoveHashCallback(i)} />
                 </div>
               ))}
               {hashes.length < 10 && <Button icon="plus" minimal onClick={addHash}>Add Hash</Button>}
@@ -383,22 +431,22 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
                 const isShare = selectedProperty?.label.toLowerCase() === 'share';
                 
                 return (
-                  <div key={i} className="flex gap-2 items-center">
+                  <div key={`property-${i}-${p.propIdx}-${p.maxValue}`} className="flex gap-2 items-center">
                     <HTMLSelect
                       options={propertyOptions}
                       value={p.propIdx}
-                      onChange={e => handlePropChange(i, "propIdx", Number(e.target.value))}
+                      onChange={createPropertySelectChangeCallback(i)}
                       placeholder="Select Property"
                       style={{ minWidth: '200px' }}
                     />
                     <NumericInput 
                       min={0} 
                       value={p.maxValue} 
-                      onValueChange={v => handlePropChange(i, "maxValue", Number(v))} 
+                      onValueChange={v => handlePropertyValueChange(i, Number(v))} 
                       placeholder="Max Value" 
                       disabled={isShare}
                     />
-                    <Button icon="cross" minimal onClick={() => removeProperty(i)} />
+                    <Button icon="cross" minimal onClick={createRemovePropertyCallback(i)} />
                     {isShare && (
                       <span className="text-sm text-gray-500">(Auto-applied)</span>
                     )}
