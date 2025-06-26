@@ -1,11 +1,22 @@
 import type { SubmittableResult } from "@polkadot/api";
 import type { SubmittableExtrinsic } from "@polkadot/api/promise/types";
 import type { Signer } from "@polkadot/api/types";
-import { web3FromAddress } from "@polkadot/extension-dapp/bundle";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import type { EventRecord } from "@polkadot/types/interfaces";
 import type { Callback } from "@polkadot/types/types";
 import { mockVotes } from "./mock";
+
+// Conditional import to avoid SSR issues
+let web3FromAddress: any = null;
+if (typeof window !== 'undefined') {
+  // Only import in browser environment
+  import("@polkadot/extension-dapp/bundle").then(module => {
+    web3FromAddress = module.web3FromAddress;
+  }).catch(() => {
+    // Silently fail if extension-dapp is not available
+    console.warn("Polkadot extension-dapp not available");
+  });
+}
 
 type Options = {
   signer?: Signer;
@@ -131,8 +142,12 @@ export async function signAndSend(
 
   const finalOptions = options || {};
   if (pair.meta.isInjected) {
-    const injected = await web3FromAddress(pair.address);
-    finalOptions.signer = injected.signer;
+    if (web3FromAddress) {
+      const injected = await web3FromAddress(pair.address);
+      finalOptions.signer = injected.signer;
+    } else {
+      console.warn("Polkadot extension-dapp not available, falling back to direct signing");
+    }
   }
   return tx.signAndSend(
     finalOptions.signer ? pair.address : pair,

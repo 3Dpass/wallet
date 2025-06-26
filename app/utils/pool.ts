@@ -18,11 +18,13 @@ export const convertPool = (
   const poolIds: string[] = [];
   let currentPoolId: string;
   for (const p of poolsSource) {
-    currentPoolId = (p[0].toHuman() as string[])[0];
+    const poolIdArray = p[0]?.toHuman() as string[];
+    currentPoolId = poolIdArray?.[0];
     if (currentPoolId && p[1]) {
+      const poolMembers = p[1].toHuman() as string[];
       pools.push({
         poolId: currentPoolId,
-        poolMembers: p[1].toHuman() as string[],
+        poolMembers: poolMembers || [],
       });
       poolIds.push(currentPoolId);
     }

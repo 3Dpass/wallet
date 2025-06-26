@@ -6,6 +6,10 @@ import * as THREE from "three";
 import { OBJLoader } from "three-stdlib";
 import type { IBlock } from "../components/types";
 
+// Constants for blockchain data parsing
+const ALGO_NAME_LENGTH = 32;
+const OBJECT_HASH_LENGTH = 64;
+
 // Create a fallback mesh when 3D object loading fails
 const createFallbackMesh = (): Mesh => {
   const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -18,9 +22,6 @@ export const loadBlock = async (
   hash?: string
 ): Promise<IBlock> => {
   let signedBlock: SignedBlock;
-
-  const algoNameLength = 32;
-  const objectHashLength = 64;
 
   if (hash === undefined) {
     signedBlock = await api.rpc.chain.getBlock();
@@ -41,16 +42,16 @@ export const loadBlock = async (
       if (log.isOther && log.asOther) {
         const logString = log.asOther.toString().substring(2);
         // Check if this looks like mining object data (has reasonable length)
-        if (logString.length >= algoNameLength) {
+        if (logString.length >= ALGO_NAME_LENGTH) {
           objectHashesString = logString;
-          objectHashAlgo = objectHashesString.substring(0, algoNameLength);
+          objectHashAlgo = objectHashesString.substring(0, ALGO_NAME_LENGTH);
 
-          let offset = algoNameLength;
+          let offset = ALGO_NAME_LENGTH;
           while (offset < objectHashesString.length) {
             objectHashes.push(
-              objectHashesString.substring(offset, offset + objectHashLength)
+              objectHashesString.substring(offset, offset + OBJECT_HASH_LENGTH)
             );
-            offset += objectHashLength;
+            offset += OBJECT_HASH_LENGTH;
           }
           break;
         }

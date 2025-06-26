@@ -114,7 +114,7 @@ export default function DialogIdentity({
         await api.query.identity.identityOf(pair.address)
       ).toHuman() as any;
       let registrarData: IPalletIdentityRegistrarInfo | null = null;
-      if (identityInfo && identityInfo.judgements && Array.isArray(identityInfo.judgements)) {
+      if (identityInfo?.judgements && Array.isArray(identityInfo.judgements)) {
         // Find the first registrar with a judgement (if any)
         const firstJudgement = identityInfo.judgements.find((j: any) => Array.isArray(j) && typeof j[0] === 'number');
         if (firstJudgement) {

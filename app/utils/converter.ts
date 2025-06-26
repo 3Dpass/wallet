@@ -6,6 +6,22 @@ import {
 } from "@polkadot/util-crypto";
 import { u8aToHex } from "@polkadot/util";
 
+// Constants for blockchain configuration
+export const EVM_CONTRACT_ADDRESS_PREFIX = '0xFBFBFBFA';
+export const P3D_DECIMALS = 12;
+export const P3D_DECIMALS_FACTOR = 10 ** P3D_DECIMALS;
+export const EVM_ADDRESS_HEX_PADDING = 32;
+
+/**
+ * Generates an EVM contract address for a given asset ID.
+ * @param assetId The asset ID.
+ * @returns The EVM contract address.
+ */
+export function generateEvmContractAddress(assetId: number): string {
+  const hexId = assetId.toString(16).padStart(EVM_ADDRESS_HEX_PADDING, '0');
+  return EVM_CONTRACT_ADDRESS_PREFIX + hexId;
+}
+
 /**
  * Converts an SS58 address to an H160 address.
  * @param ss58Address The SS58 address.

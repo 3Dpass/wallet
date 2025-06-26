@@ -172,6 +172,18 @@ export default function App() {
                           {t("governance.title")}
                         </span>
                       </Link>
+                      <Link
+                        to="/assets"
+                        className={`text-white hover:no-underline px-1 ms-3 flex items-center gap-2 ${
+                          location.pathname.startsWith("/assets")
+                            ? "font-bold"
+                            : ""
+                        }`}
+                      >
+                        <span className="mb-[-3px]">
+                          {t("assets.title", "Assets")}
+                        </span>
+                      </Link>
                       <a
                         href="https://3dpswap.online/"
                         className="text-white hover:no-underline px-1 ms-3 flex items-center gap-2"

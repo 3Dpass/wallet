@@ -1,8 +1,11 @@
-import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { BufferGeometry, Mesh } from "three";
 import * as THREE from "three";
 import { createCubeTexture } from "./threeDConstants";
+import { OrbitControls } from "three-stdlib";
+import { useThree, extend } from "@react-three/fiber";
+
+extend({ OrbitControls });
 
 interface ThreeDObjectProps {
   geometry: BufferGeometry;
@@ -21,6 +24,22 @@ const ObjectMaterial = ({ envMap }: ObjectMaterialProps) => (
     flatShading
   />
 );
+
+function Controls() {
+  const { camera, gl } = useThree();
+  const controls = useRef<any>();
+  useEffect(() => {
+    if (controls.current) {
+      controls.current.enableDamping = true;
+      controls.current.dampingFactor = 0.1;
+      controls.current.enablePan = false;
+      controls.current.enableZoom = false;
+      controls.current.autoRotate = false;
+    }
+  }, []);
+  // @ts-ignore
+  return <orbitControls ref={controls} args={[camera, gl.domElement]} />;
+}
 
 export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
   const meshRef = useRef<Mesh>(null);
@@ -51,16 +70,12 @@ export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
     };
   }, [scaled]);
 
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      const rotation = clock.getElapsedTime() / 10.0;
-      meshRef.current.rotation.set(rotation, rotation, rotation);
-    }
-  });
-
   return (
-    <mesh ref={meshRef} geometry={geometry}>
-      <ObjectMaterial envMap={textureCube} />
-    </mesh>
+    <>
+      <mesh ref={meshRef} geometry={geometry}>
+        <ObjectMaterial envMap={textureCube} />
+      </mesh>
+      <Controls />
+    </>
   );
 }

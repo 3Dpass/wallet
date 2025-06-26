@@ -113,6 +113,10 @@ export function useApi(): ApiPromise | undefined {
   return React.useContext(ApiCtx).api;
 }
 
+export function useKeyringLoaded(): boolean {
+  return React.useContext(ApiCtx).keyringLoaded;
+}
+
 export function useAccounts(): KeyringPair[] {
   return React.useContext(ApiCtx).accounts;
 }

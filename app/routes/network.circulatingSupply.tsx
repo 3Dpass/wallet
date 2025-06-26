@@ -4,6 +4,7 @@ import type { AccountInfo } from "@polkadot/types/interfaces/system/types";
 import { BigInt as PolkaBigInt } from "@polkadot/x-bigint";
 import { RPC_CONFIG, RPC_TYPES } from "../api.config";
 import { defaultEndpoint } from "../atoms";
+import { P3D_DECIMALS_FACTOR } from "../utils/converter";
 
 async function getCirculatingSupply() {
   const provider = new WsProvider(defaultEndpoint, false);
@@ -43,7 +44,7 @@ async function getCirculatingSupply() {
     circulating += free.toBigInt() - frozenValue;
   }
 
-  return ((circulating - budgetBalancesSum) / PolkaBigInt(10 ** 12)).toString();
+  return ((circulating - budgetBalancesSum) / PolkaBigInt(P3D_DECIMALS_FACTOR)).toString();
 }
 
 export async function loader() {

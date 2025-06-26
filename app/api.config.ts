@@ -38,6 +38,16 @@ export const RPC_CONFIG = {
       ],
       type: "String",
     },
+    getPoscanObject: {
+      description: "Get decompressed 3D object by index.",
+      params: [
+        {
+          name: "objectIndex",
+          type: "u32",
+        },
+      ],
+      type: "Json",
+    },
   },
 };
 export const RPC_TYPES = {

@@ -71,7 +71,7 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
       let index = null;
       if (Array.isArray(registrars)) {
         for (let i = 0; i < registrars.length; i++) {
-          if (registrars[i] && registrars[i].account === registrarPair.address) {
+          if (registrars[i]?.account === registrarPair.address) {
             index = i;
             break;
           }
@@ -82,7 +82,7 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
       const entries = await api.query.identity.identityOf.entries();
       const pending = entries
         .map(([storageKey, identityOpt]) => {
-          const address = storageKey.args[0].toString();
+          const address = storageKey.args[0]?.toString();
           const identity = identityOpt.toHuman() as unknown as Identity;
           if (!identity) return null;
           // Defensive: judgements may be undefined or not an array
@@ -165,7 +165,7 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
         twitter: { Raw: identity.info?.twitter?.Raw || "" },
         image: { Raw: "" },
         additional: (identity.info?.additional || []).map(
-          (item) => [item[0] || { Raw: '' }, item[1] || { Raw: '' }]
+          (item) => [item?.[0] || { Raw: '' }, item?.[1] || { Raw: '' }]
         )
       },
       judgements: identity.judgements.map(([regIdx, judgement]) => [regIdx.toString(), judgement]) as object[][]
