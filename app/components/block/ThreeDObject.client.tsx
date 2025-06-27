@@ -37,7 +37,7 @@ function Controls() {
       controls.current.autoRotate = false;
     }
   }, []);
-  // @ts-ignore - orbitControls is a custom component extended from OrbitControls via extend()
+  // @ts-expect-error - orbitControls is a custom component extended from OrbitControls via extend()
   return <orbitControls ref={controls} args={[camera, gl.domElement]} />;
 }
 

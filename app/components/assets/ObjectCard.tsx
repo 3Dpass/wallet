@@ -1,11 +1,10 @@
 import { Card, HTMLTable, Button, Collapse, Spinner, Icon, Classes, Popover, Intent } from "@blueprintjs/core";
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useMemo, useRef, useCallback } from "react";
-import * as THREE from "three";
+import React, { Suspense, useMemo, useRef, useCallback, useEffect, useState } from "react";
+import { Mesh } from "three";
 import { OBJLoader } from "three-stdlib";
 import ThreeDObject from "../block/ThreeDObject.client";
 import { useApi } from "app/components/Api";
-import React, { useEffect, useState } from "react";
 import { AccountName } from "app/components/common/AccountName";
 import { Buffer } from "node:buffer";
 import DialogAssetCard from "../dialogs/DialogAssetCard";
@@ -133,6 +132,229 @@ function toRecord(value: unknown): Record<string, unknown> {
   return {};
 }
 
+function ObjectDetailsTable({
+  rpcData,
+  propertyDefs,
+  formatRewards,
+  linkedAssets,
+  linkedAssetsLoading,
+  createAssetClickHandler,
+  selectedAssetId,
+  handleCloseSelectedAsset,
+  showCreateAssetDialog,
+  handleCloseCreateAssetDialog,
+  selectedPropertyForTokenization,
+  handleTokenizeProperty,
+  objectIndex,
+  selectedAccount,
+  showEstimators,
+  handleToggleEstimators,
+  showApprovers,
+  handleToggleApprovers,
+  showOutliers,
+  handleToggleOutliers
+}: {
+  rpcData: RpcObjectData;
+  propertyDefs: Record<number, { name: string; maxValue: number }>;
+  formatRewards: (amount: number) => string;
+  linkedAssets: LinkedAsset[];
+  linkedAssetsLoading: boolean;
+  createAssetClickHandler: (assetId: number) => () => void;
+  selectedAssetId: number | null;
+  handleCloseSelectedAsset: () => void;
+  showCreateAssetDialog: boolean;
+  handleCloseCreateAssetDialog: () => void;
+  selectedPropertyForTokenization: { objIdx: number; propIdx: number } | null;
+  handleTokenizeProperty: (objIdx: number, propIdx: number) => void;
+  objectIndex: number;
+  selectedAccount: string | undefined;
+  showEstimators: boolean;
+  handleToggleEstimators: () => void;
+  showApprovers: boolean;
+  handleToggleApprovers: () => void;
+  showOutliers: boolean;
+  handleToggleOutliers: () => void;
+}) {
+  return (
+    <div className="space-y-4 pt-4 border-t">
+      <HTMLTable className="w-full" striped>
+        <tbody>
+          <tr>
+            <td className="shadow-none font-medium pr-4">Estimator Rewards</td>
+            <td className="shadow-none">{formatRewards(rpcData.est_rewards)}</td>
+          </tr>
+          <tr>
+            <td className="shadow-none font-medium pr-4">Author Rewards</td>
+            <td className="shadow-none">{formatRewards(rpcData.author_rewards)}</td>
+          </tr>
+        </tbody>
+      </HTMLTable>
+      {rpcData.estimators.length > 0 && rpcData.hashes.length > 0 ? (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <Button
+              minimal
+              icon={showEstimators ? "chevron-up" : "chevron-down"}
+              onClick={handleToggleEstimators}
+              text={showEstimators ? `Hide Estimators (${rpcData.estimators.length})` : `Show Estimators (${rpcData.estimators.length})`}
+              className="mb-2"
+            />
+            {showEstimators && (
+              <div className="space-y-1 mt-2">
+                {rpcData.estimators
+                  .sort(([, a], [, b]) => a - b) // Sort by numeric value (ascending)
+                  .map(([account, value]) => (
+                  <div key={`estimator-${account}-${value}`} className="text-sm flex items-center gap-2 font-mono text-xs">
+                    <AccountName address={account} />
+                    <span className="ml-2 text-gray-600">({value} ms)</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : rpcData.estimators.length > 0 ? (
+        <div>
+          <Button
+            minimal
+            icon={showEstimators ? "chevron-up" : "chevron-down"}
+            onClick={handleToggleEstimators}
+            text={showEstimators ? `Hide Estimators (${rpcData.estimators.length})` : `Show Estimators (${rpcData.estimators.length})`}
+            className="mb-2"
+          />
+          {showEstimators && (
+            <div className="space-y-1 mt-2">
+              {rpcData.estimators
+                .sort(([, a], [, b]) => a - b) // Sort by numeric value (ascending)
+                .map(([account, value]) => (
+                <div key={`estimator-${account}-${value}`} className="text-sm flex items-center gap-2 font-mono text-xs">
+                  <AccountName address={account} />
+                  <span className="ml-2 text-gray-600">({value} ms)</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
+      {rpcData.approvers.length > 0 && (
+        <div>
+          <Button
+            minimal
+            icon={showApprovers ? "chevron-up" : "chevron-down"}
+            onClick={handleToggleApprovers}
+            text={showApprovers ? `Hide Approvers (${rpcData.approvers.length})` : `Show Approvers (${rpcData.approvers.length})`}
+            className="mb-2"
+          />
+          {showApprovers && (
+            <div className="space-y-1">
+              {rpcData.approvers.map((approver) => (
+                <div key={`approver-${approver.account_id}-${approver.when}`} className="text-sm flex items-center gap-2 font-mono text-xs">
+                  <AccountName address={approver.account_id} />
+                  <span className="ml-2 text-gray-600">(when: {approver.when ? (
+                    <a
+                      href={`https://3dpscan.xyz/#/blocks/${approver.when}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      {approver.when}
+                    </a>
+                  ) : "-"})</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      {/* Outliers Section */}
+      {rpcData.est_outliers && rpcData.est_outliers.length > 0 && (
+        <div>
+          <Button
+            minimal
+            icon={showOutliers ? "chevron-up" : "chevron-down"}
+            onClick={handleToggleOutliers}
+            text={showOutliers ? `Hide Outliers (${rpcData.est_outliers.length})` : `Show Outliers (${rpcData.est_outliers.length})`}
+            className="mb-2"
+          />
+          {showOutliers && (
+            <div className="space-y-1">
+              {rpcData.est_outliers.map((address) => (
+                <div key={`outlier-${address}`} className="text-sm font-mono text-xs text-red-700 break-all">
+                  <AccountName address={address} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ObjectPreview({ mesh, objString, objectIndex, rpcData, isLoading }: {
+  mesh: Mesh | null;
+  objString: string | null;
+  objectIndex: number;
+  rpcData: RpcObjectData | null;
+  isLoading: boolean;
+}) {
+  return (
+    <div className="md:w-80 flex-shrink-0 flex items-center justify-center overflow-hidden h-[260px] relative w-full md:w-80">
+      {mesh?.geometry ? (
+        <>
+          <Canvas camera={{ fov: 30, near: 0.1, far: 1000, position: [0, 0, 2] }}>
+            <Suspense fallback={null}>
+              <ThreeDObject geometry={mesh.geometry} />
+            </Suspense>
+          </Canvas>
+          {objString && (
+            <div className="absolute top-2 right-2 z-10 flex gap-2">
+              <a
+                className={Classes.BUTTON}
+                href={`data:text/plain;base64,${Buffer.from(objString).toString('base64')}`}
+                download={`3dpass-object-${objectIndex}.obj`}
+                title="Download OBJ file"
+              >
+                <Icon icon="download" />
+              </a>
+              <Popover
+                content={
+                  <div className="p-4">
+                    {rpcData && rpcData.hashes && rpcData.hashes.length > 0 && (
+                      <>
+                        <div className="font-mono mb-2">Hash ID Objects3D: Grid2dLow</div>
+                        <code className="block text-xs">
+                          {rpcData.hashes.map((hash) => (
+                            <div key={hash}>{hash}</div>
+                          ))}
+                        </code>
+                      </>
+                    )}
+                  </div>
+                }
+                position="bottom"
+              >
+                <Button icon="info-sign" className={Classes.BUTTON} />
+              </Popover>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-full">
+          {isLoading ? (
+            <>
+              <Spinner size={24} />
+              <span className="text-gray-400 mt-2">Loading...</span>
+            </>
+          ) : (
+            <span className="text-gray-400">No preview</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps) {
   const api = useApi();
   const [objString, setObjString] = useState<string | null>(null);
@@ -224,7 +446,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
     }
     
     try {
-      // @ts-ignore - poscan is a custom RPC
+      // @ts-expect-error - poscan is a custom RPC
       const result = await api.rpc.poscan.getPoscanObject(targetObjectIndex);
       
       // Check if request was cancelled
@@ -342,8 +564,8 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
       const loader = new OBJLoader();
       const parsed = loader.parse(objString);
       const firstChild = parsed.children[0];
-      if (firstChild && (firstChild as THREE.Mesh).isMesh && (firstChild as THREE.Mesh).geometry) {
-        return firstChild as THREE.Mesh;
+      if (firstChild && (firstChild as Mesh).isMesh && (firstChild as Mesh).geometry) {
+        return firstChild as Mesh;
       }
       return null;
     } catch (e) {
@@ -456,7 +678,9 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                   str += String.fromCharCode(parseInt(hex.substr(j, 2), 16));
                 }
                 name = str;
-              } catch (e) {}
+              } catch (e) {
+                // ignore decoding errors, fallback to original hex string
+              }
             }
             maxValue = (prop.maxValue ?? prop.max_value ?? 1) as number;
           } else {
@@ -551,59 +775,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
       <Card className="w-full hover:shadow-lg transition-shadow duration-200 mb-4 overflow-hidden">
         <div className="flex flex-col md:flex-row gap-0 mb-4 items-start">
           {/* Preview Left (fixed width) */}
-          <div className="md:w-80 flex-shrink-0 flex items-center justify-center overflow-hidden h-[260px] relative w-full md:w-80">
-            {mesh && mesh.geometry ? (
-              <>
-                <Canvas camera={{ fov: 30, near: 0.1, far: 1000, position: [0, 0, 2] }}>
-                  <Suspense fallback={null}>
-                    <ThreeDObject geometry={mesh.geometry} />
-                  </Suspense>
-                </Canvas>
-                {objString && (
-                  <div className="absolute top-2 right-2 z-10 flex gap-2">
-                    <a
-                      className={Classes.BUTTON}
-                      href={`data:text/plain;base64,${Buffer.from(objString).toString('base64')}`}
-                      download={`3dpass-object-${objectIndex}.obj`}
-                      title="Download OBJ file"
-                    >
-                      <Icon icon="download" />
-                    </a>
-                    <Popover
-                      content={
-                        <div className="p-4">
-                          {rpcData && rpcData.hashes && rpcData.hashes.length > 0 && (
-                            <>
-                              <div className="font-mono mb-2">Hash ID Objects3D: Grid2dLow</div>
-                              <code className="block text-xs">
-                                {rpcData.hashes.map((hash) => (
-                                  <div key={hash}>{hash}</div>
-                                ))}
-                              </code>
-                            </>
-                          )}
-                        </div>
-                      }
-                      position="bottom"
-                    >
-                      <Button icon="info-sign" className={Classes.BUTTON} />
-                    </Popover>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full">
-                {isLoading ? (
-                  <>
-                    <Spinner size={24} />
-                    <span className="text-gray-400 mt-2">Loading...</span>
-                  </>
-                ) : (
-                  <span className="text-gray-400">No preview</span>
-                )}
-              </div>
-            )}
-          </div>
+          <ObjectPreview mesh={mesh} objString={objString} objectIndex={objectIndex} rpcData={rpcData} isLoading={isLoading} />
           {/* Info Right (flex-1) */}
           <div className="flex-1 flex flex-col justify-start p-6 min-w-0 w-full md:w-auto">
             <div className="w-full">
@@ -663,9 +835,9 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                   <tr>
                     <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Properties</td>
                     <td className="font-medium">
-                      {rpcData && rpcData.prop && rpcData.prop.length > 0 ? (
+                      {(rpcData?.prop?.length ?? 0) > 0 ? (
                         <div className="space-y-2">
-                          {rpcData.prop.map((p) => {
+                          {rpcData?.prop?.map((p) => {
                             const def = propertyDefs[Number(p.propIdx)];
                             const name = def?.name || `Property ${p.propIdx}`;
                             const max = def?.maxValue ?? 1;
@@ -715,118 +887,28 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         {/* Detailed Information - Collapsible */}
         <Collapse isOpen={isExpanded}>
           {rpcData && (
-            <div className="space-y-4 pt-4 border-t">
-              <HTMLTable className="w-full" striped>
-                <tbody>
-                  <tr>
-                    <td className="shadow-none font-medium pr-4">Estimator Rewards</td>
-                    <td className="shadow-none">{formatRewards(rpcData.est_rewards)}</td>
-                  </tr>
-                  <tr>
-                    <td className="shadow-none font-medium pr-4">Author Rewards</td>
-                    <td className="shadow-none">{formatRewards(rpcData.author_rewards)}</td>
-                  </tr>
-                </tbody>
-              </HTMLTable>
-              {rpcData.estimators.length > 0 && rpcData.hashes.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <Button
-                      minimal
-                      icon={showEstimators ? "chevron-up" : "chevron-down"}
-                      onClick={handleToggleEstimators}
-                      text={showEstimators ? `Hide Estimators (${rpcData.estimators.length})` : `Show Estimators (${rpcData.estimators.length})`}
-                      className="mb-2"
-                    />
-                    {showEstimators && (
-                      <div className="space-y-1 mt-2">
-                        {rpcData.estimators
-                          .sort(([, a], [, b]) => a - b) // Sort by numeric value (ascending)
-                          .map(([account, value]) => (
-                          <div key={`estimator-${account}-${value}`} className="text-sm flex items-center gap-2 font-mono text-xs">
-                            <AccountName address={account} />
-                            <span className="ml-2 text-gray-600">({value} ms)</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : rpcData.estimators.length > 0 ? (
-                <div>
-                  <Button
-                    minimal
-                    icon={showEstimators ? "chevron-up" : "chevron-down"}
-                    onClick={handleToggleEstimators}
-                    text={showEstimators ? `Hide Estimators (${rpcData.estimators.length})` : `Show Estimators (${rpcData.estimators.length})`}
-                    className="mb-2"
-                  />
-                  {showEstimators && (
-                    <div className="space-y-1 mt-2">
-                      {rpcData.estimators
-                        .sort(([, a], [, b]) => a - b) // Sort by numeric value (ascending)
-                        .map(([account, value]) => (
-                        <div key={`estimator-${account}-${value}`} className="text-sm flex items-center gap-2 font-mono text-xs">
-                          <AccountName address={account} />
-                          <span className="ml-2 text-gray-600">({value} ms)</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : null}
-              {rpcData.approvers.length > 0 && (
-                <div>
-                  <Button
-                    minimal
-                    icon={showApprovers ? "chevron-up" : "chevron-down"}
-                    onClick={handleToggleApprovers}
-                    text={showApprovers ? `Hide Approvers (${rpcData.approvers.length})` : `Show Approvers (${rpcData.approvers.length})`}
-                    className="mb-2"
-                  />
-                  {showApprovers && (
-                    <div className="space-y-1">
-                      {rpcData.approvers.map((approver) => (
-                        <div key={`approver-${approver.account_id}-${approver.when}`} className="text-sm flex items-center gap-2 font-mono text-xs">
-                          <AccountName address={approver.account_id} />
-                          <span className="ml-2 text-gray-600">(when: {approver.when ? (
-                            <a
-                              href={`https://3dpscan.xyz/#/blocks/${approver.when}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:underline"
-                            >
-                              {approver.when}
-                            </a>
-                          ) : "-"})</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-              {/* Outliers Section */}
-              {rpcData.est_outliers && rpcData.est_outliers.length > 0 && (
-                <div>
-                  <Button
-                    minimal
-                    icon={showOutliers ? "chevron-up" : "chevron-down"}
-                    onClick={handleToggleOutliers}
-                    text={showOutliers ? `Hide Outliers (${rpcData.est_outliers.length})` : `Show Outliers (${rpcData.est_outliers.length})`}
-                    className="mb-2"
-                  />
-                  {showOutliers && (
-                    <div className="space-y-1">
-                      {rpcData.est_outliers.map((address) => (
-                        <div key={`outlier-${address}`} className="text-sm font-mono text-xs text-red-700 break-all">
-                          <AccountName address={address} />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            <ObjectDetailsTable
+              rpcData={rpcData}
+              propertyDefs={propertyDefs}
+              formatRewards={formatRewards}
+              linkedAssets={linkedAssets}
+              linkedAssetsLoading={linkedAssetsLoading}
+              createAssetClickHandler={createAssetClickHandler}
+              selectedAssetId={selectedAssetId}
+              handleCloseSelectedAsset={handleCloseSelectedAsset}
+              showCreateAssetDialog={showCreateAssetDialog}
+              handleCloseCreateAssetDialog={handleCloseCreateAssetDialog}
+              selectedPropertyForTokenization={selectedPropertyForTokenization}
+              handleTokenizeProperty={handleTokenizeProperty}
+              objectIndex={objectIndex}
+              selectedAccount={selectedAccount ?? undefined}
+              showEstimators={showEstimators}
+              handleToggleEstimators={handleToggleEstimators}
+              showApprovers={showApprovers}
+              handleToggleApprovers={handleToggleApprovers}
+              showOutliers={showOutliers}
+              handleToggleOutliers={handleToggleOutliers}
+            />
           )}
         </Collapse>
       </Card>

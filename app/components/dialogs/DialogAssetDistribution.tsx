@@ -34,6 +34,31 @@ function isOption(obj: unknown): obj is PolkadotOption {
   return typeof option.isSome === "boolean" && typeof option.unwrap === "function";
 }
 
+function HoldersTable({ holders, decimals, symbol, total }: { holders: Holder[]; decimals: number; symbol: string; total: number }) {
+  return (
+    <HTMLTable className="w-full" striped>
+      <thead>
+        <tr>
+          <th>Address</th>
+          <th>Balance</th>
+          <th>% Share</th>
+        </tr>
+      </thead>
+      <tbody>
+        {holders.length === 0 ? (
+          <tr><td colSpan={3} className="text-center text-gray-500">No holders found</td></tr>
+        ) : holders.map((h) => (
+          <tr key={h.accountId}>
+            <td><AccountName address={h.accountId} /></td>
+            <td><FormattedAmount value={h.balance} decimals={decimals} unit={symbol} /></td>
+            <td>{total > 0 ? ((h.balance / total) * 100).toFixed(4) + '%' : '-'}</td>
+          </tr>
+        ))}
+      </tbody>
+    </HTMLTable>
+  );
+}
+
 export default function DialogAssetDistribution({ isOpen, onClose, assetId, decimals, symbol }: DialogAssetDistributionProps) {
   const api = useApi();
   const [holders, setHolders] = useState<Holder[]>([]);
@@ -91,6 +116,7 @@ export default function DialogAssetDistribution({ isOpen, onClose, assetId, deci
       }
     }
     fetchHolders();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return () => { mountedRef.current = false; };
   }, [api, isOpen, assetId]);
 
@@ -120,26 +146,7 @@ export default function DialogAssetDistribution({ isOpen, onClose, assetId, deci
             autoFocus
           />
           <TokenHoldersPieChart holders={filteredHolders} total={total} />
-          <HTMLTable className="w-full" striped>
-            <thead>
-              <tr>
-                <th>Address</th>
-                <th>Balance</th>
-                <th>% Share</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredHolders.length === 0 ? (
-                <tr><td colSpan={3} className="text-center text-gray-500">No holders found</td></tr>
-              ) : filteredHolders.map((h) => (
-                <tr key={h.accountId}>
-                  <td><AccountName address={h.accountId} /></td>
-                  <td><FormattedAmount value={h.balance} decimals={decimals} unit={symbol} /></td>
-                  <td>{total > 0 ? ((h.balance / total) * 100).toFixed(4) + '%' : '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </HTMLTable>
+          <HoldersTable holders={filteredHolders} decimals={decimals} symbol={symbol} total={total} />
         </>
       )}
     </BaseDialog>

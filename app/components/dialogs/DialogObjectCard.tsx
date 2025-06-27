@@ -32,7 +32,7 @@ export default function DialogObjectCard({ isOpen, onClose, objectIndex }: Dialo
       setError(null);
       try {
         if (!api) throw new Error("API not ready");
-        // @ts-ignore - poscan is a custom RPC
+        // @ts-expect-error - poscan is a custom RPC
         const result = await api.rpc.poscan.getPoscanObject(objectIndex);
         // Patch snake_case to camelCase for ObjectCard compatibility
         let patchedResult = result;
@@ -51,6 +51,7 @@ export default function DialogObjectCard({ isOpen, onClose, objectIndex }: Dialo
       }
     }
     fetchObject();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return () => { mountedRef.current = false; };
   }, [api, isOpen, objectIndex]);
 

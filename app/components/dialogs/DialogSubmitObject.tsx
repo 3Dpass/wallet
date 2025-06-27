@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Suspense } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import {
   Button,
   Dialog,

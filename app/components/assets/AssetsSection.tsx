@@ -75,21 +75,46 @@ export default function AssetsSection({ children }: AssetsSectionProps) {
     return metadata;
   }, [balancesLoading, accountBalances, accounts]);
 
+  // Internal helper to render the account selector
+  function AccountSelector({
+    accounts,
+    selectedAccount,
+    setSelectedAccount,
+    accountMetadata,
+    balancesLoading
+  }: {
+    accounts: string[];
+    selectedAccount: string | null;
+    setSelectedAccount: (address: string | null) => void;
+    accountMetadata: Record<string, React.ReactNode>;
+    balancesLoading: boolean;
+  }) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="font-medium whitespace-nowrap hidden sm:block">Account:</div>
+        <AddressSelect
+          onAddressChange={setSelectedAccount}
+          selectedAddress={selectedAccount}
+          addresses={accounts}
+          isLoading={accounts.length === 0}
+          metadata={accountMetadata}
+        />
+      </div>
+    );
+  }
+
   return (
     <Container>
       <div className="grid gap-6">
         <div className="flex justify-between items-center">
           <AssetsMenu />
-          <div className="flex items-center gap-2">
-            <div className="font-medium whitespace-nowrap hidden sm:block">Account:</div>
-            <AddressSelect
-              onAddressChange={setSelectedAccount}
-              selectedAddress={selectedAccount}
-              addresses={accounts}
-              isLoading={accounts.length === 0}
-              metadata={accountMetadata}
-            />
-          </div>
+          <AccountSelector
+            accounts={accounts}
+            selectedAccount={selectedAccount}
+            setSelectedAccount={setSelectedAccount}
+            accountMetadata={accountMetadata}
+            balancesLoading={balancesLoading}
+          />
         </div>
         {children}
       </div>

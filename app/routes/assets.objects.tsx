@@ -131,9 +131,10 @@ export default function AssetsObjects() {
     // Extract the search term from the suggestion
     if (suggestion.includes(t('assets_objects.search_suggestions.find_object', { index: '' }).replace('{{index}}', ''))) {
       const index = parseInt(suggestion.split(t('assets_objects.search_suggestions.find_object', { index: '' }).replace('{{index}}', ''))[1]);
-      fetchObjectByIndex(index);
-      setSearch(''); // Clear the search input
-      setSearchSuggestions([]); // Clear suggestions
+      fetchObjectByIndex(index).then(() => {
+        setSearch(''); // Clear the search input
+        setSearchSuggestions([]); // Clear suggestions
+      });
     } else if (suggestion.includes(t('assets_objects.search_suggestions.public_objects'))) {
       setSearch('public');
       setSearchSuggestions([]); // Clear suggestions
@@ -353,6 +354,7 @@ export default function AssetsObjects() {
       }
     }
     fetchIndexes();
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     return () => { mounted = false; };
   }, [api, selectedAccount, showAll, refreshTrigger, isFetchingSpecificObject, t]);
 
@@ -442,7 +444,7 @@ export default function AssetsObjects() {
             // For "My objects", always verify ownership to catch storage inconsistencies
             if (!showAll) {
               try {
-                // @ts-ignore - poscan is a custom RPC
+                // @ts-expect-error - poscan is a custom RPC
                 const rpcResult = await api.rpc.poscan.getPoscanObject(objectIndexes[index]);
                 if (rpcResult?.owner) {
                   const actualOwner = rpcResult.owner;
@@ -467,7 +469,7 @@ export default function AssetsObjects() {
             } else {
               // For "All objects", try to get owner data but don't exclude on failure
               try {
-                // @ts-ignore - poscan is a custom RPC
+                // @ts-expect-error - poscan is a custom RPC
                 const rpcResult = await api.rpc.poscan.getPoscanObject(objectIndexes[index]);
                 if (rpcResult?.owner) {
                   return { ...obj, owner: rpcResult.owner };
@@ -601,6 +603,15 @@ export default function AssetsObjects() {
                   key={suggestion}
                   className="px-3 py-2 hover:bg-gray-700 cursor-pointer text-sm border-b border-gray-600 last:border-b-0 text-gray-200"
                   onClick={createSuggestionClickHandler(suggestion)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      createSuggestionClickHandler(suggestion)();
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Select suggestion: ${suggestion}`}
                 >
                   {suggestion}
                 </div>
@@ -641,10 +652,11 @@ export default function AssetsObjects() {
                 .map((obj, originalIndex) => ({ obj, originalIndex }))
                 .filter(({ obj, originalIndex }) => {
                   if (!obj) return false;
+                  // Always show if fetching a specific object
+                  if (isFetchingSpecificObject) return true;
                   // Search filter
                   if (!search.trim()) return true;
                   const searchTermLower = search.trim().toLowerCase();
-                  
                   // State-based searches (e.g., "Created objects", "Approved objects")
                   if (searchTermLower.endsWith(' objects')) {
                     const stateSearch = searchTermLower.replace(' objects', '');
@@ -656,7 +668,6 @@ export default function AssetsObjects() {
                       return true;
                     }
                   }
-                  
                   return (
                     // Index
                     String(objectIndexes[originalIndex]).includes(searchTermLower) ||

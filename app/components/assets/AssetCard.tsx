@@ -92,6 +92,197 @@ function getOptionValue<T>(option: PolkadotOption<T>): T | Record<string, unknow
 // Constants
 const FETCH_DEBOUNCE_MS = 300; // 300ms debounce delay
 
+// Internal helper to render the asset info, table, and actions
+function AssetInfoSection({
+  details,
+  metadata,
+  property,
+  maxSupply,
+  supplyValue,
+  issuedPercent,
+  evmContractAddress,
+  t,
+  userRole,
+  inDialog,
+  linkedObjIdx,
+  showObjectDialog,
+  handleOpenObjectDialog,
+  handleCloseObjectDialog,
+  showTeam,
+  handleToggleTeam,
+  handleCopyAddress,
+  showDistributionDialog,
+  handleOpenDistributionDialog,
+  handleCloseDistributionDialog,
+  showSetMetadataDialog,
+  handleOpenSetMetadataDialog,
+  handleCloseSetMetadataDialog,
+  showSetTeamDialog,
+  handleOpenSetTeamDialog,
+  handleCloseSetTeamDialog,
+  showMintDialog,
+  handleOpenMintDialog,
+  handleCloseMintDialog,
+  showBurnDialog,
+  handleOpenBurnDialog,
+  handleCloseBurnDialog,
+  showFreezeDialog,
+  handleOpenFreezeDialog,
+  handleCloseFreezeDialog,
+  showThawDialog,
+  handleOpenThawDialog,
+  handleCloseThawDialog,
+  showTransferOwnershipDialog,
+  handleOpenTransferOwnershipDialog,
+  handleCloseTransferOwnershipDialog,
+  showForceTransferDialog,
+  handleOpenForceTransferDialog,
+  handleCloseForceTransferDialog,
+  assetId,
+  title
+}: any) {
+  return (
+    <div className="flex flex-col md:flex-row gap-0 mb-4 items-start">
+      {/* Info */}
+      <div className="flex-1 flex flex-col justify-start p-6 min-w-0 w-full md:w-auto">
+        <div className="w-full">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex w-full items-center justify-between gap-2">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                {title}
+              </h2>
+              {!inDialog && linkedObjIdx !== null && !isNaN(linkedObjIdx) && (
+                <Button icon="cube" onClick={handleOpenObjectDialog} className="ml-4">
+                  {t("asset_card.view_object")}{linkedObjIdx}
+                </Button>
+              )}
+            </div>
+          </div>
+          <HTMLTable className="w-full mb-2" striped>
+            <tbody>
+              <tr>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Name</td>
+                <td className="font-medium">{metadata.name}</td>
+              </tr>
+              <tr>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Decimals</td>
+                <td className="font-medium">{metadata.decimals}</td>
+              </tr>
+              <tr>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Supply</td>
+                <td className="font-medium">
+                  <FormattedAmount value={supplyValue} decimals={metadata.decimals} unit={metadata.symbol} />
+                  {issuedPercent && (
+                    <span className="text-gray-500 ml-2">(Issued: {issuedPercent})</span>
+                  )}
+                </td>
+              </tr>
+              {typeof maxSupply !== 'undefined' && maxSupply !== null && (
+                <tr>
+                  <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Max supply</td>
+                  <td className="font-medium">
+                    <FormattedAmount value={typeof maxSupply === 'string' ? Number(maxSupply.replace(/,/g, '')) : maxSupply} decimals={metadata.decimals} unit={metadata.symbol} />
+                  </td>
+                </tr>
+              )}
+              <tr>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Min Balance</td>
+                <td className="font-medium">
+                  <FormattedAmount value={typeof details.minBalance === 'string' ? Number(details.minBalance.replace(/,/g, '')) : details.minBalance} decimals={metadata.decimals} unit={metadata.symbol} />
+                </td>
+              </tr>
+              <tr>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Reserved</td>
+                <td className="font-medium">
+                  <FormattedAmount value={typeof details.reserved === 'string' ? Number(details.reserved.replace(/,/g, '')) : details.reserved} decimals={metadata.decimals} unit={metadata.symbol} />
+                </td>
+              </tr>
+              <tr>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Owner</td>
+                <td className="font-medium flex items-center gap-2">
+                  <AccountName address={details.owner} />
+                  <Button
+                    minimal
+                    small
+                    icon={showTeam ? "chevron-up" : "chevron-down"}
+                    onClick={handleToggleTeam}
+                    className="ml-2"
+                  >
+                    {showTeam ? t("asset_card.hide_team") : t("asset_card.show_team")}
+                  </Button>
+                </td>
+              </tr>
+              {showTeam && (
+                <>
+                  <tr>
+                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Issuer</td>
+                    <td className="font-medium"><AccountName address={details.issuer} /></td>
+                  </tr>
+                  <tr>
+                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Admin</td>
+                    <td className="font-medium"><AccountName address={details.admin} /></td>
+                  </tr>
+                  <tr>
+                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Freezer</td>
+                    <td className="font-medium"><AccountName address={details.freezer} /></td>
+                  </tr>
+                </>
+              )}
+              <tr>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Holders</td>
+                <td className="font-medium">{typeof details.accounts === 'number' ? details.accounts : Number(details.accounts)}</td>
+              </tr>
+              <tr>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">EVM Contract</td>
+                <td className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs select-all">{evmContractAddress}</span>
+                    <Button icon="duplicate" minimal small onClick={handleCopyAddress} title={t("asset_card.copy_address")} />
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </HTMLTable>
+          {!inDialog && linkedObjIdx !== null && !isNaN(linkedObjIdx) && (
+            <DialogObjectCard
+              isOpen={showObjectDialog}
+              onClose={handleCloseObjectDialog}
+              objectIndex={linkedObjIdx}
+            />
+          )}
+          <div className="mt-6 flex justify-end gap-2">
+            <Button icon="pie-chart" onClick={handleOpenDistributionDialog}>
+              {t("asset_card.tokens_distribution")}
+            </Button>
+            {userRole === "owner" && (
+              <Button icon="edit" onClick={handleOpenSetMetadataDialog}>
+                {t("asset_card.set_metadata")}
+              </Button>
+            )}
+            {userRole === "owner" && (
+              <Button icon="people" onClick={handleOpenSetTeamDialog}>
+                {t("asset_card.set_team")}
+              </Button>
+            )}
+            {userRole && (userRole === "owner" || userRole === "issuer") && (
+              <Button icon="add" onClick={handleOpenMintDialog}>
+                {t("asset_card.mint")}
+              </Button>
+            )}
+            <DialogAssetDistribution
+              isOpen={showDistributionDialog}
+              onClose={handleCloseDistributionDialog}
+              assetId={assetId}
+              decimals={metadata.decimals}
+              symbol={metadata.symbol}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AssetCard({ assetId, inDialog = false }: AssetCardProps) {
   const { t } = useTranslation();
   const api = useApi();
@@ -292,7 +483,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
       if (signal.aborted) return;
 
       // After fetching prop, extract maxValue (or maxSupply) if available
-      let localMaxSupply: string | number | undefined = undefined;
+      let localMaxSupply: string | number | undefined;
       if (prop && typeof prop === 'object' && prop !== null) {
         if ('maxValue' in prop && (typeof prop.maxValue === 'string' || typeof prop.maxValue === 'number')) {
           localMaxSupply = prop.maxValue as string | number;
@@ -488,144 +679,54 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
         ) : error ? (
           <div className="text-red-500 p-4">{error}</div>
         ) : details && metadata ? (
-          <div className="flex flex-col md:flex-row gap-0 mb-4 items-start">
-            {/* Info */}
-            <div className="flex-1 flex flex-col justify-start p-6 min-w-0 w-full md:w-auto">
-              <div className="w-full">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex w-full items-center justify-between gap-2">
-                    <h2 className="text-lg font-semibold flex items-center gap-2">
-                      {title}
-                    </h2>
-                    {!inDialog && linkedObjIdx !== null && !isNaN(linkedObjIdx) && (
-                      <Button icon="cube" onClick={handleOpenObjectDialog} className="ml-4">
-                        {t("asset_card.view_object")}{linkedObjIdx}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                <HTMLTable className="w-full mb-2" striped>
-                  <tbody>
-                    <tr>
-                      <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Name</td>
-                      <td className="font-medium">{metadata.name}</td>
-                    </tr>
-                    <tr>
-                      <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Decimals</td>
-                      <td className="font-medium">{metadata.decimals}</td>
-                    </tr>
-                    <tr>
-                      <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Supply</td>
-                      <td className="font-medium">
-                        <FormattedAmount value={supplyValue} decimals={metadata.decimals} unit={metadata.symbol} />
-                        {issuedPercent && (
-                          <span className="text-gray-500 ml-2">(Issued: {issuedPercent})</span>
-                        )}
-                      </td>
-                    </tr>
-                    {typeof maxSupply !== 'undefined' && maxSupply !== null && (
-                      <tr>
-                        <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Max supply</td>
-                        <td className="font-medium">
-                          <FormattedAmount value={typeof maxSupply === 'string' ? Number(maxSupply.replace(/,/g, '')) : maxSupply} decimals={metadata.decimals} unit={metadata.symbol} />
-                        </td>
-                      </tr>
-                    )}
-                    <tr>
-                      <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Min Balance</td>
-                      <td className="font-medium">
-                        <FormattedAmount value={typeof details.minBalance === 'string' ? Number(details.minBalance.replace(/,/g, '')) : details.minBalance} decimals={metadata.decimals} unit={metadata.symbol} />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Reserved</td>
-                      <td className="font-medium">
-                        <FormattedAmount value={typeof details.reserved === 'string' ? Number(details.reserved.replace(/,/g, '')) : details.reserved} decimals={metadata.decimals} unit={metadata.symbol} />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Owner</td>
-                      <td className="font-medium flex items-center gap-2">
-                        <AccountName address={details.owner} />
-                        <Button
-                          minimal
-                          small
-                          icon={showTeam ? "chevron-up" : "chevron-down"}
-                          onClick={handleToggleTeam}
-                          className="ml-2"
-                        >
-                          {showTeam ? t("asset_card.hide_team") : t("asset_card.show_team")}
-                        </Button>
-                      </td>
-                    </tr>
-                    {showTeam && (
-                      <>
-                        <tr>
-                          <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Issuer</td>
-                          <td className="font-medium"><AccountName address={details.issuer} /></td>
-                        </tr>
-                        <tr>
-                          <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Admin</td>
-                          <td className="font-medium"><AccountName address={details.admin} /></td>
-                        </tr>
-                        <tr>
-                          <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Freezer</td>
-                          <td className="font-medium"><AccountName address={details.freezer} /></td>
-                        </tr>
-                      </>
-                    )}
-                    <tr>
-                      <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Holders</td>
-                      <td className="font-medium">{typeof details.accounts === 'number' ? details.accounts : Number(details.accounts)}</td>
-                    </tr>
-                    <tr>
-                      <td className="text-gray-500 whitespace-nowrap pr-8 w-0">EVM Contract</td>
-                      <td className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs select-all">{evmContractAddress}</span>
-                          <Button icon="duplicate" minimal small onClick={handleCopyAddress} title={t("asset_card.copy_address")} />
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </HTMLTable>
-                {!inDialog && linkedObjIdx !== null && !isNaN(linkedObjIdx) && (
-                  <DialogObjectCard
-                    isOpen={showObjectDialog}
-                    onClose={handleCloseObjectDialog}
-                    objectIndex={linkedObjIdx}
-                  />
-                )}
-                <div className="mt-6 flex justify-end gap-2">
-                  <Button icon="pie-chart" onClick={handleOpenDistributionDialog}>
-                    {t("asset_card.tokens_distribution")}
-                  </Button>
-                  {userRole === "owner" && (
-                    <Button icon="edit" onClick={handleOpenSetMetadataDialog}>
-                      {t("asset_card.set_metadata")}
-                    </Button>
-                  )}
-                  {userRole === "owner" && (
-                    <Button icon="people" onClick={handleOpenSetTeamDialog}>
-                      {t("asset_card.set_team")}
-                    </Button>
-                  )}
-                  {userRole && (userRole === "owner" || userRole === "issuer") && (
-                    <Button icon="add" onClick={handleOpenMintDialog}>
-                      {t("asset_card.mint")}
-                    </Button>
-                  )}
-                  <DialogAssetDistribution
-                    isOpen={showDistributionDialog}
-                    onClose={handleCloseDistributionDialog}
-                    assetId={assetId}
-                    decimals={metadata.decimals}
-                    symbol={metadata.symbol}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <AssetInfoSection
+            details={details}
+            metadata={metadata}
+            property={property}
+            maxSupply={maxSupply}
+            supplyValue={supplyValue}
+            issuedPercent={issuedPercent}
+            evmContractAddress={evmContractAddress}
+            t={t}
+            userRole={userRole}
+            inDialog={inDialog}
+            linkedObjIdx={linkedObjIdx}
+            showObjectDialog={showObjectDialog}
+            handleOpenObjectDialog={handleOpenObjectDialog}
+            handleCloseObjectDialog={handleCloseObjectDialog}
+            showTeam={showTeam}
+            handleToggleTeam={handleToggleTeam}
+            handleCopyAddress={handleCopyAddress}
+            showDistributionDialog={showDistributionDialog}
+            handleOpenDistributionDialog={handleOpenDistributionDialog}
+            handleCloseDistributionDialog={handleCloseDistributionDialog}
+            showSetMetadataDialog={showSetMetadataDialog}
+            handleOpenSetMetadataDialog={handleOpenSetMetadataDialog}
+            handleCloseSetMetadataDialog={handleCloseSetMetadataDialog}
+            showSetTeamDialog={showSetTeamDialog}
+            handleOpenSetTeamDialog={handleOpenSetTeamDialog}
+            handleCloseSetTeamDialog={handleCloseSetTeamDialog}
+            showMintDialog={showMintDialog}
+            handleOpenMintDialog={handleOpenMintDialog}
+            handleCloseMintDialog={handleCloseMintDialog}
+            showBurnDialog={showBurnDialog}
+            handleOpenBurnDialog={handleOpenBurnDialog}
+            handleCloseBurnDialog={handleCloseBurnDialog}
+            showFreezeDialog={showFreezeDialog}
+            handleOpenFreezeDialog={handleOpenFreezeDialog}
+            handleCloseFreezeDialog={handleCloseFreezeDialog}
+            showThawDialog={showThawDialog}
+            handleOpenThawDialog={handleOpenThawDialog}
+            handleCloseThawDialog={handleCloseThawDialog}
+            showTransferOwnershipDialog={showTransferOwnershipDialog}
+            handleOpenTransferOwnershipDialog={handleOpenTransferOwnershipDialog}
+            handleCloseTransferOwnershipDialog={handleCloseTransferOwnershipDialog}
+            showForceTransferDialog={showForceTransferDialog}
+            handleOpenForceTransferDialog={handleOpenForceTransferDialog}
+            handleCloseForceTransferDialog={handleCloseForceTransferDialog}
+            assetId={assetId}
+            title={title}
+          />
         ) : null}
       </Card>
       <DialogSetAssetMetadata
