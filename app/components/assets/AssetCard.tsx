@@ -114,30 +114,12 @@ interface AssetInfoSectionProps {
   showDistributionDialog?: boolean;
   handleOpenDistributionDialog?: () => void;
   handleCloseDistributionDialog?: () => void;
-  showSetMetadataDialog?: boolean;
   handleOpenSetMetadataDialog?: () => void;
-  handleCloseSetMetadataDialog?: () => void;
-  showSetTeamDialog?: boolean;
   handleOpenSetTeamDialog?: () => void;
-  handleCloseSetTeamDialog?: () => void;
-  showMintDialog?: boolean;
   handleOpenMintDialog?: () => void;
-  handleCloseMintDialog?: () => void;
-  showBurnDialog?: boolean;
-  handleOpenBurnDialog?: () => void;
-  handleCloseBurnDialog?: () => void;
-  showFreezeDialog?: boolean;
   handleOpenFreezeDialog?: () => void;
   handleCloseFreezeDialog?: () => void;
-  showThawDialog?: boolean;
   handleOpenThawDialog?: () => void;
-  handleCloseThawDialog?: () => void;
-  showTransferOwnershipDialog?: boolean;
-  handleOpenTransferOwnershipDialog?: () => void;
-  handleCloseTransferOwnershipDialog?: () => void;
-  showForceTransferDialog?: boolean;
-  handleOpenForceTransferDialog?: () => void;
-  handleCloseForceTransferDialog?: () => void;
   assetId: number;
   title: React.ReactNode;
 }
@@ -163,30 +145,12 @@ function AssetInfoSection({
   showDistributionDialog = false,
   handleOpenDistributionDialog = () => {},
   handleCloseDistributionDialog = () => {},
-  showSetMetadataDialog = false,
   handleOpenSetMetadataDialog = () => {},
-  handleCloseSetMetadataDialog = () => {},
-  showSetTeamDialog = false,
   handleOpenSetTeamDialog = () => {},
-  handleCloseSetTeamDialog = () => {},
-  showMintDialog = false,
   handleOpenMintDialog = () => {},
-  handleCloseMintDialog = () => {},
-  showBurnDialog = false,
-  handleOpenBurnDialog = () => {},
-  handleCloseBurnDialog = () => {},
-  showFreezeDialog = false,
   handleOpenFreezeDialog = () => {},
   handleCloseFreezeDialog = () => {},
-  showThawDialog = false,
   handleOpenThawDialog = () => {},
-  handleCloseThawDialog = () => {},
-  showTransferOwnershipDialog = false,
-  handleOpenTransferOwnershipDialog = () => {},
-  handleCloseTransferOwnershipDialog = () => {},
-  showForceTransferDialog = false,
-  handleOpenForceTransferDialog = () => {},
-  handleCloseForceTransferDialog = () => {},
   assetId,
   title
 }: AssetInfoSectionProps) {
@@ -350,7 +314,6 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
   const [showBurnDialog, setShowBurnDialog] = useState(false);
   const [showFreezeDialog, setShowFreezeDialog] = useState(false);
   const [showThawDialog, setShowThawDialog] = useState(false);
-  const [showTransferOwnershipDialog, setShowTransferOwnershipDialog] = useState(false);
   const [showForceTransferDialog, setShowForceTransferDialog] = useState(false);
   const [selectedAccount] = useAtom(lastSelectedAccountAtom);
 
@@ -399,10 +362,6 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
     setShowMintDialog(true);
   }, []);
 
-  const handleCloseMintDialog = useCallback(() => {
-    setShowMintDialog(false);
-  }, []);
-
   const handleOpenBurnDialog = useCallback(() => {
     setShowBurnDialog(true);
   }, []);
@@ -427,14 +386,6 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
     setShowThawDialog(false);
   }, []);
 
-  const handleOpenTransferOwnershipDialog = useCallback(() => {
-    setShowTransferOwnershipDialog(true);
-  }, []);
-
-  const handleCloseTransferOwnershipDialog = useCallback(() => {
-    setShowTransferOwnershipDialog(false);
-  }, []);
-
   const handleOpenForceTransferDialog = useCallback(() => {
     setShowForceTransferDialog(true);
   }, []);
@@ -450,6 +401,10 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
   const handleCopyAddress = useCallback(() => {
     navigator.clipboard.writeText(evmContractAddress);
   }, [evmContractAddress]);
+
+  const handleCloseMintDialog = useCallback(() => {
+    setShowMintDialog(false);
+  }, []);
 
   // Main fetch function with cancellation
   const fetchData = useCallback(async (targetAssetId: number) => {
@@ -710,7 +665,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
                     onFreeze={handleOpenFreezeDialog}
                     onThaw={handleOpenThawDialog}
                     onBurn={handleOpenBurnDialog}
-                    onTransferOwnership={handleOpenTransferOwnershipDialog}
+                    onTransferOwnership={handleOpenForceTransferDialog}
                     onForceTransfer={handleOpenForceTransferDialog}
                     role={userRole}
                   />
@@ -749,30 +704,12 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
             showDistributionDialog={showDistributionDialog}
             handleOpenDistributionDialog={handleOpenDistributionDialog}
             handleCloseDistributionDialog={handleCloseDistributionDialog}
-            showSetMetadataDialog={showSetMetadataDialog}
             handleOpenSetMetadataDialog={handleOpenSetMetadataDialog}
-            handleCloseSetMetadataDialog={handleCloseSetMetadataDialog}
-            showSetTeamDialog={showSetTeamDialog}
             handleOpenSetTeamDialog={handleOpenSetTeamDialog}
-            handleCloseSetTeamDialog={handleCloseSetTeamDialog}
-            showMintDialog={showMintDialog}
             handleOpenMintDialog={handleOpenMintDialog}
-            handleCloseMintDialog={handleCloseMintDialog}
-            showBurnDialog={showBurnDialog}
-            handleOpenBurnDialog={handleOpenBurnDialog}
-            handleCloseBurnDialog={handleCloseBurnDialog}
-            showFreezeDialog={showFreezeDialog}
             handleOpenFreezeDialog={handleOpenFreezeDialog}
             handleCloseFreezeDialog={handleCloseFreezeDialog}
-            showThawDialog={showThawDialog}
             handleOpenThawDialog={handleOpenThawDialog}
-            handleCloseThawDialog={handleCloseThawDialog}
-            showTransferOwnershipDialog={showTransferOwnershipDialog}
-            handleOpenTransferOwnershipDialog={handleOpenTransferOwnershipDialog}
-            handleCloseTransferOwnershipDialog={handleCloseTransferOwnershipDialog}
-            showForceTransferDialog={showForceTransferDialog}
-            handleOpenForceTransferDialog={handleOpenForceTransferDialog}
-            handleCloseForceTransferDialog={handleCloseForceTransferDialog}
             assetId={assetId}
             title={title}
           />
@@ -806,11 +743,6 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
       <DialogThawAsset
         isOpen={showThawDialog}
         onClose={handleCloseThawDialog}
-        assetId={assetId}
-      />
-      <DialogTransferOwnership
-        isOpen={showTransferOwnershipDialog}
-        onClose={handleCloseTransferOwnershipDialog}
         assetId={assetId}
       />
       <DialogForceTransfer

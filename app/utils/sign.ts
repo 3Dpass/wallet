@@ -9,18 +9,6 @@ import { mockVotes } from "./mock";
 // Type for the web3FromAddress function
 type Web3FromAddress = (address: string) => Promise<{ signer: Signer }>;
 
-// Conditional import to avoid SSR issues
-let web3FromAddress: Web3FromAddress | null = null;
-if (typeof window !== 'undefined') {
-  // Only import in browser environment
-  import("@polkadot/extension-dapp/bundle").then(module => {
-    web3FromAddress = module.web3FromAddress;
-  }).catch(() => {
-    // Silently fail if extension-dapp is not available
-    console.warn("Polkadot extension-dapp not available");
-  });
-}
-
 type Options = {
   signer?: Signer;
 };
@@ -145,6 +133,16 @@ export async function signAndSend(
 
   const finalOptions = options || {};
   if (pair.meta.isInjected) {
+    // Dynamically import web3FromAddress when needed
+    let web3FromAddress: ((address: string) => Promise<{ signer: Signer }>) | null = null;
+    if (typeof window !== 'undefined') {
+      try {
+        const module = await import("@polkadot/extension-dapp/bundle");
+        web3FromAddress = module.web3FromAddress;
+      } catch {
+        console.warn("Polkadot extension-dapp not available, falling back to direct signing");
+      }
+    }
     if (web3FromAddress) {
       const injected = await web3FromAddress(pair.address);
       finalOptions.signer = injected.signer;

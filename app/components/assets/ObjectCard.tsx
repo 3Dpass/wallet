@@ -134,19 +134,7 @@ function toRecord(value: unknown): Record<string, unknown> {
 
 function ObjectDetailsTable({
   rpcData,
-  propertyDefs,
   formatRewards,
-  linkedAssets,
-  linkedAssetsLoading,
-  createAssetClickHandler,
-  selectedAssetId,
-  handleCloseSelectedAsset,
-  showCreateAssetDialog,
-  handleCloseCreateAssetDialog,
-  selectedPropertyForTokenization,
-  handleTokenizeProperty,
-  objectIndex,
-  selectedAccount,
   showEstimators,
   handleToggleEstimators,
   showApprovers,
@@ -155,19 +143,7 @@ function ObjectDetailsTable({
   handleToggleOutliers
 }: {
   rpcData: RpcObjectData;
-  propertyDefs: Record<number, { name: string; maxValue: number }>;
   formatRewards: (amount: number) => string;
-  linkedAssets: LinkedAsset[];
-  linkedAssetsLoading: boolean;
-  createAssetClickHandler: (assetId: number) => () => void;
-  selectedAssetId: number | null;
-  handleCloseSelectedAsset: () => void;
-  showCreateAssetDialog: boolean;
-  handleCloseCreateAssetDialog: () => void;
-  selectedPropertyForTokenization: { objIdx: number; propIdx: number } | null;
-  handleTokenizeProperty: (objIdx: number, propIdx: number) => void;
-  objectIndex: number;
-  selectedAccount: string | undefined;
   showEstimators: boolean;
   handleToggleEstimators: () => void;
   showApprovers: boolean;
@@ -889,19 +865,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
           {rpcData && (
             <ObjectDetailsTable
               rpcData={rpcData}
-              propertyDefs={propertyDefs}
               formatRewards={formatRewards}
-              linkedAssets={linkedAssets}
-              linkedAssetsLoading={linkedAssetsLoading}
-              createAssetClickHandler={createAssetClickHandler}
-              selectedAssetId={selectedAssetId}
-              handleCloseSelectedAsset={handleCloseSelectedAsset}
-              showCreateAssetDialog={showCreateAssetDialog}
-              handleCloseCreateAssetDialog={handleCloseCreateAssetDialog}
-              selectedPropertyForTokenization={selectedPropertyForTokenization}
-              handleTokenizeProperty={handleTokenizeProperty}
-              objectIndex={objectIndex}
-              selectedAccount={selectedAccount ?? undefined}
               showEstimators={showEstimators}
               handleToggleEstimators={handleToggleEstimators}
               showApprovers={showApprovers}

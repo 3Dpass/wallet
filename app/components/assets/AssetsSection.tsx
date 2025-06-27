@@ -80,14 +80,12 @@ export default function AssetsSection({ children }: AssetsSectionProps) {
     accounts,
     selectedAccount,
     setSelectedAccount,
-    accountMetadata,
-    balancesLoading
+    accountMetadata
   }: {
     accounts: string[];
     selectedAccount: string | null;
     setSelectedAccount: (address: string | null) => void;
     accountMetadata: Record<string, React.ReactNode>;
-    balancesLoading: boolean;
   }) {
     return (
       <div className="flex items-center gap-2">
@@ -113,7 +111,6 @@ export default function AssetsSection({ children }: AssetsSectionProps) {
             selectedAccount={selectedAccount}
             setSelectedAccount={setSelectedAccount}
             accountMetadata={accountMetadata}
-            balancesLoading={balancesLoading}
           />
         </div>
         {children}
