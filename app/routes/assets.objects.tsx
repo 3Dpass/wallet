@@ -156,11 +156,6 @@ export default function AssetsObjects() {
     }
   }, [t]);
 
-  // Function to handle suggestion click without arrow function
-  const handleSuggestionClickWrapper = useCallback((suggestion: string) => {
-    handleSuggestionClick(suggestion);
-  }, [handleSuggestionClick]);
-
   // Function to create click handler for each suggestion
   const createSuggestionClickHandler = useCallback((suggestion: string) => {
     return () => handleSuggestionClick(suggestion);
@@ -648,11 +643,11 @@ export default function AssetsObjects() {
                   if (!obj) return false;
                   // Search filter
                   if (!search.trim()) return true;
-                  const s = search.trim().toLowerCase();
+                  const searchTermLower = search.trim().toLowerCase();
                   
                   // State-based searches (e.g., "Created objects", "Approved objects")
-                  if (s.endsWith(' objects')) {
-                    const stateSearch = s.replace(' objects', '');
+                  if (searchTermLower.endsWith(' objects')) {
+                    const stateSearch = searchTermLower.replace(' objects', '');
                     const allStates = ['created', 'estimating', 'estimated', 'approving', 'approved', 'notApproved'];
                     const matchingState = allStates.find(state => 
                       getStateDisplayName(state).toLowerCase() === stateSearch
@@ -664,31 +659,31 @@ export default function AssetsObjects() {
                   
                   return (
                     // Index
-                    String(objectIndexes[originalIndex]).includes(s) ||
+                    String(objectIndexes[originalIndex]).includes(searchTermLower) ||
                     // Created block
-                    (obj.whenCreated && String(obj.whenCreated).includes(s)) ||
+                    (obj.whenCreated && String(obj.whenCreated).includes(searchTermLower)) ||
                     // Public/Private
-                    (s === 'public' && obj.isPrivate === false) ||
-                    (s === 'private' && obj.isPrivate === true) ||
+                    (searchTermLower === 'public' && obj.isPrivate === false) ||
+                    (searchTermLower === 'private' && obj.isPrivate === true) ||
                     // Properties (by name or value)
                     (Array.isArray(obj.prop) && obj.prop.some(p => 
                       p && typeof p === 'object' && (
-                        (p.name && String(p.name).toLowerCase().includes(s)) ||
-                        (p.maxValue !== undefined && String(p.maxValue).includes(s))
+                        (p.name && String(p.name).toLowerCase().includes(searchTermLower)) ||
+                        (p.maxValue !== undefined && String(p.maxValue).includes(searchTermLower))
                       )
                     )) ||
                     // Non-Fungible (by property name or value)
-                    (s === 'non-fungible' && Array.isArray(obj.prop) && obj.prop.some(p => 
+                    (searchTermLower === 'non-fungible' && Array.isArray(obj.prop) && obj.prop.some(p => 
                       p && typeof p === 'object' && p.name && String(p.name).toLowerCase().includes('non-fungible')
                     )) ||
                     // State search
                     (obj.state && Object.keys(obj.state as Record<string, unknown>).some(stateKey => 
-                      stateKey.toLowerCase().includes(s)
+                      stateKey.toLowerCase().includes(searchTermLower)
                     )) ||
                     // Owner search
-                    (obj.owner && String(obj.owner).toLowerCase().includes(s)) ||
+                    (obj.owner && String(obj.owner).toLowerCase().includes(searchTermLower)) ||
                     // Identity search
-                    (obj.identity && String(obj.identity).toLowerCase().includes(s))
+                    (obj.identity && String(obj.identity).toLowerCase().includes(searchTermLower))
                   );
                 })
                 .slice(0, visibleCount)

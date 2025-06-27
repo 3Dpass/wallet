@@ -167,7 +167,7 @@ export default function DialogCreateAsset({ isOpen, onClose, onCreated, prefillO
                 options.push({
                   label: name,
                   value: propIdx,
-                  maxValue: maxValue
+                  maxValue
                 });
               }
             } else if (objectProperties && objectProperties.length > 0) {

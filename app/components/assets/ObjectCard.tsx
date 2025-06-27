@@ -137,6 +137,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
   const api = useApi();
   const [objString, setObjString] = useState<string | null>(null);
   const [rpcData, setRpcData] = useState<RpcObjectData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showEstimators, setShowEstimators] = useState(false);
   const [showApprovers, setShowApprovers] = useState(false);
@@ -193,6 +194,10 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
     return () => handleSetSelectedAssetId(assetId);
   }, [handleSetSelectedAssetId]);
 
+  const createTokenizePropertyClickHandler = useCallback((objIdx: number, propIdx: number) => {
+    return () => handleTokenizeProperty(objIdx, propIdx);
+  }, [handleTokenizeProperty]);
+
   // Main fetch function with cancellation
   const fetchObj = useCallback(async (targetObjectIndex: number) => {
     // Cancel any ongoing request
@@ -208,8 +213,14 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
       if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
         setObjString(null);
         setRpcData(null);
+        setIsLoading(false);
       }
       return;
+    }
+    
+    // Set loading state
+    if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
+      setIsLoading(true);
     }
     
     try {
@@ -249,17 +260,20 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
           setObjString(str);
           setRpcData(patchedResult as RpcObjectData);
+          setIsLoading(false);
         }
       } else {
         if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
           setObjString(null);
           setRpcData(null);
+          setIsLoading(false);
         }
       }
     } catch (e) {
       if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
         setObjString(null);
         setRpcData(null);
+        setIsLoading(false);
       }
     }
   }, [api]);
@@ -578,7 +592,16 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                 )}
               </>
             ) : (
-              <span className="text-gray-400">No preview</span>
+              <div className="flex flex-col items-center justify-center h-full">
+                {isLoading ? (
+                  <>
+                    <Spinner size={24} />
+                    <span className="text-gray-400 mt-2">Loading...</span>
+                  </>
+                ) : (
+                  <span className="text-gray-400">No preview</span>
+                )}
+              </div>
             )}
           </div>
           {/* Info Right (flex-1) */}
@@ -673,7 +696,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                                     icon="dollar"
                                     text="Tokenize"
                                     className={Classes.BUTTON}
-                                    onClick={() => handleTokenizeProperty(objectIndex, Number(p.propIdx))}
+                                    onClick={createTokenizePropertyClickHandler(objectIndex, Number(p.propIdx))}
                                   />
                                 )}
                               </div>

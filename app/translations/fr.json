@@ -40,7 +40,9 @@
       "lbl_message_copied": "Message copié dans le presse-papiers !",
       "lbl_raw_messages_not_supported": "Le signataire ne prend pas en charge la signature des messages bruts",
       "lbl_judgement_sent": "Votre jugement a été envoyé",
-      "lbl_error_loading_block_data": "Erreur lors du chargement des données du bloc, essayez de recharger."
+      "lbl_error_loading_block_data": "Erreur lors du chargement des données du bloc, essayez de recharger.",
+      "lbl_fill_required_fields": "Veuillez remplir tous les champs requis.",
+      "lbl_no_account_selected": "Aucun compte sélectionné ou impossible d'obtenir la paire de clés."
     },
     "root": {
       "lbl_app_name": "Portefeuille",
@@ -99,7 +101,13 @@
       "lbl_placeholder_twitter": "Entrez un compte Twitter",
       "lbl_placeholder_discord": "Entrez un compte Discord",
       "lbl_placeholder_riot_name": "Entrez un nom Riot",
-      "lbl_placeholder_request_judgement": "Demande de jugement"
+      "lbl_placeholder_request_judgement": "Demande de jugement",
+      "phone_placeholder": "Numéro de téléphone",
+      "linkedin_placeholder": "LinkedIn",
+      "telegram_placeholder": "Telegram",
+      "github_placeholder": "Github",
+      "custom_placeholder": "Personnalisé",
+      "pgp_placeholder": "Empreinte PGP (20 bytes hex)"
     },
     "dlg_join_pool": {
       "lbl_title": "Rejoindre une piscine de minage",
@@ -168,7 +176,8 @@
       "lbl_api_address": "Adresse RPC API",
       "lbl_explorer_graphql": "Explorer GraphQL",
       "lbl_advanced_mode": "Mode avancé",
-      "lbl_btn_save": "Enregistrer"
+      "lbl_btn_save": "Enregistrer",
+      "reset_rpc_title": "Réinitialiser le point de terminaison RPC par défaut"
     },
     "dlg_sign_verify": {
       "lbl_title": "Signer et vérifier un message",
@@ -274,6 +283,54 @@
         "identity": "Identité : {{identity}}"
       }
     },
+    "assets_tokens": {
+      "title": "Jetons",
+      "new_asset": "Nouvel actif",
+      "all_assets": "Tous les actifs",
+      "my_assets": "Mes actifs",
+      "search_placeholder": "Rechercher par ID d'actif, symbole, nom, adresse EVM, ou type...",
+      "no_assets_found": "Aucun actif trouvé.",
+      "no_assets_found_account": "Aucun actif trouvé pour votre compte.",
+      "failed_load_assets": "Échec du chargement des actifs",
+      "failed_load_my_assets": "Échec du chargement de mes actifs",
+      "asset_types": {
+        "fungible": "fongible",
+        "non_fungible": "non fongible",
+        "unknown": "inconnu"
+      }
+    },
+    "dialog_submit_object": {
+      "title": "Soumettre un nouvel objet",
+      "category": "Catégorie",
+      "rights": "Droits",
+      "obj_file": "Fichier OBJ",
+      "approvals": "Approbations",
+      "hash_id": "ID de hachage",
+      "properties": "Propriétés",
+      "public": "Public",
+      "private": "Privé",
+      "add_hashes_manually": "Ajouter des hachages manuellement",
+      "add_hash": "Ajouter un hachage",
+      "add_property": "Ajouter une propriété",
+      "select_property": "Sélectionner une propriété",
+      "max_value": "Valeur maximale",
+      "cancel": "Annuler",
+      "clear": "Effacer",
+      "submit": "Soumettre",
+      "object_submitted_successfully": "Objet soumis avec succès",
+      "failed_parse_obj": "Échec de l'analyse du fichier OBJ",
+      "drag_drop_obj": "Glissez-déposez ou cliquez pour sélectionner un fichier .obj"
+    },
+    "object_card": {
+      "tokenize": "Tokeniser",
+      "download_obj_file": "Télécharger le fichier OBJ",
+      "hide_details": "Masquer les détails",
+      "show_details": "Afficher les détails",
+      "no_preview": "Aucun aperçu",
+      "loading": "Chargement...",
+      "no_linked_assets": "Aucun actif lié",
+      "view_asset": "Voir l'actif #"
+    },
     "asset_actions": {
       "freeze": "Geler l'actif",
       "freeze_account": "Geler le compte",
@@ -347,7 +404,57 @@
       "mint": "Frapper",
       "view_object": "Voir l'objet #",
       "copy_address": "Copier l'adresse",
-      "view_on_explorer": "Voir dans l'explorateur"
+      "view_on_explorer": "Voir dans l'explorateur",
+      "api_not_ready": "API non prête",
+      "asset_not_found": "Actif non trouvé"
+    },
+    "dlg_set_registrar_fee": {
+      "title": "Définir les frais du registraire",
+      "enter_new_fee": "Entrer les nouveaux frais",
+      "set_fee": "Définir les frais",
+      "registrar_index_not_found": "Index du registraire non trouvé ou API indisponible.",
+      "fee_updated": "Frais mis à jour !"
+    },
+    "dlg_set_registrar_fee.msg_error": "Échec de la définition des frais : {{error}}",
+    "dlg_judgement_requests": {
+      "title": "Demandes de jugement",
+      "btn_provide_judgement": "Fournir un jugement",
+      "lbl_judgement": "Jugement",
+      "lbl_fee": "Frais",
+      "msg_error": "Échec de la soumission du jugement : {{error}}",
+      "search_placeholder": "Rechercher par adresse, nom, email...",
+      "no_pending_requests": "Aucune demande en attente",
+      "provide": "Fournir",
+      "judgement_submitted": "Jugement soumis !",
+      "registrar_index_not_found": "Index du registraire non trouvé ou API indisponible."
+    },
+    "dlg_object_card": {
+      "title": "Détails de l'objet"
+    },
+    "dlg_asset_distribution": {
+      "title": "Distribution des détenteurs de jetons",
+      "search_placeholder": "Rechercher par adresse ou nom...",
+      "address": "Adresse",
+      "balance": "Solde",
+      "share_percentage": "% Part",
+      "no_holders_found": "Aucun détenteur trouvé"
+    },
+    "dlg_submit_object": {
+      "title": "Soumettre un nouvel objet",
+      "hash_placeholder": "Hash (H256)",
+      "select_property": "Sélectionner une propriété",
+      "max_value": "Valeur maximale",
+      "loading_properties": "Chargement des propriétés...",
+      "auto_applied": "(Appliqué automatiquement)"
+    },
+    "dlg_create_asset": {
+      "select_property": "Sélectionner une propriété",
+      "loading_properties": "Chargement des propriétés..."
+    },
+    "errors": {
+      "api_not_ready": "API non prête",
+      "unknown_error": "Erreur inconnue",
+      "unknown_error_occurred": "Une erreur inconnue s'est produite"
     }
   }
 }

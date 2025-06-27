@@ -38,9 +38,11 @@
       "lbl_pool_difficulty_set": "矿池难度已设置",
       "lbl_interest_set": "矿池利息已设置",
       "lbl_message_copied": "消息已复制到剪贴板！",
-      "lbl_raw_messages_not_supported": "签名器不支持签署原始消息",
+      "lbl_raw_messages_not_supported": "签名者不支持签名原始消息",
       "lbl_judgement_sent": "您的判断已发送",
-      "lbl_error_loading_block_data": "加载区块数据时出错，请尝试重新加载。"
+      "lbl_error_loading_block_data": "加载区块数据时出错，请尝试重新加载。",
+      "lbl_fill_required_fields": "请填写所有必填字段。",
+      "lbl_no_account_selected": "未选择账户或无法获取密钥对。"
     },
     "root": {
       "lbl_app_name": "钱包",
@@ -99,7 +101,13 @@
       "lbl_placeholder_twitter": "输入推特账号",
       "lbl_placeholder_discord": "输入Discord账号",
       "lbl_placeholder_riot_name": "输入Riot名称",
-      "lbl_placeholder_request_judgement": "请求判断"
+      "lbl_placeholder_request_judgement": "请求判断",
+      "phone_placeholder": "电话号码",
+      "linkedin_placeholder": "LinkedIn",
+      "telegram_placeholder": "Telegram",
+      "github_placeholder": "Github",
+      "custom_placeholder": "自定义",
+      "pgp_placeholder": "PGP指纹 (20字节十六进制)"
     },
     "dlg_join_pool": {
       "lbl_title": "加入矿池",
@@ -168,7 +176,8 @@
       "lbl_api_address": "RPC API地址",
       "lbl_explorer_graphql": "浏览器GraphQL",
       "lbl_advanced_mode": "高级模式",
-      "lbl_btn_save": "保存"
+      "lbl_btn_save": "保存",
+      "reset_rpc_title": "重置RPC端点到默认值"
     },
     "dlg_sign_verify": {
       "lbl_title": "签名和验证消息",
@@ -302,7 +311,9 @@
       "mint": "铸造",
       "view_object": "查看对象 #",
       "copy_address": "复制地址",
-      "view_on_explorer": "在浏览器中查看"
+      "view_on_explorer": "在浏览器中查看",
+      "api_not_ready": "API未就绪",
+      "asset_not_found": "未找到资产"
     },
     "dlg_asset": {
       "create_title": "创建新资产",
@@ -348,6 +359,102 @@
       "force_transfer_btn": "强制转账",
       "force_transfer_source": "源地址",
       "force_transfer_dest": "目标地址"
+    },
+    "assets_tokens": {
+      "title": "代币",
+      "new_asset": "新资产",
+      "all_assets": "所有资产",
+      "my_assets": "我的资产",
+      "search_placeholder": "按资产ID、符号、名称、EVM地址或类型搜索...",
+      "no_assets_found": "未找到资产。",
+      "no_assets_found_account": "未找到您账户的资产。",
+      "failed_load_assets": "加载资产失败",
+      "failed_load_my_assets": "加载我的资产失败",
+      "asset_types": {
+        "fungible": "同质化",
+        "non_fungible": "非同质化",
+        "unknown": "未知"
+      }
+    },
+    "dialog_submit_object": {
+      "title": "提交新对象",
+      "category": "类别",
+      "rights": "权限",
+      "obj_file": "OBJ文件",
+      "approvals": "审批",
+      "hash_id": "哈希ID",
+      "properties": "属性",
+      "public": "公开",
+      "private": "私有",
+      "add_hashes_manually": "手动添加哈希",
+      "add_hash": "添加哈希",
+      "add_property": "添加属性",
+      "select_property": "选择属性",
+      "max_value": "最大值",
+      "cancel": "取消",
+      "clear": "清除",
+      "submit": "提交",
+      "object_submitted_successfully": "对象提交成功",
+      "failed_parse_obj": "解析OBJ文件失败",
+      "drag_drop_obj": "拖放或点击选择.obj文件"
+    },
+    "object_card": {
+      "tokenize": "代币化",
+      "download_obj_file": "下载OBJ文件",
+      "hide_details": "隐藏详情",
+      "show_details": "显示详情",
+      "no_preview": "无预览",
+      "loading": "加载中...",
+      "no_linked_assets": "无关联资产",
+      "view_asset": "查看资产 #"
+    },
+    "dlg_set_registrar_fee": {
+      "title": "设置注册商费用",
+      "enter_new_fee": "输入新费用",
+      "set_fee": "设置费用",
+      "registrar_index_not_found": "未找到注册商索引或API不可用。",
+      "fee_updated": "费用已更新！"
+    },
+    "dlg_set_registrar_fee.msg_error": "设置费用失败：{{error}}",
+    "dlg_judgement_requests": {
+      "title": "判断请求",
+      "btn_provide_judgement": "提供判断",
+      "lbl_judgement": "判断",
+      "lbl_fee": "费用",
+      "msg_error": "提交判断失败：{{error}}",
+      "search_placeholder": "按地址、姓名、邮箱搜索...",
+      "no_pending_requests": "没有待处理请求",
+      "provide": "提供",
+      "judgement_submitted": "判断已提交！",
+      "registrar_index_not_found": "未找到注册商索引或API不可用。"
+    },
+    "dlg_object_card": {
+      "title": "对象详情"
+    },
+    "dlg_asset_distribution": {
+      "title": "代币持有者分布",
+      "search_placeholder": "按地址或姓名搜索...",
+      "address": "地址",
+      "balance": "余额",
+      "share_percentage": "% 份额",
+      "no_holders_found": "未找到持有者"
+    },
+    "dlg_submit_object": {
+      "title": "提交新对象",
+      "hash_placeholder": "哈希 (H256)",
+      "select_property": "选择属性",
+      "max_value": "最大值",
+      "loading_properties": "加载属性中...",
+      "auto_applied": "(自动应用)"
+    },
+    "dlg_create_asset": {
+      "select_property": "选择属性",
+      "loading_properties": "加载属性中..."
+    },
+    "errors": {
+      "api_not_ready": "API未就绪",
+      "unknown_error": "未知错误",
+      "unknown_error_occurred": "发生未知错误"
     }
   }
 }

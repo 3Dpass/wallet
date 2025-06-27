@@ -8,6 +8,7 @@ import keyring from "@polkadot/ui-keyring";
 import { signAndSend } from "app/utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useTranslation } from "react-i18next";
+import type { SubmittableResult } from "@polkadot/api";
 
 interface DialogFreezeAssetProps {
   isOpen: boolean;
@@ -33,8 +34,8 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
     setWho(e.target.value);
   }, []);
 
-  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
-    if (!status.isInBlock) return;
+  const handleSignAndSendCallback = useCallback((result: SubmittableResult) => {
+    if (!result.isInBlock) return;
     toaster.show({
       icon: "endorsed",
       intent: Intent.SUCCESS,

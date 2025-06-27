@@ -38,9 +38,11 @@
       "lbl_pool_difficulty_set": "Dificuldade da piscina foi definida",
       "lbl_interest_set": "Juros da piscina foi definido",
       "lbl_message_copied": "Mensagem copiada para a área de transferência!",
-      "lbl_raw_messages_not_supported": "O Signatário não suporta assinatura de mensagens em texto simples",
+      "lbl_raw_messages_not_supported": "O assinante não suporta assinatura de mensagens brutas",
       "lbl_judgement_sent": "Seu julgamento foi enviado",
-      "lbl_error_loading_block_data": "Erro ao carregar os dados do bloco, tente recarregar."
+      "lbl_error_loading_block_data": "Erro ao carregar dados do bloco, tente recarregar.",
+      "lbl_fill_required_fields": "Por favor, preencha todos os campos obrigatórios.",
+      "lbl_no_account_selected": "Nenhuma conta selecionada ou não foi possível obter o par de chaves."
     },
     "root": {
       "lbl_app_name": "Carteira",
@@ -99,7 +101,13 @@
       "lbl_placeholder_twitter": "Digite o Twitter",
       "lbl_placeholder_discord": "Digite o Discord",
       "lbl_placeholder_riot_name": "Digite o nome Riot",
-      "lbl_placeholder_request_judgement": "Solicitar julgamento"
+      "lbl_placeholder_request_judgement": "Solicitar julgamento",
+      "phone_placeholder": "Número de telefone",
+      "linkedin_placeholder": "LinkedIn",
+      "telegram_placeholder": "Telegram",
+      "github_placeholder": "Github",
+      "custom_placeholder": "Personalizado",
+      "pgp_placeholder": "Impressão digital PGP (20 bytes hex)"
     },
     "dlg_join_pool": {
       "lbl_title": "Entrar em uma piscina de mineração",
@@ -168,7 +176,8 @@
       "lbl_api_address": "Endereço RPC API",
       "lbl_explorer_graphql": "Explorador GraphQL",
       "lbl_advanced_mode": "Modo avançado",
-      "lbl_btn_save": "Salvar"
+      "lbl_btn_save": "Salvar",
+      "reset_rpc_title": "Redefinir endpoint RPC para o padrão"
     },
     "dlg_sign_verify": {
       "lbl_title": "Assinar e Verificar Mensagem",
@@ -347,7 +356,105 @@
       "mint": "Cunhar",
       "view_object": "Ver objeto #",
       "copy_address": "Copiar endereço",
-      "view_on_explorer": "Ver no explorador"
+      "view_on_explorer": "Ver no explorador",
+      "api_not_ready": "API não está pronta",
+      "asset_not_found": "Ativo não encontrado"
+    },
+    "assets_tokens": {
+      "title": "Tokens",
+      "new_asset": "Novo ativo",
+      "all_assets": "Todos os ativos",
+      "my_assets": "Meus ativos",
+      "search_placeholder": "Buscar por ID do ativo, símbolo, nome, endereço EVM, ou tipo...",
+      "no_assets_found": "Nenhum ativo encontrado.",
+      "no_assets_found_account": "Nenhum ativo encontrado para sua conta.",
+      "failed_load_assets": "Falha ao carregar ativos",
+      "failed_load_my_assets": "Falha ao carregar meus ativos",
+      "asset_types": {
+        "fungible": "fungível",
+        "non_fungible": "não fungível",
+        "unknown": "desconhecido"
+      }
+    },
+    "dialog_submit_object": {
+      "title": "Enviar Novo Objeto",
+      "category": "Categoria",
+      "rights": "Direitos",
+      "obj_file": "Arquivo OBJ",
+      "approvals": "Aprovações",
+      "hash_id": "ID do Hash",
+      "properties": "Propriedades",
+      "public": "Público",
+      "private": "Privado",
+      "add_hashes_manually": "Adicionar hashes manualmente",
+      "add_hash": "Adicionar Hash",
+      "add_property": "Adicionar Propriedade",
+      "select_property": "Selecionar Propriedade",
+      "max_value": "Valor Máximo",
+      "cancel": "Cancelar",
+      "clear": "Limpar",
+      "submit": "Enviar",
+      "object_submitted_successfully": "Objeto enviado com sucesso",
+      "failed_parse_obj": "Falha ao analisar arquivo OBJ",
+      "drag_drop_obj": "Arraste e solte ou clique para selecionar arquivo .obj"
+    },
+    "object_card": {
+      "tokenize": "Tokenizar",
+      "download_obj_file": "Baixar arquivo OBJ",
+      "hide_details": "Ocultar Detalhes",
+      "show_details": "Mostrar Detalhes",
+      "no_preview": "Sem visualização",
+      "loading": "Carregando...",
+      "no_linked_assets": "Sem ativos vinculados",
+      "view_asset": "Ver Ativo #"
+    },
+    "dlg_set_registrar_fee": {
+      "title": "Definir Taxa do Registrador",
+      "enter_new_fee": "Inserir nova taxa",
+      "set_fee": "Definir Taxa",
+      "registrar_index_not_found": "Índice do registrador não encontrado ou API indisponível.",
+      "fee_updated": "Taxa atualizada!"
+    },
+    "dlg_set_registrar_fee.msg_error": "Falha ao definir taxa: {{error}}",
+    "dlg_judgement_requests": {
+      "title": "Solicitações de Julgamento",
+      "btn_provide_judgement": "Fornecer Julgamento",
+      "lbl_judgement": "Julgamento",
+      "lbl_fee": "Taxa",
+      "msg_error": "Falha ao enviar julgamento: {{error}}",
+      "search_placeholder": "Buscar por endereço, nome, email...",
+      "no_pending_requests": "Nenhuma solicitação pendente",
+      "provide": "Fornecer",
+      "judgement_submitted": "Julgamento enviado!",
+      "registrar_index_not_found": "Índice do registrador não encontrado ou API indisponível."
+    },
+    "dlg_object_card": {
+      "title": "Detalhes do Objeto"
+    },
+    "dlg_asset_distribution": {
+      "title": "Distribuição de Detentores de Tokens",
+      "search_placeholder": "Buscar por endereço ou nome...",
+      "address": "Endereço",
+      "balance": "Saldo",
+      "share_percentage": "% Participação",
+      "no_holders_found": "Nenhum detentor encontrado"
+    },
+    "dlg_submit_object": {
+      "title": "Enviar Novo Objeto",
+      "hash_placeholder": "Hash (H256)",
+      "select_property": "Selecionar Propriedade",
+      "max_value": "Valor Máximo",
+      "loading_properties": "Carregando propriedades...",
+      "auto_applied": "(Aplicado automaticamente)"
+    },
+    "dlg_create_asset": {
+      "select_property": "Selecionar Propriedade",
+      "loading_properties": "Carregando propriedades..."
+    },
+    "errors": {
+      "api_not_ready": "API não está pronta",
+      "unknown_error": "Erro desconhecido",
+      "unknown_error_occurred": "Ocorreu um erro desconhecido"
     }
   }
 }

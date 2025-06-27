@@ -89,11 +89,6 @@ function getOptionValue<T>(option: PolkadotOption<T>): T | Record<string, unknow
   return option.unwrap();
 }
 
-// Helper function to safely check if an object has metadata properties
-function hasMetadataProperties(obj: unknown): obj is { name?: string; symbol?: string; decimals?: string | number; isFrozen?: boolean } {
-  return Boolean(obj && typeof obj === 'object');
-}
-
 // Constants
 const FETCH_DEBOUNCE_MS = 300; // 300ms debounce delay
 

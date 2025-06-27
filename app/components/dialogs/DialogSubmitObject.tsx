@@ -18,7 +18,7 @@ import {
 import { useDropzone } from "react-dropzone";
 import { OBJLoader } from "three-stdlib";
 import { Canvas } from "@react-three/fiber";
-import { Object3D } from "three";
+import { Object3D, BufferGeometry } from "three";
 import ThreeDObject from "../block/ThreeDObject.client";
 import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
@@ -29,6 +29,7 @@ import { signAndSend } from "../../utils/sign";
 import keyring from "@polkadot/ui-keyring";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import type { SignerOptions } from "@polkadot/api/types";
+import type { SubmittableResult } from "@polkadot/api";
 
 // Constants
 const DEFAULT_MAX_VALUE = 100000000;
@@ -60,11 +61,11 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
   const [isPrivate, setIsPrivate] = useState(false);
   const [objFile, setObjFile] = useState<File | null>(null);
   const [objString, setObjString] = useState<string | null>(null);
-  const [mesh, setMesh] = useState<Object3D & { geometry?: unknown } | null>(null);
+  const [mesh, setMesh] = useState<Object3D & { geometry?: BufferGeometry } | null>(null);
   const [numApprovals, setNumApprovals] = useState(1);
   const [hashesEnabled, setHashesEnabled] = useState(false);
   const [hashes, setHashes] = useState<{ id: number; value: string }[]>([]);
-  const [properties, setProperties] = useState<{ propIdx: number; maxValue: number }[]>([]);
+  const [properties, setProperties] = useState<{ id: number; propIdx: number; maxValue: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [propertyOptions, setPropertyOptions] = useState<{ label: string; value: number; maxValue: number }[]>([]);
   const [propertyOptionsLoading, setPropertyOptionsLoading] = useState(false);
@@ -91,12 +92,12 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
   const handleHashChange = (idx: number, value: string) => {
     setHashes((prev) => prev.map((h, i) => (i === idx ? { ...h, value } : h)));
   };
-  const addHash = () => {
+  const addHash = useCallback(() => {
     if (hashes.length < 10) {
       setHashes([...hashes, { id: nextHashId, value: "" }]);
       setNextHashId(nextHashId + 1);
     }
-  };
+  }, [hashes.length, nextHashId]);
   const removeHash = (idx: number) => {
     setHashes((prev) => prev.filter((_, i) => i !== idx));
   };
@@ -121,12 +122,12 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
       return newProps;
     });
   };
-  const addProperty = () => {
+  const addProperty = useCallback(() => {
     // Set default to first available property if any exist
     const defaultPropIdx = propertyOptions.length > 0 ? propertyOptions[0].value : 0;
     const defaultMaxValue = propertyOptions.length > 0 ? propertyOptions[0].maxValue : DEFAULT_MAX_VALUE;
-    setProperties([...properties, { propIdx: defaultPropIdx, maxValue: defaultMaxValue }]);
-  };
+    setProperties([...properties, { id: Date.now() + Math.random(), propIdx: defaultPropIdx, maxValue: defaultMaxValue }]);
+  }, [propertyOptions, properties]);
   const removeProperty = (idx: number) => {
     setProperties((prev) => prev.filter((_, i) => i !== idx));
   };
@@ -236,7 +237,7 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
               options.push({
                 label: name,
                 value: index,
-                maxValue: maxValue
+                maxValue
               });
             }
           }
@@ -282,16 +283,16 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
   // Helper functions to avoid arrow functions in JSX
   const filterNonEmptyHashes = useCallback((hash: { id: number; value: string }) => hash.value.trim() !== '', []);
   
-  const filterValidProperties = useCallback((prop: { propIdx: number; maxValue: number }) => 
+  const filterValidProperties = useCallback((prop: { id: number; propIdx: number; maxValue: number }) => 
     prop.propIdx >= 0 && prop.maxValue >= 0, []);
   
-  const mapPropertyToApiFormat = useCallback((prop: { propIdx: number; maxValue: number }) => ({
+  const mapPropertyToApiFormat = useCallback((prop: { id: number; propIdx: number; maxValue: number }) => ({
     propIdx: Number(prop.propIdx),
     maxValue: BigInt(prop.maxValue)
   }), []);
 
-  const handleSignAndSendCallback = useCallback(({ status }: { status: any }) => {
-    if (!status.isInBlock) {
+  const handleSignAndSendCallback = useCallback((result: SubmittableResult) => {
+    if (!result.isInBlock) {
       return;
     }
     toaster.show({
@@ -304,7 +305,7 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
   }, [toaster, t, onClose]);
 
   // Submit handler
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!api || !pair || !objString) {
       return;
     }
@@ -353,16 +354,10 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
       });
       setIsLoading(false);
     }
-  };
-
-  // Handle dialog close with form reset
-  const handleClose = () => {
-    clearForm();
-    onClose();
-  };
+  }, [api, pair, objString, category, isPrivate, numApprovals, hashesEnabled, hashes, properties, toaster, t, handleSignAndSendCallback]);
 
   // Clear form function
-  const clearForm = () => {
+  const clearForm = useCallback(() => {
     setCategory(CATEGORY_OPTIONS[0].value);
     setIsPrivate(false);
     setObjFile(null);
@@ -373,7 +368,13 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
     setHashes([]);
     setProperties([]);
     setError(null);
-  };
+  }, []);
+
+  // Handle dialog close with form reset
+  const handleClose = useCallback(() => {
+    clearForm();
+    onClose();
+  }, [clearForm, onClose]);
 
   return (
     <Dialog 
@@ -413,7 +414,7 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
             <div className="w-full h-48 mt-2">
               <Canvas camera={{ fov: 30, near: 0.1, far: 1000, position: [0, 0, 2] }}>
                 <Suspense fallback={null}>
-                  <ThreeDObject geometry={mesh.geometry as any} />
+                  <ThreeDObject geometry={mesh.geometry as BufferGeometry} />
                 </Suspense>
               </Canvas>
             </div>
@@ -449,7 +450,7 @@ export default function DialogSubmitObject({ isOpen, onClose }: { isOpen: boolea
                 const isShare = selectedProperty?.label.toLowerCase() === 'share';
                 
                 return (
-                  <div key={`property-${p.propIdx}-${p.maxValue}-${i}-${properties.length}`} className="flex gap-2 items-center">
+                  <div key={`property-${p.id}`} className="flex gap-2 items-center">
                     <HTMLSelect
                       options={propertyOptions}
                       value={p.propIdx}

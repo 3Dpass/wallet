@@ -378,14 +378,14 @@ export default function AssetsTokens() {
   });
 
   // Add a handler to refresh assets after creation
-  const handleAssetCreated = () => {
+  const handleAssetCreated = useCallback(() => {
     if (api) {
       // Re-fetch assets
       setTimeout(() => {
         window.location.reload(); // simplest way to refresh for now
       }, ASSET_REFRESH_DELAY_MS);
     }
-  };
+  }, [api]);
 
   // Memoized callback for closing the create dialog
   const handleCloseCreateDialog = useCallback(() => {
