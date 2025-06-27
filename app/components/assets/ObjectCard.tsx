@@ -396,6 +396,57 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
     return () => handleTokenizeProperty(objIdx, propIdx);
   }, [handleTokenizeProperty]);
 
+  // Memoized functions for JSX to avoid arrow functions
+  const checkLinkedAsset = useCallback((asset: LinkedAsset, objIdx: number, propIdx: number) => {
+    const objDetails = asset.details.objDetails as AssetDetails['objDetails'];
+    if (!objDetails) return false;
+    const assetObjIdx = typeof objDetails.objIdx === 'string' 
+      ? parseInt(objDetails.objIdx, 10) 
+      : objDetails.objIdx;
+    const assetPropIdx = typeof objDetails.propIdx === 'string' 
+      ? parseInt(objDetails.propIdx, 10) 
+      : objDetails.propIdx;
+    
+    return assetObjIdx === objIdx && assetPropIdx === propIdx;
+  }, []);
+
+  const renderProperty = useCallback((p: { propIdx: number; maxValue: number }) => {
+    const def = propertyDefs[Number(p.propIdx)];
+    const name = def?.name || `Property ${p.propIdx}`;
+    const max = def?.maxValue ?? 1;
+    // Check if this property has a linked asset
+    const hasLinkedAsset = linkedAssets.some(asset => checkLinkedAsset(asset, objectIndex, Number(p.propIdx)));
+    return (
+      <div key={p.propIdx} className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {hasLinkedAsset && <Icon icon="dollar" intent="success" />}
+          <span className={hasLinkedAsset ? 'text-green-300 font-semibold' : ''}>
+            {name}: {max}
+          </span>
+        </div>
+        {!hasLinkedAsset && rpcData?.owner === selectedAccount && (
+          <Button
+            icon="dollar"
+            text="Tokenize"
+            className={Classes.BUTTON}
+            onClick={createTokenizePropertyClickHandler(objectIndex, Number(p.propIdx))}
+          />
+        )}
+      </div>
+    );
+  }, [propertyDefs, linkedAssets, objectIndex, rpcData?.owner, selectedAccount, createTokenizePropertyClickHandler, checkLinkedAsset]);
+
+  const renderLinkedAsset = useCallback((asset: LinkedAsset) => (
+    <Button
+      key={asset.assetId}
+      icon="dollar"
+      className="mb-2"
+      onClick={createAssetClickHandler(asset.assetId)}
+    >
+      View Asset #{asset.assetId}
+    </Button>
+  ), [createAssetClickHandler]);
+
   // Main fetch function with cancellation
   const fetchObj = useCallback(async (targetObjectIndex: number) => {
     // Cancel any ongoing request
@@ -813,43 +864,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                     <td className="font-medium">
                       {(rpcData?.prop?.length ?? 0) > 0 ? (
                         <div className="space-y-2">
-                          {rpcData?.prop?.map((p) => {
-                            const def = propertyDefs[Number(p.propIdx)];
-                            const name = def?.name || `Property ${p.propIdx}`;
-                            const max = def?.maxValue ?? 1;
-                            // Check if this property has a linked asset
-                            const hasLinkedAsset = linkedAssets.some(asset => {
-                              const objDetails = asset.details.objDetails as AssetDetails['objDetails'];
-                              if (!objDetails) return false;
-                              const assetObjIdx = typeof objDetails.objIdx === 'string' 
-                                ? parseInt(objDetails.objIdx, 10) 
-                                : objDetails.objIdx;
-                              const assetPropIdx = typeof objDetails.propIdx === 'string' 
-                                ? parseInt(objDetails.propIdx, 10) 
-                                : objDetails.propIdx;
-                              const currentPropIdx = Number(p.propIdx);
-                              
-                              return assetObjIdx === objectIndex && assetPropIdx === currentPropIdx;
-                            });
-                            return (
-                              <div key={p.propIdx} className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  {hasLinkedAsset && <Icon icon="dollar" intent="success" />}
-                                  <span className={hasLinkedAsset ? 'text-green-300 font-semibold' : ''}>
-                                    {name}: {max}
-                                  </span>
-                                </div>
-                                {!hasLinkedAsset && rpcData?.owner === selectedAccount && (
-                                  <Button
-                                    icon="dollar"
-                                    text="Tokenize"
-                                    className={Classes.BUTTON}
-                                    onClick={createTokenizePropertyClickHandler(objectIndex, Number(p.propIdx))}
-                                  />
-                                )}
-                              </div>
-                            );
-                          })}
+                          {rpcData?.prop?.map(renderProperty)}
                         </div>
                       ) : '-'}
                     </td>
@@ -881,16 +896,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         {linkedAssetsLoading ? (
           <Spinner size={20} className="my-2" />
         ) : linkedAssets.length > 0 ? (
-          linkedAssets.map(asset => (
-            <Button
-              key={asset.assetId}
-              icon="dollar"
-              className="mb-2"
-              onClick={createAssetClickHandler(asset.assetId)}
-            >
-              View Asset #{asset.assetId}
-            </Button>
-          ))
+          linkedAssets.map(renderLinkedAsset)
         ) : (
           <span className="text-xs text-gray-400">No linked assets</span>
         )}

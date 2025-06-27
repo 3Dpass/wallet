@@ -7,7 +7,7 @@ import type { Callback } from "@polkadot/types/types";
 import { mockVotes } from "./mock";
 
 // Type for the web3FromAddress function
-type Web3FromAddress = (address: string) => Promise<{ signer: Signer }>;
+// type Web3FromAddress = (address: string) => Promise<{ signer: Signer }>;
 
 type Options = {
   signer?: Signer;

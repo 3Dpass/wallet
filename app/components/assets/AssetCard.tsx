@@ -11,7 +11,6 @@ import DialogMintAsset from '../dialogs/DialogMintAsset';
 import DialogBurnAsset from '../dialogs/DialogBurnAsset';
 import DialogFreezeAsset from '../dialogs/DialogFreezeAsset';
 import DialogThawAsset from '../dialogs/DialogThawAsset';
-import DialogTransferOwnership from '../dialogs/DialogTransferOwnership';
 import DialogForceTransfer from '../dialogs/DialogForceTransfer';
 import AssetActions from "./AssetActions";
 import { useAtom } from "jotai";
@@ -96,7 +95,6 @@ const FETCH_DEBOUNCE_MS = 300; // 300ms debounce delay
 interface AssetInfoSectionProps {
   details: AssetDetails;
   metadata: AssetMetadata;
-  property?: PropertyDetails;
   maxSupply?: string | number;
   supplyValue: number | bigint;
   issuedPercent: string | null;
@@ -117,9 +115,6 @@ interface AssetInfoSectionProps {
   handleOpenSetMetadataDialog?: () => void;
   handleOpenSetTeamDialog?: () => void;
   handleOpenMintDialog?: () => void;
-  handleOpenFreezeDialog?: () => void;
-  handleCloseFreezeDialog?: () => void;
-  handleOpenThawDialog?: () => void;
   assetId: number;
   title: React.ReactNode;
 }
@@ -127,7 +122,6 @@ interface AssetInfoSectionProps {
 function AssetInfoSection({
   details,
   metadata,
-  property,
   maxSupply,
   supplyValue,
   issuedPercent,
@@ -148,9 +142,6 @@ function AssetInfoSection({
   handleOpenSetMetadataDialog = () => {},
   handleOpenSetTeamDialog = () => {},
   handleOpenMintDialog = () => {},
-  handleOpenFreezeDialog = () => {},
-  handleCloseFreezeDialog = () => {},
-  handleOpenThawDialog = () => {},
   assetId,
   title
 }: AssetInfoSectionProps) {
@@ -686,7 +677,6 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
           <AssetInfoSection
             details={details}
             metadata={metadata}
-            property={property ?? undefined}
             maxSupply={maxSupply}
             supplyValue={supplyValue}
             issuedPercent={issuedPercent}
@@ -707,9 +697,6 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
             handleOpenSetMetadataDialog={handleOpenSetMetadataDialog}
             handleOpenSetTeamDialog={handleOpenSetTeamDialog}
             handleOpenMintDialog={handleOpenMintDialog}
-            handleOpenFreezeDialog={handleOpenFreezeDialog}
-            handleCloseFreezeDialog={handleCloseFreezeDialog}
-            handleOpenThawDialog={handleOpenThawDialog}
             assetId={assetId}
             title={title}
           />
