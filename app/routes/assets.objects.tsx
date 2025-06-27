@@ -129,12 +129,15 @@ export default function AssetsObjects() {
   // Memoized callback for handling search suggestion clicks
   const handleSuggestionClick = useCallback((suggestion: string) => {
     // Extract the search term from the suggestion
-    if (suggestion.includes(t('assets_objects.search_suggestions.find_object', { index: '' }).replace('{{index}}', ''))) {
-      const index = parseInt(suggestion.split(t('assets_objects.search_suggestions.find_object', { index: '' }).replace('{{index}}', ''))[1]);
-      fetchObjectByIndex(index).then(() => {
-        setSearch(''); // Clear the search input
-        setSearchSuggestions([]); // Clear suggestions
-      });
+    if (suggestion.startsWith('Find the object: ')) {
+      const indexStr = suggestion.replace('Find the object: ', '');
+      const index = parseInt(indexStr, 10);
+      if (!isNaN(index)) {
+        fetchObjectByIndex(index).then(() => {
+          setSearch(''); // Clear the search input
+          setSearchSuggestions([]); // Clear suggestions
+        });
+      }
     } else if (suggestion.includes(t('assets_objects.search_suggestions.public_objects'))) {
       setSearch('public');
       setSearchSuggestions([]); // Clear suggestions
@@ -563,6 +566,14 @@ export default function AssetsObjects() {
     setLoading(isAnyLoading);
   }, [loadingIndexes, loadingObjects, loadingOwners, loadingIdentities]);
 
+  // Add this handler above the return statement in the component
+  const handleSuggestionKeyDown = useCallback((suggestion: string, e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      createSuggestionClickHandler(suggestion)();
+    }
+  }, [createSuggestionClickHandler]);
+
   return (
     <AssetsSection>
       <div className="flex justify-between items-center mb-4">
@@ -603,12 +614,7 @@ export default function AssetsObjects() {
                   key={suggestion}
                   className="px-3 py-2 hover:bg-gray-700 cursor-pointer text-sm border-b border-gray-600 last:border-b-0 text-gray-200"
                   onClick={createSuggestionClickHandler(suggestion)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      createSuggestionClickHandler(suggestion)();
-                    }
-                  }}
+                  onKeyDown={(e) => handleSuggestionKeyDown(suggestion, e)}
                   tabIndex={0}
                   role="button"
                   aria-label={`Select suggestion: ${suggestion}`}

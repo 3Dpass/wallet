@@ -18,6 +18,7 @@ import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
 import { useTranslation } from "react-i18next";
 import { generateEvmContractAddress } from "app/utils/converter";
+import type { TFunction } from "i18next";
 
 interface AssetCardProps {
   assetId: number;
@@ -92,7 +93,55 @@ function getOptionValue<T>(option: PolkadotOption<T>): T | Record<string, unknow
 // Constants
 const FETCH_DEBOUNCE_MS = 300; // 300ms debounce delay
 
-// Internal helper to render the asset info, table, and actions
+interface AssetInfoSectionProps {
+  details: AssetDetails;
+  metadata: AssetMetadata;
+  property?: PropertyDetails;
+  maxSupply?: string | number;
+  supplyValue: number | bigint;
+  issuedPercent: string | null;
+  evmContractAddress?: string;
+  t: TFunction; // i18n translation function, now strictly typed
+  userRole: "owner" | "admin" | "issuer" | "freezer" | null;
+  inDialog?: boolean;
+  linkedObjIdx: number | null;
+  showObjectDialog?: boolean;
+  handleOpenObjectDialog?: () => void;
+  handleCloseObjectDialog?: () => void;
+  showTeam?: boolean;
+  handleToggleTeam?: () => void;
+  handleCopyAddress?: () => void;
+  showDistributionDialog?: boolean;
+  handleOpenDistributionDialog?: () => void;
+  handleCloseDistributionDialog?: () => void;
+  showSetMetadataDialog?: boolean;
+  handleOpenSetMetadataDialog?: () => void;
+  handleCloseSetMetadataDialog?: () => void;
+  showSetTeamDialog?: boolean;
+  handleOpenSetTeamDialog?: () => void;
+  handleCloseSetTeamDialog?: () => void;
+  showMintDialog?: boolean;
+  handleOpenMintDialog?: () => void;
+  handleCloseMintDialog?: () => void;
+  showBurnDialog?: boolean;
+  handleOpenBurnDialog?: () => void;
+  handleCloseBurnDialog?: () => void;
+  showFreezeDialog?: boolean;
+  handleOpenFreezeDialog?: () => void;
+  handleCloseFreezeDialog?: () => void;
+  showThawDialog?: boolean;
+  handleOpenThawDialog?: () => void;
+  handleCloseThawDialog?: () => void;
+  showTransferOwnershipDialog?: boolean;
+  handleOpenTransferOwnershipDialog?: () => void;
+  handleCloseTransferOwnershipDialog?: () => void;
+  showForceTransferDialog?: boolean;
+  handleOpenForceTransferDialog?: () => void;
+  handleCloseForceTransferDialog?: () => void;
+  assetId: number;
+  title: React.ReactNode;
+}
+
 function AssetInfoSection({
   details,
   metadata,
@@ -103,44 +152,44 @@ function AssetInfoSection({
   evmContractAddress,
   t,
   userRole,
-  inDialog,
+  inDialog = false,
   linkedObjIdx,
-  showObjectDialog,
-  handleOpenObjectDialog,
-  handleCloseObjectDialog,
-  showTeam,
-  handleToggleTeam,
-  handleCopyAddress,
-  showDistributionDialog,
-  handleOpenDistributionDialog,
-  handleCloseDistributionDialog,
-  showSetMetadataDialog,
-  handleOpenSetMetadataDialog,
-  handleCloseSetMetadataDialog,
-  showSetTeamDialog,
-  handleOpenSetTeamDialog,
-  handleCloseSetTeamDialog,
-  showMintDialog,
-  handleOpenMintDialog,
-  handleCloseMintDialog,
-  showBurnDialog,
-  handleOpenBurnDialog,
-  handleCloseBurnDialog,
-  showFreezeDialog,
-  handleOpenFreezeDialog,
-  handleCloseFreezeDialog,
-  showThawDialog,
-  handleOpenThawDialog,
-  handleCloseThawDialog,
-  showTransferOwnershipDialog,
-  handleOpenTransferOwnershipDialog,
-  handleCloseTransferOwnershipDialog,
-  showForceTransferDialog,
-  handleOpenForceTransferDialog,
-  handleCloseForceTransferDialog,
+  showObjectDialog = false,
+  handleOpenObjectDialog = () => {},
+  handleCloseObjectDialog = () => {},
+  showTeam = false,
+  handleToggleTeam = () => {},
+  handleCopyAddress = () => {},
+  showDistributionDialog = false,
+  handleOpenDistributionDialog = () => {},
+  handleCloseDistributionDialog = () => {},
+  showSetMetadataDialog = false,
+  handleOpenSetMetadataDialog = () => {},
+  handleCloseSetMetadataDialog = () => {},
+  showSetTeamDialog = false,
+  handleOpenSetTeamDialog = () => {},
+  handleCloseSetTeamDialog = () => {},
+  showMintDialog = false,
+  handleOpenMintDialog = () => {},
+  handleCloseMintDialog = () => {},
+  showBurnDialog = false,
+  handleOpenBurnDialog = () => {},
+  handleCloseBurnDialog = () => {},
+  showFreezeDialog = false,
+  handleOpenFreezeDialog = () => {},
+  handleCloseFreezeDialog = () => {},
+  showThawDialog = false,
+  handleOpenThawDialog = () => {},
+  handleCloseThawDialog = () => {},
+  showTransferOwnershipDialog = false,
+  handleOpenTransferOwnershipDialog = () => {},
+  handleCloseTransferOwnershipDialog = () => {},
+  showForceTransferDialog = false,
+  handleOpenForceTransferDialog = () => {},
+  handleCloseForceTransferDialog = () => {},
   assetId,
   title
-}: any) {
+}: AssetInfoSectionProps) {
   return (
     <div className="flex flex-col md:flex-row gap-0 mb-4 items-start">
       {/* Info */}
@@ -682,7 +731,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
           <AssetInfoSection
             details={details}
             metadata={metadata}
-            property={property}
+            property={property ?? undefined}
             maxSupply={maxSupply}
             supplyValue={supplyValue}
             issuedPercent={issuedPercent}
