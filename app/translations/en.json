@@ -44,7 +44,10 @@
       "lbl_message_copied": "Message copied to clipboard!",
       "lbl_raw_messages_not_supported": "Signer does not support signing raw messages",
       "lbl_judgement_sent": "Your judgement was sent",
-      "lbl_error_loading_block_data": "Error loading block data, try to reload."
+      "lbl_error_loading_block_data": "Error loading block data, try to reload.",
+      "lbl_fill_required_fields": "Please fill all required fields.",
+      "lbl_no_account_selected": "No account selected or unable to get keyring pair.",
+      "lbl_account_locked": "Account is locked."
     },
     "root": {
       "lbl_app_name": "Wallet",
@@ -103,7 +106,13 @@
       "lbl_placeholder_twitter": "Enter twitter",
       "lbl_placeholder_discord": "Enter discord",
       "lbl_placeholder_riot_name": "Enter riot name",
-      "lbl_placeholder_request_judgement": "Request for judgement"
+      "lbl_placeholder_request_judgement": "Request for judgement",
+      "phone_placeholder": "Phone number",
+      "linkedin_placeholder": "LinkedIn",
+      "telegram_placeholder": "Telegram",
+      "github_placeholder": "Github",
+      "custom_placeholder": "Custom",
+      "pgp_placeholder": "PGP Fingerprint (20 bytes hex)"
     },
     "dlg_join_pool": {
       "lbl_title": "Join a mining pool",
@@ -176,7 +185,8 @@
       "lbl_advanced_mode": "Advanced mode",
       "lbl_btn_save": "Save",
       "title": "Settings",
-      "section_ui": "UI Settings"
+      "section_ui": "UI Settings",
+      "reset_rpc_title": "Reset RPC endpoint to default"
     },
     "dlg_sign_verify": {
       "lbl_title": "Sign and Verify Message",
@@ -286,7 +296,11 @@
       "nav_bounties": "Bounties"
     },
     "dlg_set_registrar_fee": {
-      "title": "Set Registrar Fee"
+      "title": "Set Registrar Fee",
+      "enter_new_fee": "Enter new fee",
+      "set_fee": "Set Fee",
+      "registrar_index_not_found": "Registrar index not found or API unavailable.",
+      "fee_updated": "Fee updated!"
     },
     "dlg_set_registrar_fee.msg_error": "Failed to set fee: {{error}}",
     "dlg_judgement_requests": {
@@ -294,11 +308,209 @@
       "btn_provide_judgement": "Provide Judgement",
       "lbl_judgement": "Judgement",
       "lbl_fee": "Fee",
-      "msg_error": "Failed to submit judgement: {{error}}"
+      "msg_error": "Failed to submit judgement: {{error}}",
+      "search_placeholder": "Search by address, name, email...",
+      "no_pending_requests": "No pending requests",
+      "provide": "Provide",
+      "judgement_submitted": "Judgement submitted!",
+      "registrar_index_not_found": "Registrar index not found or API unavailable."
     },
     "judgement": {
       "Unknown": "Unknown",
       "FeePaid": "Fee Paid"
+    },
+    "assets_objects": {
+      "title": "Objects",
+      "new_object": "New Object",
+      "all_objects": "All objects",
+      "my_objects": "My objects",
+      "search_placeholder": "Search by index, block, owner, state, public/private, approved/disapproved, or property...",
+      "show_all_objects": "Show all objects",
+      "load_more": "Load 10 more",
+      "no_objects_found": "No objects found.",
+      "no_objects_found_account": "No objects found for your account.",
+      "object_not_found": "Object with index {{index}} not found",
+      "failed_fetch_object": "Failed to fetch object with index {{index}}",
+      "storage_not_available": "Storage poScan.owners or account not available",
+      "failed_fetch_indexes": "Failed to fetch object indexes",
+      "failed_fetch_objects": "Failed to fetch objects",
+      "failed_fetch_owner_data": "Failed to fetch owner data:",
+      "failed_fetch_identity_data": "Failed to fetch identity data:",
+      "failed_fetch_identity": "Failed to fetch identity for owner {{owner}}:",
+      "ownership_mismatch": "Object {{index}} ownership mismatch: storage says {{storageOwner}}, actual owner is {{actualOwner}}",
+      "failed_fetch_owner": "Failed to fetch owner for object {{index}}:",
+      "state_names": {
+        "created": "Created",
+        "estimating": "Estimating",
+        "estimated": "Estimated",
+        "approving": "Approving",
+        "approved": "Approved",
+        "notApproved": "Disapproved"
+      },
+      "search_suggestions": {
+        "find_object": "Find the object: {{index}}",
+        "public_objects": "Public objects",
+        "private_objects": "Private objects",
+        "index": "Index: {{index}}",
+        "created": "Created: {{block}}",
+        "property": "Property: {{name}}",
+        "property_value": "Property value: {{value}}",
+        "owner": "Owner: {{owner}}",
+        "identity": "Identity: {{identity}}"
+      }
+    },
+    "asset_actions": {
+      "freeze": "Freeze asset",
+      "freeze_account": "Freeze account",
+      "thaw": "Thaw",
+      "burn": "Burn",
+      "mint": "Mint",
+      "force_transfer": "Force transfer",
+      "transfer_ownership": "Transfer ownership",
+      "set_metadata": "Set metadata",
+      "set_team": "Set team",
+      "view_explorer": "View on explorer",
+      "tokens_distribution": "Token distribution"
+    },
+    "assets_tokens": {
+      "title": "Tokens",
+      "new_asset": "New asset",
+      "all_assets": "All assets",
+      "my_assets": "My assets",
+      "search_placeholder": "Search by Asset ID, Symbol, Name, EVM address, or Type...",
+      "no_assets_found": "No assets found.",
+      "no_assets_found_account": "No assets found for your account.",
+      "failed_load_assets": "Failed to load assets",
+      "failed_load_my_assets": "Failed to load my assets",
+      "asset_types": {
+        "fungible": "fungible",
+        "non_fungible": "non-fungible",
+        "unknown": "unknown"
+      }
+    },
+    "dialog_submit_object": {
+      "title": "Submit New Object",
+      "category": "Category",
+      "rights": "Rights",
+      "obj_file": "OBJ File",
+      "approvals": "Approvals",
+      "hash_id": "Hash ID",
+      "properties": "Properties",
+      "public": "Public",
+      "private": "Private",
+      "add_hashes_manually": "Add Hashes Manually",
+      "add_hash": "Add Hash",
+      "add_property": "Add Property",
+      "select_property": "Select Property",
+      "max_value": "Max Value",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "submit": "Submit",
+      "object_submitted_successfully": "Object submitted successfully",
+      "failed_parse_obj": "Failed to parse OBJ file",
+      "drag_drop_obj": "Drag & drop or click to select .obj file"
+    },
+    "object_card": {
+      "tokenize": "Tokenize",
+      "download_obj_file": "Download OBJ file",
+      "hide_details": "Hide Details",
+      "show_details": "Show Details",
+      "no_preview": "No preview",
+      "loading": "Loading...",
+      "no_linked_assets": "No linked assets",
+      "view_asset": "View Asset #"
+    },
+    "asset_card": {
+      "fungible_asset": "Fungible asset",
+      "non_fungible_backed_asset": "Non-fungible backed asset",
+      "unknown_asset_type": "Unknown asset type",
+      "frozen": "Frozen",
+      "live": "Live",
+      "asset_id": "Asset ID:",
+      "hide_team": "Hide The Team",
+      "show_team": "Show The Team",
+      "tokens_distribution": "Tokens Distribution",
+      "set_metadata": "Set Metadata",
+      "set_team": "Set Team",
+      "mint": "Mint",
+      "view_object": "View Object #",
+      "copy_address": "Copy address",
+      "view_on_explorer": "View on Explorer",
+      "api_not_ready": "API not ready",
+      "asset_not_found": "Asset not found"
+    },
+    "dlg_asset": {
+      "create_title": "Create new asset",
+      "create_btn": "Create",
+      "asset_id": "Asset ID",
+      "min_balance": "Minimum balance",
+      "link_object": "Link to object",
+      "obj_idx": "Object index (objIdx)",
+      "prop_idx": "Property index (propIdx)",
+      "max_supply": "Max supply",
+      "set_metadata_title": "Set asset metadata",
+      "set_metadata_btn": "Set metadata",
+      "asset_name": "Asset name",
+      "asset_symbol": "Symbol",
+      "asset_decimals": "Decimals (0-18)",
+      "set_team_title": "Set asset team",
+      "set_team_btn": "Set team",
+      "issuer": "Issuer address",
+      "admin": "Admin address",
+      "freezer": "Freezer address",
+      "mint_title": "Mint tokens",
+      "mint_btn": "Mint",
+      "amount": "Amount (minimal units)",
+      "burn_title": "Burn tokens",
+      "burn_btn": "Burn",
+      "burn_who": "Address to burn from",
+      "freeze_title": "Freeze",
+      "freeze_btn": "Freeze",
+      "freeze_asset_btn": "Freeze asset",
+      "freeze_asset_switch": "Freeze entire asset",
+      "freeze_asset_success": "Asset frozen successfully!",
+      "freeze_who": "Address to freeze",
+      "thaw_title": "Thaw",
+      "thaw_btn": "Thaw",
+      "thaw_asset_btn": "Thaw asset",
+      "thaw_asset_switch": "Thaw entire asset",
+      "thaw_asset_success": "Asset thawed successfully!",
+      "thaw_who": "Address to thaw",
+      "transfer_ownership_title": "Transfer ownership",
+      "transfer_ownership_btn": "Transfer",
+      "transfer_ownership_new_owner": "New owner address",
+      "force_transfer_title": "Force transfer",
+      "force_transfer_btn": "Force transfer",
+      "force_transfer_source": "Source address",
+      "force_transfer_dest": "Destination address"
+    },
+    "dlg_object_card": {
+      "title": "Object Details"
+    },
+    "dlg_asset_distribution": {
+      "title": "Token Holders Distribution",
+      "search_placeholder": "Search by address or name...",
+      "address": "Address",
+      "balance": "Balance",
+      "share_percentage": "% Share",
+      "no_holders_found": "No holders found"
+    },
+    "dlg_submit_object": {
+      "title": "Submit New Object",
+      "hash_placeholder": "Hash (H256)",
+      "select_property": "Select Property",
+      "max_value": "Max Value",
+      "loading_properties": "Loading properties...",
+      "auto_applied": "(Auto-applied)"
+    },
+    "dlg_create_asset": {
+      "select_property": "Select Property",
+      "loading_properties": "Loading properties..."
+    },
+    "errors": {
+      "api_not_ready": "API not ready",
+      "unknown_error": "Unknown error",
+      "unknown_error_occurred": "Unknown error occurred"
     }
   }
 }

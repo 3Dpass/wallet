@@ -2,6 +2,7 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { BigInt as PolkaBigInt } from "@polkadot/x-bigint";
 import { RPC_CONFIG, RPC_TYPES } from "../api.config";
 import { defaultEndpoint } from "../atoms";
+import { P3D_DECIMALS_FACTOR } from "../utils/converter";
 
 async function getTotalIssuance() {
   const provider = new WsProvider(defaultEndpoint, false);
@@ -17,7 +18,7 @@ async function getTotalIssuance() {
     totalIssuance.toPrimitive() as number
   );
 
-  return (totalIssuanceNumber / PolkaBigInt(10 ** 12)).toString();
+  return (totalIssuanceNumber / PolkaBigInt(P3D_DECIMALS_FACTOR)).toString();
 }
 
 export async function loader() {

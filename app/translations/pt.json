@@ -38,9 +38,11 @@
       "lbl_pool_difficulty_set": "Dificuldade da piscina foi definida",
       "lbl_interest_set": "Juros da piscina foi definido",
       "lbl_message_copied": "Mensagem copiada para a área de transferência!",
-      "lbl_raw_messages_not_supported": "O Signatário não suporta assinatura de mensagens em texto simples",
+      "lbl_raw_messages_not_supported": "O assinante não suporta assinatura de mensagens brutas",
       "lbl_judgement_sent": "Seu julgamento foi enviado",
-      "lbl_error_loading_block_data": "Erro ao carregar os dados do bloco, tente recarregar."
+      "lbl_error_loading_block_data": "Erro ao carregar dados do bloco, tente recarregar.",
+      "lbl_fill_required_fields": "Por favor, preencha todos os campos obrigatórios.",
+      "lbl_no_account_selected": "Nenhuma conta selecionada ou não foi possível obter o par de chaves."
     },
     "root": {
       "lbl_app_name": "Carteira",
@@ -99,7 +101,13 @@
       "lbl_placeholder_twitter": "Digite o Twitter",
       "lbl_placeholder_discord": "Digite o Discord",
       "lbl_placeholder_riot_name": "Digite o nome Riot",
-      "lbl_placeholder_request_judgement": "Solicitar julgamento"
+      "lbl_placeholder_request_judgement": "Solicitar julgamento",
+      "phone_placeholder": "Número de telefone",
+      "linkedin_placeholder": "LinkedIn",
+      "telegram_placeholder": "Telegram",
+      "github_placeholder": "Github",
+      "custom_placeholder": "Personalizado",
+      "pgp_placeholder": "Impressão digital PGP (20 bytes hex)"
     },
     "dlg_join_pool": {
       "lbl_title": "Entrar em uma piscina de mineração",
@@ -168,7 +176,8 @@
       "lbl_api_address": "Endereço RPC API",
       "lbl_explorer_graphql": "Explorador GraphQL",
       "lbl_advanced_mode": "Modo avançado",
-      "lbl_btn_save": "Salvar"
+      "lbl_btn_save": "Salvar",
+      "reset_rpc_title": "Redefinir endpoint RPC para o padrão"
     },
     "dlg_sign_verify": {
       "lbl_title": "Assinar e Verificar Mensagem",
@@ -233,6 +242,219 @@
       "already_voted": "Já votou",
       "mock_mode": "Modo de Teste (Sem Rede)",
       "close_motion": "Encerrar Moção"
+    },
+    "assets_objects": {
+      "title": "Objetos",
+      "new_object": "Novo Objeto",
+      "all_objects": "Todos os objetos",
+      "my_objects": "Meus objetos",
+      "search_placeholder": "Buscar por índice, bloco, proprietário, estado, público/privado, aprovado/reprovado, ou propriedade...",
+      "show_all_objects": "Mostrar todos os objetos",
+      "load_more": "Carregar 10 mais",
+      "no_objects_found": "Nenhum objeto encontrado.",
+      "no_objects_found_account": "Nenhum objeto encontrado para sua conta.",
+      "object_not_found": "Objeto com índice {{index}} não encontrado",
+      "failed_fetch_object": "Falha ao buscar objeto com índice {{index}}",
+      "storage_not_available": "Armazenamento poScan.owners ou conta não disponível",
+      "failed_fetch_indexes": "Falha ao buscar índices de objetos",
+      "failed_fetch_objects": "Falha ao buscar objetos",
+      "failed_fetch_owner_data": "Falha ao buscar dados do proprietário:",
+      "failed_fetch_identity_data": "Falha ao buscar dados de identidade:",
+      "failed_fetch_identity": "Falha ao buscar identidade para proprietário {{owner}}:",
+      "ownership_mismatch": "Incompatibilidade de propriedade do objeto {{index}}: armazenamento diz {{storageOwner}}, proprietário real é {{actualOwner}}",
+      "failed_fetch_owner": "Falha ao buscar proprietário para objeto {{index}}:",
+      "state_names": {
+        "created": "Criado",
+        "estimating": "Estimando",
+        "estimated": "Estimado",
+        "approving": "Aprovando",
+        "approved": "Aprovado",
+        "notApproved": "Reprovado"
+      },
+      "search_suggestions": {
+        "find_object": "Encontrar o objeto: {{index}}",
+        "public_objects": "Objetos públicos",
+        "private_objects": "Objetos privados",
+        "index": "Índice: {{index}}",
+        "created": "Criado: {{block}}",
+        "property": "Propriedade: {{name}}",
+        "property_value": "Valor da propriedade: {{value}}",
+        "owner": "Proprietário: {{owner}}",
+        "identity": "Identidade: {{identity}}"
+      }
+    },
+    "asset_actions": {
+      "freeze": "Congelar ativo",
+      "freeze_account": "Congelar conta",
+      "thaw": "Descongelar",
+      "burn": "Queimar",
+      "mint": "Cunhar",
+      "force_transfer": "Transferência forçada",
+      "transfer_ownership": "Transferir propriedade",
+      "set_metadata": "Definir metadados",
+      "set_team": "Definir equipe",
+      "view_explorer": "Ver no explorador",
+      "tokens_distribution": "Distribuição de tokens"
+    },
+    "dlg_asset": {
+      "create_title": "Criar novo ativo",
+      "create_btn": "Criar",
+      "asset_id": "ID do ativo",
+      "min_balance": "Saldo mínimo",
+      "link_object": "Vincular a um objeto",
+      "obj_idx": "Índice do objeto (objIdx)",
+      "prop_idx": "Índice da propriedade (propIdx)",
+      "max_supply": "Oferta máxima",
+      "set_metadata_title": "Definir metadados do ativo",
+      "set_metadata_btn": "Definir metadados",
+      "asset_name": "Nome do ativo",
+      "asset_symbol": "Símbolo",
+      "asset_decimals": "Decimais (0-18)",
+      "set_team_title": "Definir equipe do ativo",
+      "set_team_btn": "Definir equipe",
+      "issuer": "Endereço do emissor",
+      "admin": "Endereço do administrador",
+      "freezer": "Endereço do congelador",
+      "mint_title": "Emitir tokens",
+      "mint_btn": "Emitir",
+      "amount": "Quantidade (unidades mínimas)",
+      "burn_title": "Queimar tokens",
+      "burn_btn": "Queimar",
+      "burn_who": "Endereço de onde queimar",
+      "freeze_title": "Congelar",
+      "freeze_btn": "Congelar",
+      "freeze_asset_btn": "Congelar ativo",
+      "freeze_asset_switch": "Congelar todo o ativo",
+      "freeze_asset_success": "Ativo congelado com sucesso!",
+      "freeze_who": "Endereço a congelar",
+      "thaw_title": "Descongelar",
+      "thaw_btn": "Descongelar",
+      "thaw_asset_btn": "Descongelar ativo",
+      "thaw_asset_switch": "Descongelar todo o ativo",
+      "thaw_asset_success": "Ativo descongelado com sucesso!",
+      "thaw_who": "Endereço a descongelar",
+      "transfer_ownership_title": "Transferir propriedade",
+      "transfer_ownership_btn": "Transferir",
+      "transfer_ownership_new_owner": "Novo endereço do proprietário",
+      "force_transfer_title": "Transferência forçada",
+      "force_transfer_btn": "Transferir forçadamente",
+      "force_transfer_source": "Endereço de origem",
+      "force_transfer_dest": "Endereço de destino"
+    },
+    "asset_card": {
+      "fungible_asset": "Ativo fungível",
+      "non_fungible_backed_asset": "Ativo respaldado não fungível",
+      "unknown_asset_type": "Tipo de ativo desconhecido",
+      "frozen": "Congelado",
+      "live": "Ativo",
+      "asset_id": "ID do ativo:",
+      "hide_team": "Ocultar equipe",
+      "show_team": "Mostrar equipe",
+      "tokens_distribution": "Distribuição de tokens",
+      "set_metadata": "Definir metadados",
+      "set_team": "Definir equipe",
+      "mint": "Cunhar",
+      "view_object": "Ver objeto #",
+      "copy_address": "Copiar endereço",
+      "view_on_explorer": "Ver no explorador",
+      "api_not_ready": "API não está pronta",
+      "asset_not_found": "Ativo não encontrado"
+    },
+    "assets_tokens": {
+      "title": "Tokens",
+      "new_asset": "Novo ativo",
+      "all_assets": "Todos os ativos",
+      "my_assets": "Meus ativos",
+      "search_placeholder": "Buscar por ID do ativo, símbolo, nome, endereço EVM, ou tipo...",
+      "no_assets_found": "Nenhum ativo encontrado.",
+      "no_assets_found_account": "Nenhum ativo encontrado para sua conta.",
+      "failed_load_assets": "Falha ao carregar ativos",
+      "failed_load_my_assets": "Falha ao carregar meus ativos",
+      "asset_types": {
+        "fungible": "fungível",
+        "non_fungible": "não fungível",
+        "unknown": "desconhecido"
+      }
+    },
+    "dialog_submit_object": {
+      "title": "Enviar Novo Objeto",
+      "category": "Categoria",
+      "rights": "Direitos",
+      "obj_file": "Arquivo OBJ",
+      "approvals": "Aprovações",
+      "hash_id": "ID do Hash",
+      "properties": "Propriedades",
+      "public": "Público",
+      "private": "Privado",
+      "add_hashes_manually": "Adicionar hashes manualmente",
+      "add_hash": "Adicionar Hash",
+      "add_property": "Adicionar Propriedade",
+      "select_property": "Selecionar Propriedade",
+      "max_value": "Valor Máximo",
+      "cancel": "Cancelar",
+      "clear": "Limpar",
+      "submit": "Enviar",
+      "object_submitted_successfully": "Objeto enviado com sucesso",
+      "failed_parse_obj": "Falha ao analisar arquivo OBJ",
+      "drag_drop_obj": "Arraste e solte ou clique para selecionar arquivo .obj"
+    },
+    "object_card": {
+      "tokenize": "Tokenizar",
+      "download_obj_file": "Baixar arquivo OBJ",
+      "hide_details": "Ocultar Detalhes",
+      "show_details": "Mostrar Detalhes",
+      "no_preview": "Sem visualização",
+      "loading": "Carregando...",
+      "no_linked_assets": "Sem ativos vinculados",
+      "view_asset": "Ver Ativo #"
+    },
+    "dlg_set_registrar_fee": {
+      "title": "Definir Taxa do Registrador",
+      "enter_new_fee": "Inserir nova taxa",
+      "set_fee": "Definir Taxa",
+      "registrar_index_not_found": "Índice do registrador não encontrado ou API indisponível.",
+      "fee_updated": "Taxa atualizada!"
+    },
+    "dlg_set_registrar_fee.msg_error": "Falha ao definir taxa: {{error}}",
+    "dlg_judgement_requests": {
+      "title": "Solicitações de Julgamento",
+      "btn_provide_judgement": "Fornecer Julgamento",
+      "lbl_judgement": "Julgamento",
+      "lbl_fee": "Taxa",
+      "msg_error": "Falha ao enviar julgamento: {{error}}",
+      "search_placeholder": "Buscar por endereço, nome, email...",
+      "no_pending_requests": "Nenhuma solicitação pendente",
+      "provide": "Fornecer",
+      "judgement_submitted": "Julgamento enviado!",
+      "registrar_index_not_found": "Índice do registrador não encontrado ou API indisponível."
+    },
+    "dlg_object_card": {
+      "title": "Detalhes do Objeto"
+    },
+    "dlg_asset_distribution": {
+      "title": "Distribuição de Detentores de Tokens",
+      "search_placeholder": "Buscar por endereço ou nome...",
+      "address": "Endereço",
+      "balance": "Saldo",
+      "share_percentage": "% Participação",
+      "no_holders_found": "Nenhum detentor encontrado"
+    },
+    "dlg_submit_object": {
+      "title": "Enviar Novo Objeto",
+      "hash_placeholder": "Hash (H256)",
+      "select_property": "Selecionar Propriedade",
+      "max_value": "Valor Máximo",
+      "loading_properties": "Carregando propriedades...",
+      "auto_applied": "(Aplicado automaticamente)"
+    },
+    "dlg_create_asset": {
+      "select_property": "Selecionar Propriedade",
+      "loading_properties": "Carregando propriedades..."
+    },
+    "errors": {
+      "api_not_ready": "API não está pronta",
+      "unknown_error": "Erro desconhecido",
+      "unknown_error_occurred": "Ocorreu um erro desconhecido"
     }
   }
 }

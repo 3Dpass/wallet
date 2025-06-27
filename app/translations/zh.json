@@ -38,9 +38,11 @@
       "lbl_pool_difficulty_set": "矿池难度已设置",
       "lbl_interest_set": "矿池利息已设置",
       "lbl_message_copied": "消息已复制到剪贴板！",
-      "lbl_raw_messages_not_supported": "签名器不支持签署原始消息",
+      "lbl_raw_messages_not_supported": "签名者不支持签名原始消息",
       "lbl_judgement_sent": "您的判断已发送",
-      "lbl_error_loading_block_data": "加载区块数据时出错，请尝试重新加载。"
+      "lbl_error_loading_block_data": "加载区块数据时出错，请尝试重新加载。",
+      "lbl_fill_required_fields": "请填写所有必填字段。",
+      "lbl_no_account_selected": "未选择账户或无法获取密钥对。"
     },
     "root": {
       "lbl_app_name": "钱包",
@@ -99,7 +101,13 @@
       "lbl_placeholder_twitter": "输入推特账号",
       "lbl_placeholder_discord": "输入Discord账号",
       "lbl_placeholder_riot_name": "输入Riot名称",
-      "lbl_placeholder_request_judgement": "请求判断"
+      "lbl_placeholder_request_judgement": "请求判断",
+      "phone_placeholder": "电话号码",
+      "linkedin_placeholder": "LinkedIn",
+      "telegram_placeholder": "Telegram",
+      "github_placeholder": "Github",
+      "custom_placeholder": "自定义",
+      "pgp_placeholder": "PGP指纹 (20字节十六进制)"
     },
     "dlg_join_pool": {
       "lbl_title": "加入矿池",
@@ -168,7 +176,8 @@
       "lbl_api_address": "RPC API地址",
       "lbl_explorer_graphql": "浏览器GraphQL",
       "lbl_advanced_mode": "高级模式",
-      "lbl_btn_save": "保存"
+      "lbl_btn_save": "保存",
+      "reset_rpc_title": "重置RPC端点到默认值"
     },
     "dlg_sign_verify": {
       "lbl_title": "签名和验证消息",
@@ -233,6 +242,219 @@
       "already_voted": "已投票",
       "mock_mode": "测试模式（无网络）",
       "close_motion": "结束提案"
+    },
+    "assets_objects": {
+      "title": "对象",
+      "new_object": "新对象",
+      "all_objects": "所有对象",
+      "my_objects": "我的对象",
+      "search_placeholder": "按索引、区块、所有者、状态、公开/私有、已批准/未批准或属性搜索...",
+      "show_all_objects": "显示所有对象",
+      "load_more": "加载更多10个",
+      "no_objects_found": "未找到对象。",
+      "no_objects_found_account": "未找到您账户的对象。",
+      "object_not_found": "未找到索引为{{index}}的对象",
+      "failed_fetch_object": "获取索引为{{index}}的对象失败",
+      "storage_not_available": "存储poScan.owners或账户不可用",
+      "failed_fetch_indexes": "获取对象索引失败",
+      "failed_fetch_objects": "获取对象失败",
+      "failed_fetch_owner_data": "获取所有者数据失败：",
+      "failed_fetch_identity_data": "获取身份数据失败：",
+      "failed_fetch_identity": "获取所有者{{owner}}的身份失败：",
+      "ownership_mismatch": "对象{{index}}的所有权不匹配：存储显示{{storageOwner}}，实际所有者是{{actualOwner}}",
+      "failed_fetch_owner": "获取对象{{index}}的所有者失败：",
+      "state_names": {
+        "created": "已创建",
+        "estimating": "估算中",
+        "estimated": "已估算",
+        "approving": "审批中",
+        "approved": "已批准",
+        "notApproved": "未批准"
+      },
+      "search_suggestions": {
+        "find_object": "查找对象：{{index}}",
+        "public_objects": "公开对象",
+        "private_objects": "私有对象",
+        "index": "索引：{{index}}",
+        "created": "创建：{{block}}",
+        "property": "属性：{{name}}",
+        "property_value": "属性值：{{value}}",
+        "owner": "所有者：{{owner}}",
+        "identity": "身份：{{identity}}"
+      }
+    },
+    "asset_actions": {
+      "freeze": "冻结资产",
+      "freeze_account": "冻结账户",
+      "thaw": "解冻",
+      "burn": "销毁",
+      "mint": "铸造",
+      "force_transfer": "强制转账",
+      "transfer_ownership": "转移所有权",
+      "set_metadata": "设置元数据",
+      "set_team": "设置团队",
+      "view_explorer": "在浏览器中查看",
+      "tokens_distribution": "代币分布"
+    },
+    "asset_card": {
+      "fungible_asset": "同质化资产",
+      "non_fungible_backed_asset": "非同质化支持资产",
+      "unknown_asset_type": "未知资产类型",
+      "frozen": "已冻结",
+      "live": "活跃",
+      "asset_id": "资产ID：",
+      "hide_team": "隐藏团队",
+      "show_team": "显示团队",
+      "tokens_distribution": "代币分布",
+      "set_metadata": "设置元数据",
+      "set_team": "设置团队",
+      "mint": "铸造",
+      "view_object": "查看对象 #",
+      "copy_address": "复制地址",
+      "view_on_explorer": "在浏览器中查看",
+      "api_not_ready": "API未就绪",
+      "asset_not_found": "未找到资产"
+    },
+    "dlg_asset": {
+      "create_title": "创建新资产",
+      "create_btn": "创建",
+      "asset_id": "资产ID",
+      "min_balance": "最小余额",
+      "link_object": "关联对象",
+      "obj_idx": "对象索引 (objIdx)",
+      "prop_idx": "属性索引 (propIdx)",
+      "max_supply": "最大供应量",
+      "set_metadata_title": "设置资产元数据",
+      "set_metadata_btn": "设置元数据",
+      "asset_name": "资产名称",
+      "asset_symbol": "符号",
+      "asset_decimals": "小数位数 (0-18)",
+      "set_team_title": "设置资产团队",
+      "set_team_btn": "设置团队",
+      "issuer": "发行人地址",
+      "admin": "管理员地址",
+      "freezer": "冻结者地址",
+      "mint_title": "铸造代币",
+      "mint_btn": "铸造",
+      "amount": "数量（最小单位）",
+      "burn_title": "销毁代币",
+      "burn_btn": "销毁",
+      "burn_who": "销毁地址",
+      "freeze_title": "冻结",
+      "freeze_btn": "冻结",
+      "freeze_asset_btn": "冻结资产",
+      "freeze_asset_switch": "冻结整个资产",
+      "freeze_asset_success": "资产冻结成功！",
+      "freeze_who": "要冻结的地址",
+      "thaw_title": "解冻",
+      "thaw_btn": "解冻",
+      "thaw_asset_btn": "解冻资产",
+      "thaw_asset_switch": "解冻整个资产",
+      "thaw_asset_success": "资产解冻成功！",
+      "thaw_who": "要解冻的地址",
+      "transfer_ownership_title": "转移所有权",
+      "transfer_ownership_btn": "转移",
+      "transfer_ownership_new_owner": "新所有者地址",
+      "force_transfer_title": "强制转账",
+      "force_transfer_btn": "强制转账",
+      "force_transfer_source": "源地址",
+      "force_transfer_dest": "目标地址"
+    },
+    "assets_tokens": {
+      "title": "代币",
+      "new_asset": "新资产",
+      "all_assets": "所有资产",
+      "my_assets": "我的资产",
+      "search_placeholder": "按资产ID、符号、名称、EVM地址或类型搜索...",
+      "no_assets_found": "未找到资产。",
+      "no_assets_found_account": "未找到您账户的资产。",
+      "failed_load_assets": "加载资产失败",
+      "failed_load_my_assets": "加载我的资产失败",
+      "asset_types": {
+        "fungible": "同质化",
+        "non_fungible": "非同质化",
+        "unknown": "未知"
+      }
+    },
+    "dialog_submit_object": {
+      "title": "提交新对象",
+      "category": "类别",
+      "rights": "权限",
+      "obj_file": "OBJ文件",
+      "approvals": "审批",
+      "hash_id": "哈希ID",
+      "properties": "属性",
+      "public": "公开",
+      "private": "私有",
+      "add_hashes_manually": "手动添加哈希",
+      "add_hash": "添加哈希",
+      "add_property": "添加属性",
+      "select_property": "选择属性",
+      "max_value": "最大值",
+      "cancel": "取消",
+      "clear": "清除",
+      "submit": "提交",
+      "object_submitted_successfully": "对象提交成功",
+      "failed_parse_obj": "解析OBJ文件失败",
+      "drag_drop_obj": "拖放或点击选择.obj文件"
+    },
+    "object_card": {
+      "tokenize": "代币化",
+      "download_obj_file": "下载OBJ文件",
+      "hide_details": "隐藏详情",
+      "show_details": "显示详情",
+      "no_preview": "无预览",
+      "loading": "加载中...",
+      "no_linked_assets": "无关联资产",
+      "view_asset": "查看资产 #"
+    },
+    "dlg_set_registrar_fee": {
+      "title": "设置注册商费用",
+      "enter_new_fee": "输入新费用",
+      "set_fee": "设置费用",
+      "registrar_index_not_found": "未找到注册商索引或API不可用。",
+      "fee_updated": "费用已更新！"
+    },
+    "dlg_set_registrar_fee.msg_error": "设置费用失败：{{error}}",
+    "dlg_judgement_requests": {
+      "title": "判断请求",
+      "btn_provide_judgement": "提供判断",
+      "lbl_judgement": "判断",
+      "lbl_fee": "费用",
+      "msg_error": "提交判断失败：{{error}}",
+      "search_placeholder": "按地址、姓名、邮箱搜索...",
+      "no_pending_requests": "没有待处理请求",
+      "provide": "提供",
+      "judgement_submitted": "判断已提交！",
+      "registrar_index_not_found": "未找到注册商索引或API不可用。"
+    },
+    "dlg_object_card": {
+      "title": "对象详情"
+    },
+    "dlg_asset_distribution": {
+      "title": "代币持有者分布",
+      "search_placeholder": "按地址或姓名搜索...",
+      "address": "地址",
+      "balance": "余额",
+      "share_percentage": "% 份额",
+      "no_holders_found": "未找到持有者"
+    },
+    "dlg_submit_object": {
+      "title": "提交新对象",
+      "hash_placeholder": "哈希 (H256)",
+      "select_property": "选择属性",
+      "max_value": "最大值",
+      "loading_properties": "加载属性中...",
+      "auto_applied": "(自动应用)"
+    },
+    "dlg_create_asset": {
+      "select_property": "选择属性",
+      "loading_properties": "加载属性中..."
+    },
+    "errors": {
+      "api_not_ready": "API未就绪",
+      "unknown_error": "未知错误",
+      "unknown_error_occurred": "发生未知错误"
     }
   }
 }

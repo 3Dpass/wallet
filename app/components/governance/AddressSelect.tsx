@@ -3,6 +3,7 @@ import { type ItemRenderer, Select } from "@blueprintjs/select";
 import { AccountName } from "app/components/common/AccountName";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import keyring from "@polkadot/ui-keyring";
 
 interface AddressSelectProps {
   onAddressChange: (address: string | null) => void;
@@ -71,7 +72,19 @@ export function AddressSelect({
     if (!hasInitialized && addresses.length > 0 && !selectedAddress) {
       const storedAddress = localStorage.getItem("lastSelectedAccount_v1");
       if (!storedAddress) {
-        onAddressChange(addresses[0]);
+        // Try to find an injected account first (your accounts)
+        const injectedAccount = addresses.find(address => {
+          try {
+            const pair = keyring.getPair(address);
+            return pair.meta.isInjected;
+          } catch {
+            return false;
+          }
+        });
+        
+        // If no injected account found, use the first account
+        const defaultAccount = injectedAccount || addresses[0];
+        onAddressChange(defaultAccount);
       }
       setHasInitialized(true);
     }

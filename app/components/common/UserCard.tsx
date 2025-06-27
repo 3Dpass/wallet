@@ -60,9 +60,17 @@ export default function UserCard({ registrarInfo }: IProps) {
   const renderAdditional = (
     additional: [IRegistrarInfoItem, IRegistrarInfoItem][]
   ) => {
+    if (!additional || !Array.isArray(additional)) return null;
+    
     return additional.map(([key, value]) => {
+      if (!key?.Raw || !value?.Raw) {
+        return null;
+      }
+      
       const keyString = key.Raw.toLowerCase();
       const valueString = value.Raw;
+      const uniqueKey = `additional-${key.Raw}-${value.Raw}`;
+      
       switch (keyString) {
         case "github":
           return renderSocialLink(
@@ -78,26 +86,28 @@ export default function UserCard({ registrarInfo }: IProps) {
           );
         case "discord":
           return (
-            <tr>
+            <tr key={uniqueKey}>
               <td className="shadow-none font-medium pr-4">Discord</td>
               <td className="shadow-none break-all">{valueString}</td>
             </tr>
           );
         default:
           return (
-            <tr>
+            <tr key={uniqueKey}>
               <td className="shadow-none font-medium pr-4">{key.Raw}</td>
               <td className="shadow-none break-all">{valueString}</td>
             </tr>
           );
       }
-    });
+    }).filter(Boolean);
   };
 
   const renderJudgements = () => {
     if (!registrarInfo.judgements?.length) return null;
 
-    const judgement = registrarInfo.judgements[0][1];
+    const judgement = registrarInfo.judgements[0]?.[1];
+    if (!judgement) return null;
+    
     if (typeof judgement === "object") {
       return Object.entries(judgement).map(([key, value]) => (
         <Tag
@@ -180,7 +190,7 @@ export default function UserCard({ registrarInfo }: IProps) {
               t("user_card.lbl_twitter"),
               "https://twitter.com/"
             )}
-            {registrarInfo.info.additional &&
+            {registrarInfo.info?.additional &&
               renderAdditional(registrarInfo.info.additional)}
           </tbody>
         </HTMLTable>
