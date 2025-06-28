@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import BaseDialog from "./BaseDialog";
-import { NumericInput, InputGroup, Intent } from "@blueprintjs/core";
+import { NumericInput, InputGroup, Intent, Icon } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
@@ -8,6 +8,8 @@ import keyring from "@polkadot/ui-keyring";
 import { signAndSend } from "app/utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useTranslation } from "react-i18next";
+import { isValidPolkadotAddress } from "../../utils/address";
+import { AddressIcon } from "../common/AddressIcon";
 
 interface DialogBurnAssetProps {
   isOpen: boolean;
@@ -23,6 +25,8 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
   const [who, setWho] = useState("");
   const [amount, setAmount] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [isWhoValid, setIsWhoValid] = useState(false);
 
   // Memoized callbacks for event handlers
   const handleWhoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,6 +36,18 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
   const handleAmountChange = useCallback((v: number | string) => {
     setAmount(Number(v));
   }, []);
+
+  // Validate address whenever it changes
+  useEffect(() => {
+    setIsWhoValid(who.trim() === "" || isValidPolkadotAddress(who));
+  }, [who]);
+
+  // Update submit button state
+  useEffect(() => {
+    const addressValid = isWhoValid && who.trim() !== "";
+    const amountValid = amount !== undefined && !isNaN(amount) && amount > 0;
+    setCanSubmit(api !== undefined && addressValid && amountValid);
+  }, [api, isWhoValid, who, amount]);
 
   const handleSignAndSendCallback = useCallback(({ status }: { status: { isInBlock: boolean } }) => {
     if (!status.isInBlock) return;
@@ -73,6 +89,14 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
       });
       return;
     }
+    if (!isWhoValid) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_invalid_address") || "Please enter a valid address."
+      });
+      return;
+    }
     if (!pair) {
       toaster.show({
         icon: "error",
@@ -111,6 +135,18 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
     }
   };
 
+  // Helper function to render address icon
+  const renderAddressIcon = (address: string, isValid: boolean) => {
+    if (address.trim() === "") {
+      return <Icon icon="asterisk" />;
+    }
+    return isValid ? (
+      <AddressIcon address={address} className="m-2" />
+    ) : (
+      <Icon icon="asterisk" />
+    );
+  };
+
   return (
     <BaseDialog
       isOpen={isOpen}
@@ -122,7 +158,7 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
         onClick: handleSubmit,
         intent: "primary",
         loading,
-        disabled: loading,
+        disabled: loading || !canSubmit,
       }}
     >
       <div className="flex flex-col gap-4">
@@ -132,6 +168,9 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
           value={who}
           onChange={handleWhoChange}
           required
+          leftElement={renderAddressIcon(who, isWhoValid)}
+          className="font-mono"
+          spellCheck={false}
         />
         <NumericInput
           fill

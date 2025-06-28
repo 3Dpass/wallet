@@ -44,6 +44,7 @@ function Controls() {
 export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
   const meshRef = useRef<Mesh>(null);
   const [scaled, setScaled] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Memoize texture creation
   const textureCube = useMemo(() => createCubeTexture(), []);
@@ -51,24 +52,70 @@ export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
   useEffect(() => {
     const mesh = meshRef.current;
     if (!scaled && mesh) {
-      const bbox = new THREE.Box3().setFromObject(mesh);
-      const size = bbox.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const scale = 1.0 / maxDim;
-      mesh.scale.set(scale, scale, scale);
-      setScaled(true);
+      try {
+        // Validate geometry before processing
+        if (!geometry || !geometry.attributes || !geometry.attributes.position) {
+          setError("Invalid geometry: missing position attributes");
+          return;
+        }
+
+        const positionCount = geometry.attributes.position.count;
+        if (positionCount === 0) {
+          setError("Invalid geometry: no vertices");
+          return;
+        }
+
+        const bbox = new THREE.Box3().setFromObject(mesh);
+        const size = bbox.getSize(new THREE.Vector3());
+        
+        // Check if the object has valid dimensions
+        if (size.x === 0 && size.y === 0 && size.z === 0) {
+          setError("Invalid geometry: zero dimensions");
+          return;
+        }
+        
+        const maxDim = Math.max(size.x, size.y, size.z);
+        if (maxDim === 0) {
+          setError("Invalid geometry: zero size");
+          return;
+        }
+        
+        const scale = 1.0 / maxDim;
+        mesh.scale.set(scale, scale, scale);
+        setScaled(true);
+        setError(null);
+      } catch (e) {
+        console.error("Error processing geometry:", e);
+        setError("Failed to process geometry");
+      }
     }
 
     // Cleanup
     return () => {
       if (mesh) {
-        mesh.geometry.dispose();
-        if (mesh.material instanceof THREE.Material) {
-          mesh.material.dispose();
+        try {
+          mesh.geometry.dispose();
+          if (mesh.material instanceof THREE.Material) {
+            mesh.material.dispose();
+          }
+        } catch (e) {
+          console.error("Error during cleanup:", e);
         }
       }
     };
-  }, [scaled]);
+  }, [scaled, geometry]);
+
+  // If there's an error, show a fallback
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center text-gray-400">
+          <div className="text-xs mb-1">Preview Error</div>
+          <div className="text-xs">{error}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

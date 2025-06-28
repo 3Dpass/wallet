@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import BaseDialog from "./BaseDialog";
-import { InputGroup, Intent } from "@blueprintjs/core";
+import { InputGroup, Intent, Icon } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
@@ -8,6 +8,8 @@ import keyring from "@polkadot/ui-keyring";
 import { signAndSend } from "app/utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useTranslation } from "react-i18next";
+import { isValidPolkadotAddress } from "../../utils/address";
+import { AddressIcon } from "../common/AddressIcon";
 
 interface DialogSetAssetTeamProps {
   isOpen: boolean;
@@ -24,6 +26,12 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
   const [admin, setAdmin] = useState("");
   const [freezer, setFreezer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
+
+  // Validation states
+  const [isIssuerValid, setIsIssuerValid] = useState(false);
+  const [isAdminValid, setIsAdminValid] = useState(false);
+  const [isFreezerValid, setIsFreezerValid] = useState(false);
 
   // Memoized callbacks for JSX props
   const handleIssuerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +45,20 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
   const handleFreezerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFreezer(e.target.value);
   }, []);
+
+  // Validate addresses whenever they change
+  useEffect(() => {
+    setIsIssuerValid(issuer.trim() === "" || isValidPolkadotAddress(issuer));
+    setIsAdminValid(admin.trim() === "" || isValidPolkadotAddress(admin));
+    setIsFreezerValid(freezer.trim() === "" || isValidPolkadotAddress(freezer));
+  }, [issuer, admin, freezer]);
+
+  // Update submit button state
+  useEffect(() => {
+    const allAddressesValid = isIssuerValid && isAdminValid && isFreezerValid;
+    const allFieldsFilled = issuer.trim() !== "" && admin.trim() !== "" && freezer.trim() !== "";
+    setCanSubmit(api !== undefined && allAddressesValid && allFieldsFilled);
+  }, [api, isIssuerValid, isAdminValid, isFreezerValid, issuer, admin, freezer]);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
@@ -65,6 +87,14 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
         icon: "error",
         intent: Intent.DANGER,
         message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
+      return;
+    }
+    if (!isIssuerValid || !isAdminValid || !isFreezerValid) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_invalid_address") || "Please enter valid addresses."
       });
       return;
     }
@@ -115,6 +145,18 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
     }
   };
 
+  // Helper function to render address icon
+  const renderAddressIcon = (address: string, isValid: boolean) => {
+    if (address.trim() === "") {
+      return <Icon icon="asterisk" />;
+    }
+    return isValid ? (
+      <AddressIcon address={address} className="m-2" />
+    ) : (
+      <Icon icon="asterisk" />
+    );
+  };
+
   return (
     <BaseDialog
       isOpen={isOpen}
@@ -126,7 +168,7 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
         onClick: handleSubmit,
         intent: "primary",
         loading,
-        disabled: loading,
+        disabled: loading || !canSubmit,
       }}
     >
       <div className="flex flex-col gap-4">
@@ -136,6 +178,9 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
           value={issuer}
           onChange={handleIssuerChange}
           required
+          leftElement={renderAddressIcon(issuer, isIssuerValid)}
+          className="font-mono"
+          spellCheck={false}
         />
         <InputGroup
           fill
@@ -143,6 +188,9 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
           value={admin}
           onChange={handleAdminChange}
           required
+          leftElement={renderAddressIcon(admin, isAdminValid)}
+          className="font-mono"
+          spellCheck={false}
         />
         <InputGroup
           fill
@@ -150,6 +198,9 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
           value={freezer}
           onChange={handleFreezerChange}
           required
+          leftElement={renderAddressIcon(freezer, isFreezerValid)}
+          className="font-mono"
+          spellCheck={false}
         />
         {/* No inline error or success messages, notifications only */}
       </div>

@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import BaseDialog from "./BaseDialog";
-import { InputGroup, Intent } from "@blueprintjs/core";
+import { InputGroup, Intent, Icon } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
@@ -8,6 +8,8 @@ import keyring from "@polkadot/ui-keyring";
 import { signAndSend } from "app/utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useTranslation } from "react-i18next";
+import { isValidPolkadotAddress } from "../../utils/address";
+import { AddressIcon } from "../common/AddressIcon";
 
 interface DialogTransferOwnershipProps {
   isOpen: boolean;
@@ -22,11 +24,24 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
   const [selectedAccount] = useAtom(lastSelectedAccountAtom);
   const [newOwner, setNewOwner] = useState("");
   const [loading, setLoading] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [isNewOwnerValid, setIsNewOwnerValid] = useState(false);
 
   // Memoized callback for handling new owner input changes
   const handleNewOwnerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setNewOwner(e.target.value);
   }, []);
+
+  // Validate address whenever it changes
+  useEffect(() => {
+    setIsNewOwnerValid(newOwner.trim() === "" || isValidPolkadotAddress(newOwner));
+  }, [newOwner]);
+
+  // Update submit button state
+  useEffect(() => {
+    const addressValid = isNewOwnerValid && newOwner.trim() !== "";
+    setCanSubmit(api !== undefined && addressValid);
+  }, [api, isNewOwnerValid, newOwner]);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
@@ -55,6 +70,14 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
         icon: "error",
         intent: Intent.DANGER,
         message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
+      return;
+    }
+    if (!isNewOwnerValid) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_invalid_address") || "Please enter a valid address."
       });
       return;
     }
@@ -104,6 +127,18 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
     return;
   };
 
+  // Helper function to render address icon
+  const renderAddressIcon = (address: string, isValid: boolean) => {
+    if (address.trim() === "") {
+      return <Icon icon="asterisk" />;
+    }
+    return isValid ? (
+      <AddressIcon address={address} className="m-2" />
+    ) : (
+      <Icon icon="asterisk" />
+    );
+  };
+
   return (
     <BaseDialog
       isOpen={isOpen}
@@ -115,7 +150,7 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
         onClick: handleSubmit,
         intent: "primary",
         loading,
-        disabled: loading,
+        disabled: loading || !canSubmit,
       }}
     >
       <div className="flex flex-col gap-4">
@@ -125,6 +160,9 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
           value={newOwner}
           onChange={handleNewOwnerChange}
           required
+          leftElement={renderAddressIcon(newOwner, isNewOwnerValid)}
+          className="font-mono"
+          spellCheck={false}
         />
         {/* No inline error or success messages, notifications only */}
       </div>

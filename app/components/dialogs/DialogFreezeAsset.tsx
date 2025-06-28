@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import BaseDialog from "./BaseDialog";
-import { InputGroup, Intent, Switch } from "@blueprintjs/core";
+import { InputGroup, Intent, Switch, Icon } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
@@ -9,6 +9,8 @@ import { signAndSend } from "app/utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useTranslation } from "react-i18next";
 import type { SubmittableResult } from "@polkadot/api";
+import { isValidPolkadotAddress } from "../../utils/address";
+import { AddressIcon } from "../common/AddressIcon";
 
 interface DialogFreezeAssetProps {
   isOpen: boolean;
@@ -24,6 +26,8 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
   const [who, setWho] = useState("");
   const [loading, setLoading] = useState(false);
   const [freezeAsset, setFreezeAsset] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [isWhoValid, setIsWhoValid] = useState(false);
 
   // Memoized callbacks for JSX props
   const handleFreezeAssetToggle = useCallback(() => {
@@ -33,6 +37,23 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
   const handleWhoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setWho(e.target.value);
   }, []);
+
+  // Validate address whenever it changes
+  useEffect(() => {
+    setIsWhoValid(who.trim() === "" || isValidPolkadotAddress(who));
+  }, [who]);
+
+  // Update submit button state
+  useEffect(() => {
+    if (freezeAsset) {
+      // When freezing entire asset, no address validation needed
+      setCanSubmit(api !== undefined);
+    } else {
+      // When freezing specific address, validate the address
+      const addressValid = isWhoValid && who.trim() !== "";
+      setCanSubmit(api !== undefined && addressValid);
+    }
+  }, [api, freezeAsset, isWhoValid, who]);
 
   const handleSignAndSendCallback = useCallback((result: SubmittableResult) => {
     if (!result.isInBlock) return;
@@ -76,6 +97,14 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       });
       return;
     }
+    if (!freezeAsset && !isWhoValid) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_invalid_address") || "Please enter a valid address."
+      });
+      return;
+    }
     if (!pair) {
       toaster.show({
         icon: "error",
@@ -114,6 +143,18 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
     }
   };
 
+  // Helper function to render address icon
+  const renderAddressIcon = (address: string, isValid: boolean) => {
+    if (address.trim() === "") {
+      return <Icon icon="asterisk" />;
+    }
+    return isValid ? (
+      <AddressIcon address={address} className="m-2" />
+    ) : (
+      <Icon icon="asterisk" />
+    );
+  };
+
   return (
     <BaseDialog
       isOpen={isOpen}
@@ -125,7 +166,7 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
         onClick: handleSubmit,
         intent: "primary",
         loading,
-        disabled: loading,
+        disabled: loading || !canSubmit,
       }}
     >
       <div className="flex flex-col gap-4">
@@ -141,6 +182,9 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
             value={who}
             onChange={handleWhoChange}
             required
+            leftElement={renderAddressIcon(who, isWhoValid)}
+            className="font-mono"
+            spellCheck={false}
           />
         )}
         {/* No inline error or success messages, notifications only */}

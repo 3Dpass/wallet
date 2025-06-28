@@ -15,11 +15,37 @@ The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) a
 
 ### Features:
 - Address management (create/import/inject)
-- P3D transfers
+- P3D (Native token) transfers
 - Assets transfers
-- Open Governance user interface
-- On-chain Identity module user interface (for both regular users and registrars) 
-- Sign/Verify message to prove address ownership
+- EVM (cross-platform): 
+  - Send to EVM (H160 to SS58address conversion)
+   - EVM withdraw (SS58 to H160 address conversion and withdraw tx for P3D Native)
+- Open Governance user interface:
+  - Bounties
+  - Council members
+  - Motions
+- On-chain Identity module: 
+  - Regular user interface - to create update Identity info and request for judgment
+  - Registrar user interface - to provide judgments
+- Sign/Verify message (e.g. to prove an address ownership)
+- Assets management: 
+   - 3DPRRC2 - objects authentication and its transformation into:
+    - Share-asset, 
+    - Fragment ownership (weight-tokens, square-tokens, etc.),
+    - Non-fungible asset 
+   - Fungible assets - regular fungible assets
+   - Management: 
+    - Put an object on blockchain to get it throught the 3DPRC2 authentication procedure resulting as either "Approved" or "Disaproved"
+    - Create new asset
+    - Set metadata
+    - Set the Team (Admin, Issuer, Freezer)
+    - Mint tokens
+    - Burn tokens
+    - Freeze Account/ Asset
+    - Thow Account/ Asset
+    - Force transfer
+    - Transfer Assets ownership
+    - Assets ID to EVM contracts addresses conversion 
 
 ### Supply API
 #### P3D Total Supply (current total issuance):

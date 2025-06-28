@@ -1,7 +1,7 @@
 import { Card, HTMLTable, Button, Collapse, Spinner, Icon, Classes, Popover, Intent } from "@blueprintjs/core";
 import { Canvas } from "@react-three/fiber";
 import React, { Suspense, useMemo, useRef, useCallback, useEffect, useState } from "react";
-import { Mesh } from "three";
+import { Mesh, BufferGeometry, Float32BufferAttribute, Vector3 } from "three";
 import { OBJLoader } from "three-stdlib";
 import ThreeDObject from "../block/ThreeDObject.client";
 import { useApi } from "app/components/Api";
@@ -267,16 +267,37 @@ function ObjectDetailsTable({
   );
 }
 
-function ObjectPreview({ mesh, objString, objectIndex, rpcData, isLoading }: {
+function ObjectPreview({ mesh, objString, objectIndex, rpcData, isLoading, previewReady }: {
   mesh: Mesh | null;
   objString: string | null;
   objectIndex: number;
   rpcData: RpcObjectData | null;
   isLoading: boolean;
+  previewReady: boolean;
 }) {
+  // Determine why preview failed
+  const getPreviewFailureReason = () => {
+    if (isLoading || !previewReady) return null;
+    if (!objString) return "No OBJ data available";
+    if (objString.trim().length === 0) return "Empty OBJ data";
+    if (!objString.includes('v ') && !objString.includes('f ')) return "Invalid OBJ format";
+    if (!mesh) return "Failed to parse OBJ geometry (may have malformed vertex normals)";
+    if (!mesh.geometry) return "No geometry in mesh";
+    if (!mesh.geometry.attributes?.position) return "No vertex data";
+    if (mesh.geometry.attributes.position.count === 0) return "No vertices in geometry";
+    return null;
+  };
+
+  const failureReason = getPreviewFailureReason();
+
   return (
     <div className="md:w-80 flex-shrink-0 flex items-center justify-center overflow-hidden h-[260px] relative w-full md:w-80">
-      {mesh?.geometry ? (
+      {(isLoading || !previewReady) ? (
+        <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+          <Spinner size={24} />
+          <span className="text-gray-400 mt-2">Loading...</span>
+        </div>
+      ) : mesh?.geometry && !failureReason ? (
         <>
           <Canvas camera={{ fov: 30, near: 0.1, far: 1000, position: [0, 0, 2] }}>
             <Suspense fallback={null}>
@@ -316,14 +337,26 @@ function ObjectPreview({ mesh, objString, objectIndex, rpcData, isLoading }: {
           )}
         </>
       ) : (
-        <div className="flex flex-col items-center justify-center h-full">
-          {isLoading ? (
-            <>
-              <Spinner size={24} />
-              <span className="text-gray-400 mt-2">Loading...</span>
-            </>
-          ) : (
-            <span className="text-gray-400">No preview</span>
+        <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+          <Icon icon="error" intent="warning" size={24} className="mb-2" />
+          <span className="text-gray-400 text-sm mb-1">No preview</span>
+          {failureReason && (
+            <span className="text-gray-500 text-xs max-w-full break-words">
+              {failureReason}
+            </span>
+          )}
+          {objString && (
+            <div className="mt-2">
+              <a
+                className={Classes.BUTTON + " text-xs"}
+                href={`data:text/plain;base64,${Buffer.from(objString).toString('base64')}`}
+                download={`3dpass-object-${objectIndex}.obj`}
+                title="Download OBJ file"
+              >
+                <Icon icon="download" size={12} />
+                <span className="ml-1">Download OBJ</span>
+              </a>
+            </div>
           )}
         </div>
       )}
@@ -331,11 +364,98 @@ function ObjectPreview({ mesh, objString, objectIndex, rpcData, isLoading }: {
   );
 }
 
+// Custom OBJ parser that handles malformed data (used as fallback only)
+const parseOBJRobust = (objString: string): BufferGeometry | null => {
+  try {
+    const lines = objString.split('\n');
+    const vertices: Vector3[] = [];
+    const faces: number[][] = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line || line.startsWith('#')) continue;
+      const parts = line.split(/\s+/);
+      if (parts.length === 0) continue;
+      const type = parts[0];
+      try {
+        switch (type) {
+          case 'v':
+            if (parts.length >= 4) {
+              const vertexX = parseFloat(parts[1]);
+              const vertexY = parseFloat(parts[2]);
+              const vertexZ = parseFloat(parts[3]);
+              if (!isNaN(vertexX) && !isNaN(vertexY) && !isNaN(vertexZ)) {
+                vertices.push(new Vector3(vertexX, vertexY, vertexZ));
+              }
+            }
+            break;
+          case 'vn':
+            // Only warn for malformed normals if fallback parser is used
+            if (parts.length < 4) {
+              continue;
+            }
+            break;
+          case 'f':
+            if (parts.length >= 4) {
+              const face: number[] = [];
+              for (let j = 1; j < parts.length; j++) {
+                const vertexPart = parts[j].split('/')[0];
+                const vertexIndex = parseInt(vertexPart);
+                if (!isNaN(vertexIndex) && vertexIndex > 0) {
+                  face.push(vertexIndex - 1);
+                }
+              }
+              if (face.length >= 3) {
+                faces.push(face);
+              }
+            }
+            break;
+        }
+      } catch {
+        continue;
+      }
+    }
+    if (vertices.length === 0 || faces.length === 0) {
+      return null;
+    }
+    const positions: number[] = [];
+    for (const face of faces) {
+      if (face.length === 3) {
+        for (const vertexIndex of face) {
+          if (vertexIndex < vertices.length) {
+            const vertex = vertices[vertexIndex];
+            positions.push(vertex.x, vertex.y, vertex.z);
+          }
+        }
+      } else if (face.length > 3) {
+        for (let j = 1; j < face.length - 1; j++) {
+          const indices = [face[0], face[j], face[j + 1]];
+          for (const vertexIndex of indices) {
+            if (vertexIndex < vertices.length) {
+              const vertex = vertices[vertexIndex];
+              positions.push(vertex.x, vertex.y, vertex.z);
+            }
+          }
+        }
+      }
+    }
+    if (positions.length === 0) {
+      return null;
+    }
+    const geometry = new BufferGeometry();
+    geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+    geometry.computeVertexNormals();
+    return geometry;
+  } catch (error) {
+    return null;
+  }
+};
+
 export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps) {
   const api = useApi();
   const [objString, setObjString] = useState<string | null>(null);
   const [rpcData, setRpcData] = useState<RpcObjectData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [previewReady, setPreviewReady] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showEstimators, setShowEstimators] = useState(false);
   const [showApprovers, setShowApprovers] = useState(false);
@@ -396,6 +516,57 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
     return () => handleTokenizeProperty(objIdx, propIdx);
   }, [handleTokenizeProperty]);
 
+  // Memoized functions for JSX to avoid arrow functions
+  const checkLinkedAsset = useCallback((asset: LinkedAsset, objIdx: number, propIdx: number) => {
+    const objDetails = asset.details.objDetails as AssetDetails['objDetails'];
+    if (!objDetails) return false;
+    const assetObjIdx = typeof objDetails.objIdx === 'string' 
+      ? parseInt(objDetails.objIdx, 10) 
+      : objDetails.objIdx;
+    const assetPropIdx = typeof objDetails.propIdx === 'string' 
+      ? parseInt(objDetails.propIdx, 10) 
+      : objDetails.propIdx;
+    
+    return assetObjIdx === objIdx && assetPropIdx === propIdx;
+  }, []);
+
+  const renderProperty = useCallback((p: { propIdx: number; maxValue: number }) => {
+    const def = propertyDefs[Number(p.propIdx)];
+    const name = def?.name || `Property ${p.propIdx}`;
+    const max = def?.maxValue ?? 1;
+    // Check if this property has a linked asset
+    const hasLinkedAsset = linkedAssets.some(asset => checkLinkedAsset(asset, objectIndex, Number(p.propIdx)));
+    return (
+      <div key={p.propIdx} className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {hasLinkedAsset && <Icon icon="dollar" intent="success" />}
+          <span className={hasLinkedAsset ? 'text-green-300 font-semibold' : ''}>
+            {name}: {max}
+          </span>
+        </div>
+        {!hasLinkedAsset && rpcData?.owner === selectedAccount && (
+          <Button
+            icon="dollar"
+            text="Tokenize"
+            className={Classes.BUTTON}
+            onClick={createTokenizePropertyClickHandler(objectIndex, Number(p.propIdx))}
+          />
+        )}
+      </div>
+    );
+  }, [propertyDefs, linkedAssets, objectIndex, rpcData?.owner, selectedAccount, createTokenizePropertyClickHandler, checkLinkedAsset]);
+
+  const renderLinkedAsset = useCallback((asset: LinkedAsset) => (
+    <Button
+      key={asset.assetId}
+      icon="dollar"
+      className="mb-2"
+      onClick={createAssetClickHandler(asset.assetId)}
+    >
+      View Asset #{asset.assetId}
+    </Button>
+  ), [createAssetClickHandler]);
+
   // Main fetch function with cancellation
   const fetchObj = useCallback(async (targetObjectIndex: number) => {
     // Cancel any ongoing request
@@ -454,24 +625,51 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         };
       }
       if (patchedResult && patchedResult.obj && Array.isArray(patchedResult.obj)) {
-        const str = String.fromCharCode(...patchedResult.obj);
+        // Use chunked conversion to avoid too many arguments error
+        function arrayToString(arr: number[]): string {
+          const CHUNK_SIZE = 0x8000; // 32,768
+          let result = '';
+          for (let i = 0; i < arr.length; i += CHUNK_SIZE) {
+            result += String.fromCharCode.apply(null, arr.slice(i, i + CHUNK_SIZE));
+          }
+          return result;
+        }
+
+        const str = arrayToString(patchedResult.obj);
+
+        // Check for \n characters and other control characters
+        const newlineCount = (str.match(/\n/g) || []).length;
+        const carriageReturnCount = (str.match(/\r/g) || []).length;
+        const tabCount = (str.match(/\t/g) || []).length;
+
+        // Check if the string contains literal "\n" text (not actual newlines)
+        const literalNewlineCount = (str.match(/\\n/g) || []).length;
+
+        // Preprocess the string to handle literal \n and other escape sequences
+        let processedStr = str;
+        if (literalNewlineCount > 0) {
+          processedStr = str.replace(/\\n/g, '\n');
+        }
+
+        // Also handle other common escape sequences that might be in the data
+        processedStr = processedStr.replace(/\\r/g, '\r');
+        processedStr = processedStr.replace(/\\t/g, '\t');
+
         if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
-          setObjString(str);
+          setObjString(processedStr);
           setRpcData(patchedResult as RpcObjectData);
-          setIsLoading(false);
         }
       } else {
         if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
           setObjString(null);
           setRpcData(null);
-          setIsLoading(false);
         }
       }
     } catch (e) {
+      console.error(`Failed to fetch object ${targetObjectIndex}:`, e);
       if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
         setObjString(null);
         setRpcData(null);
-        setIsLoading(false);
       }
     }
   }, [api]);
@@ -536,18 +734,56 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
   // Parse OBJ to mesh
   const mesh = useMemo(() => {
     if (!objString) return null;
+    if (typeof objString !== 'string' || objString.trim().length === 0) {
+      return null;
+    }
+    if (!objString.includes('v ') && !objString.includes('f ')) {
+      return null;
+    }
+    // Try standard OBJLoader first
     try {
       const loader = new OBJLoader();
       const parsed = loader.parse(objString);
+      if (!parsed || !parsed.children || parsed.children.length === 0) {
+        throw new Error('No children');
+      }
       const firstChild = parsed.children[0];
-      if (firstChild && (firstChild as Mesh).isMesh && (firstChild as Mesh).geometry) {
-        return firstChild as Mesh;
+      if (!firstChild) {
+        throw new Error('No first child');
+      }
+      if (!(firstChild as Mesh).isMesh) {
+        throw new Error('Not a mesh');
+      }
+      if (!(firstChild as Mesh).geometry) {
+        throw new Error('No geometry');
+      }
+      const geometry = (firstChild as Mesh).geometry;
+      if (!geometry.attributes || !geometry.attributes.position) {
+        throw new Error('No position attributes');
+      }
+      const positionCount = geometry.attributes.position.count;
+      if (positionCount === 0) {
+        throw new Error('No vertices');
+      }
+      return firstChild as Mesh;
+    } catch (e) {
+      // Try robust parser as fallback
+      try {
+        const geometry = parseOBJRobust(objString);
+        if (geometry && geometry.attributes && geometry.attributes.position && geometry.attributes.position.count > 0) {
+          return new Mesh(geometry);
+        }
+      } catch (robustError) {
+        // Silent fallback - both parsers failed
       }
       return null;
-    } catch (e) {
-      return null;
     }
-  }, [objString]);
+  }, [objString, objectIndex]);
+
+  // Track when mesh is ready
+  useEffect(() => {
+    setPreviewReady(!!mesh);
+  }, [mesh]);
 
   // State row as array of React nodes for proper formatting and links
   const stateRow = objectData?.state
@@ -746,12 +982,21 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
     };
   }, [api, objectIndex]);
 
+  // Add a useEffect to set isLoading to false only after objString is set (or null) and mesh parsing has run
+  useEffect(() => {
+    // Only stop loading after objString is set (or null) and mesh parsing has run
+    // This ensures the spinner stays until the preview is ready
+    if (objString !== undefined) {
+      setIsLoading(false);
+    }
+  }, [objString]);
+
   return (
     <div className="w-full">
       <Card className="w-full hover:shadow-lg transition-shadow duration-200 mb-4 overflow-hidden">
         <div className="flex flex-col md:flex-row gap-0 mb-4 items-start">
           {/* Preview Left (fixed width) */}
-          <ObjectPreview mesh={mesh} objString={objString} objectIndex={objectIndex} rpcData={rpcData} isLoading={isLoading} />
+          <ObjectPreview mesh={mesh} objString={objString} objectIndex={objectIndex} rpcData={rpcData} isLoading={isLoading} previewReady={previewReady} />
           {/* Info Right (flex-1) */}
           <div className="flex-1 flex flex-col justify-start p-6 min-w-0 w-full md:w-auto">
             <div className="w-full">
@@ -813,43 +1058,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
                     <td className="font-medium">
                       {(rpcData?.prop?.length ?? 0) > 0 ? (
                         <div className="space-y-2">
-                          {rpcData?.prop?.map((p) => {
-                            const def = propertyDefs[Number(p.propIdx)];
-                            const name = def?.name || `Property ${p.propIdx}`;
-                            const max = def?.maxValue ?? 1;
-                            // Check if this property has a linked asset
-                            const hasLinkedAsset = linkedAssets.some(asset => {
-                              const objDetails = asset.details.objDetails as AssetDetails['objDetails'];
-                              if (!objDetails) return false;
-                              const assetObjIdx = typeof objDetails.objIdx === 'string' 
-                                ? parseInt(objDetails.objIdx, 10) 
-                                : objDetails.objIdx;
-                              const assetPropIdx = typeof objDetails.propIdx === 'string' 
-                                ? parseInt(objDetails.propIdx, 10) 
-                                : objDetails.propIdx;
-                              const currentPropIdx = Number(p.propIdx);
-                              
-                              return assetObjIdx === objectIndex && assetPropIdx === currentPropIdx;
-                            });
-                            return (
-                              <div key={p.propIdx} className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  {hasLinkedAsset && <Icon icon="dollar" intent="success" />}
-                                  <span className={hasLinkedAsset ? 'text-green-300 font-semibold' : ''}>
-                                    {name}: {max}
-                                  </span>
-                                </div>
-                                {!hasLinkedAsset && rpcData?.owner === selectedAccount && (
-                                  <Button
-                                    icon="dollar"
-                                    text="Tokenize"
-                                    className={Classes.BUTTON}
-                                    onClick={createTokenizePropertyClickHandler(objectIndex, Number(p.propIdx))}
-                                  />
-                                )}
-                              </div>
-                            );
-                          })}
+                          {rpcData?.prop?.map(renderProperty)}
                         </div>
                       ) : '-'}
                     </td>
@@ -881,16 +1090,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         {linkedAssetsLoading ? (
           <Spinner size={20} className="my-2" />
         ) : linkedAssets.length > 0 ? (
-          linkedAssets.map(asset => (
-            <Button
-              key={asset.assetId}
-              icon="dollar"
-              className="mb-2"
-              onClick={createAssetClickHandler(asset.assetId)}
-            >
-              View Asset #{asset.assetId}
-            </Button>
-          ))
+          linkedAssets.map(renderLinkedAsset)
         ) : (
           <span className="text-xs text-gray-400">No linked assets</span>
         )}
