@@ -12,6 +12,7 @@ import DialogBurnAsset from '../dialogs/DialogBurnAsset';
 import DialogFreezeAsset from '../dialogs/DialogFreezeAsset';
 import DialogThawAsset from '../dialogs/DialogThawAsset';
 import DialogForceTransfer from '../dialogs/DialogForceTransfer';
+import DialogTransferOwnership from '../dialogs/DialogTransferOwnership';
 import AssetActions from "./AssetActions";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
@@ -306,6 +307,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
   const [showFreezeDialog, setShowFreezeDialog] = useState(false);
   const [showThawDialog, setShowThawDialog] = useState(false);
   const [showForceTransferDialog, setShowForceTransferDialog] = useState(false);
+  const [showTransferOwnershipDialog, setShowTransferOwnershipDialog] = useState(false);
   const [selectedAccount] = useAtom(lastSelectedAccountAtom);
 
   // Request cancellation and debouncing refs
@@ -383,6 +385,14 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
 
   const handleCloseForceTransferDialog = useCallback(() => {
     setShowForceTransferDialog(false);
+  }, []);
+
+  const handleOpenTransferOwnershipDialog = useCallback(() => {
+    setShowTransferOwnershipDialog(true);
+  }, []);
+
+  const handleCloseTransferOwnershipDialog = useCallback(() => {
+    setShowTransferOwnershipDialog(false);
   }, []);
 
   const handleToggleTeam = useCallback(() => {
@@ -656,7 +666,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
                     onFreeze={handleOpenFreezeDialog}
                     onThaw={handleOpenThawDialog}
                     onBurn={handleOpenBurnDialog}
-                    onTransferOwnership={handleOpenForceTransferDialog}
+                    onTransferOwnership={handleOpenTransferOwnershipDialog}
                     onForceTransfer={handleOpenForceTransferDialog}
                     role={userRole}
                   />
@@ -735,6 +745,11 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
       <DialogForceTransfer
         isOpen={showForceTransferDialog}
         onClose={handleCloseForceTransferDialog}
+        assetId={assetId}
+      />
+      <DialogTransferOwnership
+        isOpen={showTransferOwnershipDialog}
+        onClose={handleCloseTransferOwnershipDialog}
         assetId={assetId}
       />
     </div>

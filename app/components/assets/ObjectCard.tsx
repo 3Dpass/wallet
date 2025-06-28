@@ -380,11 +380,11 @@ const parseOBJRobust = (objString: string): BufferGeometry | null => {
         switch (type) {
           case 'v':
             if (parts.length >= 4) {
-              const x = parseFloat(parts[1]);
-              const y = parseFloat(parts[2]);
-              const z = parseFloat(parts[3]);
-              if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
-                vertices.push(new Vector3(x, y, z));
+              const vertexX = parseFloat(parts[1]);
+              const vertexY = parseFloat(parts[2]);
+              const vertexZ = parseFloat(parts[3]);
+              if (!isNaN(vertexX) && !isNaN(vertexY) && !isNaN(vertexZ)) {
+                vertices.push(new Vector3(vertexX, vertexY, vertexZ));
               }
             }
             break;
@@ -446,8 +446,6 @@ const parseOBJRobust = (objString: string): BufferGeometry | null => {
     geometry.computeVertexNormals();
     return geometry;
   } catch (error) {
-    // Only log if fallback parser fails
-    console.error('Error in robust OBJ parsing:', error);
     return null;
   }
 };
@@ -601,8 +599,6 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
       // Check if request was cancelled
       if (signal.aborted || currentObjectIndexRef.current !== targetObjectIndex) return;
 
-      console.log(`Object ${targetObjectIndex}: Raw API result:`, result);
-
       let patchedResult = result;
       if (result && !result.est_outliers && result.estOutliers) {
         patchedResult = { ...result, est_outliers: result.estOutliers };
@@ -629,8 +625,6 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         };
       }
       if (patchedResult && patchedResult.obj && Array.isArray(patchedResult.obj)) {
-        console.log(`Object ${targetObjectIndex}: Processing OBJ array with ${patchedResult.obj.length} elements`);
-        
         // Use chunked conversion to avoid too many arguments error
         function arrayToString(arr: number[]): string {
           const CHUNK_SIZE = 0x8000; // 32,768
@@ -643,35 +637,17 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
 
         const str = arrayToString(patchedResult.obj);
 
-        console.log(`Object ${targetObjectIndex}: Successfully converted to string (${str.length} characters)`);
-        console.log(`Object ${targetObjectIndex}: String preview (first 200 chars):`, str.substring(0, 200));
-
-        // Debug: Check for \n characters and other control characters
+        // Check for \n characters and other control characters
         const newlineCount = (str.match(/\n/g) || []).length;
         const carriageReturnCount = (str.match(/\r/g) || []).length;
         const tabCount = (str.match(/\t/g) || []).length;
 
-        console.log(`Object ${targetObjectIndex}: Control characters found:`, {
-          newlines: newlineCount,
-          carriageReturns: carriageReturnCount,
-          tabs: tabCount,
-          totalLength: str.length
-        });
-
         // Check if the string contains literal "\n" text (not actual newlines)
         const literalNewlineCount = (str.match(/\\n/g) || []).length;
-        if (literalNewlineCount > 0) {
-          console.warn(`Object ${targetObjectIndex}: Found ${literalNewlineCount} literal "\\n" strings in OBJ data`);
-        }
-
-        // Show a sample of the raw character codes for debugging
-        const sampleCodes = patchedResult.obj.slice(0, 20).map((code: number) => `${code} (${String.fromCharCode(code)})`);
-        console.log(`Object ${targetObjectIndex}: First 20 character codes:`, sampleCodes);
 
         // Preprocess the string to handle literal \n and other escape sequences
         let processedStr = str;
         if (literalNewlineCount > 0) {
-          console.log(`Object ${targetObjectIndex}: Converting literal "\\n" to actual newlines`);
           processedStr = str.replace(/\\n/g, '\n');
         }
 
@@ -679,17 +655,11 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
         processedStr = processedStr.replace(/\\r/g, '\r');
         processedStr = processedStr.replace(/\\t/g, '\t');
 
-        if (processedStr !== str) {
-          console.log(`Object ${targetObjectIndex}: String was preprocessed. New length: ${processedStr.length}`);
-          console.log(`Object ${targetObjectIndex}: Processed string preview (first 200 chars):`, processedStr.substring(0, 200));
-        }
-
         if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
           setObjString(processedStr);
           setRpcData(patchedResult as RpcObjectData);
         }
       } else {
-        console.warn(`Object ${targetObjectIndex}: No valid OBJ array found in result`);
         if (!signal.aborted && currentObjectIndexRef.current === targetObjectIndex) {
           setObjString(null);
           setRpcData(null);
@@ -797,8 +767,6 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
       }
       return firstChild as Mesh;
     } catch (e) {
-      // Only warn if fallback parser is used
-      console.warn(`Object ${objectIndex}: Standard OBJLoader failed, trying robust parser.`);
       // Try robust parser as fallback
       try {
         const geometry = parseOBJRobust(objString);
@@ -806,7 +774,7 @@ export default function ObjectCard({ objectIndex, objectData }: ObjectCardProps)
           return new Mesh(geometry);
         }
       } catch (robustError) {
-        console.error(`Object ${objectIndex}: Robust parser also failed:`, robustError);
+        // Silent fallback - both parsers failed
       }
       return null;
     }

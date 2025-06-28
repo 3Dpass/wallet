@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import BaseDialog from "./BaseDialog";
-import { InputGroup, NumericInput, Intent } from "@blueprintjs/core";
+import { InputGroup, NumericInput, Intent, Icon } from "@blueprintjs/core";
 import { useApi } from "app/components/Api";
 import { useAtom } from "jotai";
 import { lastSelectedAccountAtom } from "app/atoms";
@@ -8,6 +8,8 @@ import keyring from "@polkadot/ui-keyring";
 import { signAndSend } from "app/utils/sign";
 import useToaster from "../../hooks/useToaster";
 import { useTranslation } from "react-i18next";
+import { isValidPolkadotAddress } from "../../utils/address";
+import { AddressIcon } from "../common/AddressIcon";
 
 interface DialogForceTransferProps {
   isOpen: boolean;
@@ -24,6 +26,9 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
   const [dest, setDest] = useState("");
   const [amount, setAmount] = useState<number | undefined>();
   const [loading, setLoading] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [isSourceValid, setIsSourceValid] = useState(false);
+  const [isDestValid, setIsDestValid] = useState(false);
 
   // Memoized callbacks for event handlers
   const handleSourceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +42,20 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
   const handleAmountChange = useCallback((value: number | string) => {
     setAmount(Number(value));
   }, []);
+
+  // Validate addresses whenever they change
+  useEffect(() => {
+    setIsSourceValid(source.trim() === "" || isValidPolkadotAddress(source));
+    setIsDestValid(dest.trim() === "" || isValidPolkadotAddress(dest));
+  }, [source, dest]);
+
+  // Update submit button state
+  useEffect(() => {
+    const sourceValid = isSourceValid && source.trim() !== "";
+    const destValid = isDestValid && dest.trim() !== "";
+    const amountValid = amount !== undefined && !isNaN(amount) && amount > 0;
+    setCanSubmit(api !== undefined && sourceValid && destValid && amountValid);
+  }, [api, isSourceValid, isDestValid, source, dest, amount]);
 
   const handleSignAndSendCallback = useCallback(({ status }: { status: { isInBlock: boolean } }) => {
     if (!status.isInBlock) return;
@@ -75,6 +94,14 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
         icon: "error",
         intent: Intent.DANGER,
         message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+      });
+      return;
+    }
+    if (!isSourceValid || !isDestValid) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: t("messages.lbl_invalid_address") || "Please enter valid addresses."
       });
       return;
     }
@@ -117,6 +144,18 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
     }
   };
 
+  // Helper function to render address icon
+  const renderAddressIcon = (address: string, isValid: boolean) => {
+    if (address.trim() === "") {
+      return <Icon icon="asterisk" />;
+    }
+    return isValid ? (
+      <AddressIcon address={address} className="m-2" />
+    ) : (
+      <Icon icon="asterisk" />
+    );
+  };
+
   return (
     <BaseDialog
       isOpen={isOpen}
@@ -128,7 +167,7 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
         onClick: handleSubmit,
         intent: "primary",
         loading,
-        disabled: loading,
+        disabled: loading || !canSubmit,
       }}
     >
       <div className="flex flex-col gap-4">
@@ -138,6 +177,9 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
           value={source}
           onChange={handleSourceChange}
           required
+          leftElement={renderAddressIcon(source, isSourceValid)}
+          className="font-mono"
+          spellCheck={false}
         />
         <InputGroup
           fill
@@ -145,6 +187,9 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
           value={dest}
           onChange={handleDestChange}
           required
+          leftElement={renderAddressIcon(dest, isDestValid)}
+          className="font-mono"
+          spellCheck={false}
         />
         <NumericInput
           fill
