@@ -10,7 +10,7 @@ import {
   SpinnerSize,
   Tooltip,
 } from "@blueprintjs/core";
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAccount } from "../../hooks/useAccount";
 import { AccountName } from "../common/AccountName";
@@ -54,10 +54,22 @@ export default function Account({ pair }: AccountProps) {
     dialogToggle("send");
   };
 
-  const handleSignVerify = useCallback(() => dialogToggle("sign_verify"), [dialogToggle]);
-  const handleLockFunds = useCallback(() => dialogToggle("lock_funds"), [dialogToggle]);
-  const handleEvmWithdraw = useCallback(() => dialogToggle("evm_withdraw"), [dialogToggle]);
-  const handleDelete = useCallback(() => dialogToggle("delete"), [dialogToggle]);
+  const handleSignVerify = useCallback(
+    () => dialogToggle("sign_verify"),
+    [dialogToggle]
+  );
+  const handleLockFunds = useCallback(
+    () => dialogToggle("lock_funds"),
+    [dialogToggle]
+  );
+  const handleEvmWithdraw = useCallback(
+    () => dialogToggle("evm_withdraw"),
+    [dialogToggle]
+  );
+  const handleDelete = useCallback(
+    () => dialogToggle("delete"),
+    [dialogToggle]
+  );
   const handleIdentity = useCallback(
     (type?: string) => {
       if (type === "judgement_requests") {

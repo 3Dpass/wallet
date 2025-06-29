@@ -98,7 +98,7 @@ export default function BountiesClient() {
           // Find related motions
           const relatedMotions = motions.filter((motion) => {
             if (!motion.proposal) return false;
-            const { section, method, args } = motion.proposal;
+            const { section, method: _method, args } = motion.proposal;
             if (section !== "bounties") return false;
 
             // Check if this motion is related to this bounty

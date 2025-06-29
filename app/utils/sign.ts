@@ -13,31 +13,6 @@ type Options = {
   signer?: Signer;
 };
 
-// Mock type for SubmittableResult
-type MockSubmittableResult = {
-  readonly events: EventRecord[];
-  readonly status: {
-    isInBlock: boolean;
-    isFinalized: boolean;
-    isInvalid: boolean;
-    isUsurped: boolean;
-    isReady: boolean;
-    isBroadcast: boolean;
-    isFuture: boolean;
-    isDropped: boolean;
-  };
-  readonly isCompleted: boolean;
-  readonly isError: boolean;
-  readonly isFinalized: boolean;
-  readonly isInBlock: boolean;
-  readonly isWarning: boolean;
-  readonly txHash: string;
-  readonly txIndex: number;
-  filterRecords: <T = EventRecord>() => T[];
-  findRecord: <T = EventRecord>() => T | undefined;
-  toHuman: () => Record<string, unknown>;
-};
-
 // Create mock result with default values
 const createMockResult = (isFinalized = false): SubmittableResult =>
   ({
@@ -45,12 +20,6 @@ const createMockResult = (isFinalized = false): SubmittableResult =>
     status: {
       isInBlock: true,
       isFinalized,
-      isInvalid: false,
-      isUsurped: false,
-      isReady: false,
-      isBroadcast: false,
-      isFuture: false,
-      isDropped: false,
     },
     isCompleted: isFinalized,
     isError: false,
@@ -61,7 +30,7 @@ const createMockResult = (isFinalized = false): SubmittableResult =>
       "0x0000000000000000000000000000000000000000000000000000000000000000",
     txIndex: 0,
     filterRecords: <T = EventRecord>() => [] as T[],
-    findRecord: <T = EventRecord>() => undefined,
+    findRecord: <_T = EventRecord>() => undefined,
     toHuman: () => ({}),
   }) as unknown as SubmittableResult;
 
@@ -88,7 +57,7 @@ export async function signAndSend(
     const method = tx.method.method;
 
     if (section === "council" && method === "vote") {
-      const [hash, index, approve] = tx.args;
+      const [hash, _index, approve] = tx.args;
       const votes = mockVotes.get(hash.toString()) || { ayes: [], nays: [] };
 
       if (approve) {
@@ -134,20 +103,26 @@ export async function signAndSend(
   const finalOptions = options || {};
   if (pair.meta.isInjected) {
     // Dynamically import web3FromAddress when needed
-    let web3FromAddress: ((address: string) => Promise<{ signer: Signer }>) | null = null;
-    if (typeof window !== 'undefined') {
+    let web3FromAddress:
+      | ((address: string) => Promise<{ signer: Signer }>)
+      | null = null;
+    if (typeof window !== "undefined") {
       try {
         const module = await import("@polkadot/extension-dapp/bundle");
         web3FromAddress = module.web3FromAddress;
       } catch {
-        console.warn("Polkadot extension-dapp not available, falling back to direct signing");
+        console.warn(
+          "Polkadot extension-dapp not available, falling back to direct signing"
+        );
       }
     }
     if (web3FromAddress) {
       const injected = await web3FromAddress(pair.address);
       finalOptions.signer = injected.signer;
     } else {
-      console.warn("Polkadot extension-dapp not available, falling back to direct signing");
+      console.warn(
+        "Polkadot extension-dapp not available, falling back to direct signing"
+      );
     }
   }
   return tx.signAndSend(

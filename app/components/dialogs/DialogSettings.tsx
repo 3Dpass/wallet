@@ -1,8 +1,12 @@
-import {Button, Checkbox, Intent} from "@blueprintjs/core";
-import {useAtom} from "jotai";
-import {useState} from "react";
-import {useTranslation} from "react-i18next";
-import {apiAdvancedModeAtom, apiEndpointAtom, defaultEndpoint} from "../../atoms";
+import { Button, Checkbox, Intent } from "@blueprintjs/core";
+import { useAtom } from "jotai";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  apiAdvancedModeAtom,
+  apiEndpointAtom,
+  defaultEndpoint,
+} from "../../atoms";
 import TitledValue from "../common/TitledValue";
 import BaseDialog from "./BaseDialog";
 
@@ -11,8 +15,8 @@ type IProps = {
   onClose: () => void;
 };
 
-export default function DialogSettings({isOpen, onClose}: IProps) {
-  const {t} = useTranslation();
+export default function DialogSettings({ isOpen, onClose }: IProps) {
+  const { t } = useTranslation();
   const [apiEndpoint, setApiEndpoint] = useAtom(apiEndpointAtom);
   const [apiAdvancedMode, setApiAdvancedMode] = useAtom(apiAdvancedModeAtom);
   const dataInitial = {
@@ -60,19 +64,26 @@ export default function DialogSettings({isOpen, onClose}: IProps) {
       <TitledValue
         title={t("dlg_settings.lbl_api_address")}
         value={
-          <div style={{display: "flex", alignItems: "stretch", gap: 8, whiteSpace: "nowrap"}}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "stretch",
+              gap: 8,
+              whiteSpace: "nowrap",
+            }}
+          >
             <input
               className="border border-gray-600 p-1 px-2 mt-2 w-full"
               value={data.api_endpoint}
               onChange={(e) =>
-                setData((prev) => ({...prev, api_endpoint: e.target.value}))
+                setData((prev) => ({ ...prev, api_endpoint: e.target.value }))
               }
             />
             <Button
               icon="reset"
-              style={{marginTop: 8, minWidth: 130, fontWeight: 500}}
+              style={{ marginTop: 8, minWidth: 130, fontWeight: 500 }}
               onClick={() => {
-                setData((prev) => ({...prev, api_endpoint: defaultEndpoint}));
+                setData((prev) => ({ ...prev, api_endpoint: defaultEndpoint }));
                 setApiEndpoint(defaultEndpoint);
               }}
               size="small"

@@ -1,7 +1,7 @@
-import { redirect } from "@remix-run/node";
 import type { LoaderFunction } from "@remix-run/node";
-import AssetsSection from "../components/assets/AssetsSection";
+import { redirect } from "@remix-run/node";
 import { useLocation } from "@remix-run/react";
+import AssetsSection from "../components/assets/AssetsSection";
 
 export const loader: LoaderFunction = async () => {
   return redirect("/assets/objects");
@@ -25,4 +25,4 @@ export default function AssetsIndex() {
       </div>
     </AssetsSection>
   );
-} 
+}

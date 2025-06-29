@@ -1,13 +1,13 @@
-import React, { useState, useCallback } from "react";
-import BaseDialog from "./BaseDialog";
-import { NumericInput, Intent } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useAtom } from "jotai";
-import { lastSelectedAccountAtom } from "app/atoms";
+import { Intent, NumericInput } from "@blueprintjs/core";
 import keyring from "@polkadot/ui-keyring";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useApi } from "app/components/Api";
 import { signAndSend } from "app/utils/sign";
-import useToaster from "../../hooks/useToaster";
+import { useAtom } from "jotai";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
+import useToaster from "../../hooks/useToaster";
+import BaseDialog from "./BaseDialog";
 
 interface DialogMintAssetProps {
   isOpen: boolean;
@@ -15,7 +15,11 @@ interface DialogMintAssetProps {
   assetId: number;
 }
 
-export default function DialogMintAsset({ isOpen, onClose, assetId }: DialogMintAssetProps) {
+export default function DialogMintAsset({
+  isOpen,
+  onClose,
+  assetId,
+}: DialogMintAssetProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
@@ -31,12 +35,12 @@ export default function DialogMintAsset({ isOpen, onClose, assetId }: DialogMint
   // Get the KeyringPair for the selected account
   const pair = (() => {
     try {
-      if (selectedAccount && selectedAccount.trim() !== '') {
+      if (selectedAccount && selectedAccount.trim() !== "") {
         return keyring.getPair(selectedAccount);
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get keyring pair:', error);
+      console.warn("Failed to get keyring pair:", error);
       return null;
     }
   })();
@@ -46,15 +50,22 @@ export default function DialogMintAsset({ isOpen, onClose, assetId }: DialogMint
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "API not ready"
+        message: "API not ready",
       });
       return;
     }
-    if (!selectedAccount || amount === undefined || isNaN(amount) || amount <= 0) {
+    if (
+      !selectedAccount ||
+      amount === undefined ||
+      Number.isNaN(amount) ||
+      amount <= 0
+    ) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_fill_required_fields") || "Please enter a valid amount."
+        message:
+          t("messages.lbl_fill_required_fields") ||
+          "Please enter a valid amount.",
       });
       return;
     }
@@ -62,7 +73,9 @@ export default function DialogMintAsset({ isOpen, onClose, assetId }: DialogMint
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+        message:
+          t("messages.lbl_no_account_selected") ||
+          "No account selected or unable to get keyring pair.",
       });
       return;
     }
@@ -71,23 +84,20 @@ export default function DialogMintAsset({ isOpen, onClose, assetId }: DialogMint
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_account_locked") || "Account is locked."
+        message: t("messages.lbl_account_locked") || "Account is locked.",
       });
       return;
     }
     setLoading(true);
     try {
       // Compose the extrinsic
-      const tx = api.tx.poscanAssets.mint(
-        assetId,
-        amount
-      );
+      const tx = api.tx.poscanAssets.mint(assetId, amount);
       signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: t("dlg_asset.mint_success") || "Tokens minted successfully!"
+          message: t("dlg_asset.mint_success") || "Tokens minted successfully!",
         });
         onClose();
       });
@@ -130,4 +140,4 @@ export default function DialogMintAsset({ isOpen, onClose, assetId }: DialogMint
       </div>
     </BaseDialog>
   );
-} 
+}

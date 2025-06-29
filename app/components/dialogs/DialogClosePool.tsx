@@ -1,9 +1,8 @@
 import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useAtom } from "jotai";
 import { useEffect, useState } from "react";
-
-import type { SignerOptions } from "@polkadot/api/types";
 import { useTranslation } from "react-i18next";
 import { poolIdsAtom } from "../../atoms";
 import useToaster from "../../hooks/useToaster";
@@ -53,13 +52,13 @@ export default function DialogClosePool({ isOpen, onClose, pair }: IProps) {
         tx,
         pair,
         options,
-        ({ events = [], status, txHash }) => {
+        ({ events = [], status, txHash: _txHash }) => {
           if (!status.isFinalized) {
             return;
           }
           for (const {
-            phase,
-            event: { data, method, section },
+            phase: _phase,
+            event: { data: _data, method, section: _section },
           } of events) {
             if (
               method === "ExtrinsicSuccess" &&

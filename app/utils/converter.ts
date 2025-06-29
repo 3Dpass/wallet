@@ -1,13 +1,13 @@
+import { u8aToHex } from "@polkadot/util";
 import {
   addressToEvm,
   checkAddress,
   evmToAddress,
   isEthereumAddress,
 } from "@polkadot/util-crypto";
-import { u8aToHex } from "@polkadot/util";
 
 // Constants for blockchain configuration
-export const EVM_CONTRACT_ADDRESS_PREFIX = '0xFBFBFBFA';
+export const EVM_CONTRACT_ADDRESS_PREFIX = "0xFBFBFBFA";
 export const P3D_DECIMALS = 12;
 export const P3D_DECIMALS_FACTOR = 10 ** P3D_DECIMALS;
 export const EVM_ADDRESS_HEX_PADDING = 32;
@@ -18,7 +18,7 @@ export const EVM_ADDRESS_HEX_PADDING = 32;
  * @returns The EVM contract address.
  */
 export function generateEvmContractAddress(assetId: number): string {
-  const hexId = assetId.toString(16).padStart(EVM_ADDRESS_HEX_PADDING, '0');
+  const hexId = assetId.toString(16).padStart(EVM_ADDRESS_HEX_PADDING, "0");
   return EVM_CONTRACT_ADDRESS_PREFIX + hexId;
 }
 
@@ -28,10 +28,7 @@ export function generateEvmContractAddress(assetId: number): string {
  * @param ss58Format The SS58 format code (prefix).
  * @returns The H160 address.
  */
-export function ss58ToH160(
-  ss58Address: string,
-  ss58Format: number
-): string {
+export function ss58ToH160(ss58Address: string, ss58Format: number): string {
   try {
     if (!checkAddress(ss58Address, ss58Format)[0]) {
       throw new Error("Invalid SS58 address");
@@ -50,10 +47,7 @@ export function ss58ToH160(
  * @param ss58Format The SS58 format code (prefix). Defaults to mainnet prefix.
  * @returns The SS58 address.
  */
-export function h160ToSs58(
-  h160Address: string,
-  ss58Format: number
-): string {
+export function h160ToSs58(h160Address: string, ss58Format: number): string {
   try {
     if (!isEthereumAddress(h160Address)) {
       throw new Error("Invalid H160 address");
@@ -63,4 +57,4 @@ export function h160ToSs58(
     console.error("Failed to convert H160 to SS58:", error);
     return "";
   }
-} 
+}

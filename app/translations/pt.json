@@ -65,7 +65,12 @@
       "lbl_block": "Bloco",
       "lbl_block_not_finalized": "Não finalizado",
       "lbl_3d_object_not_available": "Objeto 3D não disponível",
-      "lbl_object_hash_algo": "Algoritmo de Hash de Objeto:",
+      "lbl_object_hash_algo": "Algoritmo de Hash do Objeto:",
+      "lbl_block_hash": "Hash do Bloco:",
+      "lbl_block_author": "Autor do Bloco:",
+      "lbl_block_seal": "Selo:",
+      "lbl_block_timestamp": "Carimbo de Tempo:",
+      "lbl_consensus_engine": "Motor de Consenso:",
       "lbl_btn_kyc": "KYC",
       "lbl_btn_no_kyc": "sem KYC",
       "lbl_btn_create": "Criar",
@@ -250,7 +255,7 @@
       "my_objects": "Meus objetos",
       "search_placeholder": "Buscar por índice, bloco, proprietário, estado, público/privado, aprovado/reprovado, ou propriedade...",
       "show_all_objects": "Mostrar todos os objetos",
-      "load_more": "Carregar 10 mais",
+      "load_next": "Carregar próximos 10",
       "no_objects_found": "Nenhum objeto encontrado.",
       "no_objects_found_account": "Nenhum objeto encontrado para sua conta.",
       "object_not_found": "Objeto com índice {{index}} não encontrado",
@@ -406,7 +411,7 @@
       "no_preview": "Sem visualização",
       "loading": "Carregando...",
       "no_linked_assets": "Sem ativos vinculados",
-      "view_asset": "Ver Ativo #"
+      "view_asset": "Ver Ativo"
     },
     "dlg_set_registrar_fee": {
       "title": "Definir Taxa do Registrador",
@@ -455,6 +460,52 @@
       "api_not_ready": "API não está pronta",
       "unknown_error": "Erro desconhecido",
       "unknown_error_occurred": "Ocorreu um erro desconhecido"
+    },
+    "utils": {
+      "time_units": {
+        "hours": "h",
+        "minutes": "min",
+        "seconds": "s",
+        "days": "d"
+      },
+      "errors": {
+        "invalid_ss58_address": "Endereço SS58 inválido",
+        "invalid_h160_address": "Endereço H160 inválido",
+        "failed_convert_ss58_to_h160": "Falha ao converter SS58 para H160:",
+        "failed_convert_h160_to_ss58": "Falha ao converter H160 para SS58:",
+        "failed_decode_author": "Erro ao decodificar autor do PreRuntime:",
+        "failed_process_digest_log": "Erro ao processar log de digest:",
+        "failed_get_timestamp": "Erro ao obter timestamp para bloco:",
+        "failed_calculate_reward": "Erro ao calcular recompensa total do bloco:",
+        "failed_get_reward_info": "Erro ao obter informações de recompensa para bloco:",
+        "failed_load_mining_object": "Erro ao carregar objeto de mineração para bloco:",
+        "polkadot_extension_unavailable": "Extensão Polkadot-dapp não disponível, recorrendo à assinatura direta"
+      }
+    },
+    "assets": {
+      "objects": "Objetos",
+      "tokens": "Tokens",
+      "name": "Nome",
+      "decimals": "Decimais",
+      "supply": "Oferta",
+      "max_supply": "Oferta máxima",
+      "min_balance": "Saldo mínimo",
+      "reserved": "Reservado",
+      "owner": "Proprietário",
+      "issuer": "Emissor",
+      "admin": "Administrador",
+      "freezer": "Congelador",
+      "holders": "Detentores",
+      "evm_contract": "Contrato EVM",
+      "property": "Propriedade",
+      "select_property": "Selecionar Propriedade",
+      "loading_properties": "Carregando propriedades...",
+      "hide_details": "Ocultar Detalhes",
+      "show_details": "Mostrar Detalhes",
+      "tokenize": "Tokenizar",
+      "download_obj_file": "Baixar arquivo OBJ",
+      "object_details": "Detalhes do Objeto",
+      "token_holders_distribution": "Distribuição de Detentores de Tokens"
     }
   }
 }

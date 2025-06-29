@@ -44,7 +44,10 @@ async function getCirculatingSupply() {
     circulating += free.toBigInt() - frozenValue;
   }
 
-  return ((circulating - budgetBalancesSum) / PolkaBigInt(P3D_DECIMALS_FACTOR)).toString();
+  return (
+    (circulating - budgetBalancesSum) /
+    PolkaBigInt(P3D_DECIMALS_FACTOR)
+  ).toString();
 }
 
 export async function loader() {

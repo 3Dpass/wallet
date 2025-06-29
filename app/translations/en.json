@@ -47,7 +47,8 @@
       "lbl_error_loading_block_data": "Error loading block data, try to reload.",
       "lbl_fill_required_fields": "Please fill all required fields.",
       "lbl_no_account_selected": "No account selected or unable to get keyring pair.",
-      "lbl_account_locked": "Account is locked."
+      "lbl_asset_created_success": "Asset created successfully!",
+      "lbl_invalid_address": "Please enter a valid address."
     },
     "root": {
       "lbl_app_name": "Wallet",
@@ -71,6 +72,14 @@
       "lbl_block_not_finalized": "Not finalized",
       "lbl_3d_object_not_available": "3D object not available",
       "lbl_object_hash_algo": "Object Hash Algo:",
+      "lbl_block_hash": "Block Hash:",
+      "lbl_block_author": "Block Author:",
+      "lbl_block_seal": "Seal:",
+      "lbl_block_timestamp": "Timestamp:",
+      "lbl_logs": "Logs:",
+      "lbl_author_reward": "Author Reward:",
+      "lbl_miner_share": "Miner Share:",
+      "lbl_total_block_reward": "Total Block Reward:",
       "lbl_btn_kyc": "KYC",
       "lbl_btn_no_kyc": "no KYC",
       "lbl_btn_create": "Create",
@@ -326,7 +335,7 @@
       "my_objects": "My objects",
       "search_placeholder": "Search by index, block, owner, state, public/private, approved/disapproved, or property...",
       "show_all_objects": "Show all objects",
-      "load_more": "Load 10 more",
+      "load_next": "Load next 10",
       "no_objects_found": "No objects found.",
       "no_objects_found_account": "No objects found for your account.",
       "object_not_found": "Object with index {{index}} not found",
@@ -418,7 +427,7 @@
       "no_preview": "No preview",
       "loading": "Loading...",
       "no_linked_assets": "No linked assets",
-      "view_asset": "View Asset #"
+      "view_asset": "View Asset"
     },
     "asset_card": {
       "fungible_asset": "Fungible asset",
@@ -511,6 +520,52 @@
       "api_not_ready": "API not ready",
       "unknown_error": "Unknown error",
       "unknown_error_occurred": "Unknown error occurred"
+    },
+    "utils": {
+      "time_units": {
+        "hours": "h",
+        "minutes": "min",
+        "seconds": "sec",
+        "days": "d"
+      },
+      "errors": {
+        "invalid_ss58_address": "Invalid SS58 address",
+        "invalid_h160_address": "Invalid H160 address",
+        "failed_convert_ss58_to_h160": "Failed to convert SS58 to H160:",
+        "failed_convert_h160_to_ss58": "Failed to convert H160 to SS58:",
+        "failed_decode_author": "Failed to decode author from PreRuntime:",
+        "failed_process_digest_log": "Failed to process digest log:",
+        "failed_get_timestamp": "Failed to get timestamp for block:",
+        "failed_calculate_reward": "Failed to calculate total block reward:",
+        "failed_get_reward_info": "Failed to get reward information for block:",
+        "failed_load_mining_object": "Failed to load mining object for block:",
+        "polkadot_extension_unavailable": "Polkadot extension-dapp not available, falling back to direct signing"
+      }
+    },
+    "assets": {
+      "objects": "Objects",
+      "tokens": "Tokens",
+      "name": "Name",
+      "decimals": "Decimals",
+      "supply": "Supply",
+      "max_supply": "Max supply",
+      "min_balance": "Min Balance",
+      "reserved": "Reserved",
+      "owner": "Owner",
+      "issuer": "Issuer",
+      "admin": "Admin",
+      "freezer": "Freezer",
+      "holders": "Holders",
+      "evm_contract": "EVM Contract",
+      "property": "Property",
+      "select_property": "Select Property",
+      "loading_properties": "Loading properties...",
+      "hide_details": "Hide Details",
+      "show_details": "Show Details",
+      "tokenize": "Tokenize",
+      "download_obj_file": "Download OBJ file",
+      "object_details": "Object Details",
+      "token_holders_distribution": "Token Holders Distribution"
     }
   }
 }

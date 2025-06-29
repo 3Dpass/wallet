@@ -1,24 +1,34 @@
-import { Card, HTMLTable, Spinner, Icon, Button, Popover, Menu, Position } from "@blueprintjs/core";
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useApi } from "app/components/Api";
-import { FormattedAmount } from "app/components/common/FormattedAmount";
-import { AccountName } from "app/components/common/AccountName";
-import DialogObjectCard from "../dialogs/DialogObjectCard";
-import DialogAssetDistribution from "../dialogs/DialogAssetDistribution";
-import DialogSetAssetMetadata from '../dialogs/DialogSetAssetMetadata';
-import DialogSetAssetTeam from '../dialogs/DialogSetAssetTeam';
-import DialogMintAsset from '../dialogs/DialogMintAsset';
-import DialogBurnAsset from '../dialogs/DialogBurnAsset';
-import DialogFreezeAsset from '../dialogs/DialogFreezeAsset';
-import DialogThawAsset from '../dialogs/DialogThawAsset';
-import DialogForceTransfer from '../dialogs/DialogForceTransfer';
-import DialogTransferOwnership from '../dialogs/DialogTransferOwnership';
-import AssetActions from "./AssetActions";
-import { useAtom } from "jotai";
+import {
+  Button,
+  Card,
+  HTMLTable,
+  Icon,
+  Menu,
+  Popover,
+  Position,
+  Spinner,
+} from "@blueprintjs/core";
 import { lastSelectedAccountAtom } from "app/atoms";
-import { useTranslation } from "react-i18next";
+import { useApi } from "app/components/Api";
+import { AccountName } from "app/components/common/AccountName";
+import { FormattedAmount } from "app/components/common/FormattedAmount";
 import { generateEvmContractAddress } from "app/utils/converter";
 import type { TFunction } from "i18next";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import DialogAssetDistribution from "../dialogs/DialogAssetDistribution";
+import DialogBurnAsset from "../dialogs/DialogBurnAsset";
+import DialogForceTransfer from "../dialogs/DialogForceTransfer";
+import DialogFreezeAsset from "../dialogs/DialogFreezeAsset";
+import DialogMintAsset from "../dialogs/DialogMintAsset";
+import DialogObjectCard from "../dialogs/DialogObjectCard";
+import DialogSetAssetMetadata from "../dialogs/DialogSetAssetMetadata";
+import DialogSetAssetTeam from "../dialogs/DialogSetAssetTeam";
+import DialogThawAsset from "../dialogs/DialogThawAsset";
+import DialogTransferOwnership from "../dialogs/DialogTransferOwnership";
+import AssetActions from "./AssetActions";
 
 interface AssetCardProps {
   assetId: number;
@@ -74,17 +84,21 @@ type PolkadotOption<T = HumanReadable> = {
 };
 
 function isOption(obj: unknown): obj is PolkadotOption {
-  if (!obj || typeof obj !== 'object') return false;
+  if (!obj || typeof obj !== "object") return false;
   const option = obj as Record<string, unknown>;
-  return typeof option.isSome === "boolean" && typeof option.unwrap === "function";
+  return (
+    typeof option.isSome === "boolean" && typeof option.unwrap === "function"
+  );
 }
 
 // Helper function to safely get human-readable data from an Option
-function getOptionValue<T>(option: PolkadotOption<T>): T | Record<string, unknown> {
-  if (option.toHuman && typeof option.toHuman === 'function') {
+function getOptionValue<T>(
+  option: PolkadotOption<T>
+): T | Record<string, unknown> {
+  if (option.toHuman && typeof option.toHuman === "function") {
     return option.toHuman();
   }
-  if (option.toJSON && typeof option.toJSON === 'function') {
+  if (option.toJSON && typeof option.toJSON === "function") {
     return option.toJSON();
   }
   return option.unwrap();
@@ -144,7 +158,7 @@ function AssetInfoSection({
   handleOpenSetTeamDialog = () => {},
   handleOpenMintDialog = () => {},
   assetId,
-  title
+  title,
 }: AssetInfoSectionProps) {
   return (
     <div className="flex flex-col md:flex-row gap-0 mb-4 items-start">
@@ -156,54 +170,105 @@ function AssetInfoSection({
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 {title}
               </h2>
-              {!inDialog && linkedObjIdx !== null && !isNaN(linkedObjIdx) && (
-                <Button icon="cube" onClick={handleOpenObjectDialog} className="ml-4">
-                  {t("asset_card.view_object")}{linkedObjIdx}
-                </Button>
-              )}
+              {!inDialog &&
+                linkedObjIdx !== null &&
+                !Number.isNaN(linkedObjIdx) && (
+                  <Button
+                    icon="cube"
+                    onClick={handleOpenObjectDialog}
+                    className="ml-4"
+                  >
+                    {t("asset_card.view_object")}
+                    {linkedObjIdx}
+                  </Button>
+                )}
             </div>
           </div>
           <HTMLTable className="w-full mb-2" striped>
             <tbody>
               <tr>
-                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Name</td>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                  {t("assets.name")}
+                </td>
                 <td className="font-medium">{metadata.name}</td>
               </tr>
               <tr>
-                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Decimals</td>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                  {t("assets.decimals")}
+                </td>
                 <td className="font-medium">{metadata.decimals}</td>
               </tr>
               <tr>
-                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Supply</td>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                  {t("assets.supply")}
+                </td>
                 <td className="font-medium">
-                  <FormattedAmount value={supplyValue} decimals={metadata.decimals} unit={metadata.symbol} />
+                  <FormattedAmount
+                    value={supplyValue}
+                    decimals={metadata.decimals}
+                    unit={metadata.symbol}
+                  />
                   {issuedPercent && (
-                    <span className="text-gray-500 ml-2">(Issued: {issuedPercent})</span>
+                    <span className="text-gray-500 ml-2">
+                      (Issued: {issuedPercent})
+                    </span>
                   )}
                 </td>
               </tr>
-              {typeof maxSupply !== 'undefined' && maxSupply !== null && (
+              {typeof maxSupply !== "undefined" && maxSupply !== null && (
                 <tr>
-                  <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Max supply</td>
+                  <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                    {t("assets.max_supply")}
+                  </td>
                   <td className="font-medium">
-                    <FormattedAmount value={typeof maxSupply === 'string' ? Number(maxSupply.replace(/,/g, '')) : maxSupply} decimals={metadata.decimals} unit={metadata.symbol} />
+                    <FormattedAmount
+                      value={
+                        typeof maxSupply === "string"
+                          ? Number(maxSupply.replace(/,/g, ""))
+                          : maxSupply
+                      }
+                      decimals={metadata.decimals}
+                      unit={metadata.symbol}
+                    />
                   </td>
                 </tr>
               )}
               <tr>
-                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Min Balance</td>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                  {t("assets.min_balance")}
+                </td>
                 <td className="font-medium">
-                  <FormattedAmount value={typeof details.minBalance === 'string' ? Number(details.minBalance.replace(/,/g, '')) : details.minBalance} decimals={metadata.decimals} unit={metadata.symbol} />
+                  <FormattedAmount
+                    value={
+                      typeof details.minBalance === "string"
+                        ? Number(details.minBalance.replace(/,/g, ""))
+                        : details.minBalance
+                    }
+                    decimals={metadata.decimals}
+                    unit={metadata.symbol}
+                  />
                 </td>
               </tr>
               <tr>
-                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Reserved</td>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                  {t("assets.reserved")}
+                </td>
                 <td className="font-medium">
-                  <FormattedAmount value={typeof details.reserved === 'string' ? Number(details.reserved.replace(/,/g, '')) : details.reserved} decimals={metadata.decimals} unit={metadata.symbol} />
+                  <FormattedAmount
+                    value={
+                      typeof details.reserved === "string"
+                        ? Number(details.reserved.replace(/,/g, ""))
+                        : details.reserved
+                    }
+                    decimals={metadata.decimals}
+                    unit={metadata.symbol}
+                  />
                 </td>
               </tr>
               <tr>
-                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Owner</td>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                  {t("assets.owner")}
+                </td>
                 <td className="font-medium flex items-center gap-2">
                   <AccountName address={details.owner} />
                   <Button
@@ -213,48 +278,79 @@ function AssetInfoSection({
                     onClick={handleToggleTeam}
                     className="ml-2"
                   >
-                    {showTeam ? t("asset_card.hide_team") : t("asset_card.show_team")}
+                    {showTeam
+                      ? t("asset_card.hide_team")
+                      : t("asset_card.show_team")}
                   </Button>
                 </td>
               </tr>
               {showTeam && (
                 <>
                   <tr>
-                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Issuer</td>
-                    <td className="font-medium"><AccountName address={details.issuer} /></td>
+                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                      {t("assets.issuer")}
+                    </td>
+                    <td className="font-medium">
+                      <AccountName address={details.issuer} />
+                    </td>
                   </tr>
                   <tr>
-                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Admin</td>
-                    <td className="font-medium"><AccountName address={details.admin} /></td>
+                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                      {t("assets.admin")}
+                    </td>
+                    <td className="font-medium">
+                      <AccountName address={details.admin} />
+                    </td>
                   </tr>
                   <tr>
-                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Freezer</td>
-                    <td className="font-medium"><AccountName address={details.freezer} /></td>
+                    <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                      {t("assets.freezer")}
+                    </td>
+                    <td className="font-medium">
+                      <AccountName address={details.freezer} />
+                    </td>
                   </tr>
                 </>
               )}
               <tr>
-                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">Holders</td>
-                <td className="font-medium">{typeof details.accounts === 'number' ? details.accounts : Number(details.accounts)}</td>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                  {t("assets.holders")}
+                </td>
+                <td className="font-medium">
+                  {typeof details.accounts === "number"
+                    ? details.accounts
+                    : Number(details.accounts)}
+                </td>
               </tr>
               <tr>
-                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">EVM Contract</td>
+                <td className="text-gray-500 whitespace-nowrap pr-8 w-0">
+                  {t("assets.evm_contract")}
+                </td>
                 <td className="font-medium">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs select-all">{evmContractAddress}</span>
-                    <Button icon="duplicate" minimal small onClick={handleCopyAddress} title={t("asset_card.copy_address")} />
+                    <span className="font-mono text-xs select-all">
+                      {evmContractAddress}
+                    </span>
+                    <Button
+                      icon="duplicate"
+                      minimal
+                      small
+                      onClick={handleCopyAddress}
+                      title={t("asset_card.copy_address")}
+                    />
                   </div>
                 </td>
               </tr>
             </tbody>
           </HTMLTable>
-          {!inDialog && linkedObjIdx !== null && !isNaN(linkedObjIdx) && (
-            <DialogObjectCard
-              isOpen={showObjectDialog}
-              onClose={handleCloseObjectDialog}
-              objectIndex={linkedObjIdx}
-            />
-          )}
+          {linkedObjIdx !== null &&
+            !Number.isNaN(linkedObjIdx) && (
+              <DialogObjectCard
+                isOpen={showObjectDialog}
+                onClose={handleCloseObjectDialog}
+                objectIndex={linkedObjIdx}
+              />
+            )}
           <div className="mt-6 flex justify-end gap-2">
             <Button icon="pie-chart" onClick={handleOpenDistributionDialog}>
               {t("asset_card.tokens_distribution")}
@@ -288,7 +384,10 @@ function AssetInfoSection({
   );
 }
 
-export default function AssetCard({ assetId, inDialog = false }: AssetCardProps) {
+export default function AssetCard({
+  assetId,
+  inDialog = false,
+}: AssetCardProps) {
   const { t } = useTranslation();
   const api = useApi();
   const [details, setDetails] = useState<AssetDetails | null>(null);
@@ -296,7 +395,9 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
   const [property, setProperty] = useState<PropertyDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [maxSupply, setMaxSupply] = useState<string | number | undefined>(undefined);
+  const [maxSupply, setMaxSupply] = useState<string | number | undefined>(
+    undefined
+  );
   const [showObjectDialog, setShowObjectDialog] = useState(false);
   const [showDistributionDialog, setShowDistributionDialog] = useState(false);
   const [showTeam, setShowTeam] = useState(false);
@@ -307,7 +408,8 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
   const [showFreezeDialog, setShowFreezeDialog] = useState(false);
   const [showThawDialog, setShowThawDialog] = useState(false);
   const [showForceTransferDialog, setShowForceTransferDialog] = useState(false);
-  const [showTransferOwnershipDialog, setShowTransferOwnershipDialog] = useState(false);
+  const [showTransferOwnershipDialog, setShowTransferOwnershipDialog] =
+    useState(false);
   const [selectedAccount] = useAtom(lastSelectedAccountAtom);
 
   // Request cancellation and debouncing refs
@@ -408,133 +510,156 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
   }, []);
 
   // Main fetch function with cancellation
-  const fetchData = useCallback(async (targetAssetId: number) => {
-    // Cancel any ongoing request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // Create new abort controller for this request
-    abortControllerRef.current = new AbortController();
-    const { signal } = abortControllerRef.current;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      if (!api) throw new Error("API not ready");
-
-      // Check if request was cancelled
-      if (signal.aborted) return;
-
-      // Fetch asset details
-      const assetOpt = await api.query.poscanAssets.asset(targetAssetId);
-      
-      // Check if request was cancelled
-      if (signal.aborted) return;
-
-      if (!isOption(assetOpt) || !assetOpt.isSome) {
-        throw new Error("Asset not found");
+  const fetchData = useCallback(
+    async (targetAssetId: number) => {
+      // Cancel any ongoing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
 
-      // Use toHuman for easier field access
-      const assetHuman = getOptionValue(assetOpt);
-      const asset = assetHuman as AssetDetails;
-      
-      // Check if request was cancelled
-      if (signal.aborted) return;
+      // Create new abort controller for this request
+      abortControllerRef.current = new AbortController();
+      const { signal } = abortControllerRef.current;
 
-      // Fetch metadata
-      const metaOpt = await api.query.poscanAssets.metadata(targetAssetId);
-      
-      // Check if request was cancelled
-      if (signal.aborted) return;
+      setLoading(true);
+      setError(null);
 
-      const metaHuman = metaOpt.toHuman ? metaOpt.toHuman() : metaOpt.toJSON();
-      let meta: AssetMetadata;
-      if (metaHuman && typeof metaHuman === 'object' && !Array.isArray(metaHuman)) {
-        const metaObj = metaHuman as Record<string, unknown>;
-        meta = {
-          name: (metaObj.name as string) || "",
-          symbol: (metaObj.symbol as string) || "",
-          decimals: Number(metaObj.decimals) || 0,
-          isFrozen: Boolean(metaObj.isFrozen),
-        };
-      } else {
-        meta = { name: "", symbol: "", decimals: 0, isFrozen: false };
-      }
-      
-      // Check if request was cancelled
-      if (signal.aborted) return;
+      try {
+        if (!api) throw new Error("API not ready");
 
-      // Fetch property if linked object is present
-      let prop: PropertyDetails | null = null;
-      if (asset?.objDetails?.propIdx != null) {
-        const propIdxNum = typeof asset.objDetails.propIdx === 'string' ? parseInt(asset.objDetails.propIdx, 10) : asset.objDetails.propIdx;
-        if (!isNaN(propIdxNum)) {
-          const propOpt = await api.query.poScan.properties(propIdxNum);
-          
-          // Check if request was cancelled
-          if (signal.aborted) return;
+        // Check if request was cancelled
+        if (signal.aborted) return;
 
-          if (isOption(propOpt) && propOpt.isSome) {
-            const propHuman = getOptionValue(propOpt);
-            prop = propHuman as PropertyDetails;
+        // Fetch asset details
+        const assetOpt = await api.query.poscanAssets.asset(targetAssetId);
+
+        // Check if request was cancelled
+        if (signal.aborted) return;
+
+        if (!isOption(assetOpt) || !assetOpt.isSome) {
+          throw new Error("Asset not found");
+        }
+
+        // Use toHuman for easier field access
+        const assetHuman = getOptionValue(assetOpt);
+        const asset = assetHuman as AssetDetails;
+
+        // Check if request was cancelled
+        if (signal.aborted) return;
+
+        // Fetch metadata
+        const metaOpt = await api.query.poscanAssets.metadata(targetAssetId);
+
+        // Check if request was cancelled
+        if (signal.aborted) return;
+
+        const metaHuman = metaOpt.toHuman
+          ? metaOpt.toHuman()
+          : metaOpt.toJSON();
+        let meta: AssetMetadata;
+        if (
+          metaHuman &&
+          typeof metaHuman === "object" &&
+          !Array.isArray(metaHuman)
+        ) {
+          const metaObj = metaHuman as Record<string, unknown>;
+          meta = {
+            name: (metaObj.name as string) || "",
+            symbol: (metaObj.symbol as string) || "",
+            decimals: Number(metaObj.decimals) || 0,
+            isFrozen: Boolean(metaObj.isFrozen),
+          };
+        } else {
+          meta = { name: "", symbol: "", decimals: 0, isFrozen: false };
+        }
+
+        // Check if request was cancelled
+        if (signal.aborted) return;
+
+        // Fetch property if linked object is present
+        let prop: PropertyDetails | null = null;
+        if (asset?.objDetails?.propIdx != null) {
+          const propIdxNum =
+            typeof asset.objDetails.propIdx === "string"
+              ? Number.parseInt(asset.objDetails.propIdx, 10)
+              : asset.objDetails.propIdx;
+          if (!Number.isNaN(propIdxNum)) {
+            const propOpt = await api.query.poScan.properties(propIdxNum);
+
+            // Check if request was cancelled
+            if (signal.aborted) return;
+
+            if (isOption(propOpt) && propOpt.isSome) {
+              const propHuman = getOptionValue(propOpt);
+              prop = propHuman as PropertyDetails;
+            }
           }
         }
-      }
-      
-      // Check if request was cancelled
-      if (signal.aborted) return;
 
-      // After fetching prop, extract maxValue (or maxSupply) if available
-      let localMaxSupply: string | number | undefined;
-      if (prop && typeof prop === 'object' && prop !== null) {
-        if ('maxValue' in prop && (typeof prop.maxValue === 'string' || typeof prop.maxValue === 'number')) {
-          localMaxSupply = prop.maxValue as string | number;
-        } else if ('maxSupply' in prop && (typeof prop.maxSupply === 'string' || typeof prop.maxSupply === 'number')) {
-          localMaxSupply = prop.maxSupply as string | number;
+        // Check if request was cancelled
+        if (signal.aborted) return;
+
+        // After fetching prop, extract maxValue (or maxSupply) if available
+        let localMaxSupply: string | number | undefined;
+        if (prop && typeof prop === "object" && prop !== null) {
+          if (
+            "maxValue" in prop &&
+            (typeof prop.maxValue === "string" ||
+              typeof prop.maxValue === "number")
+          ) {
+            localMaxSupply = prop.maxValue as string | number;
+          } else if (
+            "maxSupply" in prop &&
+            (typeof prop.maxSupply === "string" ||
+              typeof prop.maxSupply === "number")
+          ) {
+            localMaxSupply = prop.maxSupply as string | number;
+          }
+        }
+
+        // Only update state if this is still the current request
+        if (!signal.aborted && currentAssetIdRef.current === targetAssetId) {
+          setDetails(asset);
+          setMetadata(meta);
+          setProperty(prop);
+          setMaxSupply(localMaxSupply);
+          setLoading(false);
+        }
+      } catch (err: unknown) {
+        // Don't update state if request was cancelled
+        if (!signal.aborted && currentAssetIdRef.current === targetAssetId) {
+          setError(err instanceof Error ? err.message : String(err));
+          setLoading(false);
         }
       }
-      
-      // Only update state if this is still the current request
-      if (!signal.aborted && currentAssetIdRef.current === targetAssetId) {
-        setDetails(asset);
-        setMetadata(meta);
-        setProperty(prop);
-        setMaxSupply(localMaxSupply);
-        setLoading(false);
-      }
-    } catch (err: unknown) {
-      // Don't update state if request was cancelled
-      if (!signal.aborted && currentAssetIdRef.current === targetAssetId) {
-        setError(err instanceof Error ? err.message : String(err));
-        setLoading(false);
-      }
-    }
-  }, [api]);
+    },
+    [api]
+  );
 
   // Debounced fetch function
-  const debouncedFetchData = useCallback((targetAssetId: number) => {
-    // Clear existing timeout
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    // Set new timeout
-    debounceTimeoutRef.current = setTimeout(() => {
-      // Only fetch if this is still the current asset ID
-      if (currentAssetIdRef.current === targetAssetId) {
-        fetchData(targetAssetId);
+  const debouncedFetchData = useCallback(
+    (targetAssetId: number) => {
+      // Clear existing timeout
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
       }
-    }, FETCH_DEBOUNCE_MS);
-  }, [fetchData]);
+
+      // Set new timeout
+      debounceTimeoutRef.current = setTimeout(() => {
+        // Only fetch if this is still the current asset ID
+        if (currentAssetIdRef.current === targetAssetId) {
+          fetchData(targetAssetId);
+        }
+      }, FETCH_DEBOUNCE_MS);
+    },
+    [fetchData]
+  );
 
   // Effect to handle asset ID changes
   useEffect(() => {
     // Update current asset ID ref
     currentAssetIdRef.current = assetId;
-    
+
     // Trigger debounced fetch
     debouncedFetchData(assetId);
 
@@ -545,7 +670,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
         clearTimeout(debounceTimeoutRef.current);
         debounceTimeoutRef.current = null;
       }
-      
+
       // Cancel ongoing request
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -562,7 +687,7 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
         clearTimeout(debounceTimeoutRef.current);
         debounceTimeoutRef.current = null;
       }
-      
+
       // Cancel ongoing request
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -587,11 +712,28 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
     // Status icon and label
     let statusIcon: React.ReactNode = null;
     let statusLabel = "";
-    if (metadata.isFrozen || (details.status && details.status.toLowerCase() === "frozen")) {
-      statusIcon = <Icon icon="snowflake" intent="primary" className="ml-2" title={t("asset_card.frozen")} />;
+    if (
+      metadata.isFrozen ||
+      (details.status && details.status.toLowerCase() === "frozen")
+    ) {
+      statusIcon = (
+        <Icon
+          icon="snowflake"
+          intent="primary"
+          className="ml-2"
+          title={t("asset_card.frozen")}
+        />
+      );
       statusLabel = t("asset_card.frozen");
     } else if (details.status && details.status.toLowerCase() === "live") {
-      statusIcon = <Icon icon="tick-circle" intent="success" className="ml-2" title={t("asset_card.live")} />;
+      statusIcon = (
+        <Icon
+          icon="tick-circle"
+          intent="success"
+          className="ml-2"
+          title={t("asset_card.live")}
+        />
+      );
       statusLabel = t("asset_card.live");
     }
     title = (
@@ -603,7 +745,9 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
         {statusLabel && (
           <span className="text-xs text-gray-500 ml-1">{statusLabel}</span>
         )}
-        <span className="text-xs text-gray-500 ml-2">{t("asset_card.asset_id")} {assetId}</span>
+        <span className="text-xs text-gray-500 ml-2">
+          {t("asset_card.asset_id")} {assetId}
+        </span>
       </span>
     );
   }
@@ -620,27 +764,37 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
 
   // Calculate issued percent if maxSupply is defined and > 0
   let issuedPercent: string | null = null;
-  if (typeof maxSupply !== 'undefined' && maxSupply !== null) {
-    const maxSupplyNum = typeof maxSupply === 'string' ? Number(maxSupply.replace(/,/g, '')) : maxSupply;
+  if (typeof maxSupply !== "undefined" && maxSupply !== null) {
+    const maxSupplyNum =
+      typeof maxSupply === "string"
+        ? Number(maxSupply.replace(/,/g, ""))
+        : maxSupply;
     if (maxSupplyNum > 0) {
       const percent = (Number(supplyValue) / Number(maxSupplyNum)) * 100;
-      issuedPercent = percent.toFixed(2) + '%';
+      issuedPercent = `${percent.toFixed(2)}%`;
     }
   }
 
   // Get linked object index if present
-  const linkedObjIdx = details?.objDetails?.objIdx != null
-    ? (typeof details.objDetails.objIdx === 'string' ? parseInt(details.objDetails.objIdx, 10) : details.objDetails.objIdx)
-    : null;
+  const linkedObjIdx =
+    details?.objDetails?.objIdx != null
+      ? typeof details.objDetails.objIdx === "string"
+        ? Number.parseInt(details.objDetails.objIdx, 10)
+        : details.objDetails.objIdx
+      : null;
 
   // Determine user role for this asset
   let userRole: "owner" | "admin" | "issuer" | "freezer" | null = null;
   if (selectedAccount && details) {
     const account = selectedAccount.toLowerCase();
-    if (details.owner && details.owner.toLowerCase() === account) userRole = "owner";
-    else if (details.admin && details.admin.toLowerCase() === account) userRole = "admin";
-    else if (details.issuer && details.issuer.toLowerCase() === account) userRole = "issuer";
-    else if (details.freezer && details.freezer.toLowerCase() === account) userRole = "freezer";
+    if (details.owner && details.owner.toLowerCase() === account)
+      userRole = "owner";
+    else if (details.admin && details.admin.toLowerCase() === account)
+      userRole = "admin";
+    else if (details.issuer && details.issuer.toLowerCase() === account)
+      userRole = "issuer";
+    else if (details.freezer && details.freezer.toLowerCase() === account)
+      userRole = "freezer";
   }
 
   return (
@@ -754,4 +908,4 @@ export default function AssetCard({ assetId, inDialog = false }: AssetCardProps)
       />
     </div>
   );
-} 
+}

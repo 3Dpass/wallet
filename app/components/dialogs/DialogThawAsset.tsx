@@ -1,15 +1,17 @@
-import React, { useState, useCallback, useEffect } from "react";
-import BaseDialog from "./BaseDialog";
-import { InputGroup, Intent, Switch, Icon } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useAtom } from "jotai";
-import { lastSelectedAccountAtom } from "app/atoms";
+import { Icon, InputGroup, Intent, Switch } from "@blueprintjs/core";
+import type { SubmittableExtrinsic } from "@polkadot/api/types";
 import keyring from "@polkadot/ui-keyring";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useApi } from "app/components/Api";
 import { signAndSend } from "app/utils/sign";
-import useToaster from "../../hooks/useToaster";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import useToaster from "../../hooks/useToaster";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
+import BaseDialog from "./BaseDialog";
 
 interface DialogThawAssetProps {
   isOpen: boolean;
@@ -17,7 +19,11 @@ interface DialogThawAssetProps {
   assetId: number;
 }
 
-export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThawAssetProps) {
+export default function DialogThawAsset({
+  isOpen,
+  onClose,
+  assetId,
+}: DialogThawAssetProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
@@ -30,12 +36,15 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
 
   // Memoized callbacks for JSX props
   const handleThawAssetToggle = useCallback(() => {
-    setThawAsset(v => !v);
+    setThawAsset((v) => !v);
   }, []);
 
-  const handleWhoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setWho(e.target.value);
-  }, []);
+  const handleWhoChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setWho(e.target.value);
+    },
+    []
+  );
 
   // Validate address whenever it changes
   useEffect(() => {
@@ -57,12 +66,12 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
   // Get the KeyringPair for the selected account
   const pair = (() => {
     try {
-      if (selectedAccount && selectedAccount.trim() !== '') {
+      if (selectedAccount && selectedAccount.trim() !== "") {
         return keyring.getPair(selectedAccount);
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get keyring pair:', error);
+      console.warn("Failed to get keyring pair:", error);
       return null;
     }
   })();
@@ -72,7 +81,7 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "API not ready"
+        message: "API not ready",
       });
       return;
     }
@@ -80,7 +89,9 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+        message:
+          t("messages.lbl_fill_required_fields") ||
+          "Please fill all required fields.",
       });
       return;
     }
@@ -88,7 +99,8 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_invalid_address") || "Please enter a valid address."
+        message:
+          t("messages.lbl_invalid_address") || "Please enter a valid address.",
       });
       return;
     }
@@ -96,7 +108,9 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+        message:
+          t("messages.lbl_no_account_selected") ||
+          "No account selected or unable to get keyring pair.",
       });
       return;
     }
@@ -105,13 +119,13 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_account_locked") || "Account is locked."
+        message: t("messages.lbl_account_locked") || "Account is locked.",
       });
       return;
     }
     setLoading(true);
     try {
-      let tx;
+      let tx: SubmittableExtrinsic<"promise">;
       if (thawAsset) {
         tx = api.tx.poscanAssets.thawAsset(assetId);
       } else {
@@ -124,7 +138,7 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
           intent: Intent.SUCCESS,
           message: thawAsset
             ? t("dlg_asset.thaw_asset_success") || "Asset thawed successfully!"
-            : t("dlg_asset.thaw_success") || "Tokens thawed successfully!"
+            : t("dlg_asset.thaw_success") || "Tokens thawed successfully!",
         });
         onClose();
       });
@@ -158,7 +172,9 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
       onClose={onClose}
       title={t("dlg_asset.thaw_title") || "Thaw"}
       primaryButton={{
-        text: thawAsset ? (t("dlg_asset.thaw_asset_btn") || "Thaw Asset") : (t("dlg_asset.thaw_btn") || "Thaw"),
+        text: thawAsset
+          ? t("dlg_asset.thaw_asset_btn") || "Thaw Asset"
+          : t("dlg_asset.thaw_btn") || "Thaw",
         icon: "unlock",
         onClick: handleSubmit,
         intent: "primary",
@@ -188,4 +204,4 @@ export default function DialogThawAsset({ isOpen, onClose, assetId }: DialogThaw
       </div>
     </BaseDialog>
   );
-} 
+}

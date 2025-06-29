@@ -66,6 +66,11 @@
       "lbl_block_not_finalized": "No finalizado",
       "lbl_3d_object_not_available": "Objeto 3D no disponible",
       "lbl_object_hash_algo": "Algoritmo de Hash del Objeto:",
+      "lbl_block_hash": "Hash del Bloque:",
+      "lbl_block_author": "Autor del Bloque:",
+      "lbl_block_seal": "Sello:",
+      "lbl_block_timestamp": "Marca de Tiempo:",
+      "lbl_consensus_engine": "Motor de Consenso:",
       "lbl_btn_kyc": "KYC",
       "lbl_btn_no_kyc": "sin KYC",
       "lbl_btn_create": "Crear",
@@ -250,7 +255,7 @@
       "my_objects": "Mis objetos",
       "search_placeholder": "Buscar por índice, bloque, propietario, estado, público/privado, aprobado/desaprobado, o propiedad...",
       "show_all_objects": "Mostrar todos los objetos",
-      "load_more": "Cargar 10 más",
+      "load_next": "Cargar siguientes 10",
       "no_objects_found": "No se encontraron objetos.",
       "no_objects_found_account": "No se encontraron objetos para tu cuenta.",
       "object_not_found": "Objeto con índice {{index}} no encontrado",
@@ -329,7 +334,7 @@
       "no_preview": "Sin vista previa",
       "loading": "Cargando...",
       "no_linked_assets": "Sin activos vinculados",
-      "view_asset": "Ver Activo #"
+      "view_asset": "Ver Activo"
     },
     "asset_actions": {
       "freeze": "Congelar activo",
@@ -455,6 +460,52 @@
       "api_not_ready": "API no está lista",
       "unknown_error": "Error desconocido",
       "unknown_error_occurred": "Ocurrió un error desconocido"
+    },
+    "utils": {
+      "time_units": {
+        "hours": "h",
+        "minutes": "min",
+        "seconds": "s",
+        "days": "d"
+      },
+      "errors": {
+        "invalid_ss58_address": "Dirección SS58 inválida",
+        "invalid_h160_address": "Dirección H160 inválida",
+        "failed_convert_ss58_to_h160": "Error al convertir SS58 a H160:",
+        "failed_convert_h160_to_ss58": "Error al convertir H160 a SS58:",
+        "failed_decode_author": "Error al decodificar autor desde PreRuntime:",
+        "failed_process_digest_log": "Error al procesar registro de digest:",
+        "failed_get_timestamp": "Error al obtener marca de tiempo para bloque:",
+        "failed_calculate_reward": "Error al calcular recompensa total del bloque:",
+        "failed_get_reward_info": "Error al obtener información de recompensa para bloque:",
+        "failed_load_mining_object": "Error al cargar objeto de minería para bloque:",
+        "polkadot_extension_unavailable": "Extensión Polkadot-dapp no disponible, recurriendo a firma directa"
+      }
+    },
+    "assets": {
+      "objects": "Objetos",
+      "tokens": "Tokens",
+      "name": "Nombre",
+      "decimals": "Decimales",
+      "supply": "Suministro",
+      "max_supply": "Suministro máximo",
+      "min_balance": "Saldo mínimo",
+      "reserved": "Reservado",
+      "owner": "Propietario",
+      "issuer": "Emisor",
+      "admin": "Administrador",
+      "freezer": "Congelador",
+      "holders": "Titulares",
+      "evm_contract": "Contrato EVM",
+      "property": "Propiedad",
+      "select_property": "Seleccionar Propiedad",
+      "loading_properties": "Cargando propiedades...",
+      "hide_details": "Ocultar Detalles",
+      "show_details": "Mostrar Detalles",
+      "tokenize": "Tokenizar",
+      "download_obj_file": "Descargar archivo OBJ",
+      "object_details": "Detalles del Objeto",
+      "token_holders_distribution": "Distribución de Titulares de Tokens"
     }
   }
 }

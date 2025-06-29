@@ -1,7 +1,6 @@
 import { Button, Icon, Spinner, SpinnerSize } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useApi } from "../Api";
 import { FormattedAmount } from "../common/FormattedAmount";
 import TitledValue from "../common/TitledValue";
@@ -27,7 +26,6 @@ type IProps = {
 };
 
 export default function AccountAssets({ pair, onSend }: IProps) {
-  const { t } = useTranslation();
   const api = useApi();
   const [assets, setAssets] = useState<AssetBalance[]>([]);
   const [isLoading, setIsLoading] = useState(true);

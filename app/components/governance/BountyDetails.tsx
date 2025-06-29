@@ -65,7 +65,7 @@ function getBountyIcon(type: "approval" | "curator" | "close") {
 
 export function BountyDetails({
   bountyId,
-  motion,
+  motion: _motion,
   type,
   curator,
   fee,

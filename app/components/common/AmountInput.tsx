@@ -17,7 +17,7 @@ export default function AmountInput({
   unit = "P3D",
 }: AmountInputProps) {
   const [amount, setAmount] = useState("");
-  const formatOptions = useAtomValue(formatOptionsAtom);
+  const _formatOptions = useAtomValue(formatOptionsAtom);
 
   function handleAmountChange(valueAsNumber: number, valueAsString: string) {
     setAmount(valueAsString);

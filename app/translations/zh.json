@@ -65,7 +65,12 @@
       "lbl_block": "区块",
       "lbl_block_not_finalized": "未确认",
       "lbl_3d_object_not_available": "3D对象不可用",
-      "lbl_object_hash_algo": "对象哈希算法：",
+      "lbl_object_hash_algo": "对象哈希算法:",
+      "lbl_block_hash": "区块哈希:",
+      "lbl_block_author": "区块作者:",
+      "lbl_block_seal": "密封:",
+      "lbl_block_timestamp": "时间戳:",
+      "lbl_consensus_engine": "共识引擎:",
       "lbl_btn_kyc": "KYC认证",
       "lbl_btn_no_kyc": "无KYC认证",
       "lbl_btn_create": "创建",
@@ -250,7 +255,7 @@
       "my_objects": "我的对象",
       "search_placeholder": "按索引、区块、所有者、状态、公开/私有、已批准/未批准或属性搜索...",
       "show_all_objects": "显示所有对象",
-      "load_more": "加载更多10个",
+      "load_next": "加载下10个",
       "no_objects_found": "未找到对象。",
       "no_objects_found_account": "未找到您账户的对象。",
       "object_not_found": "未找到索引为{{index}}的对象",
@@ -406,7 +411,7 @@
       "no_preview": "无预览",
       "loading": "加载中...",
       "no_linked_assets": "无关联资产",
-      "view_asset": "查看资产 #"
+      "view_asset": "查看资产"
     },
     "dlg_set_registrar_fee": {
       "title": "设置注册商费用",
@@ -455,6 +460,52 @@
       "api_not_ready": "API未就绪",
       "unknown_error": "未知错误",
       "unknown_error_occurred": "发生未知错误"
+    },
+    "utils": {
+      "time_units": {
+        "hours": "小时",
+        "minutes": "分钟",
+        "seconds": "秒",
+        "days": "天"
+      },
+      "errors": {
+        "invalid_ss58_address": "无效的SS58地址",
+        "invalid_h160_address": "无效的H160地址",
+        "failed_convert_ss58_to_h160": "SS58转H160失败：",
+        "failed_convert_h160_to_ss58": "H160转SS58失败：",
+        "failed_decode_author": "从PreRuntime解码作者失败：",
+        "failed_process_digest_log": "处理摘要日志失败：",
+        "failed_get_timestamp": "获取区块时间戳失败：",
+        "failed_calculate_reward": "计算区块总奖励失败：",
+        "failed_get_reward_info": "获取区块奖励信息失败：",
+        "failed_load_mining_object": "加载区块挖矿对象失败：",
+        "polkadot_extension_unavailable": "Polkadot扩展不可用，回退到直接签名"
+      }
+    },
+    "assets": {
+      "objects": "对象",
+      "tokens": "代币",
+      "name": "名称",
+      "decimals": "小数位数",
+      "supply": "供应量",
+      "max_supply": "最大供应量",
+      "min_balance": "最小余额",
+      "reserved": "保留",
+      "owner": "所有者",
+      "issuer": "发行人",
+      "admin": "管理员",
+      "freezer": "冻结者",
+      "holders": "持有者",
+      "evm_contract": "EVM合约",
+      "property": "属性",
+      "select_property": "选择属性",
+      "loading_properties": "加载属性中...",
+      "hide_details": "隐藏详情",
+      "show_details": "显示详情",
+      "tokenize": "代币化",
+      "download_obj_file": "下载OBJ文件",
+      "object_details": "对象详情",
+      "token_holders_distribution": "代币持有者分布"
     }
   }
 }

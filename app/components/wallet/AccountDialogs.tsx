@@ -1,22 +1,22 @@
 import { Alert, Intent } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useTranslation } from "react-i18next";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import DialogAddMiner from "../dialogs/DialogAddMiner";
 import DialogClosePool from "../dialogs/DialogClosePool";
+import DialogEvmWithdraw from "../dialogs/DialogEvmWithdraw";
 import DialogIdentity from "../dialogs/DialogIdentity";
 import DialogJoinPool from "../dialogs/DialogJoinPool";
+import DialogJudgementRequests from "../dialogs/DialogJudgementRequests";
 import DialogLeavePool from "../dialogs/DialogLeavePool";
 import DialogLockFunds from "../dialogs/DialogLockFunds";
 import DialogRemoveMiner from "../dialogs/DialogRemoveMiner";
 import DialogSendFunds from "../dialogs/DialogSendFunds";
 import DialogSetPoolDifficulty from "../dialogs/DialogSetPoolDifficulty";
 import DialogSetPoolInterest from "../dialogs/DialogSetPoolInterest";
+import DialogSetRegistrarFee from "../dialogs/DialogSetRegistrarFee";
 import DialogSignAndVerify from "../dialogs/DialogSignVerify";
 import DialogUnlockAccount from "../dialogs/DialogUnlockAccount";
-import DialogJudgementRequests from "../dialogs/DialogJudgementRequests";
-import DialogSetRegistrarFee from "../dialogs/DialogSetRegistrarFee";
-import DialogEvmWithdraw from "../dialogs/DialogEvmWithdraw";
 
 // Add this type definition at the top of the file
 type DialogNames =
@@ -76,8 +76,9 @@ export function AccountDialogs({
   const handleToggleSignVerify = createToggleHandler("sign_verify");
   const handleToggleClosePool = createToggleHandler("close_pool");
   const handleToggleSetPoolInterest = createToggleHandler("set_pool_interest");
-  const handleToggleSetPoolDifficulty =
-    createToggleHandler("set_pool_difficulty");
+  const handleToggleSetPoolDifficulty = createToggleHandler(
+    "set_pool_difficulty"
+  );
   const handleToggleJoinPool = createToggleHandler("join_pool");
   const handleToggleLeavePool = createToggleHandler("leave_pool");
   const handleToggleIdentity = createToggleHandler("identity");

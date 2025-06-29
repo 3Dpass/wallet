@@ -10,7 +10,14 @@ interface AssetActionsProps {
   role: "owner" | "admin" | "issuer" | "freezer";
 }
 
-export default function AssetActions({ onFreeze, onThaw, onBurn, onTransferOwnership, onForceTransfer, role }: AssetActionsProps) {
+export default function AssetActions({
+  onFreeze,
+  onThaw,
+  onBurn,
+  onTransferOwnership,
+  onForceTransfer,
+  role,
+}: AssetActionsProps) {
   const { t } = useTranslation();
 
   // Role-based permissions
@@ -67,4 +74,4 @@ export default function AssetActions({ onFreeze, onThaw, onBurn, onTransferOwner
       )}
     </>
   );
-} 
+}

@@ -283,7 +283,7 @@ export const createMockApi = () => {
       chainDecimals: [12],
       chainTokens: ["UNIT"],
       chainSS58: 42,
-      getModuleInstances: (specName: string, module: string) => {
+      getModuleInstances: (_specName: string, module: string) => {
         if (module === "council") return ["council"];
         if (module === "collective") return ["collective"];
         return undefined;
