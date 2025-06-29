@@ -50,8 +50,6 @@ export default function DialogObjectCard({
 }: DialogObjectCardProps) {
   const { t } = useTranslation();
   const api = useApi();
-  const [objString, setObjString] = useState<string | null>(null);
-  const [rpcData, setRpcData] = useState<RpcObjectData | null>(null);
   const [mappedData, setMappedData] = useState<MappedObjectData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +69,6 @@ export default function DialogObjectCard({
         // @ts-expect-error - poscan is a custom RPC
         const result = await api.rpc.poscan.getPoscanObject(objectIndex);
         console.log('API result for objectIndex', objectIndex, ':', result);
-        setRpcData(result);
 
         // Map the RPC data to the format expected by ObjectCard
         const mapped: MappedObjectData = {
@@ -80,18 +77,8 @@ export default function DialogObjectCard({
           numApprovals: result?.num_approvals,
         };
         setMappedData(mapped);
-
-        if (result?.obj && Array.isArray(result.obj)) {
-          // Convert array to string
-          const str = String.fromCharCode.apply(null, result.obj);
-          setObjString(str);
-        } else {
-          setObjString(null);
-        }
       } catch (error) {
         console.error("Failed to fetch object:", error);
-        setObjString(null);
-        setRpcData(null);
         setMappedData(null);
         setError(error instanceof Error ? error.message : String(error));
       } finally {

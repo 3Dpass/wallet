@@ -81,10 +81,6 @@ export default function DialogJudgementRequests({
     setSearch(e.target.value);
   }, []);
 
-  const handleSelectChange = useCallback((address: string) => (e: React.ChangeEvent<HTMLSelectElement>) => {
-    handleJudgementChange(address, e.target.value);
-  }, [handleJudgementChange]);
-
   const handleSubmitJudgement = useCallback(async (address: string) => {
     if (!api) {
       toaster.show({
@@ -135,10 +131,6 @@ export default function DialogJudgementRequests({
       setSubmitting((prev) => ({ ...prev, [address]: null }));
     }
   }, [api, registrarIndex, judgementLevels, registrarPair, toaster, t]);
-
-  const handleProvideClick = useCallback((address: string) => () => {
-    void handleSubmitJudgement(address);
-  }, [handleSubmitJudgement]);
 
   // Create memoized handlers for each address to avoid arrow functions in JSX
   const createSelectChangeHandler = useCallback((address: string) => {

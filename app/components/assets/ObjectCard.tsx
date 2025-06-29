@@ -670,6 +670,19 @@ export default function ObjectCard({
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentObjectIndexRef = useRef<number | null>(null);
 
+  // Helper function to convert array to string with chunked processing
+  const arrayToString = (arr: number[]): string => {
+    const CHUNK_SIZE = 0x8000; // 32,768
+    let result = "";
+    for (let i = 0; i < arr.length; i += CHUNK_SIZE) {
+      result += String.fromCharCode.apply(
+        null,
+        arr.slice(i, i + CHUNK_SIZE)
+      );
+    }
+    return result;
+  };
+
   // Memoized callbacks for JSX props
   const handleToggleExpanded = useCallback(() => {
     setIsExpanded(!isExpanded);
@@ -877,19 +890,6 @@ export default function ObjectCard({
           };
         }
         if (patchedResult?.obj && Array.isArray(patchedResult.obj)) {
-          // Use chunked conversion to avoid too many arguments error
-          function arrayToString(arr: number[]): string {
-            const CHUNK_SIZE = 0x8000; // 32,768
-            let result = "";
-            for (let i = 0; i < arr.length; i += CHUNK_SIZE) {
-              result += String.fromCharCode.apply(
-                null,
-                arr.slice(i, i + CHUNK_SIZE)
-              );
-            }
-            return result;
-          }
-
           const str = arrayToString(patchedResult.obj);
 
           // Check if the string contains literal "\n" text (not actual newlines)
