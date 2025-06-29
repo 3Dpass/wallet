@@ -10,30 +10,6 @@ interface DialogObjectCardProps {
   objectIndex: number;
 }
 
-// Type for the RPC response data
-interface RpcObjectData {
-  state?: Record<string, number | string>;
-  obj?: number[];
-  hashes?: string[];
-  when_created?: number;
-  owner?: string;
-  estimators?: [string, number][];
-  est_outliers?: string[];
-  approvers?: Array<{
-    account_id: string;
-    when: number;
-    proof: string;
-  }>;
-  num_approvals?: number;
-  est_rewards?: number;
-  author_rewards?: number;
-  prop?: Array<{
-    propIdx: number;
-    maxValue: number;
-  }>;
-  [key: string]: unknown;
-}
-
 // Type for the mapped data that ObjectCard expects
 interface MappedObjectData {
   state?: Record<string, number | string>;

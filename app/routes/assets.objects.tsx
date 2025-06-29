@@ -744,71 +744,47 @@ export default function AssetsObjects() {
       originalIndex: number,
       searchTermLower: string
     ) => {
-      // Index
-      if (String(objectIndexes[originalIndex]).includes(searchTermLower))
-        return true;
-
-      // Created block
-      if (obj.whenCreated && String(obj.whenCreated).includes(searchTermLower))
-        return true;
-
-      // Public/Private
-      if (searchTermLower === "public" && obj.isPrivate === false) return true;
-      if (searchTermLower === "private" && obj.isPrivate === true) return true;
-
-      // Properties (by name or value)
-      if (
-        Array.isArray(obj.prop) &&
-        obj.prop.some(
-          (p) =>
-            p &&
-            typeof p === "object" &&
-            ((p.name &&
-              String(p.name).toLowerCase().includes(searchTermLower)) ||
-              (p.maxValue !== undefined &&
-                String(p.maxValue).includes(searchTermLower)))
-        )
-      )
-        return true;
-
-      // Non-Fungible (by property name)
-      if (
-        searchTermLower === "non-fungible" &&
-        Array.isArray(obj.prop) &&
-        obj.prop.some(
-          (p) =>
-            p &&
-            typeof p === "object" &&
-            p.name &&
-            String(p.name).toLowerCase().includes("non-fungible")
-        )
-      )
-        return true;
-
-      // State search
-      if (
-        obj.state &&
-        Object.keys(obj.state as Record<string, unknown>).some((stateKey) =>
-          stateKey.toLowerCase().includes(searchTermLower)
-        )
-      )
-        return true;
-
-      // Owner search
-      if (
-        obj.owner &&
-        String(obj.owner).toLowerCase().includes(searchTermLower)
-      )
-        return true;
-
-      // Identity search
-      if (
-        obj.identity &&
-        String(obj.identity).toLowerCase().includes(searchTermLower)
-      )
-        return true;
-
-      return false;
+      return (
+        // Index
+        String(objectIndexes[originalIndex]).includes(searchTermLower) ||
+        // Created block
+        (obj.whenCreated && String(obj.whenCreated).includes(searchTermLower)) ||
+        // Public/Private
+        (searchTermLower === "public" && obj.isPrivate === false) ||
+        (searchTermLower === "private" && obj.isPrivate === true) ||
+        // Properties (by name or value)
+        (Array.isArray(obj.prop) &&
+          obj.prop.some(
+            (p) =>
+              p &&
+              typeof p === "object" &&
+              ((p.name &&
+                String(p.name).toLowerCase().includes(searchTermLower)) ||
+                (p.maxValue !== undefined &&
+                  String(p.maxValue).includes(searchTermLower)))
+          )) ||
+        // Non-Fungible (by property name)
+        (searchTermLower === "non-fungible" &&
+          Array.isArray(obj.prop) &&
+          obj.prop.some(
+            (p) =>
+              p &&
+              typeof p === "object" &&
+              p.name &&
+              String(p.name).toLowerCase().includes("non-fungible")
+          )) ||
+        // State search
+        (obj.state &&
+          Object.keys(obj.state as Record<string, unknown>).some((stateKey) =>
+            stateKey.toLowerCase().includes(searchTermLower)
+          )) ||
+        // Owner search
+        (obj.owner &&
+          String(obj.owner).toLowerCase().includes(searchTermLower)) ||
+        // Identity search
+        (obj.identity &&
+          String(obj.identity).toLowerCase().includes(searchTermLower))
+      );
     },
     [objectIndexes]
   );

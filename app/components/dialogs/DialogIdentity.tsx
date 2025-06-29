@@ -103,6 +103,15 @@ export default function DialogIdentity({
     }));
   }, []);
 
+  const handleClose = useCallback(() => {
+    setIsIdentityLoading(false);
+    setIsCancelRequestLoading(false);
+    setIsClearIdentityLoading(false);
+    setShowUpdateForm(false);
+    setShowAdditionalFields(false);
+    onClose();
+  }, [onClose]);
+
   async function loadRegistrars() {
     setIsLoadingRegistrars(true);
     if (!api) {
@@ -174,7 +183,7 @@ export default function DialogIdentity({
     await loadRegistrars();
   }
 
-  async function handleSubmitRequestForJudgement() {
+  const handleSubmitRequestForJudgement = useCallback(async () => {
     if (!api) {
       return;
     }
@@ -268,7 +277,7 @@ export default function DialogIdentity({
       setIsIdentityLoading(false);
       handleClose();
     }
-  }
+  }, [api, dataState.candidateInfo, dataState.registrarData, pair, toaster, t, re, handleClose]);
 
   async function setRegistrar(registrarAccount: IPalletIdentityRegistrarInfo) {
     if (!api) {
@@ -283,15 +292,6 @@ export default function DialogIdentity({
     };
     setData((prev) => ({ ...prev, registrarData: updatedRegistrar }));
   }
-
-  const handleClose = () => {
-    setIsIdentityLoading(false);
-    setIsCancelRequestLoading(false);
-    setIsClearIdentityLoading(false);
-    setShowUpdateForm(false);
-    setShowAdditionalFields(false);
-    onClose();
-  };
 
   const handleUpdateClick = () => {
     if (!dataState.registrarData) {
