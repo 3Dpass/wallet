@@ -9,7 +9,7 @@ import type { KeyringPair } from "@polkadot/keyring/types";
 import { type MouseEventHandler, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
-import { type IPool, convertPool, poolsWithMember } from "../../utils/pool";
+import { convertPool, type IPool, poolsWithMember } from "../../utils/pool";
 import { signAndSend } from "../../utils/sign";
 import { useApi } from "../Api";
 import BaseDialog from "./BaseDialog";
@@ -119,7 +119,12 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
 
   const renderPoolId: ItemRenderer<string> = (
     poolId,
-    { handleClick, handleFocus, modifiers, query }
+    {
+      handleClick: _handleClick,
+      handleFocus: _handleFocus,
+      modifiers,
+      query: _query,
+    }
   ) => {
     if (!modifiers.matchesPredicate) {
       return null;
@@ -131,8 +136,8 @@ export default function DialogLeavePool({ isOpen, onClose, pair }: IProps) {
         disabled={modifiers.disabled}
         key={poolId}
         text={poolId}
-        onClick={handleClick as MouseEventHandler}
-        onFocus={handleFocus}
+        onClick={_handleClick as MouseEventHandler}
+        onFocus={_handleFocus}
         roleStructure="listoption"
       />
     );

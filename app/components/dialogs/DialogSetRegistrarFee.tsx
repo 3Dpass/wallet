@@ -1,13 +1,13 @@
-import { Dialog, Classes, Button, Intent } from "@blueprintjs/core";
-import { useState, useEffect } from "react";
+import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import type { KeyringPair } from "@polkadot/keyring/types";
+import { useAtomValue } from "jotai";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useApi } from "../Api";
+import { formatOptionsAtom } from "../../atoms";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
-import type { KeyringPair } from "@polkadot/keyring/types";
+import { useApi } from "../Api";
 import AmountInput from "../common/AmountInput";
-import { useAtomValue } from "jotai";
-import { formatOptionsAtom } from "../../atoms";
 
 interface DialogSetRegistrarFeeProps {
   isOpen: boolean;
@@ -15,25 +15,37 @@ interface DialogSetRegistrarFeeProps {
   registrarPair: KeyringPair;
 }
 
-export default function DialogSetRegistrarFee({ isOpen, onClose, registrarPair }: DialogSetRegistrarFeeProps) {
+export default function DialogSetRegistrarFee({
+  isOpen,
+  onClose,
+  registrarPair,
+}: DialogSetRegistrarFeeProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [fee, setFee] = useState("");
-  const [feeNumber, setFeeNumber] = useState(0);
+  const [_feeNumber, setFeeNumber] = useState(0);
   const [loading, setLoading] = useState(false);
   const [registrarIndex, setRegistrarIndex] = useState<number | null>(null);
   const formatOptions = useAtomValue(formatOptionsAtom);
-  const decimals = formatOptions && typeof formatOptions.decimals === "number" ? formatOptions.decimals : 12;
+  const decimals =
+    formatOptions && typeof formatOptions.decimals === "number"
+      ? formatOptions.decimals
+      : 12;
 
   useEffect(() => {
     if (!isOpen || !api || !registrarPair) return;
     (async () => {
-      const registrars = (await api.query.identity.registrars()).toHuman() as any[];
+      const registrars = (
+        await api.query.identity.registrars()
+      ).toHuman() as Array<Record<string, unknown>>;
       let index = null;
       if (Array.isArray(registrars)) {
         for (let i = 0; i < registrars.length; i++) {
-          if (registrars[i] && registrars[i].account === registrarPair.address) {
+          if (
+            registrars[i] &&
+            registrars[i].account === registrarPair.address
+          ) {
             index = i;
             break;
           }
@@ -45,7 +57,10 @@ export default function DialogSetRegistrarFee({ isOpen, onClose, registrarPair }
 
   const handleSubmit = async () => {
     if (!api || registrarIndex === null) {
-      toaster.show({ intent: "danger", message: t("Registrar index not found or API unavailable.") });
+      toaster.show({
+        intent: "danger",
+        message: t("Registrar index not found or API unavailable."),
+      });
       return;
     }
     setLoading(true);
@@ -70,7 +85,12 @@ export default function DialogSetRegistrarFee({ isOpen, onClose, registrarPair }
   };
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title={t("Set Registrar Fee")} className="w-[90%] sm:w-[400px]">
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("Set Registrar Fee")}
+      className="w-[90%] sm:w-[400px]"
+    >
       <div className={Classes.DIALOG_BODY}>
         <AmountInput
           disabled={loading}

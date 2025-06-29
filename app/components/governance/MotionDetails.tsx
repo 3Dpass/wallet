@@ -67,7 +67,7 @@ function useTimeRemaining(motion: DeriveCollectiveProposal): {
             votingPeriod = (
               configuredPeriod as unknown as { toNumber: () => number }
             ).toNumber();
-          } catch (e) {
+          } catch (_e) {
             // Fallback to default voting period
           }
         }
@@ -117,7 +117,13 @@ function useTimeRemaining(motion: DeriveCollectiveProposal): {
 }
 
 // Component to display time remaining
-function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
+function TimeRemaining({
+  motion,
+  t,
+}: {
+  motion: DeriveCollectiveProposal;
+  t: (key: string) => string;
+}) {
   const { timeRemaining } = useTimeRemaining(motion);
 
   if (timeRemaining === null) {
@@ -125,7 +131,7 @@ function TimeRemaining({ motion }: { motion: DeriveCollectiveProposal }) {
   }
 
   const display =
-    timeRemaining > 0 ? `${formatTimeLeft(timeRemaining)} left` : "(ended)";
+    timeRemaining > 0 ? `${formatTimeLeft(timeRemaining, t)} left` : "(ended)";
 
   return (
     <div className="flex items-center">
@@ -377,7 +383,7 @@ function StatusBar({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <TimeRemaining motion={motion} />
+            <TimeRemaining motion={motion} t={t} />
             <div className="h-5 w-[1px] bg-gray-300 dark:bg-gray-600" />
             <span className="text-sm text-gray-500">
               {isThresholdReached ? (

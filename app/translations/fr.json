@@ -65,7 +65,12 @@
       "lbl_block": "Bloc",
       "lbl_block_not_finalized": "Non finalisé",
       "lbl_3d_object_not_available": "Objet 3D non disponible",
-      "lbl_object_hash_algo": "Algorithme de hachage d'objet :",
+      "lbl_object_hash_algo": "Algorithme de Hash de l'Objet:",
+      "lbl_block_hash": "Hash du Bloc:",
+      "lbl_block_author": "Auteur du Bloc:",
+      "lbl_block_seal": "Sceau:",
+      "lbl_block_timestamp": "Horodatage:",
+      "lbl_consensus_engine": "Moteur de Consensus:",
       "lbl_btn_kyc": "KYC",
       "lbl_btn_no_kyc": "pas de KYC",
       "lbl_btn_create": "Créer",
@@ -250,7 +255,7 @@
       "my_objects": "Mes objets",
       "search_placeholder": "Rechercher par index, bloc, propriétaire, état, public/privé, approuvé/désapprouvé, ou propriété...",
       "show_all_objects": "Afficher tous les objets",
-      "load_more": "Charger 10 de plus",
+      "load_next": "Charger 10 suivants",
       "no_objects_found": "Aucun objet trouvé.",
       "no_objects_found_account": "Aucun objet trouvé pour votre compte.",
       "object_not_found": "Objet avec index {{index}} non trouvé",
@@ -329,7 +334,7 @@
       "no_preview": "Aucun aperçu",
       "loading": "Chargement...",
       "no_linked_assets": "Aucun actif lié",
-      "view_asset": "Voir l'actif #"
+      "view_asset": "Voir l'actif"
     },
     "asset_actions": {
       "freeze": "Geler l'actif",
@@ -455,6 +460,52 @@
       "api_not_ready": "API non prête",
       "unknown_error": "Erreur inconnue",
       "unknown_error_occurred": "Une erreur inconnue s'est produite"
+    },
+    "utils": {
+      "time_units": {
+        "hours": "h",
+        "minutes": "min",
+        "seconds": "s",
+        "days": "j"
+      },
+      "errors": {
+        "invalid_ss58_address": "Adresse SS58 invalide",
+        "invalid_h160_address": "Adresse H160 invalide",
+        "failed_convert_ss58_to_h160": "Échec de conversion SS58 vers H160 :",
+        "failed_convert_h160_to_ss58": "Échec de conversion H160 vers SS58 :",
+        "failed_decode_author": "Erreur lors du décodage de l'auteur depuis PreRuntime :",
+        "failed_process_digest_log": "Erreur lors du traitement du journal de digest :",
+        "failed_get_timestamp": "Erreur lors de l'obtention de l'horodatage du bloc :",
+        "failed_calculate_reward": "Erreur lors du calcul de la récompense totale du bloc :",
+        "failed_get_reward_info": "Erreur lors de l'obtention des informations de récompense du bloc :",
+        "failed_load_mining_object": "Erreur lors du chargement de l'objet de minage pour le bloc :",
+        "polkadot_extension_unavailable": "Extension Polkadot-dapp non disponible, retour à la signature directe"
+      }
+    },
+    "assets": {
+      "objects": "Objets",
+      "tokens": "Jetons",
+      "name": "Nom",
+      "decimals": "Décimales",
+      "supply": "Offre",
+      "max_supply": "Offre maximale",
+      "min_balance": "Solde minimum",
+      "reserved": "Réservé",
+      "owner": "Propriétaire",
+      "issuer": "Émetteur",
+      "admin": "Administrateur",
+      "freezer": "Geleur",
+      "holders": "Détenteurs",
+      "evm_contract": "Contrat EVM",
+      "property": "Propriété",
+      "select_property": "Sélectionner une propriété",
+      "loading_properties": "Chargement des propriétés...",
+      "hide_details": "Masquer les détails",
+      "show_details": "Afficher les détails",
+      "tokenize": "Tokeniser",
+      "download_obj_file": "Télécharger le fichier OBJ",
+      "object_details": "Détails de l'objet",
+      "token_holders_distribution": "Distribution des détenteurs de jetons"
     }
   }
 }

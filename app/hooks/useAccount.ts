@@ -186,9 +186,14 @@ export function useAccount(pair: KeyringPair) {
           for (const [, judgement] of identity.judgements) {
             const judgementStr = judgement.toString();
             // Consider any non-Unknown judgement as having an identity
-            if (judgementStr === "Reasonable" || judgementStr === "KnownGood" || 
-                judgementStr === "Erroneous" || judgementStr === "OutOfDate" || 
-                judgementStr === "LowQuality" || "FeePaid" in judgement) {
+            if (
+              judgementStr === "Reasonable" ||
+              judgementStr === "KnownGood" ||
+              judgementStr === "Erroneous" ||
+              judgementStr === "OutOfDate" ||
+              judgementStr === "LowQuality" ||
+              "FeePaid" in judgement
+            ) {
               hasIdentity = true;
               break;
             }

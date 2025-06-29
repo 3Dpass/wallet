@@ -80,8 +80,8 @@ export function AccountActions({
           onClick={onDelete}
         />
       )}
-      {!accountLocked && (
-        isRegistrar ? (
+      {!accountLocked &&
+        (isRegistrar ? (
           <>
             <MenuItem
               icon="endorsed"
@@ -100,8 +100,7 @@ export function AccountActions({
             text={t("root.lbl_identity")}
             onClick={() => onIdentity()}
           />
-        )
-      )}
+        ))}
     </>
   );
 }

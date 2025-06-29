@@ -1,15 +1,16 @@
-import React, { useState, useCallback, useEffect } from "react";
-import BaseDialog from "./BaseDialog";
-import { InputGroup, NumericInput, Intent, Icon } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useAtom } from "jotai";
-import { lastSelectedAccountAtom } from "app/atoms";
+import { Icon, InputGroup, Intent, NumericInput } from "@blueprintjs/core";
 import keyring from "@polkadot/ui-keyring";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useApi } from "app/components/Api";
 import { signAndSend } from "app/utils/sign";
-import useToaster from "../../hooks/useToaster";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import useToaster from "../../hooks/useToaster";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
+import BaseDialog from "./BaseDialog";
 
 interface DialogForceTransferProps {
   isOpen: boolean;
@@ -17,7 +18,11 @@ interface DialogForceTransferProps {
   assetId: number;
 }
 
-export default function DialogForceTransfer({ isOpen, onClose, assetId }: DialogForceTransferProps) {
+export default function DialogForceTransfer({
+  isOpen,
+  onClose,
+  assetId,
+}: DialogForceTransferProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
@@ -31,13 +36,19 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
   const [isDestValid, setIsDestValid] = useState(false);
 
   // Memoized callbacks for event handlers
-  const handleSourceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSource(e.target.value);
-  }, []);
+  const handleSourceChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSource(e.target.value);
+    },
+    []
+  );
 
-  const handleDestChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setDest(e.target.value);
-  }, []);
+  const handleDestChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setDest(e.target.value);
+    },
+    []
+  );
 
   const handleAmountChange = useCallback((value: number | string) => {
     setAmount(Number(value));
@@ -53,29 +64,34 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
   useEffect(() => {
     const sourceValid = isSourceValid && source.trim() !== "";
     const destValid = isDestValid && dest.trim() !== "";
-    const amountValid = amount !== undefined && !isNaN(amount) && amount > 0;
+    const amountValid =
+      amount !== undefined && !Number.isNaN(amount) && amount > 0;
     setCanSubmit(api !== undefined && sourceValid && destValid && amountValid);
   }, [api, isSourceValid, isDestValid, source, dest, amount]);
 
-  const handleSignAndSendCallback = useCallback(({ status }: { status: { isInBlock: boolean } }) => {
-    if (!status.isInBlock) return;
-    toaster.show({
-      icon: "endorsed",
-      intent: Intent.SUCCESS,
-      message: t("dlg_asset.force_transfer_success") || "Force transfer successful!"
-    });
-    onClose();
-  }, [toaster, t, onClose]);
+  const handleSignAndSendCallback = useCallback(
+    ({ status }: { status: { isInBlock: boolean } }) => {
+      if (!status.isInBlock) return;
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message:
+          t("dlg_asset.force_transfer_success") || "Force transfer successful!",
+      });
+      onClose();
+    },
+    [toaster, t, onClose]
+  );
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
     try {
-      if (selectedAccount && selectedAccount.trim() !== '') {
+      if (selectedAccount && selectedAccount.trim() !== "") {
         return keyring.getPair(selectedAccount);
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get keyring pair:', error);
+      console.warn("Failed to get keyring pair:", error);
       return null;
     }
   })();
@@ -85,15 +101,24 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "API not ready"
+        message: "API not ready",
       });
       return;
     }
-    if (!selectedAccount || !source || !dest || amount === undefined || isNaN(amount) || amount <= 0) {
+    if (
+      !selectedAccount ||
+      !source ||
+      !dest ||
+      amount === undefined ||
+      Number.isNaN(amount) ||
+      amount <= 0
+    ) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+        message:
+          t("messages.lbl_fill_required_fields") ||
+          "Please fill all required fields.",
       });
       return;
     }
@@ -101,7 +126,8 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_invalid_address") || "Please enter valid addresses."
+        message:
+          t("messages.lbl_invalid_address") || "Please enter valid addresses.",
       });
       return;
     }
@@ -109,7 +135,9 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+        message:
+          t("messages.lbl_no_account_selected") ||
+          "No account selected or unable to get keyring pair.",
       });
       return;
     }
@@ -118,7 +146,7 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_account_locked") || "Account is locked."
+        message: t("messages.lbl_account_locked") || "Account is locked.",
       });
       return;
     }
@@ -183,7 +211,9 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
         />
         <InputGroup
           fill
-          placeholder={t("dlg_asset.force_transfer_dest") || "Destination address"}
+          placeholder={
+            t("dlg_asset.force_transfer_dest") || "Destination address"
+          }
           value={dest}
           onChange={handleDestChange}
           required
@@ -203,4 +233,4 @@ export default function DialogForceTransfer({ isOpen, onClose, assetId }: Dialog
       </div>
     </BaseDialog>
   );
-} 
+}

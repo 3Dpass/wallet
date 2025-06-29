@@ -25,7 +25,7 @@ export default function GovernanceMotions() {
   const [votingLoading, setVotingLoading] = useState<{
     [key: string]: boolean;
   }>({});
-  const [selectedAddress, setSelectedAddress] = useAtom(
+  const [selectedAddress, _setSelectedAddress] = useAtom(
     lastSelectedAccountAtom
   );
   const [isMockMode, setIsMockMode] = useState(false);
@@ -123,7 +123,7 @@ export default function GovernanceMotions() {
     return councilMemberAddresses.includes(address);
   };
 
-  const hasVoted = (motion: DeriveCollectiveProposal, address: string) => {
+  const _hasVoted = (motion: DeriveCollectiveProposal, address: string) => {
     if (!motion.votes) return false;
 
     if (isMockMode) {

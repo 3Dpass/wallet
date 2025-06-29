@@ -127,7 +127,7 @@ export default function NetworkState() {
         />
         <TitledValue
           title={t("root.lbl_target")}
-          value={formatDuration(networkState.targetBlockTime)}
+          value={formatDuration(networkState.targetBlockTime, t)}
         />
         <TitledValue
           title={t("root.lbl_total_issuance")}

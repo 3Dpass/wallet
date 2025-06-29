@@ -1,9 +1,9 @@
 import { Button, Spinner } from "@blueprintjs/core";
 import { type ItemRenderer, Select } from "@blueprintjs/select";
+import keyring from "@polkadot/ui-keyring";
 import { AccountName } from "app/components/common/AccountName";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import keyring from "@polkadot/ui-keyring";
 
 interface AddressSelectProps {
   onAddressChange: (address: string | null) => void;
@@ -41,6 +41,8 @@ const renderAddressWithMetadata = (
     return (
       <div
         key={address}
+        role="menuitem"
+        tabIndex={0}
         onClick={handleClick}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -48,7 +50,6 @@ const renderAddressWithMetadata = (
             handleClick(e as unknown as React.MouseEvent<HTMLElement>);
           }
         }}
-        aria-selected={modifiers.active}
         className={`w-full text-left px-3 py-2 cursor-pointer hover:bg-gray-600 ${modifiers.active ? "bg-gray-600" : ""}`}
       >
         {renderAddressContent(address, metadata)}
@@ -73,7 +74,7 @@ export function AddressSelect({
       const storedAddress = localStorage.getItem("lastSelectedAccount_v1");
       if (!storedAddress) {
         // Try to find an injected account first (your accounts)
-        const injectedAccount = addresses.find(address => {
+        const injectedAccount = addresses.find((address) => {
           try {
             const pair = keyring.getPair(address);
             return pair.meta.isInjected;
@@ -81,7 +82,7 @@ export function AddressSelect({
             return false;
           }
         });
-        
+
         // If no injected account found, use the first account
         const defaultAccount = injectedAccount || addresses[0];
         onAddressChange(defaultAccount);

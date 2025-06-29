@@ -1,14 +1,14 @@
-import { Dialog, Classes, Button, Intent } from "@blueprintjs/core";
-import { useState, useMemo, useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import { useApi } from "../Api";
-import useToaster from "../../hooks/useToaster";
-import { signAndSend } from "../../utils/sign";
+import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import AmountInput from "../common/AmountInput";
 import { useAtomValue } from "jotai";
+import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { formatOptionsAtom } from "../../atoms";
+import useToaster from "../../hooks/useToaster";
 import { ss58ToH160 } from "../../utils/converter";
+import { signAndSend } from "../../utils/sign";
+import { useApi } from "../Api";
+import AmountInput from "../common/AmountInput";
 
 interface DialogEvmWithdrawProps {
   isOpen: boolean;
@@ -16,25 +16,39 @@ interface DialogEvmWithdrawProps {
   pair: KeyringPair;
 }
 
-function WithdrawDescription({ pair, h160Address }: { pair: KeyringPair; h160Address: string }) {
+function WithdrawDescription({
+  pair,
+  h160Address,
+}: {
+  pair: KeyringPair;
+  h160Address: string;
+}) {
   const { t } = useTranslation();
-  
+
   return (
     <div className="mb-4">
       <p className="text-sm text-gray-300 mb-2">
         {t("dlg_evm_withdraw.lbl_description")}
       </p>
       <p className="text-xs text-gray-400">
-        {t("dlg_evm_withdraw.lbl_address")}: <code className="text-xs">{pair.address}</code>
+        {t("dlg_evm_withdraw.lbl_address")}:{" "}
+        <code className="text-xs">{pair.address}</code>
       </p>
       <p className="text-xs text-gray-400">
-        {t("dlg_evm_withdraw.lbl_h160")}: <code className="text-xs">{h160Address}</code>
+        {t("dlg_evm_withdraw.lbl_h160")}:{" "}
+        <code className="text-xs">{h160Address}</code>
       </p>
     </div>
   );
 }
 
-function DialogFooter({ onClose, loading, amount, h160Address, onSubmit }: {
+function DialogFooter({
+  onClose,
+  loading,
+  amount,
+  h160Address,
+  onSubmit,
+}: {
   onClose: () => void;
   loading: boolean;
   amount: string;
@@ -42,7 +56,7 @@ function DialogFooter({ onClose, loading, amount, h160Address, onSubmit }: {
   onSubmit: () => void;
 }) {
   const { t } = useTranslation();
-  
+
   return (
     <div className={Classes.DIALOG_FOOTER}>
       <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -60,14 +74,21 @@ function DialogFooter({ onClose, loading, amount, h160Address, onSubmit }: {
   );
 }
 
-export default function DialogEvmWithdraw({ isOpen, onClose, pair }: DialogEvmWithdrawProps) {
+export default function DialogEvmWithdraw({
+  isOpen,
+  onClose,
+  pair,
+}: DialogEvmWithdrawProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const formatOptions = useAtomValue(formatOptionsAtom);
-  const decimals = formatOptions && typeof formatOptions.decimals === "number" ? formatOptions.decimals : 12;
+  const decimals =
+    formatOptions && typeof formatOptions.decimals === "number"
+      ? formatOptions.decimals
+      : 12;
 
   // Memoize the H160 address to avoid recalculating on every render
   const h160Address = useMemo(() => {
@@ -78,9 +99,12 @@ export default function DialogEvmWithdraw({ isOpen, onClose, pair }: DialogEvmWi
     return ss58ToH160(pair.address, ss58Format);
   }, [pair.address, api]);
 
-  const handleAmountChange = useCallback((_valueAsNumber: number, valueAsString: string) => {
-    setAmount(valueAsString);
-  }, []);
+  const handleAmountChange = useCallback(
+    (_valueAsNumber: number, valueAsString: string) => {
+      setAmount(valueAsString);
+    },
+    []
+  );
 
   const handleSubmit = useCallback(async () => {
     if (!api) {
@@ -90,25 +114,36 @@ export default function DialogEvmWithdraw({ isOpen, onClose, pair }: DialogEvmWi
     setLoading(true);
     try {
       // Convert P3D to min units without precision loss
-      const [integer, fraction = ''] = amount.split('.');
-      const paddedFraction = fraction.padEnd(decimals, '0');
+      const [integer, fraction = ""] = amount.split(".");
+      const paddedFraction = fraction.padEnd(decimals, "0");
       const truncatedFraction = paddedFraction.slice(0, decimals);
-      const amountInMinUnits = BigInt((integer || '0') + truncatedFraction);
-      
+      const amountInMinUnits = BigInt((integer || "0") + truncatedFraction);
+
       const tx = api.tx.evm.withdraw(h160Address, amountInMinUnits.toString());
       await signAndSend(tx, pair);
-      toaster.show({ intent: "success", message: t("EVM withdrawal initiated!") });
+      toaster.show({
+        intent: "success",
+        message: t("EVM withdrawal initiated!"),
+      });
       setLoading(false);
       onClose();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      toaster.show({ intent: "danger", message: t("Failed to withdraw from EVM: ") + message });
+      toaster.show({
+        intent: "danger",
+        message: t("Failed to withdraw from EVM: ") + message,
+      });
       setLoading(false);
     }
   }, [api, amount, decimals, h160Address, onClose, pair, t, toaster]);
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title={t("dlg_evm_withdraw.lbl_title")} className="w-[90%] sm:w-[400px]">
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("dlg_evm_withdraw.lbl_title")}
+      className="w-[90%] sm:w-[400px]"
+    >
       <div className={Classes.DIALOG_BODY}>
         <WithdrawDescription pair={pair} h160Address={h160Address} />
         <AmountInput
@@ -127,4 +162,4 @@ export default function DialogEvmWithdraw({ isOpen, onClose, pair }: DialogEvmWi
       />
     </Dialog>
   );
-} 
+}

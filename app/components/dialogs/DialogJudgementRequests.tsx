@@ -1,13 +1,20 @@
-import { Dialog, Classes, Button, Intent, Spinner, InputGroup } from "@blueprintjs/core";
+import {
+  Button,
+  Classes,
+  Dialog,
+  InputGroup,
+  Intent,
+  Spinner,
+} from "@blueprintjs/core";
+import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useApi } from "../Api";
-import UserCard, { IPalletIdentityRegistrarInfo } from "../common/UserCard";
-import type { KeyringPair } from "@polkadot/keyring/types";
-import type { AnyJson } from "@polkadot/types/types";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
-import { FormattedAmount } from "../common/FormattedAmount";
+import { useApi } from "../Api";
+import UserCard, {
+  type IPalletIdentityRegistrarInfo,
+} from "../common/UserCard";
 
 interface DialogJudgementRequestsProps {
   isOpen: boolean;
@@ -38,16 +45,24 @@ interface Registrar {
   [key: string]: unknown;
 }
 
-export default function DialogJudgementRequests({ isOpen, onClose, registrarPair }: DialogJudgementRequestsProps) {
+export default function DialogJudgementRequests({
+  isOpen,
+  onClose,
+  registrarPair,
+}: DialogJudgementRequestsProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
   const [loading, setLoading] = useState(false);
   const [identities, setIdentities] = useState<IdentityWithAddress[]>([]);
-  const [submitting, setSubmitting] = useState<{ [key: string]: "provide" | "reject" | null }>({});
+  const [submitting, setSubmitting] = useState<{
+    [key: string]: "provide" | "reject" | null;
+  }>({});
   const [search, setSearch] = useState("");
   const [registrarIndex, setRegistrarIndex] = useState<number | null>(null);
-  const [judgementLevels, setJudgementLevels] = useState<{ [address: string]: string }>({});
+  const [judgementLevels, setJudgementLevels] = useState<{
+    [address: string]: string;
+  }>({});
 
   const judgementOptions = [
     "Unknown",
@@ -55,7 +70,7 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
     "KnownGood",
     "Erroneous",
     "LowQuality",
-    "OutOfDate"
+    "OutOfDate",
   ];
 
   const handleJudgementChange = (address: string, value: string) => {
@@ -67,7 +82,9 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
     setLoading(true);
     (async () => {
       // Fetch all registrars and find the index for the current registrar
-      const registrars = (await api.query.identity.registrars()).toHuman() as Registrar[];
+      const registrars = (
+        await api.query.identity.registrars()
+      ).toHuman() as Registrar[];
       let index = null;
       if (Array.isArray(registrars)) {
         for (let i = 0; i < registrars.length; i++) {
@@ -91,9 +108,13 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
           const hasRequest = identity.judgements.some(([regIdx, judgement]) => {
             // Convert both to string for comparison
             if (regIdx == null || typeof regIdx === "object") return false;
-            if (parseInt(regIdx.toString()) !== index) return false;
+            if (Number.parseInt(regIdx.toString()) !== index) return false;
             // Check if judgement is an object with FeePaid
-            return judgement && typeof judgement === "object" && "FeePaid" in judgement;
+            return (
+              judgement &&
+              typeof judgement === "object" &&
+              "FeePaid" in judgement
+            );
           });
           return hasRequest ? { address, identity } : null;
         })
@@ -105,13 +126,20 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
 
   const handleSubmitJudgement = async (address: string) => {
     if (!api || registrarIndex === null) {
-      toaster.show({ intent: "danger", message: t("Registrar index not found or API unavailable.") });
+      toaster.show({
+        intent: "danger",
+        message: t("Registrar index not found or API unavailable."),
+      });
       return;
     }
     const judgement = judgementLevels[address] || "Reasonable";
     setSubmitting((prev) => ({ ...prev, [address]: "provide" }));
     try {
-      const tx = api.tx.identity.provideJudgement(registrarIndex, address, judgement);
+      const tx = api.tx.identity.provideJudgement(
+        registrarIndex,
+        address,
+        judgement
+      );
       await signAndSend(tx, registrarPair, {}, ({ status, isError }) => {
         if (isError) {
           setSubmitting((prev) => ({ ...prev, [address]: null }));
@@ -119,7 +147,10 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
         }
 
         if (status.isInBlock) {
-          toaster.show({ intent: "success", message: t("Judgement submitted!") });
+          toaster.show({
+            intent: "success",
+            message: t("Judgement submitted!"),
+          });
           setSubmitting((prev) => ({ ...prev, [address]: null }));
         }
       });
@@ -152,7 +183,10 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
     return false;
   });
 
-  const convertToRegistrarInfo = (address: string, identity: Identity): IPalletIdentityRegistrarInfo => {
+  const convertToRegistrarInfo = (
+    address: string,
+    identity: Identity
+  ): IPalletIdentityRegistrarInfo => {
     return {
       account: address,
       fee: "0",
@@ -164,41 +198,58 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
         web: { Raw: identity.info?.web?.Raw || "" },
         twitter: { Raw: identity.info?.twitter?.Raw || "" },
         image: { Raw: "" },
-        additional: (identity.info?.additional || []).map(
-          (item) => [item?.[0] || { Raw: '' }, item?.[1] || { Raw: '' }]
-        )
+        additional: (identity.info?.additional || []).map((item) => [
+          item?.[0] || { Raw: "" },
+          item?.[1] || { Raw: "" },
+        ]),
       },
-      judgements: identity.judgements.map(([regIdx, judgement]) => [regIdx.toString(), judgement]) as object[][]
+      judgements: identity.judgements.map(([regIdx, judgement]) => [
+        regIdx.toString(),
+        judgement,
+      ]) as object[][],
     };
   };
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title={t("root.lbl_judgements_requests") || "Judgement requests"} className="w-[90%] sm:w-[732px]">
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("root.lbl_judgements_requests") || "Judgement requests"}
+      className="w-[90%] sm:w-[732px]"
+    >
       <div className={Classes.DIALOG_BODY}>
         <InputGroup
           leftIcon="search"
           placeholder={t("Search by address, name, email...")}
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           className="mb-4"
         />
         {loading ? (
           <Spinner />
         ) : (
           <div className="flex flex-col gap-3">
-            {filteredIdentities.length === 0 && <div>{t("No pending requests")}</div>}
+            {filteredIdentities.length === 0 && (
+              <div>{t("No pending requests")}</div>
+            )}
             {filteredIdentities.map(({ address, identity }) => (
               <div key={address} className="p-2 rounded">
-                <UserCard registrarInfo={convertToRegistrarInfo(address, identity)} />
+                <UserCard
+                  registrarInfo={convertToRegistrarInfo(address, identity)}
+                />
                 <div className="flex gap-2 mt-2 items-center">
                   <select
                     className="border rounded px-4 py-2 text-base h-10"
                     style={{ minWidth: 160 }}
                     value={judgementLevels[address] || "Reasonable"}
-                    onChange={e => handleJudgementChange(address, e.target.value)}
+                    onChange={(e) =>
+                      handleJudgementChange(address, e.target.value)
+                    }
                   >
-                    {judgementOptions.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
+                    {judgementOptions.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
                     ))}
                   </select>
                   <Button
@@ -223,4 +274,4 @@ export default function DialogJudgementRequests({ isOpen, onClose, registrarPair
       </div>
     </Dialog>
   );
-} 
+}

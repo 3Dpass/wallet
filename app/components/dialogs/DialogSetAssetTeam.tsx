@@ -1,15 +1,16 @@
-import React, { useState, useCallback, useEffect } from "react";
-import BaseDialog from "./BaseDialog";
-import { InputGroup, Intent, Icon } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useAtom } from "jotai";
-import { lastSelectedAccountAtom } from "app/atoms";
+import { Icon, InputGroup, Intent } from "@blueprintjs/core";
 import keyring from "@polkadot/ui-keyring";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useApi } from "app/components/Api";
 import { signAndSend } from "app/utils/sign";
-import useToaster from "../../hooks/useToaster";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import useToaster from "../../hooks/useToaster";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
+import BaseDialog from "./BaseDialog";
 
 interface DialogSetAssetTeamProps {
   isOpen: boolean;
@@ -17,7 +18,11 @@ interface DialogSetAssetTeamProps {
   assetId: number;
 }
 
-export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogSetAssetTeamProps) {
+export default function DialogSetAssetTeam({
+  isOpen,
+  onClose,
+  assetId,
+}: DialogSetAssetTeamProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
@@ -34,17 +39,26 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
   const [isFreezerValid, setIsFreezerValid] = useState(false);
 
   // Memoized callbacks for JSX props
-  const handleIssuerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setIssuer(e.target.value);
-  }, []);
+  const handleIssuerChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setIssuer(e.target.value);
+    },
+    []
+  );
 
-  const handleAdminChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setAdmin(e.target.value);
-  }, []);
+  const handleAdminChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setAdmin(e.target.value);
+    },
+    []
+  );
 
-  const handleFreezerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setFreezer(e.target.value);
-  }, []);
+  const handleFreezerChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFreezer(e.target.value);
+    },
+    []
+  );
 
   // Validate addresses whenever they change
   useEffect(() => {
@@ -56,19 +70,28 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
   // Update submit button state
   useEffect(() => {
     const allAddressesValid = isIssuerValid && isAdminValid && isFreezerValid;
-    const allFieldsFilled = issuer.trim() !== "" && admin.trim() !== "" && freezer.trim() !== "";
+    const allFieldsFilled =
+      issuer.trim() !== "" && admin.trim() !== "" && freezer.trim() !== "";
     setCanSubmit(api !== undefined && allAddressesValid && allFieldsFilled);
-  }, [api, isIssuerValid, isAdminValid, isFreezerValid, issuer, admin, freezer]);
+  }, [
+    api,
+    isIssuerValid,
+    isAdminValid,
+    isFreezerValid,
+    issuer,
+    admin,
+    freezer,
+  ]);
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
     try {
-      if (selectedAccount && selectedAccount.trim() !== '') {
+      if (selectedAccount && selectedAccount.trim() !== "") {
         return keyring.getPair(selectedAccount);
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get keyring pair:', error);
+      console.warn("Failed to get keyring pair:", error);
       return null;
     }
   })();
@@ -78,7 +101,7 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "API not ready"
+        message: "API not ready",
       });
       return;
     }
@@ -86,7 +109,9 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+        message:
+          t("messages.lbl_fill_required_fields") ||
+          "Please fill all required fields.",
       });
       return;
     }
@@ -94,7 +119,8 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_invalid_address") || "Please enter valid addresses."
+        message:
+          t("messages.lbl_invalid_address") || "Please enter valid addresses.",
       });
       return;
     }
@@ -102,7 +128,9 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+        message:
+          t("messages.lbl_no_account_selected") ||
+          "No account selected or unable to get keyring pair.",
       });
       return;
     }
@@ -111,25 +139,20 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_account_locked") || "Account is locked."
+        message: t("messages.lbl_account_locked") || "Account is locked.",
       });
       return;
     }
     setLoading(true);
     try {
       // Compose the extrinsic
-      const tx = api.tx.poscanAssets.setTeam(
-        assetId,
-        issuer,
-        admin,
-        freezer
-      );
+      const tx = api.tx.poscanAssets.setTeam(assetId, issuer, admin, freezer);
       signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: t("dlg_asset.team_set_success") || "Team set successfully!"
+          message: t("dlg_asset.team_set_success") || "Team set successfully!",
         });
         onClose();
       });
@@ -206,4 +229,4 @@ export default function DialogSetAssetTeam({ isOpen, onClose, assetId }: DialogS
       </div>
     </BaseDialog>
   );
-} 
+}

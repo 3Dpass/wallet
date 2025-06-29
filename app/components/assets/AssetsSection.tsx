@@ -1,39 +1,52 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
-import AssetsMenu from './AssetsMenu';
-import { AddressSelect } from '../governance/AddressSelect';
-import { useAtom } from 'jotai';
-import { lastSelectedAccountAtom } from 'app/atoms';
-import { useAccounts, useApi, useKeyringLoaded } from 'app/components/Api';
-import { Container } from '../common/Container';
-import { FormattedAmount } from '../common/FormattedAmount';
-import { Spinner } from '@blueprintjs/core';
+import { Spinner } from "@blueprintjs/core";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useAccounts, useApi, useKeyringLoaded } from "app/components/Api";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Container } from "../common/Container";
+import { FormattedAmount } from "../common/FormattedAmount";
+import { AddressSelect } from "../governance/AddressSelect";
+import AssetsMenu from "./AssetsMenu";
 
 interface AssetsSectionProps {
   children: React.ReactNode;
 }
 
 export default function AssetsSection({ children }: AssetsSectionProps) {
-  const [selectedAccount, setSelectedAccount] = useAtom(lastSelectedAccountAtom);
+  const [selectedAccount, setSelectedAccount] = useAtom(
+    lastSelectedAccountAtom
+  );
   const accountObjects = useAccounts();
-  const accounts = useMemo(() => accountObjects.map((account) => account.address), [accountObjects]);
+  const accounts = useMemo(
+    () => accountObjects.map((account) => account.address),
+    [accountObjects]
+  );
   const api = useApi();
   const keyringLoaded = useKeyringLoaded();
-  const [accountBalances, setAccountBalances] = useState<Record<string, bigint>>({});
+  const [accountBalances, setAccountBalances] = useState<
+    Record<string, bigint>
+  >({});
   const [balancesLoading, setBalancesLoading] = useState(false);
   const fetchingRef = useRef(false);
 
   // Fetch balances for all accounts
   useEffect(() => {
-    if (!api || !keyringLoaded || accounts.length === 0 || fetchingRef.current) {
+    if (
+      !api ||
+      !keyringLoaded ||
+      accounts.length === 0 ||
+      fetchingRef.current
+    ) {
       return;
     }
 
     fetchingRef.current = true;
     setBalancesLoading(true);
-    
+
     const fetchBalances = async () => {
       const balances: Record<string, bigint> = {};
-      
+
       try {
         await Promise.all(
           accounts.map(async (address) => {
@@ -48,7 +61,7 @@ export default function AssetsSection({ children }: AssetsSectionProps) {
         );
         setAccountBalances(balances);
       } catch (error) {
-        console.error('Failed to fetch account balances:', error);
+        console.error("Failed to fetch account balances:", error);
       } finally {
         setBalancesLoading(false);
         fetchingRef.current = false;
@@ -80,7 +93,7 @@ export default function AssetsSection({ children }: AssetsSectionProps) {
     accounts,
     selectedAccount,
     setSelectedAccount,
-    accountMetadata
+    accountMetadata,
   }: {
     accounts: string[];
     selectedAccount: string | null;
@@ -89,7 +102,9 @@ export default function AssetsSection({ children }: AssetsSectionProps) {
   }) {
     return (
       <div className="flex items-center gap-2">
-        <div className="font-medium whitespace-nowrap hidden sm:block">Account:</div>
+        <div className="font-medium whitespace-nowrap hidden sm:block">
+          Account:
+        </div>
         <AddressSelect
           onAddressChange={setSelectedAccount}
           selectedAddress={selectedAccount}
@@ -117,4 +132,4 @@ export default function AssetsSection({ children }: AssetsSectionProps) {
       </div>
     </Container>
   );
-} 
+}

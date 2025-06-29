@@ -1,16 +1,18 @@
-import React, { useState, useCallback, useEffect } from "react";
-import BaseDialog from "./BaseDialog";
-import { InputGroup, Intent, Switch, Icon } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useAtom } from "jotai";
-import { lastSelectedAccountAtom } from "app/atoms";
-import keyring from "@polkadot/ui-keyring";
-import { signAndSend } from "app/utils/sign";
-import useToaster from "../../hooks/useToaster";
-import { useTranslation } from "react-i18next";
+import { Icon, InputGroup, Intent, Switch } from "@blueprintjs/core";
 import type { SubmittableResult } from "@polkadot/api";
+import type { SubmittableExtrinsic } from "@polkadot/api/types";
+import keyring from "@polkadot/ui-keyring";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useApi } from "app/components/Api";
+import { signAndSend } from "app/utils/sign";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import useToaster from "../../hooks/useToaster";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
+import BaseDialog from "./BaseDialog";
 
 interface DialogFreezeAssetProps {
   isOpen: boolean;
@@ -18,7 +20,11 @@ interface DialogFreezeAssetProps {
   assetId: number;
 }
 
-export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFreezeAssetProps) {
+export default function DialogFreezeAsset({
+  isOpen,
+  onClose,
+  assetId,
+}: DialogFreezeAssetProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
@@ -31,12 +37,15 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
 
   // Memoized callbacks for JSX props
   const handleFreezeAssetToggle = useCallback(() => {
-    setFreezeAsset(prev => !prev);
+    setFreezeAsset((prev) => !prev);
   }, []);
 
-  const handleWhoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setWho(e.target.value);
-  }, []);
+  const handleWhoChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setWho(e.target.value);
+    },
+    []
+  );
 
   // Validate address whenever it changes
   useEffect(() => {
@@ -55,27 +64,30 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
     }
   }, [api, freezeAsset, isWhoValid, who]);
 
-  const handleSignAndSendCallback = useCallback((result: SubmittableResult) => {
-    if (!result.isInBlock) return;
-    toaster.show({
-      icon: "endorsed",
-      intent: Intent.SUCCESS,
-      message: freezeAsset
-        ? t("dlg_asset.freeze_asset_success") || "Asset frozen successfully!"
-        : t("dlg_asset.freeze_success") || "Tokens frozen successfully!"
-    });
-    onClose();
-  }, [toaster, t, freezeAsset, onClose]);
+  const handleSignAndSendCallback = useCallback(
+    (result: SubmittableResult) => {
+      if (!result.isInBlock) return;
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: freezeAsset
+          ? t("dlg_asset.freeze_asset_success") || "Asset frozen successfully!"
+          : t("dlg_asset.freeze_success") || "Tokens frozen successfully!",
+      });
+      onClose();
+    },
+    [toaster, t, freezeAsset, onClose]
+  );
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
     try {
-      if (selectedAccount && selectedAccount.trim() !== '') {
+      if (selectedAccount && selectedAccount.trim() !== "") {
         return keyring.getPair(selectedAccount);
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get keyring pair:', error);
+      console.warn("Failed to get keyring pair:", error);
       return null;
     }
   })();
@@ -85,7 +97,7 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "API not ready"
+        message: "API not ready",
       });
       return;
     }
@@ -93,7 +105,9 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+        message:
+          t("messages.lbl_fill_required_fields") ||
+          "Please fill all required fields.",
       });
       return;
     }
@@ -101,7 +115,8 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_invalid_address") || "Please enter a valid address."
+        message:
+          t("messages.lbl_invalid_address") || "Please enter a valid address.",
       });
       return;
     }
@@ -109,7 +124,9 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+        message:
+          t("messages.lbl_no_account_selected") ||
+          "No account selected or unable to get keyring pair.",
       });
       return;
     }
@@ -118,13 +135,13 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_account_locked") || "Account is locked."
+        message: t("messages.lbl_account_locked") || "Account is locked.",
       });
       return;
     }
     setLoading(true);
     try {
-      let tx;
+      let tx: SubmittableExtrinsic<"promise">;
       if (freezeAsset) {
         tx = api.tx.poscanAssets.freezeAsset(assetId);
       } else {
@@ -161,7 +178,9 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       onClose={onClose}
       title={t("dlg_asset.freeze_title") || "Freeze"}
       primaryButton={{
-        text: freezeAsset ? (t("dlg_asset.freeze_asset_btn") || "Freeze Asset") : (t("dlg_asset.freeze_btn") || "Freeze"),
+        text: freezeAsset
+          ? t("dlg_asset.freeze_asset_btn") || "Freeze Asset"
+          : t("dlg_asset.freeze_btn") || "Freeze",
         icon: "snowflake",
         onClick: handleSubmit,
         intent: "primary",
@@ -191,4 +210,4 @@ export default function DialogFreezeAsset({ isOpen, onClose, assetId }: DialogFr
       </div>
     </BaseDialog>
   );
-} 
+}

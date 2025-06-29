@@ -1,8 +1,7 @@
 import { Button, Classes, Dialog, Intent } from "@blueprintjs/core";
+import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useEffect, useState } from "react";
-
-import type { SignerOptions } from "@polkadot/api/types";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";

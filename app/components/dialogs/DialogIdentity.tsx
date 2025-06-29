@@ -1,9 +1,7 @@
 import { Button, Classes, Dialog, InputGroup, Intent } from "@blueprintjs/core";
+import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
 import { useState } from "react";
-
-import type { SignerOptions } from "@polkadot/api/types";
-import type { Codec } from "@polkadot/types/types";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
@@ -39,7 +37,7 @@ type ICandidateInfo = {
 };
 
 type IdentityInfo = {
-  [key: string]: { Raw: string } | [[{ Raw: string }, { Raw: string }]];
+  [key: string]: { Raw: string } | Array<[{ Raw: string }, { Raw: string }]>;
 };
 
 type IIdentityData = {
@@ -94,7 +92,7 @@ export default function DialogIdentity({
       return;
     }
     const registrarList: IPalletIdentityRegistrarInfo[] = [];
-    let regIndexCurrent: number | null = null;
+    const _regIndexCurrent: number | null = null;
     let i = 0;
     for (const r of registrars) {
       // Skip suspended registrars
@@ -112,14 +110,18 @@ export default function DialogIdentity({
       // User has identity, try to pre-select their current registrar
       const identityInfo = (
         await api.query.identity.identityOf(pair.address)
-      ).toHuman() as any;
+      ).toHuman() as IPalletIdentityRegistrarInfo;
       let registrarData: IPalletIdentityRegistrarInfo | null = null;
       if (identityInfo?.judgements && Array.isArray(identityInfo.judgements)) {
         // Find the first registrar with a judgement (if any)
-        const firstJudgement = identityInfo.judgements.find((j: any) => Array.isArray(j) && typeof j[0] === 'number');
-        if (firstJudgement) {
-          const regIndex = firstJudgement[0];
-          registrarData = registrarList.find(r => r.regIndex === regIndex) || null;
+        const firstJudgement = identityInfo.judgements.find(
+          (j: unknown) =>
+            Array.isArray(j) && j.length > 0 && typeof j[0] === "number"
+        );
+        if (firstJudgement && Array.isArray(firstJudgement)) {
+          const regIndex = firstJudgement[0] as unknown as number;
+          registrarData =
+            registrarList.find((r) => r.regIndex === regIndex) || null;
         }
       }
       setData((prev) => ({
@@ -150,7 +152,7 @@ export default function DialogIdentity({
     setIsIdentityLoading(true);
     try {
       const candidateData = {} as IdentityInfo;
-      const additionalFields: [[{ Raw: string }, { Raw: string }]] = [] as any;
+      const additionalFields: Array<[{ Raw: string }, { Raw: string }]> = [];
       for (const [key, value] of Object.entries(dataState.candidateInfo)) {
         if (value !== null) {
           if (key === "discord") {
@@ -166,7 +168,7 @@ export default function DialogIdentity({
           } else if (key === "custom") {
             additionalFields.push([{ Raw: "Custom" }, { Raw: value }]);
           } else if (key === "pgpFingerprint") {
-            (candidateData as any).pgpFingerprint = value;
+            (candidateData as Record<string, unknown>).pgpFingerprint = value;
           } else {
             candidateData[key] = { Raw: value };
           }
@@ -191,7 +193,9 @@ export default function DialogIdentity({
             return;
           }
           let success = false;
-          for (const { event: { method, section } } of events) {
+          for (const {
+            event: { method, section },
+          } of events) {
             if (section === "system" && method === "ExtrinsicSuccess") {
               success = true;
             }
@@ -299,7 +303,9 @@ export default function DialogIdentity({
                       #{registrar.regIndex} Fee:{registrar.info?.display?.Raw}
                     </span>
                     <FormattedAmount
-                      value={Number.parseInt(registrar.fee?.replace(re, "") || "0")}
+                      value={Number.parseInt(
+                        registrar.fee?.replace(re, "") || "0"
+                      )}
                       unit="P3D"
                     />
                   </div>,
@@ -404,7 +410,11 @@ export default function DialogIdentity({
                   small
                   icon={showAdditionalFields ? "chevron-up" : "chevron-down"}
                   onClick={() => setShowAdditionalFields(!showAdditionalFields)}
-                  text={showAdditionalFields ? "Hide additional fields" : "Show additional fields"}
+                  text={
+                    showAdditionalFields
+                      ? "Hide additional fields"
+                      : "Show additional fields"
+                  }
                 />
                 {showAdditionalFields && (
                   <>
@@ -499,64 +509,123 @@ export default function DialogIdentity({
             )}
           </>
         )}
-        {!isRegistrar && hasIdentity && dataState.identityData && !showUpdateForm && (
-          (function() {
+        {!isRegistrar &&
+          hasIdentity &&
+          dataState.identityData &&
+          !showUpdateForm &&
+          (() => {
             // Only check for FeePaid status for Cancel Request button
             let showCancelRequest = false;
             let registrarIndex = null;
-            if (dataState.identityData && Array.isArray(dataState.identityData.judgements)) {
-              for (const [regIdx, judgement] of dataState.identityData.judgements) {
+            if (
+              dataState.identityData &&
+              Array.isArray(dataState.identityData.judgements)
+            ) {
+              for (const [regIdx, judgement] of dataState.identityData
+                .judgements) {
                 // regIdx can be string or number
-                const idx = typeof regIdx === 'string' ? parseInt(regIdx) : regIdx;
-                if (judgement && typeof judgement === 'object' && 'FeePaid' in judgement) {
+                const idx =
+                  typeof regIdx === "string" ? Number.parseInt(regIdx) : regIdx;
+                if (
+                  judgement &&
+                  typeof judgement === "object" &&
+                  "FeePaid" in judgement
+                ) {
                   showCancelRequest = true;
                   registrarIndex = idx;
                 }
               }
             }
             // Always show UserCard if hasIdentity is true
-            return <>
-              <UserCard registrarInfo={dataState.identityData} />
-              <Button
-                intent={Intent.PRIMARY}
-                className="mt-4"
-                onClick={() => {
-                  if (!dataState.registrarData) {
-                    let registrarData = null;
-                    if (dataState.identityData && Array.isArray(dataState.identityData.judgements)) {
-                      const firstJudgement = dataState.identityData.judgements.find((j) => Array.isArray(j));
-                      if (firstJudgement) {
-                        const regIdx = firstJudgement[0];
-                        const regIndex = typeof regIdx === 'string' ? parseInt(regIdx) : regIdx;
-                        registrarData = dataState.registrarList.find(r => r.regIndex === regIndex) || null;
+            return (
+              <>
+                <UserCard registrarInfo={dataState.identityData} />
+                <Button
+                  intent={Intent.PRIMARY}
+                  className="mt-4"
+                  onClick={() => {
+                    if (!dataState.registrarData) {
+                      let registrarData = null;
+                      if (
+                        dataState.identityData &&
+                        Array.isArray(dataState.identityData.judgements)
+                      ) {
+                        const firstJudgement =
+                          dataState.identityData.judgements.find((j) =>
+                            Array.isArray(j)
+                          );
+                        if (firstJudgement) {
+                          const regIdx = firstJudgement[0];
+                          const regIndex =
+                            typeof regIdx === "string"
+                              ? Number.parseInt(regIdx)
+                              : regIdx;
+                          registrarData =
+                            dataState.registrarList.find(
+                              (r) => r.regIndex === regIndex
+                            ) || null;
+                        }
                       }
+                      if (
+                        !registrarData &&
+                        dataState.registrarList.length > 0
+                      ) {
+                        registrarData = dataState.registrarList[0];
+                      }
+                      setData((prev) => ({ ...prev, registrarData }));
                     }
-                    if (!registrarData && dataState.registrarList.length > 0) {
-                      registrarData = dataState.registrarList[0];
-                    }
-                    setData(prev => ({ ...prev, registrarData }));
-                  }
-                  setShowUpdateForm(true);
-                }}
-              >
-                {t("Update")}
-              </Button>
-              {showCancelRequest && (
+                    setShowUpdateForm(true);
+                  }}
+                >
+                  {t("Update")}
+                </Button>
+                {showCancelRequest && (
+                  <Button
+                    intent={Intent.DANGER}
+                    className="mt-2"
+                    onClick={async () => {
+                      if (!api || registrarIndex === null) return;
+                      setIsCancelRequestLoading(true);
+                      try {
+                        const tx =
+                          api.tx.identity.cancelRequest(registrarIndex);
+                        await signAndSend(tx, pair);
+                        toaster.show({
+                          icon: "trash",
+                          intent: Intent.SUCCESS,
+                          message: t("Request cancelled!"),
+                        });
+                        setIsCancelRequestLoading(false);
+                        handleClose();
+                      } catch (e) {
+                        toaster.show({
+                          icon: "error",
+                          intent: Intent.DANGER,
+                          message: e instanceof Error ? e.message : String(e),
+                        });
+                        setIsCancelRequestLoading(false);
+                      }
+                    }}
+                    loading={isCancelRequestLoading}
+                  >
+                    {t("Cancel Request")}
+                  </Button>
+                )}
                 <Button
                   intent={Intent.DANGER}
                   className="mt-2"
                   onClick={async () => {
-                    if (!api || registrarIndex === null) return;
-                    setIsCancelRequestLoading(true);
+                    if (!api) return;
+                    setIsClearIdentityLoading(true);
                     try {
-                      const tx = api.tx.identity.cancelRequest(registrarIndex);
+                      const tx = api.tx.identity.clearIdentity();
                       await signAndSend(tx, pair);
                       toaster.show({
                         icon: "trash",
                         intent: Intent.SUCCESS,
-                        message: t("Request cancelled!"),
+                        message: t("Identity clear request sent!"),
                       });
-                      setIsCancelRequestLoading(false);
+                      setIsClearIdentityLoading(false);
                       handleClose();
                     } catch (e) {
                       toaster.show({
@@ -564,281 +633,265 @@ export default function DialogIdentity({
                         intent: Intent.DANGER,
                         message: e instanceof Error ? e.message : String(e),
                       });
-                      setIsCancelRequestLoading(false);
+                      setIsClearIdentityLoading(false);
                     }
                   }}
-                  loading={isCancelRequestLoading}
+                  loading={isClearIdentityLoading}
                 >
-                  {t("Cancel Request")}
+                  {t("Clear")}
                 </Button>
+              </>
+            );
+          })()}
+        {!isRegistrar &&
+          hasIdentity &&
+          dataState.identityData &&
+          showUpdateForm && (
+            <>
+              <AddressSelect
+                onAddressChange={handleRegistrarSelect}
+                selectedAddress={dataState.registrarData?.account || ""}
+                addresses={dataState.registrarList.map((r) => r.account)}
+                isLoading={isIdentityLoading}
+                metadata={Object.fromEntries(
+                  dataState.registrarList.map((registrar) => [
+                    registrar.account,
+                    <div
+                      key={registrar.account}
+                      className="flex items-center gap-2"
+                    >
+                      <span className="flex items-right gap-2 pl-8">
+                        #{registrar.regIndex} Fee:{registrar.info?.display?.Raw}
+                      </span>
+                      <FormattedAmount
+                        value={Number.parseInt(
+                          registrar.fee?.replace(re, "") || "0"
+                        )}
+                        unit="P3D"
+                      />
+                    </div>,
+                  ])
+                )}
+              />
+              <InputGroup
+                disabled={isIdentityLoading}
+                large
+                className="font-mono"
+                spellCheck={false}
+                placeholder={t("dlg_identity.lbl_placeholder_display_name")}
+                onChange={(e) => {
+                  const ci = dataState.candidateInfo;
+                  ci.display = e.target.value;
+                  setData((prev) => ({ ...prev, candidateInfo: ci }));
+                }}
+                value={dataState.candidateInfo.display || ""}
+              />
+              <InputGroup
+                disabled={isIdentityLoading}
+                large
+                className="font-mono"
+                spellCheck={false}
+                placeholder={t("dlg_identity.lbl_placeholder_legal_name")}
+                onChange={(e) => {
+                  const ci = dataState.candidateInfo;
+                  ci.legal = e.target.value;
+                  setData((prev) => ({ ...prev, candidateInfo: ci }));
+                }}
+                value={dataState.candidateInfo.legal || ""}
+              />
+              <InputGroup
+                disabled={isIdentityLoading}
+                large
+                className="font-mono"
+                spellCheck={false}
+                placeholder={t("dlg_identity.lbl_placeholder_email")}
+                onChange={(e) => {
+                  const ci = dataState.candidateInfo;
+                  ci.email = e.target.value;
+                  setData((prev) => ({ ...prev, candidateInfo: ci }));
+                }}
+                value={dataState.candidateInfo.email || ""}
+              />
+              <InputGroup
+                disabled={isIdentityLoading}
+                large
+                className="font-mono"
+                spellCheck={false}
+                placeholder={t("dlg_identity.lbl_placeholder_web_address")}
+                onChange={(e) => {
+                  const ci = dataState.candidateInfo;
+                  ci.web = e.target.value;
+                  setData((prev) => ({ ...prev, candidateInfo: ci }));
+                }}
+                value={dataState.candidateInfo.web || ""}
+              />
+              <InputGroup
+                disabled={isIdentityLoading}
+                large
+                className="font-mono"
+                spellCheck={false}
+                placeholder={t("dlg_identity.lbl_placeholder_twitter")}
+                onChange={(e) => {
+                  const ci = dataState.candidateInfo;
+                  ci.twitter = e.target.value;
+                  setData((prev) => ({ ...prev, candidateInfo: ci }));
+                }}
+                value={dataState.candidateInfo.twitter || ""}
+              />
+              <InputGroup
+                disabled={isIdentityLoading}
+                large
+                className="font-mono"
+                spellCheck={false}
+                placeholder={t("dlg_identity.lbl_placeholder_discord")}
+                onChange={(e) => {
+                  const ci = dataState.candidateInfo;
+                  ci.discord = e.target.value;
+                  setData((prev) => ({ ...prev, candidateInfo: ci }));
+                }}
+                value={dataState.candidateInfo.discord || ""}
+              />
+              <InputGroup
+                disabled={isIdentityLoading}
+                large
+                className="font-mono"
+                spellCheck={false}
+                placeholder={t("dlg_identity.lbl_placeholder_riot_name")}
+                onChange={(e) => {
+                  const ci = dataState.candidateInfo;
+                  ci.riot = e.target.value;
+                  setData((prev) => ({ ...prev, candidateInfo: ci }));
+                }}
+                value={dataState.candidateInfo.riot || ""}
+              />
+              <Button
+                minimal
+                small
+                icon={showAdditionalFields ? "chevron-up" : "chevron-down"}
+                onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+                text={
+                  showAdditionalFields
+                    ? "Hide additional fields"
+                    : "Show additional fields"
+                }
+              />
+              {showAdditionalFields && (
+                <>
+                  <InputGroup
+                    disabled={isIdentityLoading}
+                    large
+                    className="font-mono"
+                    spellCheck={false}
+                    placeholder="Phone number"
+                    onChange={(e) => {
+                      const ci = dataState.candidateInfo;
+                      ci.phone = e.target.value;
+                      setData((prev) => ({ ...prev, candidateInfo: ci }));
+                    }}
+                    value={dataState.candidateInfo.phone || ""}
+                  />
+                  <InputGroup
+                    disabled={isIdentityLoading}
+                    large
+                    className="font-mono"
+                    spellCheck={false}
+                    placeholder="LinkedIn"
+                    onChange={(e) => {
+                      const ci = dataState.candidateInfo;
+                      ci.linkedin = e.target.value;
+                      setData((prev) => ({ ...prev, candidateInfo: ci }));
+                    }}
+                    value={dataState.candidateInfo.linkedin || ""}
+                  />
+                  <InputGroup
+                    disabled={isIdentityLoading}
+                    large
+                    className="font-mono"
+                    spellCheck={false}
+                    placeholder="Telegram"
+                    onChange={(e) => {
+                      const ci = dataState.candidateInfo;
+                      ci.telegram = e.target.value;
+                      setData((prev) => ({ ...prev, candidateInfo: ci }));
+                    }}
+                    value={dataState.candidateInfo.telegram || ""}
+                  />
+                  <InputGroup
+                    disabled={isIdentityLoading}
+                    large
+                    className="font-mono"
+                    spellCheck={false}
+                    placeholder="Github"
+                    onChange={(e) => {
+                      const ci = dataState.candidateInfo;
+                      ci.github = e.target.value;
+                      setData((prev) => ({ ...prev, candidateInfo: ci }));
+                    }}
+                    value={dataState.candidateInfo.github || ""}
+                  />
+                  <InputGroup
+                    disabled={isIdentityLoading}
+                    large
+                    className="font-mono"
+                    spellCheck={false}
+                    placeholder="Custom"
+                    onChange={(e) => {
+                      const ci = dataState.candidateInfo;
+                      ci.custom = e.target.value;
+                      setData((prev) => ({ ...prev, candidateInfo: ci }));
+                    }}
+                    value={dataState.candidateInfo.custom || ""}
+                  />
+                  <InputGroup
+                    disabled={isIdentityLoading}
+                    large
+                    className="font-mono"
+                    spellCheck={false}
+                    placeholder="PGP Fingerprint (20 bytes hex)"
+                    onChange={(e) => {
+                      const ci = dataState.candidateInfo;
+                      ci.pgpFingerprint = e.target.value;
+                      setData((prev) => ({ ...prev, candidateInfo: ci }));
+                    }}
+                    value={dataState.candidateInfo.pgpFingerprint || ""}
+                  />
+                </>
               )}
               <Button
-                intent={Intent.DANGER}
+                intent={Intent.PRIMARY}
+                disabled={isIdentityLoading || !api}
+                onClick={handleSubmitRequestForJudgement}
+                loading={isIdentityLoading}
+                text={t("dlg_identity.lbl_placeholder_request_judgement")}
+              />
+              <Button
                 className="mt-2"
-                onClick={async () => {
-                  if (!api) return;
-                  setIsClearIdentityLoading(true);
-                  try {
-                    const tx = api.tx.identity.clearIdentity();
-                    await signAndSend(tx, pair);
-                    toaster.show({
-                      icon: "trash",
-                      intent: Intent.SUCCESS,
-                      message: t("Identity clear request sent!"),
-                    });
-                    setIsClearIdentityLoading(false);
-                    handleClose();
-                  } catch (e) {
-                    toaster.show({
-                      icon: "error",
-                      intent: Intent.DANGER,
-                      message: e instanceof Error ? e.message : String(e),
-                    });
-                    setIsClearIdentityLoading(false);
-                  }
+                onClick={() => {
+                  setShowUpdateForm(false);
+                  // Clear registrar data when canceling update
+                  setData((prev) => ({
+                    ...prev,
+                    registrarData: null,
+                  }));
                 }}
-                loading={isClearIdentityLoading}
               >
-                {t("Clear")}
+                {t("Cancel")}
               </Button>
-            </>;
-          })()
-        )}
-        {!isRegistrar && hasIdentity && dataState.identityData && showUpdateForm && (
-          <>
-            <AddressSelect
-              onAddressChange={handleRegistrarSelect}
-              selectedAddress={dataState.registrarData?.account || ""}
-              addresses={dataState.registrarList.map((r) => r.account)}
-              isLoading={isIdentityLoading}
-              metadata={Object.fromEntries(
-                dataState.registrarList.map((registrar) => [
-                  registrar.account,
-                  <div
-                    key={registrar.account}
-                    className="flex items-center gap-2"
-                  >
-                    <span className="flex items-right gap-2 pl-8">
-                      #{registrar.regIndex} Fee:{registrar.info?.display?.Raw}
-                    </span>
-                    <FormattedAmount
-                      value={Number.parseInt(registrar.fee?.replace(re, "") || "0")}
-                      unit="P3D"
-                    />
-                  </div>,
-                ])
-              )}
-            />
-            <InputGroup
-              disabled={isIdentityLoading}
-              large
-              className="font-mono"
-              spellCheck={false}
-              placeholder={t("dlg_identity.lbl_placeholder_display_name")}
-              onChange={(e) => {
-                const ci = dataState.candidateInfo;
-                ci.display = e.target.value;
-                setData((prev) => ({ ...prev, candidateInfo: ci }));
-              }}
-              value={dataState.candidateInfo.display || ""}
-            />
-            <InputGroup
-              disabled={isIdentityLoading}
-              large
-              className="font-mono"
-              spellCheck={false}
-              placeholder={t("dlg_identity.lbl_placeholder_legal_name")}
-              onChange={(e) => {
-                const ci = dataState.candidateInfo;
-                ci.legal = e.target.value;
-                setData((prev) => ({ ...prev, candidateInfo: ci }));
-              }}
-              value={dataState.candidateInfo.legal || ""}
-            />
-            <InputGroup
-              disabled={isIdentityLoading}
-              large
-              className="font-mono"
-              spellCheck={false}
-              placeholder={t("dlg_identity.lbl_placeholder_email")}
-              onChange={(e) => {
-                const ci = dataState.candidateInfo;
-                ci.email = e.target.value;
-                setData((prev) => ({ ...prev, candidateInfo: ci }));
-              }}
-              value={dataState.candidateInfo.email || ""}
-            />
-            <InputGroup
-              disabled={isIdentityLoading}
-              large
-              className="font-mono"
-              spellCheck={false}
-              placeholder={t("dlg_identity.lbl_placeholder_web_address")}
-              onChange={(e) => {
-                const ci = dataState.candidateInfo;
-                ci.web = e.target.value;
-                setData((prev) => ({ ...prev, candidateInfo: ci }));
-              }}
-              value={dataState.candidateInfo.web || ""}
-            />
-            <InputGroup
-              disabled={isIdentityLoading}
-              large
-              className="font-mono"
-              spellCheck={false}
-              placeholder={t("dlg_identity.lbl_placeholder_twitter")}
-              onChange={(e) => {
-                const ci = dataState.candidateInfo;
-                ci.twitter = e.target.value;
-                setData((prev) => ({ ...prev, candidateInfo: ci }));
-              }}
-              value={dataState.candidateInfo.twitter || ""}
-            />
-            <InputGroup
-              disabled={isIdentityLoading}
-              large
-              className="font-mono"
-              spellCheck={false}
-              placeholder={t("dlg_identity.lbl_placeholder_discord")}
-              onChange={(e) => {
-                const ci = dataState.candidateInfo;
-                ci.discord = e.target.value;
-                setData((prev) => ({ ...prev, candidateInfo: ci }));
-              }}
-              value={dataState.candidateInfo.discord || ""}
-            />
-            <InputGroup
-              disabled={isIdentityLoading}
-              large
-              className="font-mono"
-              spellCheck={false}
-              placeholder={t("dlg_identity.lbl_placeholder_riot_name")}
-              onChange={(e) => {
-                const ci = dataState.candidateInfo;
-                ci.riot = e.target.value;
-                setData((prev) => ({ ...prev, candidateInfo: ci }));
-              }}
-              value={dataState.candidateInfo.riot || ""}
-            />
-            <Button
-              minimal
-              small
-              icon={showAdditionalFields ? "chevron-up" : "chevron-down"}
-              onClick={() => setShowAdditionalFields(!showAdditionalFields)}
-              text={showAdditionalFields ? "Hide additional fields" : "Show additional fields"}
-            />
-            {showAdditionalFields && (
-              <>
-                <InputGroup
-                  disabled={isIdentityLoading}
-                  large
-                  className="font-mono"
-                  spellCheck={false}
-                  placeholder="Phone number"
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.phone = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
-                  value={dataState.candidateInfo.phone || ""}
-                />
-                <InputGroup
-                  disabled={isIdentityLoading}
-                  large
-                  className="font-mono"
-                  spellCheck={false}
-                  placeholder="LinkedIn"
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.linkedin = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
-                  value={dataState.candidateInfo.linkedin || ""}
-                />
-                <InputGroup
-                  disabled={isIdentityLoading}
-                  large
-                  className="font-mono"
-                  spellCheck={false}
-                  placeholder="Telegram"
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.telegram = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
-                  value={dataState.candidateInfo.telegram || ""}
-                />
-                <InputGroup
-                  disabled={isIdentityLoading}
-                  large
-                  className="font-mono"
-                  spellCheck={false}
-                  placeholder="Github"
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.github = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
-                  value={dataState.candidateInfo.github || ""}
-                />
-                <InputGroup
-                  disabled={isIdentityLoading}
-                  large
-                  className="font-mono"
-                  spellCheck={false}
-                  placeholder="Custom"
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.custom = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
-                  value={dataState.candidateInfo.custom || ""}
-                />
-                <InputGroup
-                  disabled={isIdentityLoading}
-                  large
-                  className="font-mono"
-                  spellCheck={false}
-                  placeholder="PGP Fingerprint (20 bytes hex)"
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.pgpFingerprint = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
-                  value={dataState.candidateInfo.pgpFingerprint || ""}
-                />
-              </>
-            )}
-            <Button
-              intent={Intent.PRIMARY}
-              disabled={isIdentityLoading || !api}
-              onClick={handleSubmitRequestForJudgement}
-              loading={isIdentityLoading}
-              text={t("dlg_identity.lbl_placeholder_request_judgement")}
-            />
-            <Button
-              className="mt-2"
-              onClick={() => {
-                setShowUpdateForm(false);
-                // Clear registrar data when canceling update
-                setData(prev => ({
-                  ...prev,
-                  registrarData: null
-                }));
-              }}
-            >
-              {t("Cancel")}
-            </Button>
-          </>
-        )}
+            </>
+          )}
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS} />
       </div>
-      {(function() {
+      {(() => {
         const r = dataState.registrarData;
         // Check for all required fields
-        const isValid = r && typeof r === 'object' && r.account && r.info && r.regIndex !== undefined;
+        const isValid =
+          r &&
+          typeof r === "object" &&
+          r.account &&
+          r.info &&
+          r.regIndex !== undefined;
         if (isValid) {
           try {
             return (
@@ -846,11 +899,22 @@ export default function DialogIdentity({
                 <UserCard registrarInfo={r} />
               </div>
             );
-          } catch (e) {
-            return <div className="mt-4 text-red-500">Failed to render registrar card.</div>;
+          } catch (_e) {
+            return (
+              <div className="mt-4 text-red-500">
+                Failed to render registrar card.
+              </div>
+            );
           }
-        } else if (!isLoadingRegistrars && dataState.registrarList.length === 0) {
-          return <div className="mt-4 text-red-500">No available registrar to display.</div>;
+        } else if (
+          !isLoadingRegistrars &&
+          dataState.registrarList.length === 0
+        ) {
+          return (
+            <div className="mt-4 text-red-500">
+              No available registrar to display.
+            </div>
+          );
         } else {
           return null;
         }

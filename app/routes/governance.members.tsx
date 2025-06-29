@@ -167,8 +167,8 @@ export default function GovernanceMembers() {
   const remainingBlocks = termProgress
     ? termProgress.total - termProgress.mod
     : 0;
-  const timeLeft = formatTimeLeft(remainingBlocks);
-  const totalTime = termProgress ? formatTimeLeft(termProgress.total) : "";
+  const timeLeft = formatTimeLeft(remainingBlocks, t);
+  const totalTime = termProgress ? formatTimeLeft(termProgress.total, t) : "";
 
   return (
     <div>

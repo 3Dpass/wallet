@@ -1,15 +1,16 @@
-import React, { useState, useCallback, useEffect } from "react";
-import BaseDialog from "./BaseDialog";
-import { InputGroup, Intent, Icon } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useAtom } from "jotai";
-import { lastSelectedAccountAtom } from "app/atoms";
+import { Icon, InputGroup, Intent } from "@blueprintjs/core";
 import keyring from "@polkadot/ui-keyring";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useApi } from "app/components/Api";
 import { signAndSend } from "app/utils/sign";
-import useToaster from "../../hooks/useToaster";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import useToaster from "../../hooks/useToaster";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
+import BaseDialog from "./BaseDialog";
 
 interface DialogTransferOwnershipProps {
   isOpen: boolean;
@@ -17,7 +18,11 @@ interface DialogTransferOwnershipProps {
   assetId: number;
 }
 
-export default function DialogTransferOwnership({ isOpen, onClose, assetId }: DialogTransferOwnershipProps) {
+export default function DialogTransferOwnership({
+  isOpen,
+  onClose,
+  assetId,
+}: DialogTransferOwnershipProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
@@ -28,13 +33,18 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
   const [isNewOwnerValid, setIsNewOwnerValid] = useState(false);
 
   // Memoized callback for handling new owner input changes
-  const handleNewOwnerChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewOwner(e.target.value);
-  }, []);
+  const handleNewOwnerChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setNewOwner(e.target.value);
+    },
+    []
+  );
 
   // Validate address whenever it changes
   useEffect(() => {
-    setIsNewOwnerValid(newOwner.trim() === "" || isValidPolkadotAddress(newOwner));
+    setIsNewOwnerValid(
+      newOwner.trim() === "" || isValidPolkadotAddress(newOwner)
+    );
   }, [newOwner]);
 
   // Update submit button state
@@ -46,12 +56,12 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
   // Get the KeyringPair for the selected account
   const pair = (() => {
     try {
-      if (selectedAccount && selectedAccount.trim() !== '') {
+      if (selectedAccount && selectedAccount.trim() !== "") {
         return keyring.getPair(selectedAccount);
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get keyring pair:', error);
+      console.warn("Failed to get keyring pair:", error);
       return null;
     }
   })();
@@ -61,7 +71,7 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "API not ready"
+        message: "API not ready",
       });
       return;
     }
@@ -69,7 +79,9 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+        message:
+          t("messages.lbl_fill_required_fields") ||
+          "Please fill all required fields.",
       });
       return;
     }
@@ -77,7 +89,8 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_invalid_address") || "Please enter a valid address."
+        message:
+          t("messages.lbl_invalid_address") || "Please enter a valid address.",
       });
       return;
     }
@@ -85,7 +98,9 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+        message:
+          t("messages.lbl_no_account_selected") ||
+          "No account selected or unable to get keyring pair.",
       });
       return;
     }
@@ -94,23 +109,22 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_account_locked") || "Account is locked."
+        message: t("messages.lbl_account_locked") || "Account is locked.",
       });
       return;
     }
     setLoading(true);
     try {
       // Compose the extrinsic
-      const tx = api.tx.poscanAssets.transferOwnership(
-        assetId,
-        newOwner
-      );
+      const tx = api.tx.poscanAssets.transferOwnership(assetId, newOwner);
       signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: t("dlg_asset.transfer_ownership_success") || "Ownership transferred successfully!"
+          message:
+            t("dlg_asset.transfer_ownership_success") ||
+            "Ownership transferred successfully!",
         });
         onClose();
       });
@@ -156,7 +170,9 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
       <div className="flex flex-col gap-4">
         <InputGroup
           fill
-          placeholder={t("dlg_asset.transfer_ownership_new_owner") || "New owner address"}
+          placeholder={
+            t("dlg_asset.transfer_ownership_new_owner") || "New owner address"
+          }
           value={newOwner}
           onChange={handleNewOwnerChange}
           required
@@ -168,4 +184,4 @@ export default function DialogTransferOwnership({ isOpen, onClose, assetId }: Di
       </div>
     </BaseDialog>
   );
-} 
+}

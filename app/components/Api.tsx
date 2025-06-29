@@ -1,13 +1,20 @@
-import {ApiPromise, WsProvider} from "@polkadot/api";
-import type {KeyringPair} from "@polkadot/keyring/types";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import type { KeyringPair } from "@polkadot/keyring/types";
 import keyring from "@polkadot/ui-keyring";
-import {cryptoWaitReady} from "@polkadot/util-crypto";
-import {useSetAtom} from "jotai/index";
-import React, {useEffect} from "react";
-import {genesisHashes, NETWORK_MAINNET, NETWORK_TEST, RPC_CONFIG, RPC_TYPES, ss58formats,} from "../api.config";
-import {defaultEndpoint, formatOptionsAtom} from "../atoms";
-import {createMockApi} from "../utils/mock";
-import {loadWeb3Accounts} from "./Web3.client";
+import { cryptoWaitReady } from "@polkadot/util-crypto";
+import { useSetAtom } from "jotai/index";
+import React, { useEffect } from "react";
+import {
+  genesisHashes,
+  NETWORK_MAINNET,
+  NETWORK_TEST,
+  RPC_CONFIG,
+  RPC_TYPES,
+  ss58formats,
+} from "../api.config";
+import { defaultEndpoint, formatOptionsAtom } from "../atoms";
+import { createMockApi } from "../utils/mock";
+import { loadWeb3Accounts } from "./Web3.client";
 
 interface Props {
   children: React.ReactNode;
@@ -28,10 +35,10 @@ const ApiCtx = React.createContext<Context>({
 });
 
 export function ApiCtxRoot({
-                             apiUrl,
-                             children,
-                             isMockMode = false,
-                           }: Props): React.ReactElement<Props> | null {
+  apiUrl,
+  children,
+  isMockMode = false,
+}: Props): React.ReactElement<Props> | null {
   const [api, setApi] = React.useState<ApiPromise>();
   const [accounts, setAccounts] = React.useState<KeyringPair[]>([]);
   const [keyringLoaded, setKeyringLoaded] = React.useState(false);
@@ -43,10 +50,10 @@ export function ApiCtxRoot({
       return;
     }
 
-    let wsProvider;
+    let wsProvider: WsProvider;
     try {
       wsProvider = new WsProvider(apiUrl);
-    } catch (e) {
+    } catch (_e) {
       // use default endpoint
       wsProvider = new WsProvider(defaultEndpoint);
     }
@@ -78,14 +85,14 @@ export function ApiCtxRoot({
       const genesisHash =
         genesisHashes[isMainnet ? NETWORK_MAINNET : NETWORK_TEST];
       const injected = await loadWeb3Accounts(genesisHash, ss58Format);
-      const accounts = injected?.map(({address, meta}) => ({
+      const accounts = injected?.map(({ address, meta }) => ({
         address,
         meta: {
           ...meta,
           genesisHash: meta.genesisHash as `0x${string}` | null | undefined,
         },
       }));
-      keyring.loadAll({ss58Format, type: "sr25519"}, accounts);
+      keyring.loadAll({ ss58Format, type: "sr25519" }, accounts);
     }
 
     let subscription: { unsubscribe: () => void } | undefined;
@@ -102,7 +109,7 @@ export function ApiCtxRoot({
   }, [api, keyringLoaded, setFormatOptions]);
 
   const contextValue = React.useMemo(
-    () => ({api, keyringLoaded, accounts}),
+    () => ({ api, keyringLoaded, accounts }),
     [api, keyringLoaded, accounts]
   );
 

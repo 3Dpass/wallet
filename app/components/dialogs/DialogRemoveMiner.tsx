@@ -116,7 +116,12 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
 
   const renderMemberId: ItemRenderer<string> = (
     poolId,
-    { handleClick, handleFocus, modifiers, query }
+    {
+      handleClick: _handleClick,
+      handleFocus: _handleFocus,
+      modifiers,
+      query: _query,
+    }
   ) => {
     if (!modifiers.matchesPredicate) {
       return null;
@@ -128,8 +133,8 @@ export default function DialogRemoveMiner({ isOpen, onClose, pair }: IProps) {
         disabled={modifiers.disabled}
         key={poolId}
         text={poolId}
-        onClick={handleClick as MouseEventHandler}
-        onFocus={handleFocus}
+        onClick={_handleClick as MouseEventHandler}
+        onFocus={_handleFocus}
         roleStructure="listoption"
       />
     );

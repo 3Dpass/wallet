@@ -1,15 +1,16 @@
-import React, { useState, useCallback, useEffect } from "react";
-import BaseDialog from "./BaseDialog";
-import { NumericInput, InputGroup, Intent, Icon } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useAtom } from "jotai";
-import { lastSelectedAccountAtom } from "app/atoms";
+import { Icon, InputGroup, Intent, NumericInput } from "@blueprintjs/core";
 import keyring from "@polkadot/ui-keyring";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useApi } from "app/components/Api";
 import { signAndSend } from "app/utils/sign";
-import useToaster from "../../hooks/useToaster";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import useToaster from "../../hooks/useToaster";
 import { isValidPolkadotAddress } from "../../utils/address";
 import { AddressIcon } from "../common/AddressIcon";
+import BaseDialog from "./BaseDialog";
 
 interface DialogBurnAssetProps {
   isOpen: boolean;
@@ -17,7 +18,11 @@ interface DialogBurnAssetProps {
   assetId: number;
 }
 
-export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurnAssetProps) {
+export default function DialogBurnAsset({
+  isOpen,
+  onClose,
+  assetId,
+}: DialogBurnAssetProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
@@ -29,9 +34,12 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
   const [isWhoValid, setIsWhoValid] = useState(false);
 
   // Memoized callbacks for event handlers
-  const handleWhoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setWho(e.target.value);
-  }, []);
+  const handleWhoChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setWho(e.target.value);
+    },
+    []
+  );
 
   const handleAmountChange = useCallback((v: number | string) => {
     setAmount(Number(v));
@@ -45,29 +53,33 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
   // Update submit button state
   useEffect(() => {
     const addressValid = isWhoValid && who.trim() !== "";
-    const amountValid = amount !== undefined && !isNaN(amount) && amount > 0;
+    const amountValid =
+      amount !== undefined && !Number.isNaN(amount) && amount > 0;
     setCanSubmit(api !== undefined && addressValid && amountValid);
   }, [api, isWhoValid, who, amount]);
 
-  const handleSignAndSendCallback = useCallback(({ status }: { status: { isInBlock: boolean } }) => {
-    if (!status.isInBlock) return;
-    toaster.show({
-      icon: "endorsed",
-      intent: Intent.SUCCESS,
-      message: t("dlg_asset.burn_success") || "Tokens burned successfully!"
-    });
-    onClose();
-  }, [toaster, t, onClose]);
+  const handleSignAndSendCallback = useCallback(
+    ({ status }: { status: { isInBlock: boolean } }) => {
+      if (!status.isInBlock) return;
+      toaster.show({
+        icon: "endorsed",
+        intent: Intent.SUCCESS,
+        message: t("dlg_asset.burn_success") || "Tokens burned successfully!",
+      });
+      onClose();
+    },
+    [toaster, t, onClose]
+  );
 
   // Get the KeyringPair for the selected account
   const pair = (() => {
     try {
-      if (selectedAccount && selectedAccount.trim() !== '') {
+      if (selectedAccount && selectedAccount.trim() !== "") {
         return keyring.getPair(selectedAccount);
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get keyring pair:', error);
+      console.warn("Failed to get keyring pair:", error);
       return null;
     }
   })();
@@ -77,15 +89,23 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "API not ready"
+        message: "API not ready",
       });
       return;
     }
-    if (!selectedAccount || !who || amount === undefined || isNaN(amount) || amount <= 0) {
+    if (
+      !selectedAccount ||
+      !who ||
+      amount === undefined ||
+      Number.isNaN(amount) ||
+      amount <= 0
+    ) {
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+        message:
+          t("messages.lbl_fill_required_fields") ||
+          "Please fill all required fields.",
       });
       return;
     }
@@ -93,7 +113,8 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_invalid_address") || "Please enter a valid address."
+        message:
+          t("messages.lbl_invalid_address") || "Please enter a valid address.",
       });
       return;
     }
@@ -101,7 +122,9 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+        message:
+          t("messages.lbl_no_account_selected") ||
+          "No account selected or unable to get keyring pair.",
       });
       return;
     }
@@ -110,18 +133,14 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_account_locked") || "Account is locked."
+        message: t("messages.lbl_account_locked") || "Account is locked.",
       });
       return;
     }
     setLoading(true);
     try {
       // Compose the extrinsic
-      const tx = api.tx.poscanAssets.burn(
-        assetId,
-        who,
-        amount
-      );
+      const tx = api.tx.poscanAssets.burn(assetId, who, amount);
       signAndSend(tx, pair, {}, handleSignAndSendCallback);
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : String(e);
@@ -184,4 +203,4 @@ export default function DialogBurnAsset({ isOpen, onClose, assetId }: DialogBurn
       </div>
     </BaseDialog>
   );
-} 
+}

@@ -1,6 +1,13 @@
-import {Button, Classes, Dialog, type DialogProps, type IconName, Intent,} from "@blueprintjs/core";
-import type {ReactNode} from "react";
-import {useTranslation} from "react-i18next";
+import {
+  Button,
+  Classes,
+  Dialog,
+  type DialogProps,
+  type IconName,
+  Intent,
+} from "@blueprintjs/core";
+import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 interface BaseDialogProps {
   isOpen: boolean;
@@ -29,18 +36,18 @@ interface BaseDialogProps {
 }
 
 export default function BaseDialog({
-                                     isOpen,
-                                     onClose,
-                                     onOpening,
-                                     title,
-                                     className = "w-[90%] sm:w-[640px]",
-                                     children,
-                                     footerContent,
-                                     cancelButtonText,
-                                     primaryButton,
-                                     secondaryButton,
-                                   }: BaseDialogProps) {
-  const {t} = useTranslation();
+  isOpen,
+  onClose,
+  onOpening,
+  title,
+  className = "w-[90%] sm:w-[640px]",
+  children,
+  footerContent,
+  cancelButtonText,
+  primaryButton,
+  secondaryButton,
+}: BaseDialogProps) {
+  const { t } = useTranslation();
   const defaultCancelText = t("commons.lbl_btn_cancel");
 
   const dialogProps: Partial<DialogProps> = {

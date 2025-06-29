@@ -1,13 +1,14 @@
-import React, { useState, useCallback } from "react";
-import BaseDialog from "./BaseDialog";
-import { NumericInput, InputGroup, Intent } from "@blueprintjs/core";
-import { useApi } from "app/components/Api";
-import { useAtom } from "jotai";
-import { lastSelectedAccountAtom } from "app/atoms";
+import { InputGroup, Intent, NumericInput } from "@blueprintjs/core";
 import keyring from "@polkadot/ui-keyring";
+import { lastSelectedAccountAtom } from "app/atoms";
+import { useApi } from "app/components/Api";
 import { signAndSend } from "app/utils/sign";
-import useToaster from "../../hooks/useToaster";
+import { useAtom } from "jotai";
+import type React from "react";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
+import useToaster from "../../hooks/useToaster";
+import BaseDialog from "./BaseDialog";
 
 interface DialogSetAssetMetadataProps {
   isOpen: boolean;
@@ -15,7 +16,11 @@ interface DialogSetAssetMetadataProps {
   assetId: number;
 }
 
-export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: DialogSetAssetMetadataProps) {
+export default function DialogSetAssetMetadata({
+  isOpen,
+  onClose,
+  assetId,
+}: DialogSetAssetMetadataProps) {
   const { t } = useTranslation();
   const api = useApi();
   const toaster = useToaster();
@@ -26,13 +31,19 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
   const [loading, setLoading] = useState(false);
 
   // Memoized callbacks for JSX props
-  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  }, []);
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setName(e.target.value);
+    },
+    []
+  );
 
-  const handleSymbolChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSymbol(e.target.value);
-  }, []);
+  const handleSymbolChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSymbol(e.target.value);
+    },
+    []
+  );
 
   const handleDecimalsChange = useCallback((v: number) => {
     setDecimals(Number(v));
@@ -41,12 +52,12 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
   // Get the KeyringPair for the selected account
   const pair = (() => {
     try {
-      if (selectedAccount && selectedAccount.trim() !== '') {
+      if (selectedAccount && selectedAccount.trim() !== "") {
         return keyring.getPair(selectedAccount);
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get keyring pair:', error);
+      console.warn("Failed to get keyring pair:", error);
       return null;
     }
   })();
@@ -56,7 +67,7 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: "API not ready"
+        message: "API not ready",
       });
       return;
     }
@@ -64,7 +75,9 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_fill_required_fields") || "Please fill all required fields."
+        message:
+          t("messages.lbl_fill_required_fields") ||
+          "Please fill all required fields.",
       });
       return;
     }
@@ -72,7 +85,9 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_no_account_selected") || "No account selected or unable to get keyring pair."
+        message:
+          t("messages.lbl_no_account_selected") ||
+          "No account selected or unable to get keyring pair.",
       });
       return;
     }
@@ -80,7 +95,9 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("dlg_asset.invalid_decimals") || "Decimals must be between 0 and 18."
+        message:
+          t("dlg_asset.invalid_decimals") ||
+          "Decimals must be between 0 and 18.",
       });
       return;
     }
@@ -89,7 +106,7 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
       toaster.show({
         icon: "error",
         intent: Intent.DANGER,
-        message: t("messages.lbl_account_locked") || "Account is locked."
+        message: t("messages.lbl_account_locked") || "Account is locked.",
       });
       return;
     }
@@ -107,7 +124,8 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
         toaster.show({
           icon: "endorsed",
           intent: Intent.SUCCESS,
-          message: t("dlg_asset.metadata_set_success") || "Metadata set successfully!"
+          message:
+            t("dlg_asset.metadata_set_success") || "Metadata set successfully!",
         });
         onClose();
       });
@@ -165,4 +183,4 @@ export default function DialogSetAssetMetadata({ isOpen, onClose, assetId }: Dia
       </div>
     </BaseDialog>
   );
-} 
+}

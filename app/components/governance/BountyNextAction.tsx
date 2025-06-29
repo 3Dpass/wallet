@@ -1,13 +1,13 @@
 import { Intent, Tag } from "@blueprintjs/core";
 import type { u32 } from "@polkadot/types";
 import { useApi } from "app/components/Api";
-import { BLOCK_TIME_SECONDS } from "app/utils/time";
-import { useEffect, useState } from "react";
-import { Fragment } from "react";
+import { formatTimeLeft } from "app/utils/time";
+import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 function TimeUntilFunding() {
   const api = useApi();
+  const { t } = useTranslation();
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [currentBlock, setCurrentBlock] = useState<number | null>(null);
   const [spendPeriod, setSpendPeriod] = useState<number | null>(null);
@@ -47,23 +47,7 @@ function TimeUntilFunding() {
     return null;
   }
 
-  const formatTimeLeft = (blocks: number) => {
-    const seconds = blocks * BLOCK_TIME_SECONDS;
-    const hours = Math.floor(seconds / 3600);
-    const days = Math.floor(hours / 24);
-    const remainingHours = hours % 24;
-
-    if (days > 0) {
-      return `${days}d ${remainingHours}h`;
-    }
-    if (hours > 0) {
-      return `${hours}h`;
-    }
-    const minutes = Math.ceil(seconds / 60);
-    return `${minutes}m`;
-  };
-
-  return <> ({formatTimeLeft(timeRemaining)} until funding)</>;
+  return <> ({formatTimeLeft(timeRemaining, t)} until funding)</>;
 }
 
 interface BountyNextActionProps {
@@ -76,7 +60,7 @@ interface BountyNextActionProps {
 
 export function BountyNextAction({
   status,
-  curator,
+  curator: _curator,
   updateDue,
   unlockAt,
   bestNumber,

@@ -61,7 +61,7 @@ export default function Wallet() {
           intent: Intent.SUCCESS,
           message: t("wallet.msg_address_imported"),
         });
-      } catch (e) {
+      } catch (_e) {
         toaster.show({
           icon: "error",
           intent: Intent.DANGER,

@@ -1,17 +1,17 @@
-import { Icon, InputGroup, Intent, Checkbox } from "@blueprintjs/core";
+import { Checkbox, Icon, InputGroup, Intent } from "@blueprintjs/core";
 import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useEffect, useState, useCallback } from "react";
+import { isEthereumAddress } from "@polkadot/util-crypto";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
 import { isValidPolkadotAddress } from "../../utils/address";
+import { h160ToSs58 } from "../../utils/converter";
 import { signAndSend } from "../../utils/sign";
 import { useApi } from "../Api";
 import { AddressIcon } from "../common/AddressIcon";
 import AmountInput from "../common/AmountInput";
 import BaseDialog from "./BaseDialog";
-import { h160ToSs58 } from "../../utils/converter";
-import { isEthereumAddress } from "@polkadot/util-crypto";
 
 type IProps = {
   pair: KeyringPair;
@@ -71,9 +71,12 @@ export default function DialogSendFunds({
     }));
   }
 
-  const handleAddressChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setData((prev) => ({ ...prev, address: e.target.value }));
-  }, []);
+  const handleAddressChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setData((prev) => ({ ...prev, address: e.target.value }));
+    },
+    []
+  );
 
   const handleEvmCheckboxChange = useCallback(() => {
     setSendToEvm((prev) => !prev);

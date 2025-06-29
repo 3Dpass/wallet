@@ -1,5 +1,3 @@
-import { scan } from "react-scan";
-
 import type { Toaster } from "@blueprintjs/core";
 import {
   Alignment,
@@ -20,25 +18,25 @@ import {
   ScrollRestoration,
   useLocation,
 } from "@remix-run/react";
+import i18next from "i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 import { useAtomValue, useSetAtom } from "jotai";
 import type { FormEvent, LegacyRef } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { initReactI18next, useTranslation } from "react-i18next";
+import { scan } from "react-scan";
 import { ClientOnly } from "remix-utils";
 import { apiEndpointAtom, toasterAtom } from "./atoms";
 import { ApiCtxRoot } from "./components/Api";
 import DialogSettings from "./components/dialogs/DialogSettings";
 // @ts-expect-error - can't find styles file, fix later
 import styles from "./styles/app.css";
-import { isValidPolkadotAddress } from "./utils/address";
-
-import i18next from "i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import { initReactI18next, useTranslation } from "react-i18next";
 import en from "./translations/en.json";
 import es from "./translations/es.json";
 import fr from "./translations/fr.json";
 import pt from "./translations/pt.json";
 import zh from "./translations/zh.json";
+import { isValidPolkadotAddress } from "./utils/address";
 
 export function meta() {
   return [
@@ -105,7 +103,7 @@ export default function App() {
   const toasterRef = useRef<Toaster>();
   const setToaster = useSetAtom(toasterAtom);
   const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, _setSearchValue] = useState("");
 
   useEffect(() => {
     scan({
@@ -117,7 +115,7 @@ export default function App() {
     setToaster(toasterRef.current);
   }, [setToaster]);
 
-  const handleSearchSubmit = useCallback(
+  const _handleSearchSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
       // if searchValue is integer redirect to block page
@@ -192,7 +190,7 @@ export default function App() {
                       >
                         <span className="mb-[-3px]">Swap</span>
                       </a>
-                       <a
+                      <a
                         href="https://mining.3dpscan.xyz/"
                         className="text-white hover:no-underline px-1 ms-3 flex items-center gap-2"
                         target="_blank"
