@@ -539,7 +539,7 @@ export default function AssetsObjects() {
   // Reset currentPage when objectIndexes change
   useEffect(() => {
     setCurrentPage(1);
-  }, []);
+  }, [objectIndexes]);
 
   // Reset loading states when account changes
   useEffect(() => {

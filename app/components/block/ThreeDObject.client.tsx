@@ -51,6 +51,7 @@ export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
   const [scaled, setScaled] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const geometryRef = useRef<BufferGeometry | null>(null);
+  const previousGeometryRef = useRef<BufferGeometry | null>(null);
 
   // Memoize texture creation with better error handling
   const textureCube = useMemo(() => {
@@ -67,7 +68,9 @@ export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
     const mesh = meshRef.current;
     if (!scaled && mesh && geometry) {
       try {
-        // Store reference to geometry for cleanup
+        // Store reference to previous geometry for cleanup
+        previousGeometryRef.current = geometryRef.current;
+        // Store reference to current geometry
         geometryRef.current = geometry;
 
         // Validate geometry before processing
@@ -115,9 +118,9 @@ export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
     return () => {
       if (mesh) {
         try {
-          // Only dispose if we own the geometry
-          if (geometryRef.current && geometryRef.current !== geometry) {
-            geometryRef.current.dispose();
+          // Dispose the previous geometry if it exists and is different from the current one
+          if (previousGeometryRef.current && previousGeometryRef.current !== geometry) {
+            previousGeometryRef.current.dispose();
           }
 
           if (mesh.material instanceof THREE.Material) {
@@ -125,7 +128,7 @@ export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
           }
 
           // Clear references
-          geometryRef.current = null;
+          previousGeometryRef.current = null;
         } catch (e) {
           console.error("Error during cleanup:", e);
         }
@@ -136,13 +139,19 @@ export default function ThreeDObject({ geometry }: ThreeDObjectProps) {
   // Additional cleanup on unmount
   useEffect(() => {
     return () => {
-      if (geometryRef.current) {
-        try {
+      try {
+        // Dispose current geometry
+        if (geometryRef.current) {
           geometryRef.current.dispose();
           geometryRef.current = null;
-        } catch (e) {
-          console.error("Error during unmount cleanup:", e);
         }
+        // Dispose previous geometry
+        if (previousGeometryRef.current) {
+          previousGeometryRef.current.dispose();
+          previousGeometryRef.current = null;
+        }
+      } catch (e) {
+        console.error("Error during unmount cleanup:", e);
       }
     };
   }, []);
