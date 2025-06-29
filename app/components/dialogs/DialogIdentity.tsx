@@ -27,7 +27,6 @@ type ICandidateInfo = {
   email: string | null;
   discord: string | null;
   pgpFingerprint: string | null;
-  image: string | null;
   twitter: string | null;
   phone: string | null;
   linkedin: string | null;
@@ -45,7 +44,6 @@ type IIdentityData = {
   registrarData: IPalletIdentityRegistrarInfo | null;
   identityData: IPalletIdentityRegistrarInfo | null;
   candidateInfo: ICandidateInfo;
-  dateMonthAgo: Date | null;
 };
 
 export default function DialogIdentity({
@@ -67,7 +65,6 @@ export default function DialogIdentity({
     registrarData: null,
     identityData: null,
     candidateInfo: {} as ICandidateInfo,
-    dateMonthAgo: null,
   };
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
@@ -130,7 +127,6 @@ export default function DialogIdentity({
       return;
     }
     const registrarList: IPalletIdentityRegistrarInfo[] = [];
-    const _regIndexCurrent: number | null = null;
     let i = 0;
     for (const r of registrars) {
       // Skip suspended registrars
@@ -293,7 +289,7 @@ export default function DialogIdentity({
     setData((prev) => ({ ...prev, registrarData: updatedRegistrar }));
   }
 
-  const handleUpdateClick = () => {
+  const handleUpdateClick = useCallback(() => {
     if (!dataState.registrarData) {
       let registrarData = null;
       if (
@@ -325,7 +321,30 @@ export default function DialogIdentity({
       setData((prev) => ({ ...prev, registrarData }));
     }
     setShowUpdateForm(true);
-  };
+  }, [dataState.registrarData, dataState.identityData, dataState.registrarList]);
+
+  const handleClearIdentity = useCallback(async () => {
+    if (!api) return;
+    setIsClearIdentityLoading(true);
+    try {
+      const tx = api.tx.identity.clearIdentity();
+      await signAndSend(tx, pair);
+      toaster.show({
+        icon: "trash",
+        intent: Intent.SUCCESS,
+        message: t("Identity clear request sent!"),
+      });
+      setIsClearIdentityLoading(false);
+      handleClose();
+    } catch (e) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e instanceof Error ? e.message : String(e),
+      });
+      setIsClearIdentityLoading(false);
+    }
+  }, [api, pair, toaster, t, handleClose]);
 
   const createCancelRequestHandler = (registrarIndex: number | object | null) => async () => {
     if (!api || registrarIndex === null) return;
@@ -588,28 +607,7 @@ export default function DialogIdentity({
                 <Button
                   intent={Intent.DANGER}
                   className="mt-2"
-                  onClick={async () => {
-                    if (!api) return;
-                    setIsClearIdentityLoading(true);
-                    try {
-                      const tx = api.tx.identity.clearIdentity();
-                      await signAndSend(tx, pair);
-                      toaster.show({
-                        icon: "trash",
-                        intent: Intent.SUCCESS,
-                        message: t("Identity clear request sent!"),
-                      });
-                      setIsClearIdentityLoading(false);
-                      handleClose();
-                    } catch (e) {
-                      toaster.show({
-                        icon: "error",
-                        intent: Intent.DANGER,
-                        message: e instanceof Error ? e.message : String(e),
-                      });
-                      setIsClearIdentityLoading(false);
-                    }
-                  }}
+                  onClick={handleClearIdentity}
                   loading={isClearIdentityLoading}
                 >
                   {t("Clear")}
