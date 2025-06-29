@@ -452,6 +452,11 @@ function ObjectPreview({
     contextManager.unregisterContext(contextId);
   }, [contextId]);
 
+  // Handle Canvas creation
+  const handleCanvasCreated = useCallback(({ gl }: { gl: WebGLRenderer }) => {
+    rendererRef.current = gl;
+  }, []);
+
   // Register context when component mounts
   useEffect(() => {
     if (mesh?.geometry && !failureReason) {
@@ -475,9 +480,7 @@ function ObjectPreview({
           <Canvas
             key={contextId}
             camera={{ fov: 30, near: 0.1, far: 1000, position: [0, 0, 2] }}
-            onCreated={({ gl }) => {
-              rendererRef.current = gl;
-            }}
+            onCreated={handleCanvasCreated}
             style={{ background: "transparent" }}
           >
             <Suspense fallback={<Spinner size={24} />}>

@@ -1,7 +1,7 @@
 import { Button, Classes, Dialog, InputGroup, Intent } from "@blueprintjs/core";
 import type { SignerOptions } from "@polkadot/api/types";
 import type { KeyringPair } from "@polkadot/keyring/types";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
@@ -73,6 +73,35 @@ export default function DialogIdentity({
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [dataState, setData] = useState(dataInitial);
   const [isLoadingRegistrars, setIsLoadingRegistrars] = useState(false);
+
+  const handleRegistrarSelect = useCallback((account: string | null) => {
+    if (!account) return;
+    const registrar = dataState.registrarList.find(
+      (r) => r.account === account
+    );
+    if (registrar) {
+      void setRegistrar(registrar);
+    }
+  }, [dataState.registrarList]);
+
+  const handleInputChange = useCallback((field: keyof ICandidateInfo) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const ci = dataState.candidateInfo;
+    ci[field] = e.target.value;
+    setData((prev) => ({ ...prev, candidateInfo: ci }));
+  }, [dataState.candidateInfo]);
+
+  const handleToggleAdditionalFields = useCallback(() => {
+    setShowAdditionalFields(!showAdditionalFields);
+  }, [showAdditionalFields]);
+
+  const handleCancelUpdate = useCallback(() => {
+    setShowUpdateForm(false);
+    // Clear registrar data when canceling update
+    setData((prev) => ({
+      ...prev,
+      registrarData: null,
+    }));
+  }, []);
 
   async function loadRegistrars() {
     setIsLoadingRegistrars(true);
@@ -255,21 +284,72 @@ export default function DialogIdentity({
     setData((prev) => ({ ...prev, registrarData: updatedRegistrar }));
   }
 
-  function handleRegistrarSelect(account: string | null) {
-    if (!account) return;
-    const registrar = dataState.registrarList.find(
-      (r) => r.account === account
-    );
-    if (registrar) {
-      void setRegistrar(registrar);
-    }
-  }
-
   const handleClose = () => {
     setIsIdentityLoading(false);
     setIsCancelRequestLoading(false);
     setIsClearIdentityLoading(false);
+    setShowUpdateForm(false);
+    setShowAdditionalFields(false);
     onClose();
+  };
+
+  const handleUpdateClick = () => {
+    if (!dataState.registrarData) {
+      let registrarData = null;
+      if (
+        dataState.identityData &&
+        Array.isArray(dataState.identityData.judgements)
+      ) {
+        const firstJudgement =
+          dataState.identityData.judgements.find((j) =>
+            Array.isArray(j)
+          );
+        if (firstJudgement) {
+          const regIdx = firstJudgement[0];
+          const regIndex =
+            typeof regIdx === "string"
+              ? Number.parseInt(regIdx)
+              : regIdx;
+          registrarData =
+            dataState.registrarList.find(
+              (r) => r.regIndex === regIndex
+            ) || null;
+        }
+      }
+      if (
+        !registrarData &&
+        dataState.registrarList.length > 0
+      ) {
+        registrarData = dataState.registrarList[0];
+      }
+      setData((prev) => ({ ...prev, registrarData }));
+    }
+    setShowUpdateForm(true);
+  };
+
+  const createCancelRequestHandler = (registrarIndex: number | object | null) => async () => {
+    if (!api || registrarIndex === null) return;
+    const regIndex = typeof registrarIndex === "number" ? registrarIndex : Number.parseInt(String(registrarIndex));
+    setIsCancelRequestLoading(true);
+    try {
+      const tx =
+        api.tx.identity.cancelRequest(regIndex);
+      await signAndSend(tx, pair);
+      toaster.show({
+        icon: "trash",
+        intent: Intent.SUCCESS,
+        message: t("Request cancelled!"),
+      });
+      setIsCancelRequestLoading(false);
+      handleClose();
+    } catch (e) {
+      toaster.show({
+        icon: "error",
+        intent: Intent.DANGER,
+        message: e instanceof Error ? e.message : String(e),
+      });
+      setIsCancelRequestLoading(false);
+    }
   };
 
   return (
@@ -320,11 +400,7 @@ export default function DialogIdentity({
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_display_name")}
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.display = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
+                  onChange={handleInputChange("display")}
                   value={dataState.candidateInfo.display || ""}
                 />
                 <InputGroup
@@ -333,11 +409,7 @@ export default function DialogIdentity({
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_legal_name")}
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.legal = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
+                  onChange={handleInputChange("legal")}
                   value={dataState.candidateInfo.legal || ""}
                 />
                 <InputGroup
@@ -346,11 +418,7 @@ export default function DialogIdentity({
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_email")}
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.email = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
+                  onChange={handleInputChange("email")}
                   value={dataState.candidateInfo.email || ""}
                 />
                 <InputGroup
@@ -359,11 +427,7 @@ export default function DialogIdentity({
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_web_address")}
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.web = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
+                  onChange={handleInputChange("web")}
                   value={dataState.candidateInfo.web || ""}
                 />
                 <InputGroup
@@ -372,11 +436,7 @@ export default function DialogIdentity({
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_twitter")}
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.twitter = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
+                  onChange={handleInputChange("twitter")}
                   value={dataState.candidateInfo.twitter || ""}
                 />
                 <InputGroup
@@ -385,11 +445,7 @@ export default function DialogIdentity({
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_discord")}
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.discord = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
+                  onChange={handleInputChange("discord")}
                   value={dataState.candidateInfo.discord || ""}
                 />
                 <InputGroup
@@ -398,18 +454,14 @@ export default function DialogIdentity({
                   className="font-mono"
                   spellCheck={false}
                   placeholder={t("dlg_identity.lbl_placeholder_riot_name")}
-                  onChange={(e) => {
-                    const ci = dataState.candidateInfo;
-                    ci.riot = e.target.value;
-                    setData((prev) => ({ ...prev, candidateInfo: ci }));
-                  }}
+                  onChange={handleInputChange("riot")}
                   value={dataState.candidateInfo.riot || ""}
                 />
                 <Button
                   minimal
                   small
                   icon={showAdditionalFields ? "chevron-up" : "chevron-down"}
-                  onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+                  onClick={handleToggleAdditionalFields}
                   text={
                     showAdditionalFields
                       ? "Hide additional fields"
@@ -424,11 +476,7 @@ export default function DialogIdentity({
                       className="font-mono"
                       spellCheck={false}
                       placeholder="Phone number"
-                      onChange={(e) => {
-                        const ci = dataState.candidateInfo;
-                        ci.phone = e.target.value;
-                        setData((prev) => ({ ...prev, candidateInfo: ci }));
-                      }}
+                      onChange={handleInputChange("phone")}
                       value={dataState.candidateInfo.phone || ""}
                     />
                     <InputGroup
@@ -437,11 +485,7 @@ export default function DialogIdentity({
                       className="font-mono"
                       spellCheck={false}
                       placeholder="LinkedIn"
-                      onChange={(e) => {
-                        const ci = dataState.candidateInfo;
-                        ci.linkedin = e.target.value;
-                        setData((prev) => ({ ...prev, candidateInfo: ci }));
-                      }}
+                      onChange={handleInputChange("linkedin")}
                       value={dataState.candidateInfo.linkedin || ""}
                     />
                     <InputGroup
@@ -450,11 +494,7 @@ export default function DialogIdentity({
                       className="font-mono"
                       spellCheck={false}
                       placeholder="Telegram"
-                      onChange={(e) => {
-                        const ci = dataState.candidateInfo;
-                        ci.telegram = e.target.value;
-                        setData((prev) => ({ ...prev, candidateInfo: ci }));
-                      }}
+                      onChange={handleInputChange("telegram")}
                       value={dataState.candidateInfo.telegram || ""}
                     />
                     <InputGroup
@@ -463,11 +503,7 @@ export default function DialogIdentity({
                       className="font-mono"
                       spellCheck={false}
                       placeholder="Github"
-                      onChange={(e) => {
-                        const ci = dataState.candidateInfo;
-                        ci.github = e.target.value;
-                        setData((prev) => ({ ...prev, candidateInfo: ci }));
-                      }}
+                      onChange={handleInputChange("github")}
                       value={dataState.candidateInfo.github || ""}
                     />
                     <InputGroup
@@ -476,11 +512,7 @@ export default function DialogIdentity({
                       className="font-mono"
                       spellCheck={false}
                       placeholder="Custom"
-                      onChange={(e) => {
-                        const ci = dataState.candidateInfo;
-                        ci.custom = e.target.value;
-                        setData((prev) => ({ ...prev, candidateInfo: ci }));
-                      }}
+                      onChange={handleInputChange("custom")}
                       value={dataState.candidateInfo.custom || ""}
                     />
                     <InputGroup
@@ -489,11 +521,7 @@ export default function DialogIdentity({
                       className="font-mono"
                       spellCheck={false}
                       placeholder="PGP Fingerprint (20 bytes hex)"
-                      onChange={(e) => {
-                        const ci = dataState.candidateInfo;
-                        ci.pgpFingerprint = e.target.value;
-                        setData((prev) => ({ ...prev, candidateInfo: ci }));
-                      }}
+                      onChange={handleInputChange("pgpFingerprint")}
                       value={dataState.candidateInfo.pgpFingerprint || ""}
                     />
                   </>
@@ -543,39 +571,7 @@ export default function DialogIdentity({
                 <Button
                   intent={Intent.PRIMARY}
                   className="mt-4"
-                  onClick={() => {
-                    if (!dataState.registrarData) {
-                      let registrarData = null;
-                      if (
-                        dataState.identityData &&
-                        Array.isArray(dataState.identityData.judgements)
-                      ) {
-                        const firstJudgement =
-                          dataState.identityData.judgements.find((j) =>
-                            Array.isArray(j)
-                          );
-                        if (firstJudgement) {
-                          const regIdx = firstJudgement[0];
-                          const regIndex =
-                            typeof regIdx === "string"
-                              ? Number.parseInt(regIdx)
-                              : regIdx;
-                          registrarData =
-                            dataState.registrarList.find(
-                              (r) => r.regIndex === regIndex
-                            ) || null;
-                        }
-                      }
-                      if (
-                        !registrarData &&
-                        dataState.registrarList.length > 0
-                      ) {
-                        registrarData = dataState.registrarList[0];
-                      }
-                      setData((prev) => ({ ...prev, registrarData }));
-                    }
-                    setShowUpdateForm(true);
-                  }}
+                  onClick={handleUpdateClick}
                 >
                   {t("Update")}
                 </Button>
@@ -583,29 +579,7 @@ export default function DialogIdentity({
                   <Button
                     intent={Intent.DANGER}
                     className="mt-2"
-                    onClick={async () => {
-                      if (!api || registrarIndex === null) return;
-                      setIsCancelRequestLoading(true);
-                      try {
-                        const tx =
-                          api.tx.identity.cancelRequest(registrarIndex);
-                        await signAndSend(tx, pair);
-                        toaster.show({
-                          icon: "trash",
-                          intent: Intent.SUCCESS,
-                          message: t("Request cancelled!"),
-                        });
-                        setIsCancelRequestLoading(false);
-                        handleClose();
-                      } catch (e) {
-                        toaster.show({
-                          icon: "error",
-                          intent: Intent.DANGER,
-                          message: e instanceof Error ? e.message : String(e),
-                        });
-                        setIsCancelRequestLoading(false);
-                      }
-                    }}
+                    onClick={createCancelRequestHandler(registrarIndex)}
                     loading={isCancelRequestLoading}
                   >
                     {t("Cancel Request")}
@@ -679,11 +653,7 @@ export default function DialogIdentity({
                 className="font-mono"
                 spellCheck={false}
                 placeholder={t("dlg_identity.lbl_placeholder_display_name")}
-                onChange={(e) => {
-                  const ci = dataState.candidateInfo;
-                  ci.display = e.target.value;
-                  setData((prev) => ({ ...prev, candidateInfo: ci }));
-                }}
+                onChange={handleInputChange("display")}
                 value={dataState.candidateInfo.display || ""}
               />
               <InputGroup
@@ -692,11 +662,7 @@ export default function DialogIdentity({
                 className="font-mono"
                 spellCheck={false}
                 placeholder={t("dlg_identity.lbl_placeholder_legal_name")}
-                onChange={(e) => {
-                  const ci = dataState.candidateInfo;
-                  ci.legal = e.target.value;
-                  setData((prev) => ({ ...prev, candidateInfo: ci }));
-                }}
+                onChange={handleInputChange("legal")}
                 value={dataState.candidateInfo.legal || ""}
               />
               <InputGroup
@@ -705,11 +671,7 @@ export default function DialogIdentity({
                 className="font-mono"
                 spellCheck={false}
                 placeholder={t("dlg_identity.lbl_placeholder_email")}
-                onChange={(e) => {
-                  const ci = dataState.candidateInfo;
-                  ci.email = e.target.value;
-                  setData((prev) => ({ ...prev, candidateInfo: ci }));
-                }}
+                onChange={handleInputChange("email")}
                 value={dataState.candidateInfo.email || ""}
               />
               <InputGroup
@@ -718,11 +680,7 @@ export default function DialogIdentity({
                 className="font-mono"
                 spellCheck={false}
                 placeholder={t("dlg_identity.lbl_placeholder_web_address")}
-                onChange={(e) => {
-                  const ci = dataState.candidateInfo;
-                  ci.web = e.target.value;
-                  setData((prev) => ({ ...prev, candidateInfo: ci }));
-                }}
+                onChange={handleInputChange("web")}
                 value={dataState.candidateInfo.web || ""}
               />
               <InputGroup
@@ -731,11 +689,7 @@ export default function DialogIdentity({
                 className="font-mono"
                 spellCheck={false}
                 placeholder={t("dlg_identity.lbl_placeholder_twitter")}
-                onChange={(e) => {
-                  const ci = dataState.candidateInfo;
-                  ci.twitter = e.target.value;
-                  setData((prev) => ({ ...prev, candidateInfo: ci }));
-                }}
+                onChange={handleInputChange("twitter")}
                 value={dataState.candidateInfo.twitter || ""}
               />
               <InputGroup
@@ -744,11 +698,7 @@ export default function DialogIdentity({
                 className="font-mono"
                 spellCheck={false}
                 placeholder={t("dlg_identity.lbl_placeholder_discord")}
-                onChange={(e) => {
-                  const ci = dataState.candidateInfo;
-                  ci.discord = e.target.value;
-                  setData((prev) => ({ ...prev, candidateInfo: ci }));
-                }}
+                onChange={handleInputChange("discord")}
                 value={dataState.candidateInfo.discord || ""}
               />
               <InputGroup
@@ -757,18 +707,14 @@ export default function DialogIdentity({
                 className="font-mono"
                 spellCheck={false}
                 placeholder={t("dlg_identity.lbl_placeholder_riot_name")}
-                onChange={(e) => {
-                  const ci = dataState.candidateInfo;
-                  ci.riot = e.target.value;
-                  setData((prev) => ({ ...prev, candidateInfo: ci }));
-                }}
+                onChange={handleInputChange("riot")}
                 value={dataState.candidateInfo.riot || ""}
               />
               <Button
                 minimal
                 small
                 icon={showAdditionalFields ? "chevron-up" : "chevron-down"}
-                onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+                onClick={handleToggleAdditionalFields}
                 text={
                   showAdditionalFields
                     ? "Hide additional fields"
@@ -783,11 +729,7 @@ export default function DialogIdentity({
                     className="font-mono"
                     spellCheck={false}
                     placeholder="Phone number"
-                    onChange={(e) => {
-                      const ci = dataState.candidateInfo;
-                      ci.phone = e.target.value;
-                      setData((prev) => ({ ...prev, candidateInfo: ci }));
-                    }}
+                    onChange={handleInputChange("phone")}
                     value={dataState.candidateInfo.phone || ""}
                   />
                   <InputGroup
@@ -796,11 +738,7 @@ export default function DialogIdentity({
                     className="font-mono"
                     spellCheck={false}
                     placeholder="LinkedIn"
-                    onChange={(e) => {
-                      const ci = dataState.candidateInfo;
-                      ci.linkedin = e.target.value;
-                      setData((prev) => ({ ...prev, candidateInfo: ci }));
-                    }}
+                    onChange={handleInputChange("linkedin")}
                     value={dataState.candidateInfo.linkedin || ""}
                   />
                   <InputGroup
@@ -809,11 +747,7 @@ export default function DialogIdentity({
                     className="font-mono"
                     spellCheck={false}
                     placeholder="Telegram"
-                    onChange={(e) => {
-                      const ci = dataState.candidateInfo;
-                      ci.telegram = e.target.value;
-                      setData((prev) => ({ ...prev, candidateInfo: ci }));
-                    }}
+                    onChange={handleInputChange("telegram")}
                     value={dataState.candidateInfo.telegram || ""}
                   />
                   <InputGroup
@@ -822,11 +756,7 @@ export default function DialogIdentity({
                     className="font-mono"
                     spellCheck={false}
                     placeholder="Github"
-                    onChange={(e) => {
-                      const ci = dataState.candidateInfo;
-                      ci.github = e.target.value;
-                      setData((prev) => ({ ...prev, candidateInfo: ci }));
-                    }}
+                    onChange={handleInputChange("github")}
                     value={dataState.candidateInfo.github || ""}
                   />
                   <InputGroup
@@ -835,11 +765,7 @@ export default function DialogIdentity({
                     className="font-mono"
                     spellCheck={false}
                     placeholder="Custom"
-                    onChange={(e) => {
-                      const ci = dataState.candidateInfo;
-                      ci.custom = e.target.value;
-                      setData((prev) => ({ ...prev, candidateInfo: ci }));
-                    }}
+                    onChange={handleInputChange("custom")}
                     value={dataState.candidateInfo.custom || ""}
                   />
                   <InputGroup
@@ -848,11 +774,7 @@ export default function DialogIdentity({
                     className="font-mono"
                     spellCheck={false}
                     placeholder="PGP Fingerprint (20 bytes hex)"
-                    onChange={(e) => {
-                      const ci = dataState.candidateInfo;
-                      ci.pgpFingerprint = e.target.value;
-                      setData((prev) => ({ ...prev, candidateInfo: ci }));
-                    }}
+                    onChange={handleInputChange("pgpFingerprint")}
                     value={dataState.candidateInfo.pgpFingerprint || ""}
                   />
                 </>
@@ -866,14 +788,7 @@ export default function DialogIdentity({
               />
               <Button
                 className="mt-2"
-                onClick={() => {
-                  setShowUpdateForm(false);
-                  // Clear registrar data when canceling update
-                  setData((prev) => ({
-                    ...prev,
-                    registrarData: null,
-                  }));
-                }}
+                onClick={handleCancelUpdate}
               >
                 {t("Cancel")}
               </Button>

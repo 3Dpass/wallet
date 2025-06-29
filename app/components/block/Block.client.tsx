@@ -10,7 +10,7 @@ import {
 import { Canvas } from "@react-three/fiber";
 import { Link } from "@remix-run/react";
 import { useAtomValue } from "jotai";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { bestNumberFinalizedAtom } from "../../atoms";
 import TitledValue from "../common/TitledValue";
@@ -37,19 +37,25 @@ const DigestEngineItem = ({
   engine: DigestEngine;
   isLast: boolean;
   onCopy: (bytes: string) => void;
-}) => (
-  <div className="flex items-center gap-1">
-    <strong>{engine.name}</strong>
-    <Button
-      icon="duplicate"
-      minimal
-      small
-      onClick={() => onCopy(engine.digestBytes)}
-      className="p-1"
-    />
-    {!isLast && <span className="text-gray-600">,</span>}
-  </div>
-);
+}) => {
+  const handleCopy = useCallback(() => {
+    onCopy(engine.digestBytes);
+  }, [onCopy, engine.digestBytes]);
+
+  return (
+    <div className="flex items-center gap-1">
+      <strong>{engine.name}</strong>
+      <Button
+        icon="duplicate"
+        minimal
+        small
+        onClick={handleCopy}
+        className="p-1"
+      />
+      {!isLast && <span className="text-gray-600">,</span>}
+    </div>
+  );
+};
 
 // Helper component for rendering digest groups
 const DigestGroup = ({
@@ -63,17 +69,19 @@ const DigestGroup = ({
 }) => {
   if (engines.length === 0) return null;
 
+  const renderEngine = useCallback((engine: DigestEngine, index: number) => (
+    <DigestEngineItem
+      key={`${engine.name}-${engine.bytes}`}
+      engine={engine}
+      isLast={index === engines.length - 1}
+      onCopy={onCopy}
+    />
+  ), [engines.length, onCopy]);
+
   return (
     <div className="flex items-center gap-1">
       <span className="text-gray-600">{title}:</span>
-      {engines.map((engine, index) => (
-        <DigestEngineItem
-          key={`${engine.name}-${engine.bytes}`}
-          engine={engine}
-          isLast={index === engines.length - 1}
-          onCopy={onCopy}
-        />
-      ))}
+      {engines.map(renderEngine)}
     </div>
   );
 };
@@ -93,33 +101,37 @@ const SealAndConsensusGroup = ({
 
   if (!hasSeal && !hasConsensus) return null;
 
+  const renderSealEngine = useCallback((engine: DigestEngine, index: number) => (
+    <DigestEngineItem
+      key={`seal-${engine.name}-${engine.bytes}`}
+      engine={engine}
+      isLast={index === sealEngines.length - 1}
+      onCopy={onCopy}
+    />
+  ), [sealEngines.length, onCopy]);
+
+  const renderConsensusEngine = useCallback((engine: DigestEngine, index: number) => (
+    <DigestEngineItem
+      key={`consensus-${engine.name}-${engine.bytes}`}
+      engine={engine}
+      isLast={index === consensusEngines.length - 1}
+      onCopy={onCopy}
+    />
+  ), [consensusEngines.length, onCopy]);
+
   return (
     <div className="flex items-center gap-1">
       {hasSeal && (
         <>
           <span className="text-gray-600">Seal:</span>
-          {sealEngines.map((engine, index) => (
-            <DigestEngineItem
-              key={`seal-${engine.name}-${engine.bytes}`}
-              engine={engine}
-              isLast={index === sealEngines.length - 1}
-              onCopy={onCopy}
-            />
-          ))}
+          {sealEngines.map(renderSealEngine)}
         </>
       )}
       {hasSeal && hasConsensus && <span className="text-gray-600">,</span>}
       {hasConsensus && (
         <>
           <span className="text-gray-600">Consensus:</span>
-          {consensusEngines.map((engine, index) => (
-            <DigestEngineItem
-              key={`consensus-${engine.name}-${engine.bytes}`}
-              engine={engine}
-              isLast={index === consensusEngines.length - 1}
-              onCopy={onCopy}
-            />
-          ))}
+          {consensusEngines.map(renderConsensusEngine)}
         </>
       )}
     </div>
@@ -172,6 +184,14 @@ const BlockDetailsPopover = ({
   const { t } = useTranslation();
   const [showLogs, setShowLogs] = useState(false);
 
+  const handleToggleLogs = useCallback(() => {
+    setShowLogs(!showLogs);
+  }, [showLogs]);
+
+  const renderHash = useCallback((hash: string) => (
+    <div key={hash}>{hash}</div>
+  ), []);
+
   return (
     <div className="p-4">
       {block.blockHash && (
@@ -200,7 +220,7 @@ const BlockDetailsPopover = ({
               minimal
               small
               icon={showLogs ? "chevron-up" : "chevron-down"}
-              onClick={() => setShowLogs(!showLogs)}
+              onClick={handleToggleLogs}
             />
           </div>
           {showLogs && (
@@ -236,9 +256,7 @@ const BlockDetailsPopover = ({
         </div>
       )}
       <code className="block text-xs">
-        {block.objectHashes.map((hash) => (
-          <div key={hash}>{hash}</div>
-        ))}
+        {block.objectHashes.map(renderHash)}
       </code>
     </div>
   );
@@ -259,14 +277,14 @@ export default function Block({ block }: BlockProps) {
   const downloadFilename = `3dpass-${block.block.header.number.toString()}.obj`;
 
   // Event handlers
-  const handleCopyEngineBytes = async (bytes: string): Promise<void> => {
+  const handleCopyEngineBytes = useCallback(async (bytes: string): Promise<void> => {
     try {
       await navigator.clipboard.writeText(bytes);
       // You could add a toast notification here if you have a toaster
     } catch (error) {
       console.error("Failed to copy engine bytes:", error);
     }
-  };
+  }, []);
 
   return (
     <Card elevation={Elevation.ZERO}>

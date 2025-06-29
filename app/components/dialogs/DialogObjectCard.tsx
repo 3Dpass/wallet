@@ -10,6 +10,39 @@ interface DialogObjectCardProps {
   objectIndex: number;
 }
 
+// Type for the RPC response data
+interface RpcObjectData {
+  state?: Record<string, number | string>;
+  obj?: number[];
+  hashes?: string[];
+  when_created?: number;
+  owner?: string;
+  estimators?: [string, number][];
+  est_outliers?: string[];
+  approvers?: Array<{
+    account_id: string;
+    when: number;
+    proof: string;
+  }>;
+  num_approvals?: number;
+  est_rewards?: number;
+  author_rewards?: number;
+  prop?: Array<{
+    propIdx: number;
+    maxValue: number;
+  }>;
+  [key: string]: unknown;
+}
+
+// Type for the mapped data that ObjectCard expects
+interface MappedObjectData {
+  state?: Record<string, number | string>;
+  isPrivate?: boolean;
+  whenCreated?: number;
+  numApprovals?: number;
+  [key: string]: unknown;
+}
+
 export default function DialogObjectCard({
   isOpen,
   onClose,
@@ -18,7 +51,8 @@ export default function DialogObjectCard({
   const { t } = useTranslation();
   const api = useApi();
   const [objString, setObjString] = useState<string | null>(null);
-  const [rpcData, setRpcData] = useState<Record<string, unknown> | null>(null);
+  const [rpcData, setRpcData] = useState<RpcObjectData | null>(null);
+  const [mappedData, setMappedData] = useState<MappedObjectData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const _abortControllerRef = useRef<AbortController | null>(null);
@@ -39,6 +73,14 @@ export default function DialogObjectCard({
         console.log('API result for objectIndex', objectIndex, ':', result);
         setRpcData(result);
 
+        // Map the RPC data to the format expected by ObjectCard
+        const mapped: MappedObjectData = {
+          ...result,
+          whenCreated: result?.when_created,
+          numApprovals: result?.num_approvals,
+        };
+        setMappedData(mapped);
+
         if (result?.obj && Array.isArray(result.obj)) {
           // Convert array to string
           const str = String.fromCharCode.apply(null, result.obj);
@@ -50,6 +92,7 @@ export default function DialogObjectCard({
         console.error("Failed to fetch object:", error);
         setObjString(null);
         setRpcData(null);
+        setMappedData(null);
         setError(error instanceof Error ? error.message : String(error));
       } finally {
         setIsLoading(false);
@@ -82,8 +125,8 @@ export default function DialogObjectCard({
             </div>
             <div className="text-xs mt-2">Error: {error}</div>
           </div>
-        ) : rpcData ? (
-          <ObjectCard objectIndex={objectIndex} objectData={rpcData} inDialog={true} />
+        ) : mappedData ? (
+          <ObjectCard objectIndex={objectIndex} objectData={mappedData} inDialog={true} />
         ) : (
           <div className="text-center py-12">
             <div className="text-lg font-semibold mb-2">
