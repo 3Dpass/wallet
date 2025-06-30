@@ -10,6 +10,7 @@ import useToaster from "../../hooks/useToaster";
 import BaseDialog from "./BaseDialog";
 import AmountInput from "../common/AmountInput";
 import { formatOptionsAtom } from "../../atoms";
+import { toChainUnit } from "../../utils/converter";
 
 interface DialogProposeBountyProps {
   isOpen: boolean;
@@ -102,7 +103,7 @@ export default function DialogProposeBounty({
     setLoading(true);
     try {
       // Convert value to plancks (chain units), as in send funds dialog
-      const valuePlancks = BigInt(Math.floor(valueNumber * 10 ** decimals));
+      const valuePlancks = toChainUnit(value, decimals);
       const tx = api.tx.bounties.proposeBounty(valuePlancks, description);
       signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
@@ -124,7 +125,7 @@ export default function DialogProposeBounty({
     } finally {
       setLoading(false);
     }
-  }, [api, selectedAccount, value, valueNumber, description, pair, toaster, t, onProposed, onClose, decimals]);
+  }, [api, selectedAccount, value, description, pair, toaster, t, onProposed, onClose, decimals]);
 
   // Bond calculation constants
   const BASE_BOND = 1;

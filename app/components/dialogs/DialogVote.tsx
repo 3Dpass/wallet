@@ -9,6 +9,7 @@ import keyring from "@polkadot/ui-keyring";
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
 import { formatOptionsAtom } from "../../atoms";
+import { toChainUnit } from "../../utils/converter";
 
 interface DialogVoteProps {
   isOpen: boolean;
@@ -49,7 +50,7 @@ export default function DialogVote({ isOpen, onClose, selectedVotes, selectedAcc
         return;
       }
       // Convert amount to plancks (chain units)
-      const value = BigInt(Math.floor(amountNumber * 10 ** decimals));
+      const value = toChainUnit(amount, decimals);
       const tx = api.tx.phragmenElection.vote(selectedVotes, value);
       await signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
@@ -70,7 +71,7 @@ export default function DialogVote({ isOpen, onClose, selectedVotes, selectedAcc
       });
       setIsLoading(false);
     }
-  }, [api, selectedAccount, amount, amountNumber, selectedVotes, toaster, onClose, decimals]);
+  }, [api, selectedAccount, amount, selectedVotes, toaster, onClose, decimals]);
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose} title={t('governance.submit_vote')}>
