@@ -11,7 +11,7 @@ import {
 } from "app/components/common/AccountName";
 import { CircularProgress } from "app/components/common/CircularProgress";
 import { formatTimeLeft } from "app/utils/time";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useApi } from "../components/Api";
 import type { Option, Vec } from "@polkadot/types";
@@ -251,7 +251,8 @@ export default function GovernanceMembers() {
     }
   }, [votingMode, selectedVotes.length]);
 
-  const handleSelectVote = useCallback((address: string) => {
+  const handleSelectVote = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const { value: address } = event.target;
     setSelectedVotes((prev) =>
       prev.includes(address)
         ? prev.filter((a) => a !== address)
@@ -364,8 +365,9 @@ export default function GovernanceMembers() {
                 <td>
                   <input
                     type="checkbox"
+                    value={member.address}
                     checked={selectedVotes.includes(member.address)}
-                    onChange={() => handleSelectVote(member.address)}
+                    onChange={handleSelectVote}
                   />
                 </td>
               )}
@@ -426,8 +428,9 @@ export default function GovernanceMembers() {
                     <td>
                       <input
                         type="checkbox"
+                        value={runner.who}
                         checked={selectedVotes.includes(runner.who)}
-                        onChange={() => handleSelectVote(runner.who)}
+                        onChange={handleSelectVote}
                       />
                     </td>
                   )}
@@ -477,8 +480,9 @@ export default function GovernanceMembers() {
                     <td>
                       <input
                         type="checkbox"
+                        value={cand.address}
                         checked={selectedVotes.includes(cand.address)}
-                        onChange={() => handleSelectVote(cand.address)}
+                        onChange={handleSelectVote}
                       />
                     </td>
                   )}

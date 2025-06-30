@@ -17,7 +17,7 @@ import { useApi } from "app/components/Api";
 import { BountyDetails } from "app/components/governance/BountyDetails";
 import { initializeMockBounties, mockBounties } from "app/utils/mock";
 import { disableMockMode, enableMockMode } from "app/utils/sign";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import DialogProposeBounty from "app/components/dialogs/DialogProposeBounty";
 
@@ -149,6 +149,19 @@ export default function BountiesClient() {
     setLoading(true); // Force reload of bounties
   };
 
+  const handleOpenDialog = useCallback(() => setDialogOpen(true), []);
+  const handleCloseDialog = useCallback(() => setDialogOpen(false), []);
+
+  const handleBountyProposed = useCallback(() => {
+    setDialogOpen(false);
+    setLoading(true);
+    // reload bounties
+    setTimeout(() => {
+      // Give time for block inclusion
+      setLoading(false);
+    }, 2000);
+  }, []);
+
   if (loading) {
     return <Spinner />;
   }
@@ -169,22 +182,14 @@ export default function BountiesClient() {
             icon="plus"
             intent="primary"
             text={t("governance.propose_bounty") || "+ Propose bounty"}
-            onClick={() => setDialogOpen(true)}
+            onClick={handleOpenDialog}
           />
         </div>
       </div>
       <DialogProposeBounty
         isOpen={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        onProposed={() => {
-          setDialogOpen(false);
-          setLoading(true);
-          // reload bounties
-          setTimeout(() => {
-            // Give time for block inclusion
-            setLoading(false);
-          }, 2000);
-        }}
+        onClose={handleCloseDialog}
+        onProposed={handleBountyProposed}
       />
       <div className="space-y-3">
         {bounties.length === 0 ? (

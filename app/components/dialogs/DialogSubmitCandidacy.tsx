@@ -21,6 +21,7 @@ export default function DialogSubmitCandidacy({ isOpen, onClose }: DialogSubmitC
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasValidIdentity, setHasValidIdentity] = useState(false);
+  const [numCandidates, setNumCandidates] = useState(0);
 
   useEffect(() => {
     const allAccounts = keyring.getPairs().map((pair) => pair.address);
@@ -30,6 +31,26 @@ export default function DialogSubmitCandidacy({ isOpen, onClose }: DialogSubmitC
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
+
+  useEffect(() => {
+    async function fetchNumCandidates() {
+      if (!api) return;
+      try {
+        const candidates = await api.query.phragmenElection.candidates();
+        if (candidates && (candidates as any).length) {
+          setNumCandidates((candidates as any).length);
+        } else {
+          setNumCandidates(0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch number of candidates:", error);
+      }
+    }
+
+    if (isOpen) {
+      fetchNumCandidates();
+    }
+  }, [api, isOpen]);
 
   useEffect(() => {
     async function checkIdentity() {
@@ -108,7 +129,7 @@ export default function DialogSubmitCandidacy({ isOpen, onClose }: DialogSubmitC
         setIsLoading(false);
         return;
       }
-      const tx = api.tx.phragmenElection.submitCandidacy(0);
+      const tx = api.tx.phragmenElection.submitCandidacy(numCandidates);
       await signAndSend(tx, pair, {}, (status) => {
         if (status.isInBlock) {
           toaster.show({
@@ -129,7 +150,7 @@ export default function DialogSubmitCandidacy({ isOpen, onClose }: DialogSubmitC
       });
       setIsLoading(false);
     }
-  }, [api, canSubmit, selectedAccount, t, toaster, onClose]);
+  }, [api, canSubmit, selectedAccount, t, toaster, onClose, numCandidates]);
 
   const handleAccountChange = useCallback((address: string | null) => {
     setSelectedAccount(address);

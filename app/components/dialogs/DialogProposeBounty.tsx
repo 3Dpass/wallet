@@ -4,7 +4,7 @@ import { lastSelectedAccountAtom } from "app/atoms";
 import { useApi } from "app/components/Api";
 import { signAndSend } from "app/utils/sign";
 import { useAtom, useAtomValue } from "jotai";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import useToaster from "../../hooks/useToaster";
 import BaseDialog from "./BaseDialog";
@@ -55,6 +55,15 @@ export default function DialogProposeBounty({
       return null;
     }
   })();
+
+  const handleAmountChange = useCallback((num: number, str: string) => {
+    setValue(str);
+    setValueNumber(num);
+  }, []);
+
+  const handleDescriptionChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setDescription(e.target.value);
+  }, []);
 
   const handleSubmit = useCallback(() => {
     if (!api) {
@@ -146,10 +155,7 @@ export default function DialogProposeBounty({
       <div className="flex flex-col gap-4">
         <AmountInput
           disabled={loading}
-          onValueChange={(num: number, str: string) => {
-            setValue(str);
-            setValueNumber(num);
-          }}
+          onValueChange={handleAmountChange}
           placeholder={t("governance.enter_amount_to_allocate") || "Enter amount to allocate"}
           unit={unit}
         />
@@ -157,7 +163,7 @@ export default function DialogProposeBounty({
           fill
           placeholder={t("governance.enter_bounty_description") || "Enter bounty description"}
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={handleDescriptionChange}
           required
         />
       </div>

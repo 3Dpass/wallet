@@ -7,6 +7,8 @@ import { AccountName } from "../common/AccountName";
 import AmountInput from "../common/AmountInput";
 import keyring from "@polkadot/ui-keyring";
 import { useTranslation } from "react-i18next";
+import { useAtomValue } from "jotai";
+import { formatOptionsAtom } from "../../atoms";
 
 interface DialogVoteProps {
   isOpen: boolean;
@@ -22,11 +24,14 @@ export default function DialogVote({ isOpen, onClose, selectedVotes, selectedAcc
   const [amountNumber, setAmountNumber] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
+  const formatOptions = useAtomValue(formatOptionsAtom);
+  const decimals = formatOptions && typeof formatOptions.decimals === "number" ? formatOptions.decimals : 12;
+  const unit = formatOptions && formatOptions.unit ? formatOptions.unit : "";
 
-  const handleAmountChange = (valueAsNumber: number, valueAsString: string) => {
+  const handleAmountChange = useCallback((valueAsNumber: number, valueAsString: string) => {
     setAmount(valueAsString);
     setAmountNumber(valueAsNumber);
-  };
+  }, []);
 
   const handleSubmit = useCallback(async () => {
     if (!api || !selectedAccount || !amount || selectedVotes.length === 0) return;
@@ -44,7 +49,7 @@ export default function DialogVote({ isOpen, onClose, selectedVotes, selectedAcc
         return;
       }
       // Convert amount to plancks (chain units)
-      const value = BigInt(Math.floor(amountNumber * 10 ** 12));
+      const value = BigInt(Math.floor(amountNumber * 10 ** decimals));
       const tx = api.tx.phragmenElection.vote(selectedVotes, value);
       await signAndSend(tx, pair, {}, ({ status }) => {
         if (!status.isInBlock) return;
@@ -65,7 +70,7 @@ export default function DialogVote({ isOpen, onClose, selectedVotes, selectedAcc
       });
       setIsLoading(false);
     }
-  }, [api, selectedAccount, amount, amountNumber, selectedVotes, toaster, onClose]);
+  }, [api, selectedAccount, amount, amountNumber, selectedVotes, toaster, onClose, decimals]);
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose} title={t('governance.submit_vote')}>
@@ -84,7 +89,7 @@ export default function DialogVote({ isOpen, onClose, selectedVotes, selectedAcc
           disabled={isLoading}
           onValueChange={handleAmountChange}
           placeholder={t('governance.enter_amount_to_stake', 'Enter amount to stake for voting')}
-          unit="P3D"
+          unit={unit}
         />
         <div className="flex justify-end mt-4 gap-2">
           <Button
