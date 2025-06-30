@@ -7,6 +7,7 @@ import BaseDialog from "./BaseDialog";
 import { AddressSelect } from "../governance/AddressSelect";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
+import type { Vec } from "@polkadot/types";
 
 interface DialogSubmitCandidacyProps {
   isOpen: boolean;
@@ -36,14 +37,11 @@ export default function DialogSubmitCandidacy({ isOpen, onClose }: DialogSubmitC
     async function fetchNumCandidates() {
       if (!api) return;
       try {
-        const candidates = await api.query.phragmenElection.candidates();
-        if (candidates && (candidates as any).length) {
-          setNumCandidates((candidates as any).length);
-        } else {
-          setNumCandidates(0);
-        }
+        const candidates = (await api.query.phragmenElection.candidates()) as Vec<any>;
+        setNumCandidates(candidates.length);
       } catch (error) {
         console.error("Failed to fetch number of candidates:", error);
+        setNumCandidates(0);
       }
     }
 
