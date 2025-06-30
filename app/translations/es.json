@@ -87,7 +87,10 @@
       "lbl_account_is_password_protected_1": "La cuenta está protegida con ",
       "lbl_account_is_password_protected_2": "contraseña, debes ",
       "lbl_account_is_password_protected_3": "desbloquearla",
-      "lbl_account_is_password_protected_4": " antes de usarla"
+      "lbl_account_is_password_protected_4": " antes de usarla",
+      "lbl_prime": "Principal",
+      "identity_required": "La cuenta debe tener un juicio de identidad 'Razonable' o 'Conocido y Bueno'.",
+      "identity_prohibitive": "La cuenta tiene un juicio de identidad prohibitivo (p. ej., Erróneo, de Baja Calidad)."
     },
     "root_wallet": {
       "lbl_btn_create_new_address": "Crear nueva dirección...",
@@ -246,7 +249,24 @@
       "no_accounts": "No hay cuentas disponibles. Crea o importa una cuenta para participar en la gobernanza.",
       "already_voted": "Ya has votado",
       "mock_mode": "Modo de Prueba (Sin Red)",
-      "close_motion": "Cerrar Moción"
+      "close_motion": "Cerrar Moción",
+      "propose_bounty": "Proponer recompensa",
+      "bond": "Depósito",
+      "enter_bounty_description": "Ingrese la descripción de la recompensa",
+      "enter_amount_to_allocate": "Ingrese la cantidad a asignar",
+      "prime": "Principal",
+      "candidates": "Candidatos",
+      "runners_up": "Suplentes",
+      "deposit": "Depósito",
+      "my_vote": "Mi voto",
+      "my_votes": "Mis votos",
+      "vote_btn": "Votar",
+      "submit_vote": "Enviar voto",
+      "submit_vote_btn": "Votar",
+      "vote_submitted": "¡Voto enviado!",
+      "unvote_all_btn": "Eliminar todos los votos",
+      "unvote_all_confirm": "¿Está seguro de que desea eliminar todos sus votos?",
+      "unvote_all_submitted": "¡Todos los votos eliminados!"
     },
     "assets_objects": {
       "title": "Objetos",
@@ -506,6 +526,9 @@
       "download_obj_file": "Descargar archivo OBJ",
       "object_details": "Detalles del Objeto",
       "token_holders_distribution": "Distribución de Titulares de Tokens"
-    }
+    },
+    "submit_candidacy": "Presentar candidatura",
+    "submit_candidacy_btn": "Candidatura",
+    "candidacy_submitted": "¡Candidatura presentada!"
   }
 }

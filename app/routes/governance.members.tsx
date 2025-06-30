@@ -1,4 +1,4 @@
-import { Classes, HTMLTable, Intent, Spinner, Tag } from "@blueprintjs/core";
+import { Classes, HTMLTable, Intent, Spinner, Tag, Button } from "@blueprintjs/core";
 import type {
   DeriveCouncilVotes,
   DeriveElectionsInfo,
@@ -11,9 +11,15 @@ import {
 } from "app/components/common/AccountName";
 import { CircularProgress } from "app/components/common/CircularProgress";
 import { formatTimeLeft } from "app/utils/time";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useApi } from "../components/Api";
+import type { Option, Vec } from "@polkadot/types";
+import DialogSubmitCandidacy from "../components/dialogs/DialogSubmitCandidacy";
+import DialogVote from "../components/dialogs/DialogVote";
+import DialogUnvoteAll from "../components/dialogs/DialogUnvoteAll";
+import { useAtom } from "jotai";
+import { lastSelectedAccountAtom } from "app/atoms";
 
 interface CouncilMember {
   address: string;
@@ -27,10 +33,18 @@ interface CouncilMember {
   balance: string;
 }
 
+type RunnerUp = { who: string; stake: string; deposit: string };
+type CandidateTuple = [string, string];
+interface MyVotingInfo {
+  votes: string[];
+  stake: string;
+  deposit: string;
+}
+
 const transformVotes = (
   entries: DeriveCouncilVotes
 ): Record<string, AccountId[]> =>
-  entries.reduce<Record<string, AccountId[]>>((result, [voter, { votes }]) => {
+  entries.reduce<Record<string, AccountId[]>>((result: Record<string, AccountId[]>, [voter, { votes }]: [AccountId, { votes: AccountId[] }]) => {
     for (const candidate of votes) {
       const address = candidate.toString();
 
@@ -58,6 +72,16 @@ export default function GovernanceMembers() {
     blockNumber: number;
     mod: number;
   } | null>(null);
+  const [prime, setPrime] = useState<string | null>(null);
+  const [runnersUp, setRunnersUp] = useState<RunnerUp[]>([]);
+  const [candidates, setCandidates] = useState<{ address: string; stake: string }[]>([]);
+  const [showCandidacyDialog, setShowCandidacyDialog] = useState(false);
+  const [votingMode, setVotingMode] = useState(false);
+  const [selectedVotes, setSelectedVotes] = useState<string[]>([]);
+  const [showVoteDialog, setShowVoteDialog] = useState(false);
+  const [showUnvoteAllDialog, setShowUnvoteAllDialog] = useState(false);
+  const [lastSelectedAccount] = useAtom(lastSelectedAccountAtom);
+  const [myVotes, setMyVotes] = useState<MyVotingInfo | null>(null);
 
   useEffect(() => {
     if (!api) return;
@@ -157,6 +181,95 @@ export default function GovernanceMembers() {
     fetchCouncilData();
   }, [api, electionsInfo, allVotes]);
 
+  useEffect(() => {
+    if (!api) return;
+    (async () => {
+      try {
+        const primeOpt = (await api.query.council.prime()) as Option<AccountId>;
+        if (primeOpt && primeOpt.isSome) {
+          setPrime(primeOpt.unwrap().toString());
+        } else {
+          setPrime(null);
+        }
+      } catch {
+        setPrime(null);
+      }
+    })();
+  }, [api]);
+
+  useEffect(() => {
+    if (!api) return;
+
+    (async () => {
+      try {
+        // Runners Up
+        const runnersUpCodec = await api.query.phragmenElection.runnersUp();
+        setRunnersUp(runnersUpCodec.toJSON() as RunnerUp[]);
+
+        // Candidates
+        const candidatesCodec = await api.query.phragmenElection.candidates();
+        setCandidates(
+          (candidatesCodec.toJSON() as CandidateTuple[]).map(([address, stake]) => ({
+            address,
+            stake,
+          }))
+        );
+      } catch (e) {
+        setRunnersUp([]);
+        setCandidates([]);
+      }
+    })();
+  }, [api]);
+
+  useEffect(() => {
+    async function fetchMyVotes() {
+      if (!api || !lastSelectedAccount) {
+        setMyVotes(null);
+        return;
+      }
+      try {
+        const voting = await api.query.phragmenElection.voting(lastSelectedAccount);
+        const data = voting.toJSON() as unknown as MyVotingInfo;
+        if (data && data.votes && data.votes.length > 0) {
+          setMyVotes(data);
+        } else {
+          setMyVotes(null);
+        }
+      } catch {
+        setMyVotes(null);
+      }
+    }
+    fetchMyVotes();
+  }, [api, lastSelectedAccount]);
+
+  const handleToggleVoting = useCallback(() => {
+    if (votingMode && selectedVotes.length > 0) {
+      setShowVoteDialog(true);
+    } else {
+      setVotingMode((v) => !v);
+      setSelectedVotes([]);
+    }
+  }, [votingMode, selectedVotes.length]);
+
+  const handleSelectVote = useCallback((address: string) => {
+    setSelectedVotes((prev) =>
+      prev.includes(address)
+        ? prev.filter((a) => a !== address)
+        : [...prev, address]
+    );
+  }, []);
+
+  const handleCloseVoteDialog = useCallback(() => {
+    setShowVoteDialog(false);
+    setVotingMode(false);
+    setSelectedVotes([]);
+  }, []);
+
+  const handleShowCandidacyDialog = useCallback(() => setShowCandidacyDialog(true), []);
+  const handleCloseCandidacyDialog = useCallback(() => setShowCandidacyDialog(false), []);
+  const handleShowUnvoteAllDialog = useCallback(() => setShowUnvoteAllDialog(true), []);
+  const handleCloseUnvoteAllDialog = useCallback(() => setShowUnvoteAllDialog(false), []);
+
   if (loading) {
     return <Spinner />;
   }
@@ -174,8 +287,8 @@ export default function GovernanceMembers() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className={Classes.HEADING}>{t("governance.council_members")}</h2>
-        {termProgress && (
-          <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4">
+          {termProgress && (
             <div className="flex flex-col text-right">
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 {t("governance.term_progress")} (
@@ -194,20 +307,68 @@ export default function GovernanceMembers() {
                 </span>
               </div>
             </div>
-          </div>
-        )}
+          )}
+          <Button
+            icon="tick-circle"
+            intent={votingMode ? "success" : "none"}
+            text={
+              votingMode && selectedVotes.length > 0
+                ? `${t("governance.vote_btn", "Vote")} (${selectedVotes.length})`
+                : t("governance.vote_btn", "Vote")
+            }
+            onClick={handleToggleVoting}
+            style={{ minWidth: 90 }}
+          />
+          {myVotes && myVotes.votes.length > 0 && (
+            <Button
+              icon="eraser"
+              intent="danger"
+              text={t("governance.unvote_all_btn", "Unvote All")}
+              onClick={handleShowUnvoteAllDialog}
+              style={{ minWidth: 110 }}
+            />
+          )}
+          <Button
+            icon="plus"
+            intent="primary"
+            text={t("governance.submit_candidacy_btn", "Candidacy")}
+            onClick={handleShowCandidacyDialog}
+          />
+        </div>
       </div>
+      <DialogSubmitCandidacy isOpen={showCandidacyDialog} onClose={handleCloseCandidacyDialog} />
+      <DialogVote
+        isOpen={showVoteDialog}
+        onClose={handleCloseVoteDialog}
+        selectedVotes={selectedVotes}
+        selectedAccount={lastSelectedAccount || ""}
+      />
+      <DialogUnvoteAll
+        isOpen={showUnvoteAllDialog}
+        onClose={handleCloseUnvoteAllDialog}
+        selectedAccount={lastSelectedAccount || ""}
+      />
       <HTMLTable className="w-full" striped={true}>
         <thead>
           <tr>
-            <th className="text-right w-24">{t("governance.votes")}</th>
-            <th className="text-right w-32">{t("governance.balance")}</th>
-            <th className="w-full">{t("governance.member")}</th>
+            {votingMode && <th></th>}
+            <th className="text-right w-24 text-gray-500">{t("governance.votes")}</th>
+            <th className="text-right w-32 text-gray-500">{t("governance.balance")}</th>
+            <th className="w-full text-gray-500">{t("governance.member")}</th>
           </tr>
         </thead>
         <tbody>
           {councilMembers.map((member) => (
             <tr key={member.address}>
+              {votingMode && (
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedVotes.includes(member.address)}
+                    onChange={() => handleSelectVote(member.address)}
+                  />
+                </td>
+              )}
               <td className="text-right">
                 <Tag intent={Intent.SUCCESS} minimal>
                   {member.votes}
@@ -219,15 +380,132 @@ export default function GovernanceMembers() {
                 </Tag>
               </td>
               <td>
-                <AccountName
-                  address={member.address}
-                  identity={member.identity}
-                />
+                <div className="flex items-center gap-2">
+                  <AccountName
+                    address={member.address}
+                    identity={member.identity}
+                  />
+                  {prime === member.address && (
+                    <Tag intent={Intent.WARNING} minimal>
+                      {t('governance.prime')}
+                    </Tag>
+                  )}
+                  {myVotes && myVotes.votes.includes(member.address) && (
+                    <>
+                      <Tag intent={Intent.DANGER} minimal>
+                        {t('governance.my_vote')}
+                      </Tag>
+                      <Tag intent={Intent.NONE} minimal>
+                        {formatBalance(myVotes.stake, { withUnit: 'P3D', decimals: 12 })}
+                      </Tag>
+                    </>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </HTMLTable>
+      {/* Runners Up Table */}
+      {runnersUp.length > 0 && (
+        <div className="mt-8">
+          <h3 className={Classes.HEADING}>{t('governance.runners_up')}</h3>
+          <HTMLTable className="w-full" striped={true}>
+            <thead>
+              <tr>
+                {votingMode && <th></th>}
+                <th className="w-full text-gray-500">{t('governance.member')}</th>
+                <th className="text-right w-32 text-gray-500">{t('governance.balance')}</th>
+                <th className="text-right w-32 text-gray-500">{t('governance.deposit')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {runnersUp.map((runner) => (
+                <tr key={runner.who}>
+                  {votingMode && (
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedVotes.includes(runner.who)}
+                        onChange={() => handleSelectVote(runner.who)}
+                      />
+                    </td>
+                  )}
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <AccountName address={runner.who} />
+                      {myVotes && myVotes.votes.includes(runner.who) && (
+                        <>
+                          <Tag intent={Intent.DANGER} minimal>
+                            {t('governance.my_vote')}
+                          </Tag>
+                          <Tag intent={Intent.NONE} minimal>
+                            {formatBalance(myVotes.stake, { withUnit: 'P3D', decimals: 12 })}
+                          </Tag>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  <td className="text-right">
+                    <Tag intent={Intent.PRIMARY} minimal>{formatBalance(runner.stake, { withUnit: 'P3D', decimals: 12 })}</Tag>
+                  </td>
+                  <td className="text-right">
+                    <Tag intent={Intent.NONE} minimal>{formatBalance(runner.deposit, { withUnit: 'P3D', decimals: 12 })}</Tag>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </HTMLTable>
+        </div>
+      )}
+      {/* Candidates Table */}
+      {candidates.length > 0 && (
+        <div className="mt-8">
+          <h3 className={Classes.HEADING}>{t('governance.candidates')}</h3>
+          <HTMLTable className="w-full" striped={true}>
+            <thead>
+              <tr>
+                {votingMode && <th></th>}
+                <th className="w-full text-gray-500">{t('governance.member')}</th>
+                <th className="text-right w-32 text-gray-500">{t('governance.balance')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {candidates.map((cand) => (
+                <tr key={cand.address}>
+                  {votingMode && (
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedVotes.includes(cand.address)}
+                        onChange={() => handleSelectVote(cand.address)}
+                      />
+                    </td>
+                  )}
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <AccountName address={cand.address} />
+                      {myVotes && myVotes.votes.includes(cand.address) && (
+                        <>
+                          <Tag intent={Intent.DANGER} minimal>
+                            {t('governance.my_vote')}
+                          </Tag>
+                          <Tag intent={Intent.NONE} minimal>
+                            {formatBalance(myVotes.stake, { withUnit: 'P3D', decimals: 12 })}
+                          </Tag>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  <td className="text-right">
+                    <Tag intent={Intent.PRIMARY} minimal>{formatBalance(cand.stake, { withUnit: 'P3D', decimals: 12 })}</Tag>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </HTMLTable>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   Spinner,
   Switch,
   Tag,
+  Button,
 } from "@blueprintjs/core";
 import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import type { Option } from "@polkadot/types";
@@ -18,6 +19,7 @@ import { initializeMockBounties, mockBounties } from "app/utils/mock";
 import { disableMockMode, enableMockMode } from "app/utils/sign";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import DialogProposeBounty from "app/components/dialogs/DialogProposeBounty";
 
 interface Bounty {
   id: string;
@@ -44,6 +46,7 @@ export default function BountiesClient() {
   const [bounties, setBounties] = useState<Bounty[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMockMode, setIsMockMode] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!api) return;
@@ -154,14 +157,35 @@ export default function BountiesClient() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className={Classes.HEADING}>{t("governance.bounties")}</h2>
-        {process.env.NODE_ENV === "development" && (
-          <Switch
-            checked={isMockMode}
-            label={t("governance.mock_mode")}
-            onChange={handleMockModeToggle}
+        <div className="flex items-center gap-2">
+          {process.env.NODE_ENV === "development" && (
+            <Switch
+              checked={isMockMode}
+              label={t("governance.mock_mode")}
+              onChange={handleMockModeToggle}
+            />
+          )}
+          <Button
+            icon="plus"
+            intent="primary"
+            text={t("governance.propose_bounty") || "+ Propose bounty"}
+            onClick={() => setDialogOpen(true)}
           />
-        )}
+        </div>
       </div>
+      <DialogProposeBounty
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onProposed={() => {
+          setDialogOpen(false);
+          setLoading(true);
+          // reload bounties
+          setTimeout(() => {
+            // Give time for block inclusion
+            setLoading(false);
+          }, 2000);
+        }}
+      />
       <div className="space-y-3">
         {bounties.length === 0 ? (
           <Card>

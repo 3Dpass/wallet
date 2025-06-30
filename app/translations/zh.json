@@ -87,7 +87,10 @@
       "lbl_account_is_password_protected_1": "账户已",
       "lbl_account_is_password_protected_2": "密码保护，您需要",
       "lbl_account_is_password_protected_3": "解锁",
-      "lbl_account_is_password_protected_4": "后才能使用"
+      "lbl_account_is_password_protected_4": "后才能使用",
+      "lbl_prime": "首席",
+      "identity_required": "账户必须具有“合理”或“已知良好”的身份判断。",
+      "identity_prohibitive": "账户具有禁止性身份判断（例如，错误、低质量）。"
     },
     "root_wallet": {
       "lbl_btn_create_new_address": "创建新地址...",
@@ -246,7 +249,15 @@
       "no_accounts": "没有可用账户。创建或导入账户以参与治理。",
       "already_voted": "已投票",
       "mock_mode": "测试模式（无网络）",
-      "close_motion": "结束提案"
+      "close_motion": "结束提案",
+      "propose_bounty": "提议赏金",
+      "bond": "保证金",
+      "enter_bounty_description": "输入赏金描述",
+      "enter_amount_to_allocate": "输入分配金额",
+      "prime": "首席",
+      "candidates": "候选人",
+      "runners_up": "候补",
+      "deposit": "保证金"
     },
     "assets_objects": {
       "title": "对象",
@@ -506,6 +517,15 @@
       "download_obj_file": "下载OBJ文件",
       "object_details": "对象详情",
       "token_holders_distribution": "代币持有者分布"
-    }
+    },
+    "submit_candidacy": "提交候选资格",
+    "submit_candidacy_btn": "候选资格",
+    "candidacy_submitted": "候选资格已提交！",
+    "my_vote": "我的投票",
+    "my_votes": "我的投票",
+    "vote_btn": "投票",
+    "submit_vote": "提交投票",
+    "submit_vote_btn": "投票",
+    "vote_submitted": "投票已提交！"
   }
 }
