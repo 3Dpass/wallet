@@ -48,7 +48,9 @@
       "lbl_fill_required_fields": "Please fill all required fields.",
       "lbl_no_account_selected": "No account selected or unable to get keyring pair.",
       "lbl_asset_created_success": "Asset created successfully!",
-      "lbl_invalid_address": "Please enter a valid address."
+      "lbl_invalid_address": "Please enter a valid address.",
+      "identity_required": "Account must have a 'Reasonable' or 'KnownGood' identity judgment.",
+      "identity_prohibitive": "Account has a prohibitive identity judgment (e.g., Erroneous, Low Quality)."
     },
     "root": {
       "lbl_app_name": "Wallet",
@@ -302,7 +304,27 @@
       "term_progress": "Term Progress",
       "blocks_remaining": "blocks remaining",
       "remaining": "remaining",
-      "nav_bounties": "Bounties"
+      "nav_bounties": "Bounties",
+      "propose_bounty": "Propose bounty",
+      "enter_bounty_description": "Enter bounty description",
+      "enter_amount_to_allocate": "Enter amount to allocate",
+      "bond": "Bond",
+      "prime": "Prime",
+      "candidates": "Candidates",
+      "runners_up": "Runners Up",
+      "deposit": "Deposit",
+      "submit_candidacy": "Submit Candidacy",
+      "submit_candidacy_btn": "Candidacy",
+      "candidacy_submitted": "Candidacy submitted!",
+      "my_vote": "My vote",
+      "my_votes": "My votes",
+      "vote_btn": "Vote",
+      "submit_vote": "Submit Vote",
+      "submit_vote_btn": "Vote",
+      "vote_submitted": "Vote submitted!",
+      "unvote_all_btn": "Unvote All",
+      "unvote_all_confirm": "Are you sure you want to remove all your votes?",
+      "unvote_all_submitted": "Unvoted all successfully!"
     },
     "dlg_set_registrar_fee": {
       "title": "Set Registrar Fee",

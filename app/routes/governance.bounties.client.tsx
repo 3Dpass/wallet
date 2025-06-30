@@ -6,6 +6,7 @@ import {
   Spinner,
   Switch,
   Tag,
+  Button,
 } from "@blueprintjs/core";
 import type { DeriveCollectiveProposal } from "@polkadot/api-derive/types";
 import type { Option } from "@polkadot/types";
@@ -16,8 +17,9 @@ import { useApi } from "app/components/Api";
 import { BountyDetails } from "app/components/governance/BountyDetails";
 import { initializeMockBounties, mockBounties } from "app/utils/mock";
 import { disableMockMode, enableMockMode } from "app/utils/sign";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import DialogProposeBounty from "app/components/dialogs/DialogProposeBounty";
 
 interface Bounty {
   id: string;
@@ -44,11 +46,14 @@ export default function BountiesClient() {
   const [bounties, setBounties] = useState<Bounty[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMockMode, setIsMockMode] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     if (!api) return;
 
     const loadBounties = async () => {
+      setLoading(true);
       try {
         if (isMockMode) {
           // Load mock bounties
@@ -132,9 +137,9 @@ export default function BountiesClient() {
     };
 
     loadBounties();
-  }, [api, isMockMode]);
+  }, [api, isMockMode, refreshTrigger]);
 
-  const handleMockModeToggle = () => {
+  const handleMockModeToggle = useCallback(() => {
     if (!isMockMode) {
       enableMockMode();
       initializeMockBounties();
@@ -144,7 +149,18 @@ export default function BountiesClient() {
     }
     setIsMockMode(!isMockMode);
     setLoading(true); // Force reload of bounties
-  };
+  }, [isMockMode]);
+
+  const handleOpenDialog = useCallback(() => setDialogOpen(true), []);
+  const handleCloseDialog = useCallback(() => setDialogOpen(false), []);
+
+  const handleBountyProposed = useCallback(() => {
+    setDialogOpen(false);
+    // reload bounties after a delay for block inclusion
+    setTimeout(() => {
+      setRefreshTrigger((prev) => prev + 1);
+    }, 2000);
+  }, []);
 
   if (loading) {
     return <Spinner />;
@@ -154,14 +170,27 @@ export default function BountiesClient() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className={Classes.HEADING}>{t("governance.bounties")}</h2>
-        {process.env.NODE_ENV === "development" && (
-          <Switch
-            checked={isMockMode}
-            label={t("governance.mock_mode")}
-            onChange={handleMockModeToggle}
+        <div className="flex items-center gap-2">
+          {process.env.NODE_ENV === "development" && (
+            <Switch
+              checked={isMockMode}
+              label={t("governance.mock_mode")}
+              onChange={handleMockModeToggle}
+            />
+          )}
+          <Button
+            icon="plus"
+            intent="primary"
+            text={t("governance.propose_bounty") || "+ Propose bounty"}
+            onClick={handleOpenDialog}
           />
-        )}
+        </div>
       </div>
+      <DialogProposeBounty
+        isOpen={dialogOpen}
+        onClose={handleCloseDialog}
+        onProposed={handleBountyProposed}
+      />
       <div className="space-y-3">
         {bounties.length === 0 ? (
           <Card>

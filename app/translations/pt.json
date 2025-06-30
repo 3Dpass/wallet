@@ -87,7 +87,9 @@
       "lbl_account_is_password_protected_1": "A conta está protegida por ",
       "lbl_account_is_password_protected_2": ", você precisa ",
       "lbl_account_is_password_protected_3": "desbloqueá-la",
-      "lbl_account_is_password_protected_4": " antes de usar"
+      "lbl_account_is_password_protected_4": " antes de usar",
+      "identity_required": "A conta deve ter um julgamento de identidade 'Razoável' ou 'Conhecido e Bom'.",
+      "identity_prohibitive": "A conta tem um julgamento de identidade proibitivo (p. ex., Errôneo, de Baixa Qualidade)."
     },
     "root_wallet": {
       "lbl_btn_create_new_address": "Criar novo endereço...",
@@ -246,7 +248,27 @@
       "no_accounts": "Nenhuma conta disponível. Crie ou importe uma conta para participar da governança.",
       "already_voted": "Já votou",
       "mock_mode": "Modo de Teste (Sem Rede)",
-      "close_motion": "Encerrar Moção"
+      "close_motion": "Encerrar Moção",
+      "propose_bounty": "Propor recompensa",
+      "bond": "Depósito",
+      "enter_bounty_description": "Insira a descrição da recompensa",
+      "enter_amount_to_allocate": "Insira o valor a alocar",
+      "prime": "Prime",
+      "candidates": "Candidatos",
+      "runners_up": "Suplentes",
+      "deposit": "Depósito",
+      "submit_candidacy": "Enviar candidatura",
+      "submit_candidacy_btn": "Candidatura",
+      "candidacy_submitted": "Candidatura enviada!",
+      "my_vote": "Meu voto",
+      "my_votes": "Meus votos",
+      "vote_btn": "Votar",
+      "submit_vote": "Enviar voto",
+      "submit_vote_btn": "Votar",
+      "vote_submitted": "Voto enviado!",
+      "unvote_all_btn": "Remover todos os votos",
+      "unvote_all_confirm": "Tem certeza de que deseja remover todos os seus votos?",
+      "unvote_all_submitted": "Todos os votos removidos!"
     },
     "assets_objects": {
       "title": "Objetos",

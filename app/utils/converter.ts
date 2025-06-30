@@ -13,6 +13,36 @@ export const P3D_DECIMALS_FACTOR = 10 ** P3D_DECIMALS;
 export const EVM_ADDRESS_HEX_PADDING = 32;
 
 /**
+ * Converts a string representation of a number to a BigInt in the chain's smallest unit.
+ * This function handles decimal values by splitting the string and padding correctly,
+ * avoiding floating-point inaccuracies.
+ *
+ * @param amount The amount as a string, e.g., "123.456".
+ * @param decimals The number of decimals for the token.
+ * @returns The amount in the smallest chain unit as a BigInt.
+ */
+export function toChainUnit(amount: string, decimals: number): bigint {
+  if (!amount) {
+    return 0n;
+  }
+
+  if (amount.startsWith(".")) {
+    amount = "0" + amount;
+  }
+
+  const [integer, fraction = ""] = amount.split(".");
+
+  const safeInteger = integer || "0";
+
+  const truncatedFraction = fraction.slice(0, decimals);
+  const paddedFraction = truncatedFraction.padEnd(decimals, "0");
+
+  const chainValueString = `${safeInteger}${paddedFraction}`;
+
+  return BigInt(chainValueString);
+}
+
+/**
  * Generates an EVM contract address for a given asset ID.
  * @param assetId The asset ID.
  * @returns The EVM contract address.
