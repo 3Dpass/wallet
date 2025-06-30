@@ -8,6 +8,7 @@ import { AddressSelect } from "../governance/AddressSelect";
 import useToaster from "../../hooks/useToaster";
 import { signAndSend } from "../../utils/sign";
 import type { Vec } from "@polkadot/types";
+import type { ITuple } from "@polkadot/types/types";
 
 interface DialogSubmitCandidacyProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ export default function DialogSubmitCandidacy({ isOpen, onClose }: DialogSubmitC
     async function fetchNumCandidates() {
       if (!api) return;
       try {
-        const candidates = (await api.query.phragmenElection.candidates()) as Vec<any>;
+        const candidates = (await api.query.phragmenElection.candidates()) as Vec<ITuple>;
         setNumCandidates(candidates.length);
       } catch (error) {
         console.error("Failed to fetch number of candidates:", error);
@@ -114,9 +115,11 @@ export default function DialogSubmitCandidacy({ isOpen, onClose }: DialogSubmitC
 
   const handleSubmit = useCallback(async () => {
     if (!canSubmit) return;
+    if (!selectedAccount) return;
+
     setIsLoading(true);
     try {
-      const pair = keyring.getPair(selectedAccount!);
+      const pair = keyring.getPair(selectedAccount);
       const isLocked = pair.isLocked && !pair.meta.isInjected;
       if (isLocked) {
         toaster.show({
@@ -148,7 +151,7 @@ export default function DialogSubmitCandidacy({ isOpen, onClose }: DialogSubmitC
       });
       setIsLoading(false);
     }
-  }, [api, canSubmit, selectedAccount, t, toaster, onClose, numCandidates]);
+  }, [api, canSubmit, selectedAccount, t, toaster, onClose, numCandidates, hasValidIdentity]);
 
   const handleAccountChange = useCallback((address: string | null) => {
     setSelectedAccount(address);

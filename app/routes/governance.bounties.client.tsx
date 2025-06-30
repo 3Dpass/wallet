@@ -47,11 +47,13 @@ export default function BountiesClient() {
   const [loading, setLoading] = useState(true);
   const [isMockMode, setIsMockMode] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     if (!api) return;
 
     const loadBounties = async () => {
+      setLoading(true);
       try {
         if (isMockMode) {
           // Load mock bounties
@@ -135,9 +137,9 @@ export default function BountiesClient() {
     };
 
     loadBounties();
-  }, [api, isMockMode]);
+  }, [api, isMockMode, refreshTrigger]);
 
-  const handleMockModeToggle = () => {
+  const handleMockModeToggle = useCallback(() => {
     if (!isMockMode) {
       enableMockMode();
       initializeMockBounties();
@@ -147,18 +149,16 @@ export default function BountiesClient() {
     }
     setIsMockMode(!isMockMode);
     setLoading(true); // Force reload of bounties
-  };
+  }, [isMockMode]);
 
   const handleOpenDialog = useCallback(() => setDialogOpen(true), []);
   const handleCloseDialog = useCallback(() => setDialogOpen(false), []);
 
   const handleBountyProposed = useCallback(() => {
     setDialogOpen(false);
-    setLoading(true);
-    // reload bounties
+    // reload bounties after a delay for block inclusion
     setTimeout(() => {
-      // Give time for block inclusion
-      setLoading(false);
+      setRefreshTrigger((prev) => prev + 1);
     }, 2000);
   }, []);
 

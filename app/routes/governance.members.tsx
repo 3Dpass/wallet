@@ -14,7 +14,7 @@ import { formatTimeLeft } from "app/utils/time";
 import { useEffect, useState, useCallback, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useApi } from "../components/Api";
-import type { Option, Vec } from "@polkadot/types";
+import type { Option } from "@polkadot/types";
 import DialogSubmitCandidacy from "../components/dialogs/DialogSubmitCandidacy";
 import DialogVote from "../components/dialogs/DialogVote";
 import DialogUnvoteAll from "../components/dialogs/DialogUnvoteAll";
