@@ -546,14 +546,14 @@ function ObjectDetailsTable({
               {(() => {
                 const outliers = rpcData.estOutliers || rpcData.est_outliers || [];
                 return outliers;
-              })().map((outlierAddress: string, index: number) => {
+              })().map((outlierAddress: string) => {
                 // Look up the outlier in the estimators list to get the time
                 const estimatorEntry = rpcData.estimators.find(([address]) => address === outlierAddress);
                 const time = estimatorEntry ? estimatorEntry[1] : 0;
                 
                 return (
                   <div
-                    key={`outlier-${outlierAddress}-${index}`}
+                    key={`outlier-${outlierAddress}`}
                     className="text-sm font-mono text-xs text-red-700 break-all"
                   >
                     <AccountName address={outlierAddress} />
