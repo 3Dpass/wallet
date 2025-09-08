@@ -288,7 +288,10 @@ export default function DialogCreateAsset({
   const pair = (() => {
     try {
       if (selectedAccount && selectedAccount.trim() !== "") {
-        return keyring.getPair(selectedAccount);
+        // Additional check to ensure keyring is actually ready
+        if (keyring.getPairs().length > 0 || keyring.getAccounts().length > 0) {
+          return keyring.getPair(selectedAccount);
+        }
       }
       return null;
     } catch (error) {
@@ -422,7 +425,7 @@ export default function DialogCreateAsset({
               ) : (
                 <div className="flex gap-2 items-center">
                   <HTMLSelect
-                    options={propertyOptions}
+                    options={propertyOptions.map(opt => ({ label: opt.label, value: opt.value }))}
                     value={propIdx}
                     onChange={handlePropIdxChange}
                     placeholder="Select Property"

@@ -351,7 +351,10 @@ export default function DialogSubmitObject({
   const pair: KeyringPair | null = (() => {
     try {
       if (keyringLoaded && selectedAccount && selectedAccount.trim() !== "") {
-        return keyring.getPair(selectedAccount);
+        // Additional check to ensure keyring is actually ready
+        if (keyring.getPairs().length > 0 || keyring.getAccounts().length > 0) {
+          return keyring.getPair(selectedAccount);
+        }
       }
       return null;
     } catch (error) {

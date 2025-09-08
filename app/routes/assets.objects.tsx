@@ -434,10 +434,6 @@ export default function AssetsObjects() {
           const result = await api.query.poScan.owners(selectedAccount);
           const owned = result.toJSON() as number[];
           indexes = Array.isArray(owned) ? owned : [];
-          console.log(
-            `Storage says account ${selectedAccount} owns objects:`,
-            indexes
-          );
         } else {
           if (!api.query?.poScan?.objCount) {
             if (mounted) {
@@ -449,11 +445,15 @@ export default function AssetsObjects() {
           }
           const count = await api.query.poScan.objCount();
           const n = Number(count.toString());
+          // For now, let's use a simpler approach: assume all objects 0 to n-1 exist
+          // The RPC limit issue suggests we need to be more conservative with batch sizes
+          // We'll let the object fetching handle the actual existence checking
           indexes = Array.from({ length: n }, (_, i) => i);
         }
         if (mounted) {
           // Reverse the indexes to show newest objects first
-          setObjectIndexes([...indexes].reverse());
+          const reversedIndexes = [...indexes].reverse();
+          setObjectIndexes(reversedIndexes);
           setObjCount(indexes.length);
         }
       } catch (e) {
@@ -477,13 +477,15 @@ export default function AssetsObjects() {
     };
   }, [api, selectedAccount, showAll, isFetchingSpecificObject, t]);
 
-  // Fetch object data for the current indexes
+  // Fetch object data for the current page only
   useEffect(() => {
     // Skip if we're fetching a specific object
     if (isFetchingSpecificObject) return;
 
-    const mounted = true;
-    async function fetchObjects() {
+    let mounted = true;
+    let abortController: AbortController | null = null;
+    
+    async function fetchObjectsForPage() {
       if (!api || objectIndexes.length === 0) {
         setObjects([]);
         setLoadingObjects(false);
@@ -493,12 +495,32 @@ export default function AssetsObjects() {
         setLoadingIdentities(false);
         return;
       }
+
+      // Cancel any ongoing request
+      if (abortController) {
+        abortController.abort();
+      }
+      abortController = new AbortController();
+      const { signal } = abortController;
+
       setLoadingObjects(true);
+      setError(null);
+      
       try {
-        const queries = objectIndexes.map((idx) =>
-          api.query.poScan.objects(idx)
-        );
+        // Calculate which objects to fetch for the current page
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageObjectIndexes = objectIndexes.slice(startIndex, endIndex);
+        
+        if (pageObjectIndexes.length === 0) {
+          setObjects([]);
+          return;
+        }
+
+        // Fetch only the objects for the current page
+        const queries = pageObjectIndexes.map((idx) => api.query.poScan.objects(idx));
         const results = await Promise.all(queries);
+        
         const parsed = results.map((opt) => {
           if (
             opt &&
@@ -523,18 +545,34 @@ export default function AssetsObjects() {
           }
           return null;
         });
-        if (mounted) setObjects(parsed);
+        
+        if (mounted && !signal.aborted) {
+          setObjects(parsed);
+        }
       } catch (e) {
-        if (mounted) setObjects([]);
+        if (mounted && !signal.aborted) {
+          setObjects([]);
+          setError(t("assets_objects.failed_fetch_objects"));
+        }
         // eslint-disable-next-line no-console
-        console.error("Failed to fetch objects", e);
+        console.error("Failed to fetch objects for page", e);
       } finally {
-        if (mounted) setLoadingObjects(false);
+        if (mounted && !signal.aborted) {
+          setLoadingObjects(false);
+        }
       }
     }
-    fetchObjects();
+    
+    fetchObjectsForPage();
+    
+    return () => {
+      mounted = false;
+      if (abortController) {
+        abortController.abort();
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [api, isFetchingSpecificObject, objectIndexes.length, objectIndexes.map]);
+  }, [api, isFetchingSpecificObject, objectIndexes, currentPage, itemsPerPage, t]);
 
   // Reset currentPage when objectIndexes change
   useEffect(() => {
@@ -554,12 +592,14 @@ export default function AssetsObjects() {
     setIsFetchingSpecificObject(false);
   }, []);
 
-  // Fetch owner data for objects (simplified - no need to verify ownership for "My objects")
+  // Fetch owner data for objects on current page only
   useEffect(() => {
     // Skip if we're fetching a specific object
     if (isFetchingSpecificObject) return;
 
     let mounted = true;
+    let abortController: AbortController | null = null;
+    
     async function fetchOwnerData() {
       if (!api || objects.length === 0) {
         setObjectsWithOwners([]);
@@ -567,19 +607,31 @@ export default function AssetsObjects() {
         return;
       }
 
+      // Cancel any ongoing request
+      if (abortController) {
+        abortController.abort();
+      }
+      abortController = new AbortController();
+      const { signal } = abortController;
+
       setLoadingOwners(true);
       try {
+        // Calculate which object indexes correspond to the current page
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const pageObjectIndexes = objectIndexes.slice(startIndex, endIndex);
+        
         const objectsWithOwnerData = await Promise.all(
           objects.map(async (obj, index) => {
             if (!obj) return obj;
+
+            const objectIndex = pageObjectIndexes[index];
 
             // For "My objects", always verify ownership to catch storage inconsistencies
             if (!showAll) {
               try {
                 // @ts-expect-error - poscan is a custom RPC
-                const rpcResult = await api.rpc.poscan.getPoscanObject(
-                  objectIndexes[index]
-                );
+                const rpcResult = await api.rpc.poscan.getPoscanObject(objectIndex);
                 if (rpcResult?.owner) {
                   const actualOwner = rpcResult.owner;
 
@@ -589,7 +641,7 @@ export default function AssetsObjects() {
                   }
                   console.warn(
                     t("assets_objects.ownership_mismatch", {
-                      index: objectIndexes[index],
+                      index: objectIndex,
                       storageOwner: selectedAccount,
                       actualOwner,
                     })
@@ -599,7 +651,7 @@ export default function AssetsObjects() {
               } catch (error) {
                 console.warn(
                   t("assets_objects.failed_fetch_owner", {
-                    index: objectIndexes[index],
+                    index: objectIndex,
                   }),
                   error
                 );
@@ -610,16 +662,14 @@ export default function AssetsObjects() {
               // For "All objects", try to get owner data but don't exclude on failure
               try {
                 // @ts-expect-error - poscan is a custom RPC
-                const rpcResult = await api.rpc.poscan.getPoscanObject(
-                  objectIndexes[index]
-                );
+                const rpcResult = await api.rpc.poscan.getPoscanObject(objectIndex);
                 if (rpcResult?.owner) {
                   return { ...obj, owner: rpcResult.owner };
                 }
               } catch (error) {
                 console.warn(
                   t("assets_objects.failed_fetch_owner", {
-                    index: objectIndexes[index],
+                    index: objectIndex,
                   }),
                   error
                 );
@@ -632,16 +682,16 @@ export default function AssetsObjects() {
           })
         );
 
-        if (mounted) {
+        if (mounted && !signal.aborted) {
           setObjectsWithOwners(objectsWithOwnerData);
         }
       } catch (error) {
         console.error(t("assets_objects.failed_fetch_owner_data"), error);
-        if (mounted) {
+        if (mounted && !signal.aborted) {
           setObjectsWithOwners(objects);
         }
       } finally {
-        if (mounted) {
+        if (mounted && !signal.aborted) {
           setLoadingOwners(false);
         }
       }
@@ -650,29 +700,43 @@ export default function AssetsObjects() {
     fetchOwnerData();
     return () => {
       mounted = false;
+      if (abortController) {
+        abortController.abort();
+      }
     };
   }, [
     api,
     objects,
     objectIndexes,
+    currentPage,
+    itemsPerPage,
     isFetchingSpecificObject,
     showAll,
     selectedAccount,
     t,
   ]);
 
-  // Fetch identity data for owners
+  // Fetch identity data for owners on current page only
   useEffect(() => {
     // Skip if we're fetching a specific object
     if (isFetchingSpecificObject) return;
 
     let mounted = true;
+    let abortController: AbortController | null = null;
+    
     async function fetchIdentityData() {
       if (!api || objectsWithOwners.length === 0) {
         setObjectsWithIdentities([]);
         setLoadingIdentities(false);
         return;
       }
+
+      // Cancel any ongoing request
+      if (abortController) {
+        abortController.abort();
+      }
+      abortController = new AbortController();
+      const { signal } = abortController;
 
       setLoadingIdentities(true);
       try {
@@ -698,16 +762,16 @@ export default function AssetsObjects() {
           })
         );
 
-        if (mounted) {
+        if (mounted && !signal.aborted) {
           setObjectsWithIdentities(objectsWithIdentityData);
         }
       } catch (error) {
         console.error(t("assets_objects.failed_fetch_identity_data"), error);
-        if (mounted) {
+        if (mounted && !signal.aborted) {
           setObjectsWithIdentities(objectsWithOwners);
         }
       } finally {
-        if (mounted) {
+        if (mounted && !signal.aborted) {
           setLoadingIdentities(false);
         }
       }
@@ -716,6 +780,9 @@ export default function AssetsObjects() {
     fetchIdentityData();
     return () => {
       mounted = false;
+      if (abortController) {
+        abortController.abort();
+      }
     };
   }, [api, objectsWithOwners, isFetchingSpecificObject, t]);
 
@@ -789,13 +856,18 @@ export default function AssetsObjects() {
     [objectIndexes]
   );
 
-  // Calculate pagination values
-  const filteredObjects = useMemo(() => {
+  // Calculate pagination values - now we work with the total object count and current page objects
+  const totalPages = Math.ceil(objectIndexes.length / itemsPerPage);
+  const hasNextPage = currentPage < totalPages;
+  const hasPreviousPage = currentPage > 1;
+
+  // Filter current page objects based on search
+  const filteredCurrentObjects = useMemo(() => {
     if (objectsWithIdentities.length === 0) return [];
 
     return objectsWithIdentities
-      .map((obj, originalIndex) => ({ obj, originalIndex }))
-      .filter(({ obj, originalIndex }) => {
+      .map((obj, index) => ({ obj, index }))
+      .filter(({ obj, index }) => {
         if (!obj) return false;
         // Always show if fetching a specific object
         if (isFetchingSpecificObject) return true;
@@ -827,7 +899,10 @@ export default function AssetsObjects() {
           }
         }
 
-        return matchesSearch(obj, originalIndex, searchTermLower);
+        // Calculate the actual object index for this page object
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const actualObjectIndex = objectIndexes[startIndex + index];
+        return matchesSearch(obj, actualObjectIndex, searchTermLower);
       });
   }, [
     objectsWithIdentities,
@@ -835,14 +910,10 @@ export default function AssetsObjects() {
     isFetchingSpecificObject,
     matchesSearch,
     getStateDisplayName,
+    currentPage,
+    itemsPerPage,
+    objectIndexes,
   ]);
-
-  const totalPages = Math.ceil(filteredObjects.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentObjects = filteredObjects.slice(startIndex, endIndex);
-  const hasNextPage = currentPage < totalPages;
-  const hasPreviousPage = currentPage > 1;
 
   return (
     <AssetsSection>
@@ -930,15 +1001,22 @@ export default function AssetsObjects() {
                   </div>
                 </div>
               )}
-              {currentObjects.map(({ obj, originalIndex }) =>
+              {filteredCurrentObjects.map(({ obj, index }) =>
                 obj ? (
                   <ObjectCard
                     key={
-                      objectIndexes[originalIndex] !== undefined
-                        ? `${objectIndexes[originalIndex]}-${originalIndex}`
-                        : originalIndex
+                      (() => {
+                        const startIndex = (currentPage - 1) * itemsPerPage;
+                        const actualObjectIndex = objectIndexes[startIndex + index];
+                        return actualObjectIndex !== undefined
+                          ? `${actualObjectIndex}-${index}`
+                          : index;
+                      })()
                     }
-                    objectIndex={objectIndexes[originalIndex]}
+                    objectIndex={(() => {
+                      const startIndex = (currentPage - 1) * itemsPerPage;
+                      return objectIndexes[startIndex + index];
+                    })()}
                     objectData={obj}
                   />
                 ) : null

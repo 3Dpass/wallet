@@ -73,10 +73,11 @@ class WebGLContextManager {
     if (context) {
       try {
         context.dispose();
-      } catch (e) {
-        console.warn("Error disposing WebGL context:", e);
+      } catch (error) {
+        console.warn("Error disposing WebGL context:", error);
+      } finally {
+        this.activeContexts.delete(id);
       }
-      this.activeContexts.delete(id);
     }
   }
 
@@ -142,7 +143,22 @@ interface ObjectData {
   state?: ObjectState;
   isPrivate?: boolean;
   whenCreated?: number;
+  whenApproved?: number | null;
   numApprovals?: number;
+  owner?: string;
+  compressed_with?: string | null;
+  category?: { Objects3D: string } | null;
+  is_replica?: boolean;
+  original_obj?: number | null;
+  sn_hash?: number | null;
+  inspector?: string | null;
+  is_ownership_abdicated?: boolean;
+  is_self_proved?: boolean;
+  proof_of_existence?: string | null;
+  ipfs_link?: string | null;
+  fee_payer?: string;
+  inspector_fee?: number;
+  qc_timeout?: number;
 }
 
 // Type for asset details with objDetails
@@ -162,23 +178,41 @@ interface ObjectCardProps {
 interface RpcObjectData {
   state: ObjectState;
   obj: number[];
-  hashes: string[];
-  when_created: number;
-  owner: string;
-  estimators: [string, number][];
-  est_outliers: string[];
+  compressed_with?: string | null; // compression method used (e.g., Lzss) or null if not compressed
+  category?: { Objects3D: string } | null; // the object category and algorithm preset
+  is_private: boolean; // whether the object is private and requires permissions for replicas
+  hashes: string[]; // the HASH ID submitted by user (ex. the top 10 hashes from Grid2d output)
+  whenCreated: number; // the block number the object was created at
+  whenApproved?: number | null; // the block number the object was approved at (null if not approved)
+  owner: string; // P3D address - the object owner
+  estimators: [string, number][]; // the list of Validators (P3D addresses), who voted for the object to pass the estimation threshold
+  estOutliers: string[]; // the validators ruled out of vote, due to the weird processing time
+  est_outliers?: string[]; // alternative field name for estOutliers
   approvers: Array<{
     account_id: string;
     when: number;
     proof: string;
-  }>;
-  num_approvals: number;
-  est_rewards: number;
-  author_rewards: number;
+  }>; // the list of block authors (miners) provided their judgement on the object authenticity
+  numApprovals: number; // the number of confirmations ordered by user
+  estRewards: number; // the validator share of rewards in minimum indivisible units "Crumbs"
+  authorRewards: number; // the block author share of rewards in minimum indivisible units "Crumbs"
+  est_rewards?: number; // alternative field name for estRewards
+  author_rewards?: number; // alternative field name for authorRewards
   prop: Array<{
     propIdx: number;
     maxValue: number;
-  }>;
+  }>; // the list of the object properties (inherent to the object)
+  is_replica?: boolean; // whether this object is a replica of another object
+  original_obj?: number | null; // the object index of the original object if this is a replica (null if not a replica)
+  sn_hash?: number | null; // serial number hash for replicas (null if not a replica)
+  inspector?: string | null; // the inspector assigned for QC inspection (null if not under QC)
+  is_ownership_abdicated?: boolean; // whether object ownership has been abdicated (irreversible)
+  is_self_proved?: boolean; // whether this object is self-proved (skips estimation/approval process)
+  proof_of_existence?: string | null; // hash proving the object's existence (null if not self-proved)
+  ipfs_link?: string | null; // IPFS link to the object or related data (null if not provided)
+  fee_payer?: string; // the account that will be charged for verification fees
+  inspector_fee?: number; // inspector fee reserved for QC inspection (in Crumbs)
+  qc_timeout?: number; // custom QC timeout in blocks (5-100,000, default from configuration)
 }
 
 // Type for state info return value
@@ -197,7 +231,11 @@ type BlueprintIcon =
   | "chart"
   | "refresh"
   | "plus"
-  | "info-sign";
+  | "info-sign"
+  | "eye-open"
+  | "shield"
+  | "tick-circle"
+  | "cross-circle";
 
 function isOption(obj: unknown): obj is PolkadotOption {
   if (!obj || typeof obj !== "object") return false;
@@ -247,22 +285,139 @@ function ObjectDetailsTable({
   showOutliers: boolean;
   handleToggleOutliers: () => void;
 }) {
+  // Build array of rows to avoid whitespace issues
+  const rows = [
+    <tr key="estimator-rewards">
+      <td className="shadow-none font-medium pr-4">Estimator Rewards</td>
+      <td className="shadow-none">
+        {formatRewards(rpcData.estRewards ?? rpcData.est_rewards)}
+      </td>
+    </tr>,
+    <tr key="author-rewards">
+      <td className="shadow-none font-medium pr-4">Author Rewards</td>
+      <td className="shadow-none">
+        {formatRewards(rpcData.authorRewards ?? rpcData.author_rewards)}
+      </td>
+    </tr>,
+  ];
+
+  if (rpcData.compressed_with) {
+    rows.push(
+      <tr key="compression">
+        <td className="shadow-none font-medium pr-4">Compression</td>
+        <td className="shadow-none">{rpcData.compressed_with}</td>
+      </tr>
+    );
+  }
+
+  if (rpcData.is_replica) {
+    rows.push(
+      <tr key="replica-info">
+        <td className="shadow-none font-medium pr-4">Replica Info</td>
+        <td className="shadow-none">
+          <div className="space-y-1">
+            <div>Original Object: {rpcData.original_obj || "N/A"}</div>
+            {rpcData.sn_hash && <div>Serial Number Hash: {rpcData.sn_hash}</div>}
+          </div>
+        </td>
+      </tr>
+    );
+  }
+
+  if (rpcData.inspector) {
+    rows.push(
+      <tr key="inspector">
+        <td className="shadow-none font-medium pr-4">Inspector</td>
+        <td className="shadow-none">
+          <AccountName address={rpcData.inspector} />
+        </td>
+      </tr>
+    );
+  }
+
+  if (rpcData.is_ownership_abdicated) {
+    rows.push(
+      <tr key="ownership">
+        <td className="shadow-none font-medium pr-4">Ownership</td>
+        <td className="shadow-none text-orange-600">Abdicated (Irreversible)</td>
+      </tr>
+    );
+  }
+
+  if (rpcData.is_self_proved) {
+    rows.push(
+      <tr key="self-proved">
+        <td className="shadow-none font-medium pr-4">Self Proved</td>
+        <td className="shadow-none text-blue-600">Yes</td>
+      </tr>
+    );
+  }
+
+  if (rpcData.proof_of_existence) {
+    rows.push(
+      <tr key="proof-of-existence">
+        <td className="shadow-none font-medium pr-4">Proof of Existence</td>
+        <td className="shadow-none font-mono text-xs break-all">
+          {rpcData.proof_of_existence}
+        </td>
+      </tr>
+    );
+  }
+
+  if (rpcData.ipfs_link) {
+    rows.push(
+      <tr key="ipfs-link">
+        <td className="shadow-none font-medium pr-4">IPFS Link</td>
+        <td className="shadow-none">
+          <a
+            href={rpcData.ipfs_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline break-all"
+          >
+            {rpcData.ipfs_link}
+          </a>
+        </td>
+      </tr>
+    );
+  }
+
+  if (rpcData.fee_payer) {
+    rows.push(
+      <tr key="fee-payer">
+        <td className="shadow-none font-medium pr-4">Fee Payer</td>
+        <td className="shadow-none">
+          <AccountName address={rpcData.fee_payer} />
+        </td>
+      </tr>
+    );
+  }
+
+  if (rpcData.inspector_fee) {
+    rows.push(
+      <tr key="inspector-fee">
+        <td className="shadow-none font-medium pr-4">Inspector Fee</td>
+        <td className="shadow-none">
+          {formatRewards(rpcData.inspector_fee)}
+        </td>
+      </tr>
+    );
+  }
+
+  if (rpcData.qc_timeout) {
+    rows.push(
+      <tr key="qc-timeout">
+        <td className="shadow-none font-medium pr-4">QC Timeout</td>
+        <td className="shadow-none">{rpcData.qc_timeout} blocks</td>
+      </tr>
+    );
+  }
+
   return (
     <div className="space-y-4 pt-4 border-t">
       <HTMLTable className="w-full" striped>
         <tbody>
-          <tr>
-            <td className="shadow-none font-medium pr-4">Estimator Rewards</td>
-            <td className="shadow-none">
-              {formatRewards(rpcData.est_rewards)}
-            </td>
-          </tr>
-          <tr>
-            <td className="shadow-none font-medium pr-4">Author Rewards</td>
-            <td className="shadow-none">
-              {formatRewards(rpcData.author_rewards)}
-            </td>
-          </tr>
+          {rows}
         </tbody>
       </HTMLTable>
       {rpcData.estimators.length > 0 && rpcData.hashes.length > 0 ? (
@@ -370,7 +525,10 @@ function ObjectDetailsTable({
         </div>
       )}
       {/* Outliers Section */}
-      {rpcData.est_outliers && rpcData.est_outliers.length > 0 && (
+      {(() => {
+        const outliers = rpcData.estOutliers || rpcData.est_outliers;
+        return outliers && outliers.length > 0;
+      })() && (
         <div>
           <Button
             minimal
@@ -378,21 +536,31 @@ function ObjectDetailsTable({
             onClick={handleToggleOutliers}
             text={
               showOutliers
-                ? `Hide Outliers (${rpcData.est_outliers.length})`
-                : `Show Outliers (${rpcData.est_outliers.length})`
+                ? `Hide Outliers (${(rpcData.estOutliers || rpcData.est_outliers || []).length})`
+                : `Show Outliers (${(rpcData.estOutliers || rpcData.est_outliers || []).length})`
             }
             className="mb-2"
           />
           {showOutliers && (
             <div className="space-y-1">
-              {rpcData.est_outliers.map((address) => (
-                <div
-                  key={`outlier-${address}`}
-                  className="text-sm font-mono text-xs text-red-700 break-all"
-                >
-                  <AccountName address={address} />
-                </div>
-              ))}
+              {(() => {
+                const outliers = rpcData.estOutliers || rpcData.est_outliers || [];
+                return outliers;
+              })().map((outlierAddress: string, index: number) => {
+                // Look up the outlier in the estimators list to get the time
+                const estimatorEntry = rpcData.estimators.find(([address]) => address === outlierAddress);
+                const time = estimatorEntry ? estimatorEntry[1] : 0;
+                
+                return (
+                  <div
+                    key={`outlier-${outlierAddress}-${index}`}
+                    className="text-sm font-mono text-xs text-red-700 break-all"
+                  >
+                    <AccountName address={outlierAddress} />
+                    {time > 0 && <span className="ml-2 text-gray-600">({time} ms)</span>}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -420,6 +588,12 @@ function ObjectPreview({
 }) {
   const contextId = useMemo(() => `object-${objectIndex}`, [objectIndex]);
   const rendererRef = useRef<WebGLRenderer | null>(null);
+  const disposedRef = useRef(false);
+  
+  // Type for WebGL renderer with custom cleanup function
+  interface WebGLRendererWithCleanup extends WebGLRenderer {
+    __cleanupListeners?: () => void;
+  }
 
   // Determine why preview failed
   const getPreviewFailureReason = () => {
@@ -439,34 +613,70 @@ function ObjectPreview({
 
   const failureReason = getPreviewFailureReason();
 
-  // Cleanup function for WebGL context
-  const disposeContext = useCallback(() => {
+  // Cleanup function for WebGL context (only disposes the renderer, not the context manager)
+  const disposeRenderer = useCallback(() => {
+    if (disposedRef.current) return; // Prevent multiple disposals
+    disposedRef.current = true;
+    
     if (rendererRef.current) {
       try {
+        // Clean up event listeners first
+        const rendererWithCleanup = rendererRef.current as WebGLRendererWithCleanup;
+        if (rendererWithCleanup.__cleanupListeners) {
+          rendererWithCleanup.__cleanupListeners();
+        }
+        
         rendererRef.current.dispose();
         rendererRef.current = null;
-      } catch (e) {
-        console.warn("Error disposing renderer:", e);
+      } catch (error) {
+        console.warn("Error disposing renderer:", error);
       }
     }
+  }, []);
+
+  // Separate cleanup function for context manager
+  const disposeContext = useCallback(() => {
+    disposeRenderer();
     contextManager.unregisterContext(contextId);
-  }, [contextId]);
+  }, [contextId, disposeRenderer]);
 
   // Handle Canvas creation
   const handleCanvasCreated = useCallback(({ gl }: { gl: WebGLRenderer }) => {
+    disposedRef.current = false; // Reset disposal flag for new renderer
     rendererRef.current = gl;
-  }, []);
+    
+    // Add context loss handling
+    const canvas = gl.domElement;
+    const handleContextLost = (event: Event) => {
+      console.warn('WebGL context lost for object', objectIndex);
+      event.preventDefault();
+    };
+    
+    const handleContextRestored = () => {
+      console.log('WebGL context restored for object', objectIndex);
+    };
+    
+    canvas.addEventListener('webglcontextlost', handleContextLost);
+    canvas.addEventListener('webglcontextrestored', handleContextRestored);
+    
+    // Store cleanup function
+    const glWithCleanup = gl as WebGLRendererWithCleanup;
+    glWithCleanup.__cleanupListeners = () => {
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+      canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+    };
+  }, [objectIndex]);
 
   // Register context when component mounts
   useEffect(() => {
     if (mesh?.geometry && !failureReason) {
-      contextManager.registerContext(contextId, disposeContext);
+      contextManager.registerContext(contextId, disposeRenderer);
     }
 
     return () => {
       disposeContext();
     };
-  }, [contextId, mesh?.geometry, failureReason, disposeContext]);
+  }, [contextId, mesh?.geometry, failureReason, disposeRenderer, disposeContext]);
 
   return (
     <div className="md:w-80 flex-shrink-0 flex items-center justify-center overflow-hidden h-[260px] relative w-full md:w-80">
@@ -848,7 +1058,7 @@ export default function ObjectCard({
       }
 
       try {
-        // @ts-expect-error - poscan is a custom RPC
+        // @ts-expect-error - poscan is a custom RPC method not in standard Polkadot types
         const result = await api.rpc.poscan.getPoscanObject(targetObjectIndex);
 
         // Check if request was cancelled
@@ -859,11 +1069,19 @@ export default function ObjectCard({
           return;
 
         let patchedResult = result;
-        if (result && !result.est_outliers && result.estOutliers) {
-          patchedResult = { ...result, est_outliers: result.estOutliers };
+        // Normalize estOutliers field names
+        if (result && !result.estOutliers && result.est_outliers) {
+          patchedResult = { ...result, estOutliers: result.est_outliers };
         }
         if (patchedResult && !patchedResult.prop && patchedResult.props) {
           patchedResult = { ...patchedResult, prop: patchedResult.props };
+        }
+        // Normalize rewards field names
+        if (patchedResult && !patchedResult.estRewards && patchedResult.est_rewards !== undefined) {
+          patchedResult = { ...patchedResult, estRewards: patchedResult.est_rewards };
+        }
+        if (patchedResult && !patchedResult.authorRewards && patchedResult.author_rewards !== undefined) {
+          patchedResult = { ...patchedResult, authorRewards: patchedResult.author_rewards };
         }
         if (patchedResult?.prop && Array.isArray(patchedResult.prop)) {
           const normalizedProps = patchedResult.prop.map(
@@ -921,8 +1139,8 @@ export default function ObjectCard({
             setRpcData(null);
           }
         }
-      } catch (e) {
-        console.error(`Failed to fetch object ${targetObjectIndex}:`, e);
+      } catch (error) {
+        console.error(`Failed to fetch object ${targetObjectIndex}:`, error);
         if (
           !signal.aborted &&
           currentObjectIndexRef.current === targetObjectIndex
@@ -1117,6 +1335,35 @@ export default function ObjectCard({
         intent: "none",
       };
 
+    // Check for QC-related statuses first (they might contain additional info)
+    if (stateKeys.includes("qcInspecting")) {
+      return {
+        label: "QC Inspecting",
+        icon: "eye-open" as BlueprintIcon,
+        intent: "warning",
+      };
+    }
+    if (stateKeys.includes("qcPassed")) {
+      return {
+        label: "QC Passed",
+        icon: "tick-circle" as BlueprintIcon,
+        intent: "success",
+      };
+    }
+    if (stateKeys.includes("qcRejected")) {
+      return {
+        label: "QC Rejected",
+        icon: "cross-circle" as BlueprintIcon,
+        intent: "danger",
+      };
+    }
+    if (stateKeys.includes("selfProved")) {
+      return {
+        label: "Self Proved",
+        icon: "shield" as BlueprintIcon,
+        intent: "primary",
+      };
+    }
     if (stateKeys.includes("approved")) {
       return {
         label: "Approved",
@@ -1171,8 +1418,18 @@ export default function ObjectCard({
   const stateInfo = getStateInfo();
 
   // Format rewards
-  const formatRewards = (amount: number) => {
-    return `${(amount / P3D_DECIMALS_FACTOR).toFixed(6)} P3D`;
+  const formatRewards = (amount: number | string | undefined | null) => {
+    if (amount === undefined || amount === null) {
+      return "0.000000 P3D";
+    }
+    
+    const numericAmount = typeof amount === 'string' ? Number(amount) : amount;
+    
+    if (isNaN(numericAmount) || !isFinite(numericAmount)) {
+      return "0.000000 P3D";
+    }
+    
+    return `${(numericAmount / P3D_DECIMALS_FACTOR).toFixed(6)} P3D`;
   };
 
   // Fetch property names for each propIdx in rpcData.prop

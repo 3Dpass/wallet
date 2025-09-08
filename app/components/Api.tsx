@@ -71,7 +71,7 @@ export function ApiCtxRoot({
     if (!api || keyringLoaded) {
       return;
     }
-    setKeyringLoaded(true);
+    
     const ss58format = api.registry.chainSS58 || ss58formats[NETWORK_MAINNET];
     setFormatOptions({
       decimals: api.registry.chainDecimals[0],
@@ -98,6 +98,8 @@ export function ApiCtxRoot({
     let subscription: { unsubscribe: () => void } | undefined;
 
     loadAllAccounts(ss58format).then(() => {
+      // Set keyring loaded AFTER the keyring is actually loaded
+      setKeyringLoaded(true);
       subscription = keyring.accounts.subject.subscribe(() => {
         setAccounts(keyring.getPairs());
       });
