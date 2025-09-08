@@ -22,6 +22,10 @@ export default function DialogUnvoteAll({ isOpen, onClose, selectedAccount }: Di
     if (!api || !selectedAccount) return;
     setIsLoading(true);
     try {
+      // Check if keyring is ready before getting pair
+      if (keyring.getPairs().length === 0 && keyring.getAccounts().length === 0) {
+        throw new Error("Keyring not ready");
+      }
       const pair = keyring.getPair(selectedAccount);
       const isLocked = pair.isLocked && !pair.meta.isInjected;
       if (isLocked) {

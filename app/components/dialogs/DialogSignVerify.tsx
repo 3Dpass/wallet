@@ -97,6 +97,10 @@ export default function DialogSignAndVerify({ pair, isOpen, onClose }: IProps) {
       });
       signature = signed.signature;
     } else {
+      // Check if keyring is ready before getting pair
+      if (keyring.getPairs().length === 0 && keyring.getAccounts().length === 0) {
+        throw new Error("Keyring not ready");
+      }
       const signer = keyring.getPair(data.address);
       signature = u8aToHex(await signer.sign(data.message));
     }
