@@ -1650,7 +1650,7 @@ export default function ObjectCard({
                     <td className="font-medium">
                       {objectData?.whenCreated ? (
                         <a
-                          href={`https://3dpscan.xyz/#/blocks/${objectData.whenCreated}`}
+                          href={`https://scan.p3d.top/#/blocks/${objectData.whenCreated}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline"
