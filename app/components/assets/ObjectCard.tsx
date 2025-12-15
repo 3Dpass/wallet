@@ -506,7 +506,7 @@ function ObjectDetailsTable({
                     (when:{" "}
                     {approver.when ? (
                       <a
-                        href={`https://3dpscan.xyz/#/blocks/${approver.when}`}
+                        href={`https://scan.p3d.top/#/blocks/${approver.when}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:underline"
