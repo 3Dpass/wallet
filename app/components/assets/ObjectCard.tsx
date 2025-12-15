@@ -506,7 +506,7 @@ function ObjectDetailsTable({
                     (when:{" "}
                     {approver.when ? (
                       <a
-                        href={`https://3dpscan.xyz/#/blocks/${approver.when}`}
+                        href={`https://scan.p3d.top/#/blocks/${approver.when}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:underline"
@@ -1297,7 +1297,7 @@ export default function ObjectCard({
             <>
               {label}:{" "}
               <a
-                href={`https://3dpscan.xyz/#/blocks/${v}`}
+                href={`https://scan.p3d.top/#/blocks/${v}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:underline"
@@ -1650,7 +1650,7 @@ export default function ObjectCard({
                     <td className="font-medium">
                       {objectData?.whenCreated ? (
                         <a
-                          href={`https://3dpscan.xyz/#/blocks/${objectData.whenCreated}`}
+                          href={`https://scan.p3d.top/#/blocks/${objectData.whenCreated}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline"
