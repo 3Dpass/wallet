@@ -1,16 +1,13 @@
 # 3DPass Web3 Wallet
-The wallet is a WEB3 UI for ["The Ledger of Things" (LoT)](https://github.com/3Dpass/3DP), which is a non-custodial js app that allows for import of user accounts directly or its injection from a third-party keychain extension (ex. from the [polka js](https://polkadot.js.org/extension/) extension).
-
-The wallet page: https://wallet.3dpass.org/
+The wallet is a WEB3 UI for ["The Ledger of Things" (LoT)](https://github.com/3Dpass/3DP), which is a non-custodial js app that allows for import of user accounts directly or its injection from a third-party keychain extension (ex. from the [polkadot js](https://polkadot.js.org/extension/) extension).
 
 [![DeepSource](https://app.deepsource.com/gh/3Dpass/wallet.svg/?label=resolved+issues&show_trend=true&token=z_DO8FXnvAQwY3HBOodOfScB)](https://app.deepsource.com/gh/3Dpass/wallet/)
 
-## Interaction
-The wallet interacts with the blockchain [Node](https://github.com/3Dpass/3DP) available via the RPC API websocket endpoint directly from your web browser. You can change the RPC API endpoint in Settings. Explore these ["How To" tips](https://3dpass.org/mainnet#wallet) for more detail.
+## Blockchain Network Interaction
+The wallet is interacting with the [Node](https://github.com/3Dpass/3DP) via RPC API websocket endpoint directly from the WEB browser. Default WSS endpoint is set up in the `app/atoms.ts`. You can also  [change](https://3dpass.org/mainnet#wallet) it in Settings from the WEB browser.
 
-### The LoT RPC API Endpoints:
+### The LoT RPC API providers:
 - Mainnet: [RPC API providers](https://github.com/3Dpass/rpc-list/blob/main/list.txt)
-- Testnet `wss://test-rpc.3dpass.org`
 - Local Node `wss://127.0.0.1:9944`
 
 ### Features:
