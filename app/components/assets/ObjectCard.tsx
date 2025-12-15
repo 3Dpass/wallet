@@ -1297,7 +1297,7 @@ export default function ObjectCard({
             <>
               {label}:{" "}
               <a
-                href={`https://3dpscan.xyz/#/blocks/${v}`}
+                href={`https://scan.p3d.top/#/blocks/${v}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:underline"
