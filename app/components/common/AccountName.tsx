@@ -131,7 +131,7 @@ export function AccountName({
 
   return (
     <a
-      href={`https://3dpscan.xyz/#/accounts/${address}`}
+      href={`https://scan.p3d.top/#/accounts/${address}`}
       className="no-underline group"
       target="_blank"
       rel="noreferrer"
