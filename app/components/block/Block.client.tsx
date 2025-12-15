@@ -152,7 +152,7 @@ const BlockStatus = ({
     return (
       <>
         <Link
-          to={`https://3dpscan.xyz/#/blocks/${blockNumber}`}
+          to={`https://scan.p3d.top/#/blocks/${blockNumber}`}
           target="_blank"
           rel="noopener noreferrer"
         >
