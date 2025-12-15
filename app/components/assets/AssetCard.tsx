@@ -803,7 +803,7 @@ export default function AssetCard({
         {/* Asset actions menu trigger */}
         <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
           <a
-            href={`https://3dpscan.xyz/#/assets/${assetId}`}
+            href={`https://scan.p3d.top/#/assets/${assetId}`}
             target="_blank"
             rel="noopener noreferrer"
             title={t("asset_card.view_on_explorer")}
